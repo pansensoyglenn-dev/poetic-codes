@@ -305,21 +305,17 @@
     <main>
         <article class="article-card">
             <h1>Mastering the 4 Pillars of Python OOP (2026 Edition)</h1>
-
-            
-
             <div class="intro">
                 Object-Oriented Programming (OOP) remains the bedrock of professional software engineering, providing a blueprint for building applications that are not just functional, but scalable and maintainable. In the landscape of 2026, where Python is the driving force behind AI agents, complex data pipelines, and microservices, understanding the "how" is no longer enough—you must master the "why." 
                 <br><br>
                 The traditional four pillars serve as an organizational framework that allows developers to model real-world entities into digital logic. While the core concepts haven't changed, the modern Python ecosystem has introduced sophisticated tools like structural typing with Protocols and memory-optimized Dataclasses to make these pillars more robust than ever before.
             </div>
-
             <div class="pillar">
                 <h3>1. Encapsulation</h3>
                 <p>Encapsulation is about creating a protective shield around an object's internal data. By bundling attributes and the methods that manipulate them into a single class, you control how the state is accessed and modified, preventing external "leaks" or accidental interference from other parts of the program.</p>
                 <p>In practice, this reduces bugs caused by direct attribute manipulation and makes refactoring safer. Python's convention of using a single underscore <code>_</code> for "protected" and double underscore <code>__</code> for name-mangled "private" members helps signal intent—even though nothing is truly private.</p>
                 <div class="modern-note"><strong>2026 Strategy</strong>: Use <code>@dataclass(slots=True)</code> to lock down attributes and save memory. Slots prevent arbitrary attribute creation (which wastes RAM in large-scale systems) and give ~20–40% better memory usage + faster attribute access in performance-critical code like ML pipelines or simulation engines.</div>
-                <a href="https://pansensoyglenn-dev.github.io/poetic-codes/encapsulation.html" class="toggle-btn">Encapsulation Show Examples →</a>
+                <a href="../https://pansensoyglenn-dev.github.io/poetic-codes/encapsulation.html" class="toggle-btn">Encapsulation Show Examples →</a>
             </div>
 
             <div class="pillar">
@@ -329,7 +325,6 @@
                 <div class="modern-note"><strong>2026 Strategy</strong>: <code>typing.Protocol</code> is now the preferred way to define "Duck Typed" interfaces. Structural subtyping (via Protocols) gives you interface-like behavior without forcing inheritance — perfect for plugin systems, testing mocks, and clean dependency injection in 2026-era Python projects.</div>
                 <a href="abstraction.html" class="toggle-btn">Abstraction Show Examples →</a>
             </div>
-
             <div class="pillar">
                 <h3>3. Inheritance</h3>
                 <p>Inheritance enables a class to adopt the behavior and data of another class, promoting code reuse. It establishes a hierarchy that reflects "is-a" relationships. However, modern best practices advise using inheritance sparingly, often favoring composition to avoid creating rigid and fragile class structures that are hard to change.</p>
