@@ -1,0 +1,122 @@
+<div id="cookie-banner" class="cookie-container">
+    <div class="cookie-content">
+        <div class="cookie-text">
+            <span class="cookie-icon">🍪</span>
+            <p>
+                We use cookies to enhance your experience and serve relevant ads via <strong>Google AdSense</strong>. 
+                By clicking "Accept", you consent to our use of cookies. 
+                Read our <a href="cookie.html">Cookie Policy</a>.
+            </p>
+        </div>
+        <div class="cookie-actions">
+            <button onclick="acceptCookies()" class="btn-accept">Accept</button>
+            <button onclick="closeBanner()" class="btn-close">Decline</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Obsidian & Midnight Blue Banner Style */
+    .cookie-container {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 800px;
+        background-color: #0b0e14; /* Obsidian */
+        border: 1px solid #1a2a44; /* Midnight Blue */
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+        border-radius: 12px;
+        padding: 20px;
+        z-index: 9999;
+        display: none; /* Hidden by default, shown via JS */
+        animation: slideUp 0.5s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { bottom: -100px; opacity: 0; }
+        to { bottom: 20px; opacity: 1; }
+    }
+
+    .cookie-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .cookie-text {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex: 1;
+    }
+
+    .cookie-icon { font-size: 1.5rem; }
+
+    .cookie-text p {
+        color: #e0e6ed;
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .cookie-text a {
+        color: #3d7afe;
+        text-decoration: underline;
+    }
+
+    .cookie-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-accept {
+        background-color: #3d7afe; /* Accent Blue */
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .btn-accept:hover { background-color: #2a5ecb; }
+
+    .btn-close {
+        background-color: transparent;
+        color: #94a3b8;
+        border: 1px solid #1a2a44;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .btn-close:hover { background-color: #1a2a44; color: white; }
+
+    @media (max-width: 600px) {
+        .cookie-content { flex-direction: column; text-align: center; }
+        .cookie-text { flex-direction: column; }
+    }
+</style>
+
+<script>
+    // Logic to show/hide the banner
+    window.onload = function() {
+        if (!localStorage.getItem("cookiesAccepted")) {
+            document.getElementById("cookie-banner").style.display = "block";
+        }
+    };
+
+    function acceptCookies() {
+        localStorage.setItem("cookiesAccepted", "true");
+        document.getElementById("cookie-banner").style.display = "none";
+    }
+
+    function closeBanner() {
+        document.getElementById("cookie-banner").style.display = "none";
+    }
+</script>
