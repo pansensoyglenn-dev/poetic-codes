@@ -315,7 +315,7 @@
                 <p>Encapsulation is about creating a protective shield around an object's internal data. By bundling attributes and the methods that manipulate them into a single class, you control how the state is accessed and modified, preventing external "leaks" or accidental interference from other parts of the program.</p>
                 <p>In practice, this reduces bugs caused by direct attribute manipulation and makes refactoring safer. Python's convention of using a single underscore <code>_</code> for "protected" and double underscore <code>__</code> for name-mangled "private" members helps signal intent—even though nothing is truly private.</p>
                 <div class="modern-note"><strong>2026 Strategy</strong>: Use <code>@dataclass(slots=True)</code> to lock down attributes and save memory. Slots prevent arbitrary attribute creation (which wastes RAM in large-scale systems) and give ~20–40% better memory usage + faster attribute access in performance-critical code like ML pipelines or simulation engines.</div>
-                <a href="encapsulation/encapsulation.html" class="toggle-btn">Encapsulation Show Examples →</a>
+                <a href="../encapsulation/encapsulation.html" class="toggle-btn">Encapsulation Show Examples →</a>
             </div>
 
             <div class="pillar">
