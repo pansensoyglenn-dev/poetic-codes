@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Master the 4 Pillars of Python OOP with modern 2026 best practices: encapsulation, abstraction, inheritance, polymorphism + dataclasses, slots & protocols.">
+    <title>Mastering the 4 Pillars of Python OOP | Poetic Codes 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --obsidian-bg: #0d1117;
+            --midnight-blue: #161b22;
+            --electric-blue: #58a6ff;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --accent-orange: #f0883e;
+            --border: #30363d;
+            --code-bg: #0d1117;
+            --code-border: #f0883e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--obsidian-bg);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--midnight-blue);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--electric-blue);
+            font-weight: 700;
+            font-size: 1.4rem;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .hamburger {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .hamburger span {
+            width: 28px;
+            height: 3px;
+            background: var(--electric-blue);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .nav-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--midnight-blue);
+            transform: translateX(100%);
+            transition: transform 0.4s ease;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-overlay.active { transform: translateX(0); }
+
+        .nav-overlay a {
+            color: var(--text-main);
+            font-size: 1.6rem;
+            margin: 1.2rem 0;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-overlay a:hover { color: var(--electric-blue); }
+
+        .hamburger.active span:nth-child(1) { transform: translateY(10px) rotate(45deg); }
+        .hamburger.active span:nth-child(2) { opacity: 0; }
+        .hamburger.active span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
+
+        main {
+            flex: 1;
+            padding: 3rem 1rem;
+            max-width: 1150px; 
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .article-card {
+            background: var(--midnight-blue);
+            padding: 2.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        h1 {
+            color: var(--electric-blue);
+            font-size: 1.85rem; 
+            margin-bottom: 1.2rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.8rem;
+            letter-spacing: -0.5px;
+            text-align: left; /* Titles usually look better left-aligned even when body is justified */
+        }
+
+        .intro {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            border-left: 4px solid var(--electric-blue);
+            padding-left: 1.2rem;
+            margin: 1.5rem 0 2.5rem;
+            text-align: justify; /* Justified text */
+            hyphens: auto;
+        }
+
+        .pillar {
+            background: var(--obsidian-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 2.2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+
+        .pillar:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(88,166,255,0.12);
+        }
+
+        .pillar h3 {
+            color: var(--accent-orange);
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .pillar p {
+            margin-bottom: 1rem;
+            color: var(--text-main);
+            max-width: 100%;
+            text-align: justify; /* Justified text */
+            hyphens: auto;
+        }
+
+        .modern-note {
+            background: rgba(88,166,255,0.06);
+            border-left: 4px solid var(--electric-blue);
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            text-align: justify;
+        }
+
+        button.toggle-btn {
+            background: transparent;
+            border: 1px solid var(--electric-blue);
+            color: var(--electric-blue);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.25s;
+            margin-top: 0.5rem;
+        }
+
+        button.toggle-btn:hover {
+            background: var(--electric-blue);
+            color: white;
+        }
+
+        .code-snippet {
+            display: none;
+            background: var(--code-bg);
+            color: #c9d1d9;
+            padding: 1.5rem;
+            margin-top: 1.2rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--code-border);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.95rem;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            text-align: left; /* Code should never be justified */
+        }
+
+        footer {
+            background: var(--midnight-blue);
+            border-top: 1px solid var(--border);
+            padding: 3rem 1.5rem 2rem;
+            margin-top: auto;
+        }
+
+        .footer-grid {
+            max-width: 1150px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .footer-col h4 {
+            color: var(--electric-blue);
+            font-size: 0.9rem;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .footer-col a {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.7rem;
+            transition: color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .footer-col a:hover { color: var(--accent-orange); }
+
+        .legal {
+            text-align: center;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: #6e7681;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 768px) {
+            .article-card { padding: 1.5rem; }
+            h1 { font-size: 1.6rem; }
+            .pillar { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="https://poetic-codes.blogspot.com" class="logo">POETIC CODES</a>
+        <div class="hamburger" onclick="toggleMenu()">
+            <span></span><span></span><span></span>
+        </div>
+    </header>
+
+    <nav class="nav-overlay" id="navOverlay">
+        <a href="https://poetic-codes.blogspot.com" onclick="toggleMenu()">Home</a>
+        <a href="https://poetic-codes.blogspot.com/p/python-intro.html" onclick="toggleMenu()">Python Intro</a>
+        <a href="https://poetic-codes.blogspot.com/p/oop-intro.html" onclick="toggleMenu()">OOP Intro</a>
+        <a href="https://poetic-codes.blogspot.com/p/privacy.html" onclick="toggleMenu()">Privacy</a>
+    </nav>
+
+    <main>
+        <article class="article-card">
+            <h1>Mastering the 4 Pillars of Python OOP (2026 Edition)</h1>
+
+            
+            <div class="intro">
+                Object-Oriented Programming (OOP) remains the bedrock of professional software engineering, providing a blueprint for building applications that are not just functional, but scalable and maintainable. In the landscape of 2026, where Python is the driving force behind AI agents, complex data pipelines, and microservices, understanding the "how" is no longer enough—you must master the "why." 
+                <br><br>
+                The traditional four pillars serve as an organizational framework that allows developers to model real-world entities into digital logic. While the core concepts haven't changed, the modern Python ecosystem has introduced sophisticated tools like structural typing with Protocols and memory-optimized Dataclasses to make these pillars more robust than ever before.
+            </div>
+
+            <div class="pillar">
+                <h3>1. Encapsulation</h3>
+                <p>Encapsulation is about creating a protective shield around an object's internal data. By bundling attributes and the methods that manipulate them into a single class, you control how the state is accessed and modified, preventing external "leaks" or accidental interference from other parts of the program.</p>
+                <div class="modern-note"><strong>2026 Strategy</strong>: Use <code>@dataclass(slots=True)</code> to lock down attributes and save memory.</div>
+                <button class="toggle-btn" onclick="toggleSnippet('encap')">View Code Examples</button>
+                <div id="encap" class="code-snippet">
+<code>from dataclasses import dataclass, field
+
+@dataclass(slots=True, frozen=True)
+class SecureVault:
+    _key: str = field(repr=False) 
+    balance: float = 0.0
+
+    @property
+    def vault_status(self) -> str:
+        return "Active" if self.balance > 0 else "Empty"</code>
+                </div>
+            </div>
+
+            <div class="pillar">
+                <h3>2. Abstraction</h3>
+                <p>Abstraction is the art of "simplification through concealment." It allows you to expose only the necessary interfaces to a user while hiding the underlying complexity. By focusing on what an object does rather than how it does it, you create more intuitive and decoupled codebases that are easier to maintain.</p>
+                <div class="modern-note"><strong>2026 Strategy</strong>: <code>typing.Protocol</code> is now the preferred way to define "Duck Typed" interfaces.</div>
+                <button class="toggle-btn" onclick="toggleSnippet('abstr')">View Code Examples</button>
+                <div id="abstr" class="code-snippet">
+<code>from typing import Protocol
+
+class Drawable(Protocol):
+    def draw(self) -> None: ...
+
+class Circle:
+    def draw(self) -> None:
+        print("Rendering pixels for a circle...")</code>
+                </div>
+            </div>
+
+            <div class="pillar">
+                <h3>3. Inheritance</h3>
+                <p>Inheritance enables a class to adopt the behavior and data of another class, promoting code reuse. It establishes a hierarchy that reflects "is-a" relationships. However, modern best practices advise using inheritance sparingly, often favoring composition to avoid creating rigid and fragile class structures that are hard to change.</p>
+                <button class="toggle-btn" onclick="toggleSnippet('inherit')">View Code Examples</button>
+                <div id="inherit" class="code-snippet">
+<code>class BaseModel:
+    def save(self):
+        print("Saving to database...")
+
+class User(BaseModel):
+    def sign_up(self):
+        self.save()
+        print("User registered!")</code>
+                </div>
+            </div>
+
+            <div class="pillar">
+                <h3>4. Polymorphism</h3>
+                <p>Polymorphism allows different types of objects to be accessed through the same interface. It means "many forms," enabling a single function or method to behave differently based on the object it is acting upon. This leads to highly flexible code that can handle new data types without changing its core structural logic.</p>
+                <button class="toggle-btn" onclick="toggleSnippet('poly')">View Code Examples</button>
+                <div id="poly" class="code-snippet">
+<code>shapes = [Circle(), Square(), Triangle()]
+
+for shape in shapes:
+    shape.draw()  # Each executes its own specific logic</code>
+                </div>
+            </div>
+
+        </article>
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Learning Paths</h4>
+                <a href="https://poetic-codes.blogspot.com/p/python-intro.html">Python Introduction</a>
+                <a href="https://poetic-codes.blogspot.com/p/oop-intro.html">OOP Foundations</a>
+                <a href="https://poetic-codes.blogspot.com">Latest Articles</a>
+            </div>
+            <div class="footer-col">
+                <h4>Compliance & Links</h4>
+                <a href="https://poetic-codes.blogspot.com/p/privacy.html">Privacy Policy</a>
+                <a href="https://poetic-codes.blogspot.com/p/terms.html">Terms of Service</a>
+                <a href="https://poetic-codes.blogspot.com/p/cookie.html">Cookie Policy</a>
+            </div>
+        </div>
+        <div class="legal">
+            © 2026 Poetic Codes | Crafting Pythonic Excellence
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.querySelector('.hamburger').classList.toggle('active');
+            document.getElementById('navOverlay').classList.toggle('active');
+            document.body.style.overflow = document.getElementById('navOverlay').classList.contains('active') ? 'hidden' : 'auto';
+        }
+
+        function toggleSnippet(id) {
+            const el = document.getElementById(id);
+            const isVisible = el.style.display === 'block';
+            el.style.display = isVisible ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>
