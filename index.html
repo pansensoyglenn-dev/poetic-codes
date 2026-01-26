@@ -98,18 +98,18 @@
 
         main {
             flex: 1;
-            padding: 3rem 1rem;
-            max-width: 1150px; 
+            padding: 2rem 1rem;
+            max-width: 1200px; 
             margin: 0 auto;
             width: 100%;
         }
 
         .article-card {
             background: var(--midnight-blue);
-            padding: 2.5rem;
+            padding: 1.5rem;
             border-radius: 12px;
             border: 1px solid var(--border);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
         h1 {
@@ -119,13 +119,7 @@
             border-bottom: 2px solid var(--border);
             padding-bottom: 0.8rem;
             letter-spacing: -0.5px;
-            text-align: left;
-        }
-
-        /* ALL TEXT JUSTIFIED */
-        .intro, .pillar p, .modern-note, .outro-content p {
-            text-align: justify;
-            hyphens: auto;
+            text-align: left; /* Headers should remain left-aligned */
         }
 
         .intro {
@@ -134,13 +128,15 @@
             border-left: 4px solid var(--electric-blue);
             padding-left: 1.2rem;
             margin: 1.5rem 0 2.5rem;
+            text-align: justify;
+            hyphens: auto;
         }
 
         .pillar {
             background: var(--obsidian-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 2.2rem;
+            padding: 1.5rem;
             margin-bottom: 2rem;
             transition: transform 0.2s, box-shadow 0.2s;
             width: 100%;
@@ -160,7 +156,8 @@
         .pillar p {
             margin-bottom: 1rem;
             color: var(--text-main);
-            max-width: 100%;
+            text-align: justify;
+            hyphens: auto;
         }
 
         .modern-note {
@@ -170,21 +167,16 @@
             margin: 1.5rem 0;
             border-radius: 6px;
             font-size: 0.95rem;
+            text-align: justify;
+            hyphens: auto;
         }
 
-        /* OUTRO SECTION STYLING */
-        .outro-section {
-            margin-top: 4rem;
-            border-top: 1px solid var(--border);
-            padding-top: 2rem;
+        .modern-note strong {
+            color: var(--accent-orange);
         }
 
-        .outro-section h2 {
-            color: var(--electric-blue);
-            margin-bottom: 1.5rem;
-        }
-
-        button.toggle-btn {
+        .toggle-btn {
+            display: inline-block;
             background: transparent;
             border: 1px solid var(--electric-blue);
             color: var(--electric-blue);
@@ -194,75 +186,103 @@
             font-weight: 500;
             transition: all 0.25s;
             margin-top: 0.5rem;
+            text-decoration: none;
+            font-size: 0.9rem;
+            text-align: center;
         }
 
-        button.toggle-btn:hover {
+        .toggle-btn:hover {
             background: var(--electric-blue);
             color: white;
+            transform: translateY(-2px);
         }
 
-        .code-snippet {
-            display: none;
-            background: var(--code-bg);
-            color: #c9d1d9;
+        .conclusion {
+            margin-top: 3rem;
             padding: 1.5rem;
-            margin-top: 1.2rem;
-            border-radius: 8px;
-            border-left: 4px solid var(--code-border);
-            font-family: 'Fira Code', monospace;
-            font-size: 0.95rem;
-            overflow-x: auto;
-            white-space: pre-wrap;
+            background: rgba(88,166,255,0.04);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .conclusion h2 {
+            color: var(--electric-blue);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
             text-align: left;
         }
 
+        .conclusion p {
+            text-align: justify;
+            hyphens: auto;
+        }
+
+        .outro {
+            margin-top: 3rem;
+            text-align: center; /* Outro is typically centered for impact */
+            padding: 2rem 1.2rem;
+            background: var(--midnight-blue);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .outro h3 {
+            color: var(--accent-orange);
+            margin-bottom: 1.2rem;
+        }
+
+        /* --- Footer (Consistent with atm.html) --- */
         footer {
             background: var(--midnight-blue);
             border-top: 1px solid var(--border);
-            padding: 3rem 1.5rem 2rem;
+            padding: 4rem 1.5rem 2rem;
             margin-top: auto;
         }
 
         .footer-grid {
-            max-width: 1150px;
+            max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
         }
 
         .footer-col h4 {
             color: var(--electric-blue);
-            font-size: 0.9rem;
-            margin-bottom: 1.2rem;
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 2px;
+            font-weight: 700;
         }
 
         .footer-col a {
             color: var(--text-muted);
             text-decoration: none;
             display: block;
-            margin-bottom: 0.7rem;
-            transition: color 0.2s;
+            margin-bottom: 0.8rem;
+            transition: all 0.3s ease;
             font-size: 0.95rem;
         }
 
-        .footer-col a:hover { color: var(--accent-orange); }
+        .footer-col a:hover {
+            color: var(--accent-orange);
+            transform: translateX(5px);
+        }
 
         .legal {
             text-align: center;
-            margin-top: 2.5rem;
-            padding-top: 1.5rem;
+            margin-top: 4rem;
+            padding-top: 2rem;
             border-top: 1px solid var(--border);
-            color: #6e7681;
+            color: var(--text-muted);
             font-size: 0.85rem;
         }
 
         @media (max-width: 768px) {
-            .article-card { padding: 1.5rem; }
+            .article-card { padding: 1.2rem; }
             h1 { font-size: 1.6rem; }
-            .pillar { padding: 1.5rem; }
+            .pillar { padding: 1.2rem; }
         }
     </style>
 </head>
@@ -286,84 +306,63 @@
         <article class="article-card">
             <h1>Mastering the 4 Pillars of Python OOP (2026 Edition)</h1>
 
+            
+
             <div class="intro">
                 Object-Oriented Programming (OOP) remains the bedrock of professional software engineering, providing a blueprint for building applications that are not just functional, but scalable and maintainable. In the landscape of 2026, where Python is the driving force behind AI agents, complex data pipelines, and microservices, understanding the "how" is no longer enough—you must master the "why." 
                 <br><br>
                 The traditional four pillars serve as an organizational framework that allows developers to model real-world entities into digital logic. While the core concepts haven't changed, the modern Python ecosystem has introduced sophisticated tools like structural typing with Protocols and memory-optimized Dataclasses to make these pillars more robust than ever before.
             </div>
-            
+
             <div class="pillar">
                 <h3>1. Encapsulation</h3>
                 <p>Encapsulation is about creating a protective shield around an object's internal data. By bundling attributes and the methods that manipulate them into a single class, you control how the state is accessed and modified, preventing external "leaks" or accidental interference from other parts of the program.</p>
-                <div class="modern-note"><strong>2026 Strategy</strong>: Use <code>@dataclass(slots=True)</code> to lock down attributes and save memory.</div>
-                <button class="toggle-btn" onclick="toggleSnippet('encap')">View Code Examples</button>
-                <div id="encap" class="code-snippet">
-<code>from dataclasses import dataclass, field
-
-@dataclass(slots=True, frozen=True)
-class SecureVault:
-    _key: str = field(repr=False) 
-    balance: float = 0.0
-
-    @property
-    def vault_status(self) -> str:
-        return "Active" if self.balance > 0 else "Empty"</code>
-                </div>
+                <p>In practice, this reduces bugs caused by direct attribute manipulation and makes refactoring safer. Python's convention of using a single underscore <code>_</code> for "protected" and double underscore <code>__</code> for name-mangled "private" members helps signal intent—even though nothing is truly private.</p>
+                <div class="modern-note"><strong>2026 Strategy</strong>: Use <code>@dataclass(slots=True)</code> to lock down attributes and save memory. Slots prevent arbitrary attribute creation (which wastes RAM in large-scale systems) and give ~20–40% better memory usage + faster attribute access in performance-critical code like ML pipelines or simulation engines.</div>
+                <a href="encapsulation.html" class="toggle-btn">Encapsulation Show Examples →</a>
             </div>
 
             <div class="pillar">
                 <h3>2. Abstraction</h3>
                 <p>Abstraction is the art of "simplification through concealment." It allows you to expose only the necessary interfaces to a user while hiding the underlying complexity. By focusing on what an object does rather than how it does it, you create more intuitive and decoupled codebases that are easier to maintain.</p>
-                <div class="modern-note"><strong>2026 Strategy</strong>: <code>typing.Protocol</code> is now the preferred way to define "Duck Typed" interfaces.</div>
-                <button class="toggle-btn" onclick="toggleSnippet('abstr')">View Code Examples</button>
-                <div id="abstr" class="code-snippet">
-<code>from typing import Protocol
-
-class Drawable(Protocol):
-    def draw(self) -> None: ...
-
-class Circle:
-    def draw(self) -> None:
-        print("Rendering pixels for a circle...")</code>
-                </div>
+                <p>Good abstraction reduces cognitive load: library users shouldn't need to understand file I/O internals to call <code>.save()</code>, or know database schemas to query <code>.filter()</code>.</p>
+                <div class="modern-note"><strong>2026 Strategy</strong>: <code>typing.Protocol</code> is now the preferred way to define "Duck Typed" interfaces. Structural subtyping (via Protocols) gives you interface-like behavior without forcing inheritance — perfect for plugin systems, testing mocks, and clean dependency injection in 2026-era Python projects.</div>
+                <a href="abstraction.html" class="toggle-btn">Abstraction Show Examples →</a>
             </div>
 
             <div class="pillar">
                 <h3>3. Inheritance</h3>
                 <p>Inheritance enables a class to adopt the behavior and data of another class, promoting code reuse. It establishes a hierarchy that reflects "is-a" relationships. However, modern best practices advise using inheritance sparingly, often favoring composition to avoid creating rigid and fragile class structures that are hard to change.</p>
-                <button class="toggle-btn" onclick="toggleSnippet('inherit')">View Code Examples</button>
-                <div id="inherit" class="code-snippet">
-<code>class BaseModel:
-    def save(self):
-        print("Saving to database...")
-
-class User(BaseModel):
-    def sign_up(self):
-        self.save()
-        print("User registered!")</code>
-                </div>
+                <p>Deep inheritance trees frequently lead to the infamous "fragile base class problem" — small changes high up break many subclasses. In 2026, senior engineers almost always prefer "has-a" (composition) or "uses-a" (dependency injection) over deep "is-a" hierarchies.</p>
+                <div class="modern-note"><strong>2026 Best Practice</strong>: Favor composition over inheritance. Use mixins only for very narrow, orthogonal behaviors. Leverage Protocols + composition for flexible, testable systems that scale without exploding class hierarchies.</div>
+                <a href="inheritance.html" class="toggle-btn">Inheritance Show Examples →</a>
             </div>
 
             <div class="pillar">
                 <h3>4. Polymorphism</h3>
                 <p>Polymorphism allows different types of objects to be accessed through the same interface. It means "many forms," enabling a single function or method to behave differently based on the object it is acting upon. This leads to highly flexible code that can handle new data types without changing its core structural logic.</p>
-                <button class="toggle-btn" onclick="toggleSnippet('poly')">View Code Examples</button>
-                <div id="poly" class="code-snippet">
-<code>shapes = [Circle(), Square(), Triangle()]
-
-for shape in shapes:
-    shape.draw()  # Each executes its own specific logic</code>
-                </div>
+                <p>Python's duck typing + Protocols make polymorphism especially elegant—no need for explicit interfaces in most cases, yet you still get strong type checking when desired.</p>
+                <div class="modern-note"><strong>2026 Strategy</strong>: Combine polymorphism with Protocols for runtime-flexible yet statically-checkable code. This pattern shines in event handlers, serializers, renderers, and AI agent toolkits where behavior varies by concrete type.</div>
+                <a href="polymorphism.html" class="toggle-btn">Polymorphism Show Examples →</a>
             </div>
 
-            <section class="outro-section">
-                <h2>The 2026 Developer's Verdict</h2>
-                <div class="outro-content">
-                    <p>Understanding these four pillars is akin to learning the grammar of a language; you can speak without them, but you cannot write a masterpiece. In 2026, the shift towards functional programming and composition has not made OOP obsolete—it has simply made it more refined. By combining <strong>Encapsulation</strong> with memory-efficient <code>__slots__</code>, using <strong>Abstraction</strong> through <code>Protocols</code> for better testing, and applying <strong>Polymorphism</strong> to build plugin-based architectures, you ensure your code survives the test of scale.</p>
-                    <br>
-                    <p>The key to "Pythonic Excellence" lies in knowing when to apply these patterns. Avoid the "Super Object" anti-pattern and remember that inheritance should be your last resort, not your first tool. As you continue your journey with Poetic Codes, focus on building systems that are as beautiful as they are functional.</p>
-                </div>
-            </section>
+            <div class="conclusion">
+                <h2>Putting It All Together in 2026</h2>
+                <p>The four pillars are timeless, but how we apply them has evolved. Today's professional Python code leans heavily toward:</p>
+                <ul style="margin: 1rem 0 1rem 1.8rem; list-style-type: disc; color: var(--text-main);">
+                    <li>Composition + small, focused classes</li>
+                    <li>Structural typing (Protocols) instead of rigid ABCs</li>
+                    <li>Memory-aware patterns with <code>slots=True</code></li>
+                    <li>Strong typing where it adds safety (especially in teams > 5 devs)</li>
+                </ul>
+                <p>Mastering these pillars isn't about memorizing definitions — it's about choosing the right tool for readability, performance, and long-term maintainability in real 2026 systems.</p>
+            </div>
+
+            <div class="outro">
+                <h3>Ready to Level Up Your OOP Game?</h3>
+                <p>Click the buttons above to dive into concrete, production-ready code examples for each pillar — complete with 2026-style patterns, type hints, and explanations of when to break the "rules."</p>
+                <a href="https://github.com/pansensoyglenn-dev/poetic-codes" class="toggle-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;">Explore the Full Repo on GitHub</a>
+            </div>
 
         </article>
     </main>
@@ -377,15 +376,21 @@ for shape in shapes:
                 <a href="./index.html">Latest Articles</a>
             </div>
             <div class="footer-col">
-                <h4>Compliance & Links</h4>
-                <a href="./about-us.html">About Us</a>
+                <h4>Resources</h4>
+                <a href="https://github.com/pansensoyglenn-dev/poetic-codes">GitHub Repository</a>
+                <a href="./docs.html">Documentation</a>
+                <a href="./community.html">Community Forum</a>
+            </div>
+            <div class="footer-col">
+                <h4>Compliance</h4>
+                <a href="./about.html">About Us</a>
                 <a href="./privacy.html">Privacy Policy</a>
                 <a href="./terms.html">Terms of Service</a>
                 <a href="./cookie.html">Cookie Policy</a>
             </div>
         </div>
         <div class="legal">
-            © 2026 Poetic Codes | Crafting Pythonic Excellence
+            © 2026 Poetic Codes | Crafted for <a href="https://github.com/pansensoyglenn-dev/poetic-codes" style="color: inherit;">GitHub Pages</a>
         </div>
     </footer>
 
@@ -394,12 +399,6 @@ for shape in shapes:
             document.querySelector('.hamburger').classList.toggle('active');
             document.getElementById('navOverlay').classList.toggle('active');
             document.body.style.overflow = document.getElementById('navOverlay').classList.contains('active') ? 'hidden' : 'auto';
-        }
-
-        function toggleSnippet(id) {
-            const el = document.getElementById(id);
-            const isVisible = el.style.display === 'block';
-            el.style.display = isVisible ? 'none' : 'block';
         }
     </script>
 </body>
