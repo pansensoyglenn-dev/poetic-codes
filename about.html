@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Poetic Codes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --obsidian-bg: #0d1117;
+            --midnight-blue: #161b22;
+            --electric-blue: #58a6ff;
+            --text-main: #ffffff;
+            --text-muted: #f0f0f0;
+            --accent-orange: #f0883e;
+            --purple-accent: #bc8cff;
+            --border: #30363d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--obsidian-bg);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.75;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--midnight-blue);
+            border-bottom: 1px solid var(--border);
+            padding: 1.2rem 5vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--electric-blue);
+            font-weight: 700;
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn {
+            color: var(--electric-blue);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--electric-blue);
+            color: white;
+        }
+
+        main {
+            flex: 1;
+            padding: clamp(2rem, 4vw, 3rem) 5vw;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .about-container {
+            background: var(--midnight-blue);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: clamp(2rem, 4vw, 3rem);
+        }
+
+        h1 {
+            color: var(--electric-blue);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+            margin: 2.5rem 0 1rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        p, li {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .hero-icon {
+            font-size: 3rem;
+            color: var(--electric-blue);
+            margin-bottom: 1rem;
+        }
+
+        .mission-statement {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(188, 140, 255, 0.1));
+            border-left: 4px solid var(--accent-orange);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .team-section {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(88, 166, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .team-avatar {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, var(--electric-blue), var(--purple-accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            flex-shrink: 0;
+        }
+
+        .team-info h3 {
+            color: var(--electric-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .team-title {
+            color: var(--accent-orange);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .value-card {
+            background: rgba(88, 166, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .value-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--electric-blue);
+        }
+
+        .value-icon {
+            font-size: 2rem;
+            color: var(--electric-blue);
+            margin-bottom: 1rem;
+        }
+
+        .value-card h4 {
+            color: var(--accent-orange);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 1.5rem;
+            background: rgba(88, 166, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--electric-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        footer {
+            background: #0b0f1c;
+            border-top: 1px solid var(--border);
+            padding: 3rem 5vw 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .footer-links a {
+            color: var(--electric-blue);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .team-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .team-avatar {
+                width: 120px;
+                height: 120px;
+                font-size: 2.5rem;
+            }
+            
+            .values-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="./index.html" class="logo">
+            <i class="fas fa-code"></i>
+            POETIC CODES
+        </a>
+        <a href="./index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </header>
+
+    <main>
+        <div class="about-container">
+            <div class="hero-section">
+                <div class="hero-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h1>About Poetic Codes</h1>
+                <p style="font-size: 1.2rem; color: var(--accent-orange); font-weight: 600;">
+                    Where Logic Meets Literature in Programming Education
+                </p>
+            </div>
+
+            <div class="mission-statement">
+                <p style="font-size: 1.1rem; font-style: italic;">
+                    "We believe that programming is not just about writing code—it's about telling stories, 
+                    solving puzzles, and creating beauty through logical expression. Poetic Codes bridges 
+                    the gap between technical precision and creative expression."
+                </p>
+            </div>
+
+            <h2>Our Story</h2>
+            <p>Poetic Codes began as a personal journey of Glenn Pansensoy, a web developer from Zamboanga Sibugay, Philippines, who discovered that the most effective way to teach programming concepts was through the lens of storytelling and real-world applications.</p>
+            <p>What started as a collection of Python tutorials has grown into a comprehensive learning platform that serves thousands of developers worldwide, helping them master Python OOP through clear explanations, practical examples, and engaging projects.</p>
+
+            <div class="team-section">
+                <div class="team-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="team-info">
+                    <h3>Glenn Junsay Pansensoy</h3>
+                    <div class="team-title">Founder & Lead Developer</div>
+                    <p>A passionate web developer specializing in Python, JavaScript, and modern web technologies. With years of experience in both teaching and development, Glenn created Poetic Codes to make complex programming concepts accessible to everyone.</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Zamboanga Sibugay, Philippines</p>
+                </div>
+            </div>
+
+            <h2>Our Mission</h2>
+            <p>To democratize programming education by providing high-quality, accessible resources that transform beginners into confident developers and help experienced programmers stay current with modern best practices.</p>
+
+            <h2>Our Values</h2>
+            <div class="values-grid">
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h4>Accessible Education</h4>
+                    <p>Breaking down complex concepts into understandable lessons that anyone can follow.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h4>Practical Learning</h4>
+                    <p>Focusing on real-world applications and hands-on projects that build actual skills.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4>Community First</h4>
+                    <p>Building a supportive community where developers can learn, share, and grow together.</p>
+                </div>
+                <div class="value-card">
+                    <div class="value-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h4>Modern Approach</h4>
+                    <p>Teaching 2026 best practices and keeping content updated with the latest trends.</p>
+                </div>
+            </div>
+
+            <h2>What We Offer</h2>
+            <ul>
+                <li><strong>Comprehensive Python OOP Guide:</strong> From basics to advanced patterns</li>
+                <li><strong>Interactive Code Examples:</strong> Learn by doing with real code</li>
+                <li><strong>Project-Based Learning:</strong> Build actual applications</li>
+                <li><strong>Best Practices:</strong> Industry standards for professional development</li>
+                <li><strong>Free Resources:</strong> All content is freely available to everyone</li>
+            </ul>
+
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">10,000+</div>
+                    <div class="stat-label">Monthly Learners</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">500+</div>
+                    <div class="stat-label">Code Examples</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Tutorials</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Access</div>
+                </div>
+            </div>
+
+            <h2>Join Our Community</h2>
+            <p>Whether you're just starting your programming journey or looking to level up your skills, Poetic Codes is here to help. All our content is free, open-source, and created with care for the global developer community.</p>
+            
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="./index.html" class="back-btn" style="display: inline-block; margin-right: 1rem;">
+                    <i class="fas fa-home"></i> Start Learning
+                </a>
+                <a href="https://github.com/pansensoyglenn-dev/poetic-codes" class="back-btn" target="_blank" rel="noopener noreferrer" style="display: inline-block;">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="./index.html">Home</a>
+                <a href="./python-intro.html">Python Intro</a>
+                <a href="./oop-intro.html">OOP Foundations</a>
+                <a href="./projects.html">Projects</a>
+                <a href="./contact.html">Contact</a>
