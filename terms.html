@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | Poetic Codes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --obsidian-bg: #0d1117;
+            --midnight-blue: #161b22;
+            --electric-blue: #58a6ff;
+            --text-main: #ffffff;
+            --text-muted: #f0f0f0;
+            --accent-orange: #f0883e;
+            --warning-yellow: #d29922;
+            --danger-red: #f85149;
+            --border: #30363d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--obsidian-bg);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.75;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--midnight-blue);
+            border-bottom: 1px solid var(--border);
+            padding: 1.2rem 5vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: var(--electric-blue);
+            font-weight: 700;
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            color: var(--accent-orange);
+        }
+
+        .back-btn {
+            color: var(--electric-blue);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: var(--electric-blue);
+            color: white;
+        }
+
+        main {
+            flex: 1;
+            padding: clamp(2rem, 4vw, 3rem) 5vw;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .terms-container {
+            background: var(--midnight-blue);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: clamp(2rem, 4vw, 3rem);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: var(--electric-blue);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: var(--accent-orange);
+        }
+
+        h2 {
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+            margin: 3rem 0 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        h3 {
+            color: var(--electric-blue);
+            font-size: 1.2rem;
+            margin: 2rem 0 0.75rem;
+        }
+
+        p, li {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        ul, ol {
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        li::marker {
+            color: var(--electric-blue);
+        }
+
+        .update-badge {
+            display: inline-block;
+            background: var(--accent-orange);
+            color: var(--obsidian-bg);
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .notice-box {
+            background: rgba(88, 166, 255, 0.1);
+            border: 2px solid var(--electric-blue);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .warning-box {
+            background: rgba(240, 136, 62, 0.1);
+            border-left: 4px solid var(--accent-orange);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .danger-box {
+            background: rgba(248, 81, 73, 0.1);
+            border: 2px solid var(--danger-red);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+
+        .section-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--electric-blue);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: 600;
+        }
+
+        .legal-section {
+            background: rgba(88, 166, 255, 0.05);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .definition-list {
+            margin: 1.5rem 0;
+        }
+
+        .definition-term {
+            color: var(--electric-blue);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .definition-description {
+            margin-left: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .agreement-section {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(240, 136, 62, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .agreement-section h3 {
+            color: var(--accent-orange);
+            margin-top: 0;
+        }
+
+        footer {
+            background: #0b0f1c;
+            border-top: 1px solid var(--border);
+            padding: 3rem 5vw 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-col h4 {
+            color: var(--electric-blue);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-col a {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer-col a:hover {
+            color: var(--electric-blue);
+            transform: translateX(5px);
+        }
+
+        .legal {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .terms-container {
+                padding: 1.5rem;
+            }
+            
+            .agreement-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .back-btn {
+                width: 100%;
+                max-width: 200px;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="./index.html" class="logo">
+            <i class="fas fa-code"></i>
+            POETIC CODES
+        </a>
+        <a href="./index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </header>
+
+    <main>
+        <div class="terms-container">
+            <div class="update-badge">
+                <i class="fas fa-clock"></i> Last Updated: January 2026
+            </div>
+            <h1>Terms of Service</h1>
+            
+            <div class="notice-box">
+                <p><strong>📝 Important Notice:</strong> By accessing or using Poetic Codes ("the Site"), you agree to be bound by these Terms of Service. If you disagree with any part of these terms, please do not use our Site.</p>
+            </div>
+
+            <h2><span class="section-number">1</span> Acceptance of Terms</h2>
+            <p>These Terms of Service ("Terms") govern your access to and use of Poetic Codes, including any content, functionality, and services offered on or through poetic-codes (the "Site").</p>
+            <p>By accessing or using the Site, you accept and agree to be bound by these Terms. If you do not want to agree to these Terms, you must not access or use the Site.</p>
+
+            <div class="definition-list">
+                <div class="definition-term">"User", "You", "Your"</div>
+                <div class="definition-description">Refers to any individual accessing or using our Site.</div>
+                
+                <div class="definition-term">"Content"</div>
+                <div class="definition-description">Refers to text, code, images, videos, documentation, and other materials available on the Site.</div>
+                
+                <div class="definition-term">"Services"</div>
+                <div class="definition-description">Refers to the educational resources, tutorials, and tools provided through the Site.</div>
+            </div>
+
+            <h2><span class="section-number">2</span> Educational Purpose</h2>
+            <p>Poetic Codes is an educational platform providing programming tutorials and resources. Our content is for educational purposes only and should not be considered professional advice.</p>
+            
+            <div class="warning-box">
+                <p><strong>⚠️ Disclaimer:</strong> While we strive for accuracy, programming information changes rapidly. Always verify information and test code in development environments before production use.</p>
+            </div>
+
+            <h2><span class="section-number">3</span> User Responsibilities</h2>
+            <h3>3.1 Acceptable Use</h3>
+            <p>You agree to use the Site only for lawful purposes and in accordance with these Terms. You agree not to:</p>
+            <ul>
+                <li>Use the Site in any way that violates applicable laws or regulations</li>
+                <li>Attempt to gain unauthorized access to any portion of the Site</li>
+                <li>Introduce viruses, Trojan horses, or other harmful code</li>
+                <li>Use automated systems to access the Site without permission</li>
+                <li>Interfere with or disrupt the Site or servers</li>
+            </ul>
+
+            <h3>3.2 Code Usage</h3>
+            <p>All code examples provided on this Site are for educational purposes. You may:</p>
+            <ul>
+                <li>Use code examples for learning and personal projects</li>
+                <li>Modify and adapt code for your own use</li>
+                <li>Share code with attribution to Poetic Codes</li>
+            </ul>
+            <p>You may not:</p>
+            <ul>
+                <li>Claim authorship of our original code examples</li>
+                <li>Use code for commercial purposes without permission</li>
+                <li>Distribute code as your own work without attribution</li>
+            </ul>
+
+            <h2><span class="section-number">4</span> Intellectual Property Rights</h2>
+            <h3>4.1 Our Content</h3>
+            <p>The Site and its original content, features, and functionality are owned by Poetic Codes and are protected by international copyright, trademark, and other intellectual property laws.</p>
+
+            <h3>4.2 License to Use</h3>
+            <p>We grant you a limited, non-exclusive, non-transferable, revocable license to access and use the Site for personal, non-commercial educational purposes.</p>
+
+            <div class="code-block">
+                # Example of proper attribution
+                # Code adapted from Poetic Codes Python OOP Tutorial
+                # Original source: https://poetic-codes/encapsulation.html
+                # Licensed for educational use
+            </div>
+
+            <h2><span class="section-number">5</span> User Contributions</h2>
+            <p>The Site may contain interactive features allowing users to post, submit, or contribute content. By providing contributions, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, and distribute your contributions.</p>
+
+            <div class="danger-box">
+                <p><strong>🚫 Prohibited Content:</strong> You may not submit content that is illegal, infringing, defamatory, obscene, threatening, or violates any third-party rights.</p>
+            </div>
+
+            <h2><span class="section-number">6</span> Disclaimer of Warranties</h2>
+            <p>THE SITE IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS. WE MAKE NO WARRANTIES, EXPRESS OR IMPLIED, REGARDING THE ACCURACY, COMPLETENESS, OR RELIABILITY OF THE CONTENT.</p>
+            
+            <div class="legal-section">
+                <p><strong>Specifically, we do not warrant that:</strong></p>
+                <ul>
+                    <li>The Site will be uninterrupted or error-free</li>
+                    <li>Defects will be corrected</li>
+                    <li>The Site is free of viruses or other harmful components</li>
+                    <li>The content is accurate, complete, or current</li>
+                </ul>
+            </div>
+
+            <h2><span class="section-number">7</span> Limitation of Liability</h2>
+            <p>TO THE FULLEST EXTENT PERMITTED BY LAW, POETIC CODES SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES RESULTING FROM YOUR USE OF THE SITE.</p>
+            
+            <div class="warning-box">
+                <p><strong>💡 Educational Use Only:</strong> The code examples provided are for educational purposes. Always test code thoroughly and consult professional developers for production systems.</p>
+            </div>
+
+            <h2><span class="section-number">8</span> Indemnification</h2>
+            <p>You agree to defend, indemnify, and hold harmless Poetic Codes from any claims, damages, or expenses arising from your violation of these Terms or your use of the Site.</p>
+
+            <h2><span class="section-number">9</span> Termination</h2>
+            <p>We may terminate or suspend your access to the Site immediately, without prior notice, for conduct that we believe violates these Terms or is harmful to other users.</p>
+
+            <h2><span class="section-number">10</span> Governing Law</h2>
+            <p>These Terms shall be governed by and construed in accordance with the laws of the Philippines, without regard to its conflict of law provisions.</p>
+
+            <h2><span class="section-number">11</span> Changes to Terms</h2>
+            <p>We reserve the right to modify these Terms at any time. We will provide notice of significant changes by updating the "Last Updated" date and posting notice on the Site.</p>
+
+            <h2><span class="section-number">12</span> Contact Information</h2>
+            <div class="agreement-section">
+                <h3>Questions About These Terms?</h3>
+                <p>If you have questions about these Terms of Service, please contact us:</p>
+                <div style="margin-top: 1.5rem;">
+                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong> pansensoyglenn@gmail.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> Zamboanga Sibugay, Philippines</p>
+                    <p><i class="fab fa-github"></i> <strong>GitHub:</strong> pansensoyglenn-dev/poetic-codes</p>
+                </div>
+                <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                    These Terms are effective as of January 2026.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Learning Paths</h4>
+                    <a href="./python-intro.html">Python Introduction</a>
+                    <a href="./oop-intro.html">OOP Foundations</a>
+                    <a href="./encapsulation.html">Encapsulation</a>
+                    <a href="./abstraction.html">Abstraction</a>
+                    <a href="./inheritance.html">Inheritance</a>
+                    <a href="./polymorphism.html">Polymorphism</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal & Compliance</h4>
+                    <a href="./privacy.html">Privacy Policy</a>
+                    <a href="./terms.html">Terms of Service</a>
+                    <a href="./cookie.html">Cookie Policy</a>
+                    <a href="./disclaimer.html">Disclaimer</a>
+                    <a href="./accessibility.html">Accessibility</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Resources</h4>
+                    <a href="./projects.html">Projects</a>
+                    <a href="./best-practices.html">Best Practices</a>
+                    <a href="./cheatsheet.html">Cheat Sheets</a>
+                    <a href="./tools.html">Tools & Libraries</a>
+                    <a href="./glossary.html">Glossary</a>
+                </div>
+                <div class="footer-col">
+                    <h4>About & Contact</h4>
+                    <a href="./about.html">About Us</a>
+                    <a href="./contact.html">Contact Form</a>
+                    <a href="./faq.html">FAQ</a>
+                    <a href="./contributing.html">Contributing</a>
+                    <a href="https://github.com/pansensoyglenn-dev" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-github"></i> GitHub Profile
+                    </a>
+                </div>
+            </div>
+            <div class="legal">
+                <p>© 2026 Poetic Codes. All educational content is provided free of charge for learning purposes.</p>
+                <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+                    By using this site, you agree to our 
+                    <a href="./terms.html">Terms of Service</a> and 
+                    <a href="./privacy.html">Privacy Policy</a>.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
