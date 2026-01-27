@@ -3,22 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Master the 4 Pillars of Python OOP with modern 2026 best practices: encapsulation, abstraction, inheritance, polymorphism + dataclasses, slots & protocols.">
-    <title>Mastering the 4 Pillars of Python OOP | Poetic Codes 2026</title>
+    
+    <title>Mastering the 4 Pillars of Python OOP (2026 Edition) – Modern Best Practices | Poetic Codes</title>
+    <meta name="description" content="Master the 4 pillars of Python OOP (encapsulation, abstraction, inheritance, polymorphism) with 2026 best practices: dataclasses, slots, Protocol, composition over inheritance, structural typing for AI & scalable code.">
+    <meta name="keywords" content="python oop, python oop 2026, four pillars oop, python encapsulation, python abstraction, python inheritance, python polymorphism, typing protocol, dataclasses slots, composition over inheritance">
+    
+    <meta property="og:title" content="Mastering the 4 Pillars of Python OOP – 2026 Edition">
+    <meta property="og:description" content="Deep dive into modern Python OOP: encapsulation with slots, abstraction via Protocols, inheritance best practices, polymorphism with duck typing.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pansensoyglenn-dev.github.io/poetic-codes">
+    <meta property="og:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-oop-2026-social.jpg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Python OOP Pillars 2026 – Encapsulation, Abstraction, Inheritance, Polymorphism">
+    <meta name="twitter:description" content="Updated Python OOP guide for 2026: Protocols, slots, composition-first design.">
+
+    <link rel="canonical" href="https://pansensoyglenn-dev.github.io/poetic-codes">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
     <style>
         :root {
             --obsidian-bg: #0d1117;
             --midnight-blue: #161b22;
             --electric-blue: #58a6ff;
-            --text-main: #e6edf3;
-            --text-muted: #8b949e;
+            --text-main: #ffffff;
+            --text-muted: #f0f0f0;
             --accent-orange: #f0883e;
             --border: #30363d;
-            --code-bg: #0d1117;
-            --code-border: #f0883e;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,7 +41,7 @@
             background: var(--obsidian-bg);
             color: var(--text-main);
             font-family: 'Inter', system-ui, sans-serif;
-            line-height: 1.7;
+            line-height: 1.75;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -35,7 +50,7 @@
         header {
             background: var(--midnight-blue);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 1.5rem;
+            padding: 1.2rem 5vw;
             position: sticky;
             top: 0;
             z-index: 1000;
@@ -47,24 +62,22 @@
         .logo {
             color: var(--electric-blue);
             font-weight: 700;
-            font-size: 1.4rem;
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
             text-decoration: none;
-            letter-spacing: 1px;
         }
 
         .hamburger {
             cursor: pointer;
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
         }
 
         .hamburger span {
-            width: 28px;
-            height: 3px;
+            width: 30px;
+            height: 3.5px;
             background: var(--electric-blue);
             border-radius: 2px;
-            transition: all 0.3s;
         }
 
         .nav-overlay {
@@ -84,29 +97,26 @@
 
         .nav-overlay a {
             color: var(--text-main);
-            font-size: 1.6rem;
-            margin: 1.2rem 0;
+            font-size: clamp(1.4rem, 5vw, 2rem);
+            margin: 1.5rem 0;
             text-decoration: none;
-            font-weight: 500;
         }
 
-        .nav-overlay a:hover { color: var(--electric-blue); }
-
-        .hamburger.active span:nth-child(1) { transform: translateY(10px) rotate(45deg); }
+        .hamburger.active span:nth-child(1) { transform: translateY(11px) rotate(45deg); }
         .hamburger.active span:nth-child(2) { opacity: 0; }
-        .hamburger.active span:nth-child(3) { transform: translateY(-10px) rotate(-45deg); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-11px) rotate(-45deg); }
 
         main {
             flex: 1;
-            padding: 2rem 1rem;
-            max-width: 1200px; 
+            padding: clamp(1.5rem, 4vw, 2.5rem) 4vw;
+            max-width: 1280px;
             margin: 0 auto;
             width: 100%;
         }
 
         .article-card {
             background: var(--midnight-blue);
-            padding: 1.5rem;
+            padding: clamp(1.5rem, 4vw, 2rem);
             border-radius: 12px;
             border: 1px solid var(--border);
             box-shadow: 0 8px 32px rgba(0,0,0,0.4);
@@ -114,175 +124,272 @@
 
         h1 {
             color: var(--electric-blue);
-            font-size: 1.85rem; 
-            margin-bottom: 1.2rem;
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 0.8rem;
-            letter-spacing: -0.5px;
-            text-align: left; /* Headers should remain left-aligned */
+            font-size: clamp(1.9rem, 4.5vw, 2.4rem);
+            font-weight: 400;
+            letter-spacing: 0.10em;
+            line-height: 1.25;
+            margin: 0 0 2rem 0;
+            padding-bottom: 0.9rem;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+        }
+
+        h2, h3 {
+            color: var(--electric-blue);
+        }
+
+        .intro, .conclusion p, .foundation > p, ul {
+            color: var(--text-main);
+            text-align: justify;
+            margin-bottom: 1.5rem;
         }
 
         .intro {
             font-size: 1.1rem;
             color: var(--text-muted);
-            border-left: 4px solid var(--electric-blue);
-            padding-left: 1.2rem;
-            margin: 1.5rem 0 2.5rem;
-            text-align: justify;
-            hyphens: auto;
+            margin: 2rem 0 3rem;
+        }
+
+        .foundation {
+            margin-bottom: 3.5rem;
+        }
+
+        .foundation h3 {
+            font-size: clamp(1.4rem, 4vw, 1.6rem);
+            margin-bottom: 1.4rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.7rem;
+        }
+
+        .foundation-grid,
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem 1.8rem;
+            margin-top: 2rem;
         }
 
         .pillar {
-            background: var(--obsidian-bg);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            transition: transform 0.2s, box-shadow 0.2s;
-            width: 100%;
-        }
-
-        .pillar:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 32px rgba(88,166,255,0.12);
+            padding: 0.8rem 1.2rem;
         }
 
         .pillar h3 {
             color: var(--accent-orange);
-            font-size: 1.4rem;
-            margin-bottom: 0.8rem;
+            font-size: clamp(1.2rem, 3.5vw, 1.35rem);
+            font-weight: 600;
+            margin: 0 0 0.9rem 0;
+            line-height: 1.3;
+            text-align: left;
         }
 
         .pillar p {
-            margin-bottom: 1rem;
-            color: var(--text-main);
+            margin: 0 0 1.1rem 0;
             text-align: justify;
             hyphens: auto;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
         }
 
         .modern-note {
             background: rgba(88,166,255,0.06);
-            border-left: 4px solid var(--electric-blue);
-            padding: 1.2rem;
-            margin: 1.5rem 0;
-            border-radius: 6px;
-            font-size: 0.95rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 0.94rem;
+            margin: 1rem 0 0 0;
             text-align: justify;
-            hyphens: auto;
+            line-height: 1.55;
         }
 
-        .modern-note strong {
-            color: var(--accent-orange);
-        }
+        .modern-note strong { color: var(--accent-orange); }
 
         .toggle-btn {
-            display: inline-block;
             background: transparent;
             border: 1px solid var(--electric-blue);
             color: var(--electric-blue);
-            padding: 0.6rem 1.2rem;
+            padding: 0.75rem 1.4rem;
             border-radius: 6px;
-            cursor: pointer;
             font-weight: 500;
             transition: all 0.25s;
-            margin-top: 0.5rem;
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.94rem;
             text-align: center;
+            display: inline-block;
         }
 
         .toggle-btn:hover {
             background: var(--electric-blue);
             color: white;
-            transform: translateY(-2px);
+            transform: translateY(-3px);
         }
 
         .conclusion {
-            margin-top: 3rem;
-            padding: 1.5rem;
+            margin: 4.5rem 0 3.5rem;
+            padding: 1.6rem;
             background: rgba(88,166,255,0.04);
             border-radius: 10px;
-            border: 1px solid var(--border);
         }
 
         .conclusion h2 {
-            color: var(--electric-blue);
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            text-align: left;
+            font-size: 1.55rem;
+            margin-bottom: 1.1rem;
         }
 
-        .conclusion p {
-            text-align: justify;
-            hyphens: auto;
+        .conclusion ul {
+            margin: 1rem 0 1rem 1.8rem;
+            list-style-type: disc;
         }
 
         .outro {
-            margin-top: 3rem;
-            text-align: center; /* Outro is typically centered for impact */
+            margin-top: 4rem;
+            text-align: center;
             padding: 2rem 1.2rem;
             background: var(--midnight-blue);
             border-radius: 12px;
-            border: 1px solid var(--border);
         }
 
         .outro h3 {
             color: var(--accent-orange);
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.1rem;
         }
 
-        /* --- Footer (Consistent with atm.html) --- */
         footer {
-            background: var(--midnight-blue);
+            background: #0b0f1c;
             border-top: 1px solid var(--border);
-            padding: 4rem 1.5rem 2rem;
-            margin-top: auto;
+            padding: 4rem 5vw 2.5rem;
+            margin-top: 4.5rem;
+        }
+
+        .footer-container {
+            max-width: 1280px;
+            margin: 0 auto;
         }
 
         .footer-grid {
-            max-width: 1200px;
-            margin: 0 auto;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 3.5rem 2.5rem;
         }
 
         .footer-col h4 {
             color: var(--electric-blue);
-            font-size: 0.85rem;
-            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            margin-bottom: 1.6rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 1.8px;
             font-weight: 700;
+        }
+
+        .footer-col p {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-bottom: 1.6rem;
+            line-height: 1.65;
         }
 
         .footer-col a {
             color: var(--text-muted);
             text-decoration: none;
             display: block;
-            margin-bottom: 0.8rem;
-            transition: all 0.3s ease;
-            font-size: 0.95rem;
+            margin-bottom: 0.9rem;
+            transition: all 0.25s ease;
+            font-size: 0.96rem;
         }
 
         .footer-col a:hover {
-            color: var(--accent-orange);
-            transform: translateX(5px);
+            color: var(--electric-blue);
+            transform: translateX(6px);
+        }
+
+        .social-icons {
+            margin-top: 1.4rem;
+        }
+
+        .social-icons a {
+            display: inline-block;
+            margin-right: 1.5rem;
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: var(--electric-blue);
+            transform: translateY(-4px);
         }
 
         .legal {
             text-align: center;
-            margin-top: 4rem;
-            padding-top: 2rem;
+            margin-top: 5rem;
+            padding-top: 2.5rem;
             border-top: 1px solid var(--border);
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.86rem;
+            line-height: 1.6;
+        }
+
+        .legal a {
+            color: var(--text-muted);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.25s ease;
+        }
+
+        .legal a:hover {
+            color: var(--electric-blue);
+        }
+
+        @media (max-width: 1024px) {
+            .foundation-grid,
+            .pillars-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 2.2rem 1.5rem;
+            }
         }
 
         @media (max-width: 768px) {
-            .article-card { padding: 1.2rem; }
-            h1 { font-size: 1.6rem; }
-            .pillar { padding: 1.2rem; }
+            main {
+                padding: 1.5rem 1rem;
+            }
+            .article-card {
+                padding: 1.4rem;
+            }
+            .foundation-grid,
+            .pillars-grid {
+                grid-template-columns: 1fr;
+                gap: 3rem 1rem;
+            }
+            .pillar {
+                padding: 0.6rem 1rem;
+            }
+            .pillar h3 {
+                font-size: 1.3rem;
+            }
+            .pillar p, .modern-note {
+                font-size: 0.98rem;
+            }
+            .toggle-btn {
+                width: 100%;
+                max-width: 340px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: clamp(1.7rem, 6.5vw, 2.1rem);
+                letter-spacing: 0.08em;
+            }
+            .pillar h3 {
+                font-size: 1.25rem;
+            }
+            .pillar p, .modern-note {
+                font-size: 0.96rem;
+                line-height: 1.6;
+            }
+            .pillar {
+                padding: 0.5rem 0.9rem;
+            }
         }
     </style>
 </head>
@@ -305,46 +412,83 @@
     <main>
         <article class="article-card">
             <h1>Mastering the 4 Pillars of Python OOP (2026 Edition)</h1>
+
             <div class="intro">
                 Object-Oriented Programming (OOP) remains the bedrock of professional software engineering, providing a blueprint for building applications that are not just functional, but scalable and maintainable. In the landscape of 2026, where Python is the driving force behind AI agents, complex data pipelines, and microservices, understanding the "how" is no longer enough—you must master the "why." 
                 <br><br>
                 The traditional four pillars serve as an organizational framework that allows developers to model real-world entities into digital logic. While the core concepts haven't changed, the modern Python ecosystem has introduced sophisticated tools like structural typing with Protocols and memory-optimized Dataclasses to make these pillars more robust than ever before.
             </div>
-            <div class="pillar">
-                <h3>1. Encapsulation</h3>
-                <p>Encapsulation is about creating a protective shield around an object's internal data. By bundling attributes and the methods that manipulate them into a single class, you control how the state is accessed and modified, preventing external "leaks" or accidental interference from other parts of the program.</p>
-                <p>In practice, this reduces bugs caused by direct attribute manipulation and makes refactoring safer. Python's convention of using a single underscore <code>_</code> for "protected" and double underscore <code>__</code> for name-mangled "private" members helps signal intent—even though nothing is truly private.</p>
-                <div class="modern-note"><strong>2026 Strategy</strong>: Use <code>@dataclass(slots=True)</code> to lock down attributes and save memory. Slots prevent arbitrary attribute creation (which wastes RAM in large-scale systems) and give ~20–40% better memory usage + faster attribute access in performance-critical code like ML pipelines or simulation engines.</div>
-                <a href="encapsulation/encapsulation.html" class="toggle-btn">Encapsulation Show Examples →</a>
+
+            <div class="foundation">
+                <h3>Before the Pillars: Understanding Classes, Objects, Methods & Instantiation</h3>
+                
+                <p>Before exploring encapsulation, abstraction, inheritance, and polymorphism, we must first grasp the foundational elements of OOP in Python. These are not mere syntax—they form a mental model for representing reality in code.</p>
+
+                <div class="foundation-grid">
+                    <div class="pillar">
+                        <h3>Classes — The Blueprint</h3>
+                        <p>A class is a user-defined <strong>type</strong>—a template that defines what <em>data</em> (attributes) and <em>behavior</em> (methods) an object can have. It describes <em>possible</em> things, not actual things.</p>
+                        <div class="modern-note"><strong>2026 Insight</strong>: Classes are increasingly lightweight. With <code>@dataclass</code>, <code>slots</code>, and <code>Protocol</code>, they serve as precise contracts for shape and behavior rather than heavy inheritance hierarchies.</div>
+                    </div>
+
+                    <div class="pillar">
+                        <h3>Objects (Instances) — The Living Entities</h3>
+                        <p>An object is a concrete <strong>instance</strong> of a class—allocated in memory with its own identity (<code>id()</code>), state (attributes), and lifecycle. Multiple objects from the same class can exist independently.</p>
+                        <div class="modern-note"><strong>Key Truth</strong>: In Python, <em>everything is an object</em>—even integers and functions. Classes let you define new kinds of objects with custom meaning.</div>
+                    </div>
+
+                    <div class="pillar">
+                        <h3>Methods — Behavior Bound to the Object</h3>
+                        <p>A method is a function inside a class that receives the instance (<code>self</code>) automatically. It reads and modifies the object's own state—making behavior intrinsically tied to identity.</p>
+                        <div class="modern-note"><strong>2026 Nuance</strong>: Thanks to duck typing + Protocols, methods no longer require inheritance; any object that has the right shape can be treated the same way.</div>
+                    </div>
+
+                    <div class="pillar">
+                        <h3>Instantiation — Giving Life to the Blueprint</h3>
+                        <p>Instantiation is the act of creating an object: <code>obj = ClassName(...)</code>. Python allocates memory, calls <code>__init__</code> (if present), and returns a fully initialized entity.</p>
+                        <div class="modern-note"><strong>Philosophical View</strong>: Instantiation is the moment an abstract possibility becomes a concrete participant in your program—often thousands or millions in modern AI/agent systems.</div>
+                    </div>
+                </div>
             </div>
 
-            <div class="pillar">
-                <h3>2. Abstraction</h3>
-                <p>Abstraction is the art of "simplification through concealment." It allows you to expose only the necessary interfaces to a user while hiding the underlying complexity. By focusing on what an object does rather than how it does it, you create more intuitive and decoupled codebases that are easier to maintain.</p>
-                <p>Good abstraction reduces cognitive load: library users shouldn't need to understand file I/O internals to call <code>.save()</code>, or know database schemas to query <code>.filter()</code>.</p>
-                <div class="modern-note"><strong>2026 Strategy</strong>: <code>typing.Protocol</code> is now the preferred way to define "Duck Typed" interfaces. Structural subtyping (via Protocols) gives you interface-like behavior without forcing inheritance — perfect for plugin systems, testing mocks, and clean dependency injection in 2026-era Python projects.</div>
-                <a href="abstraction.html" class="toggle-btn">Abstraction Show Examples →</a>
-            </div>
-            <div class="pillar">
-                <h3>3. Inheritance</h3>
-                <p>Inheritance enables a class to adopt the behavior and data of another class, promoting code reuse. It establishes a hierarchy that reflects "is-a" relationships. However, modern best practices advise using inheritance sparingly, often favoring composition to avoid creating rigid and fragile class structures that are hard to change.</p>
-                <p>Deep inheritance trees frequently lead to the infamous "fragile base class problem" — small changes high up break many subclasses. In 2026, senior engineers almost always prefer "has-a" (composition) or "uses-a" (dependency injection) over deep "is-a" hierarchies.</p>
-                <div class="modern-note"><strong>2026 Best Practice</strong>: Favor composition over inheritance. Use mixins only for very narrow, orthogonal behaviors. Leverage Protocols + composition for flexible, testable systems that scale without exploding class hierarchies.</div>
-                <a href="inheritance.html" class="toggle-btn">Inheritance Show Examples →</a>
-            </div>
+            <div class="pillars-grid">
+                <div class="pillar">
+                    <h3>1. Encapsulation</h3>
+                    <p>Encapsulation is about creating a protective shield around an object's internal data. By bundling attributes and the methods that manipulate them into a single class, you control how the state is accessed and modified, preventing external "leaks" or accidental interference from other parts of the program.</p>
+                    <p>In practice, this reduces bugs caused by direct attribute manipulation and makes refactoring safer. Python's convention of using a single underscore <code>_</code> for "protected" and double underscore <code>__</code> for name-mangled "private" members helps signal intent—even though nothing is truly private.</p>
+                    <div class="modern-note"><strong>2026 Strategy</strong>: Use <code>@dataclass(slots=True)</code> to lock down attributes and save memory. Slots prevent arbitrary attribute creation (which wastes RAM in large-scale systems) and give ~20–40% better memory usage + faster attribute access in performance-critical code like ML pipelines or simulation engines.</div>
+                    <a href="encapsulation.html" class="toggle-btn">Encapsulation Show Examples →</a>
+                </div>
 
-            <div class="pillar">
-                <h3>4. Polymorphism</h3>
-                <p>Polymorphism allows different types of objects to be accessed through the same interface. It means "many forms," enabling a single function or method to behave differently based on the object it is acting upon. This leads to highly flexible code that can handle new data types without changing its core structural logic.</p>
-                <p>Python's duck typing + Protocols make polymorphism especially elegant—no need for explicit interfaces in most cases, yet you still get strong type checking when desired.</p>
-                <div class="modern-note"><strong>2026 Strategy</strong>: Combine polymorphism with Protocols for runtime-flexible yet statically-checkable code. This pattern shines in event handlers, serializers, renderers, and AI agent toolkits where behavior varies by concrete type.</div>
-                <a href="polymorphism.html" class="toggle-btn">Polymorphism Show Examples →</a>
+                <div class="pillar">
+                    <h3>2. Abstraction</h3>
+                    <p>Abstraction is the art of "simplification through concealment." It allows you to expose only the necessary interfaces to a user while hiding the underlying complexity. By focusing on what an object does rather than how it does it, you create more intuitive and decoupled codebases that are easier to maintain.</p>
+                    <p>Good abstraction reduces cognitive load: library users shouldn't need to understand file I/O internals to call <code>.save()</code>, or know database schemas to query <code>.filter()</code>.</p>
+                    <div class="modern-note"><strong>2026 Strategy</strong>: <code>typing.Protocol</code> is now the preferred way to define "Duck Typed" interfaces. Structural subtyping (via Protocols) gives you interface-like behavior without forcing inheritance — perfect for plugin systems, testing mocks, and clean dependency injection in 2026-era Python projects.</div>
+                    <a href="abstraction.html" class="toggle-btn">Abstraction Show Examples →</a>
+                </div>
+
+                <div class="pillar">
+                    <h3>3. Inheritance</h3>
+                    <p>Inheritance enables a class to adopt the behavior and data of another class, promoting code reuse. It establishes a hierarchy that reflects "is-a" relationships. However, modern best practices advise using inheritance sparingly, often favoring composition to avoid creating rigid and fragile class structures that are hard to change.</p>
+                    <p>Deep inheritance trees frequently lead to the infamous "fragile base class problem" — small changes high up break many subclasses. In 2026, senior engineers almost always prefer "has-a" (composition) or "uses-a" (dependency injection) over deep "is-a" hierarchies.</p>
+                    <div class="modern-note"><strong>2026 Best Practice</strong>: Favor composition over inheritance. Use mixins only for very narrow, orthogonal behaviors. Leverage Protocols + composition for flexible, testable systems that scale without exploding class hierarchies.</div>
+                    <a href="inheritance.html" class="toggle-btn">Inheritance Show Examples →</a>
+                </div>
+
+                <div class="pillar">
+                    <h3>4. Polymorphism</h3>
+                    <p>Polymorphism allows different types of objects to be accessed through the same interface. It means "many forms," enabling a single function or method to behave differently based on the object it is acting upon. This leads to highly flexible code that can handle new data types without changing its core structural logic.</p>
+                    <p>Python's duck typing + Protocols make polymorphism especially elegant—no need for explicit interfaces in most cases, yet you still get strong type checking when desired.</p>
+                    <div class="modern-note"><strong>2026 Strategy</strong>: Combine polymorphism with Protocols for runtime-flexible yet statically-checkable code. This pattern shines in event handlers, serializers, renderers, and AI agent toolkits where behavior varies by concrete type.</div>
+                    <a href="polymorphism.html" class="toggle-btn">Polymorphism Show Examples →</a>
+                </div>
             </div>
 
             <div class="conclusion">
                 <h2>Putting It All Together in 2026</h2>
-                <p>The four pillars are timeless, but how we apply them has evolved. Today's professional Python code leans heavily toward:</p>
-                <ul style="margin: 1rem 0 1rem 1.8rem; list-style-type: disc; color: var(--text-main);">
+                <p style="text-align:justify;">The four pillars are timeless, but how we apply them has evolved. Today's professional Python code leans heavily toward:</p>
+                <ul>
                     <li>Composition + small, focused classes</li>
                     <li>Structural typing (Protocols) instead of rigid ABCs</li>
                     <li>Memory-aware patterns with <code>slots=True</code></li>
@@ -355,37 +499,48 @@
 
             <div class="outro">
                 <h3>Ready to Level Up Your OOP Game?</h3>
-                <p>Click the buttons above to dive into concrete, production-ready code examples for each pillar — complete with 2026-style patterns, type hints, and explanations of when to break the "rules."</p>
-                <a href="https://github.com/pansensoyglenn-dev/poetic-codes" class="toggle-btn" style="font-size: 1rem; padding: 0.8rem 1.5rem;">Explore the Full Repo on GitHub</a>
+                <p style="text-align:justify;">Click the buttons below to dive into concrete, production-ready code examples for each pillar — complete with 2026-style patterns, type hints, and explanations of when to break the "rules."</p>
+                <a href="https://github.com/pansensoyglenn-dev/poetic-codes" class="toggle-btn" target="_blank" rel="noopener noreferrer">Explore the Full Repo on GitHub</a>
             </div>
 
         </article>
     </main>
 
     <footer>
-        <div class="footer-grid">
-            <div class="footer-col">
-                <h4>Learning Paths</h4>
-                <a href="./python-intro.html">Python Introduction</a>
-                <a href="./oop-intro.html">OOP Foundations</a>
-                <a href="./index.html">Latest Articles</a>
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>About Poetic Codes</h4>
+                    <p style="text-align: justify;">Glenn Pansensoy is a Web Developer specializing in Python codes and logical design.This hub bridges the gap between raw code and software principles.Think of poetic code as the intersection of a logic gate and a literary lens. It’s the realization that programming isn't just a series of cold commands to a processor, but a form of digital storytelling where the syntax itself carries weight.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Learning Paths</h4>
+                    <a href="./python-intro.html">Python Introduction</a>
+                    <a href="./oop-intro.html">OOP Foundations</a>
+                    <a href="./index.html">Latest Articles</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Compliance</h4>
+                    <a href="./privacy.html">Privacy Policy</a>
+                    <a href="./terms.html">Terms of Service</a>
+                    <a href="./cookie.html">Cookie Policy</a>
+                    <a href="./about.html">About Us</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <a href="mailto:pansensoyglenn@gmail.com"><i class="fas fa-envelope"></i> pansensoyglenn@gmail.com</a>
+                    <a href="#"><i class="fas fa-map-marker-alt"></i> Zamboanga Sibugay Province, PH</a>
+                </div>
             </div>
-            <div class="footer-col">
-                <h4>Resources</h4>
-                <a href="https://github.com/pansensoyglenn-dev/poetic-codes">GitHub Repository</a>
-                <a href="./docs.html">Documentation</a>
-                <a href="./community.html">Community Forum</a>
+            <div class="legal">
+                © 2026 Poetic Codes | Crafted for 
+                <a href="https://github.com/pansensoyglenn-dev/poetic-codes" target="_blank" rel="noopener noreferrer">Global Developers</a>
             </div>
-            <div class="footer-col">
-                <h4>Compliance</h4>
-                <a href="./about.html">About Us</a>
-                <a href="./privacy.html">Privacy Policy</a>
-                <a href="./terms.html">Terms of Service</a>
-                <a href="./cookie.html">Cookie Policy</a>
-            </div>
-        </div>
-        <div class="legal">
-            © 2026 Poetic Codes | Crafted for <a href="https://github.com/pansensoyglenn-dev/poetic-codes" style="color: inherit;">GitHub Pages</a>
         </div>
     </footer>
 
@@ -399,4 +554,4 @@
 </body>
 </html>
 
-            
+        .                
