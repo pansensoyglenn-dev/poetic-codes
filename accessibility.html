@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessibility Statement | Poetic Codes - Accessible Programming Education</title>
+    <meta name="description" content="Accessibility statement for Poetic Codes. Our commitment to making programming education accessible to everyone, including people with disabilities.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --obsidian-bg: #0d1117;
+            --midnight-blue: #161b22;
+            --electric-blue: #58a6ff;
+            --text-main: #ffffff;
+            --text-muted: #f0f0f0;
+            --accent-orange: #f0883e;
+            --success-green: #3fb950;
+            --border: #30363d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--obsidian-bg);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.75;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--midnight-blue);
+            border-bottom: 1px solid var(--border);
+            padding: 1.2rem 5vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: var(--electric-blue);
+            font-weight: 700;
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            color: var(--accent-orange);
+        }
+
+        .back-btn {
+            color: var(--electric-blue);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: var(--electric-blue);
+            color: white;
+        }
+
+        main {
+            flex: 1;
+            padding: clamp(2rem, 4vw, 3rem) 5vw;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .accessibility-container {
+            background: var(--midnight-blue);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: clamp(2rem, 4vw, 3rem);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: var(--electric-blue);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: var(--accent-orange);
+        }
+
+        h2 {
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+            margin: 3rem 0 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        h3 {
+            color: var(--electric-blue);
+            font-size: 1.2rem;
+            margin: 2rem 0 0.75rem;
+        }
+
+        p, li {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        ul, ol {
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        li::marker {
+            color: var(--electric-blue);
+        }
+
+        .commitment-banner {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(63, 185, 80, 0.1));
+            border: 2px solid var(--success-green);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .commitment-icon {
+            font-size: 3rem;
+            color: var(--success-green);
+            margin-bottom: 1rem;
+        }
+
+        .commitment-banner h3 {
+            color: var(--success-green);
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
+        .feature-card {
+            background: rgba(88, 166, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--electric-blue);
+            transform: translateY(-2px);
+        }
+
+        .feature-card h4 {
+            color: var(--electric-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-icon {
+            color: var(--accent-orange);
+            font-size: 1.2rem;
+        }
+
+        .standards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .standard-item {
+            background: rgba(88, 166, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .standard-icon {
+            font-size: 2rem;
+            color: var(--electric-blue);
+            margin-bottom: 1rem;
+        }
+
+        .compliance-level {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            background: var(--success-green);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .compliance-level.partial {
+            background: var(--accent-orange);
+        }
+
+        .accessibility-tools {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(240, 136, 62, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 3rem 0;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .tool-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .tool-icon {
+            font-size: 1.5rem;
+            color: var(--electric-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-section {
+            background: rgba(88, 166, 255, 0.05);
+            border-left: 4px solid var(--electric-blue);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .improvement-plan {
+            background: rgba(240, 136, 62, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        footer {
+            background: #0b0f1c;
+            border-top: 1px solid var(--border);
+            padding: 3rem 5vw 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-col h4 {
+            color: var(--electric-blue);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-col a {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer-col a:hover {
+            color: var(--electric-blue);
+            transform: translateX(5px);
+        }
+
+        .legal {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .accessibility-container {
+                padding: 1.5rem;
+            }
+            
+            .standards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .back-btn {
+                width: 100%;
+                max-width: 200px;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="./index.html" class="logo">
+            <i class="fas fa-code"></i>
+            POETIC CODES
+        </a>
+        <a href="./index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </header>
+
+    <main>
+        <div class="accessibility-container">
+            <h1>Accessibility Statement</h1>
+            <p><strong>Last Updated:</strong> January 2026</p>
+
+            <div class="commitment-banner">
+                <div class="commitment-icon">
+                    <i class="fas fa-universal-access"></i>
+                </div>
+                <h3>Our Commitment to Accessibility</h3>
+                <p>Poetic Codes is committed to making programming education accessible to everyone, regardless of ability or disability. We believe that learning to code should be available to all.</p>
+            </div>
+
+            <h2>Our Accessibility Philosophy</h2>
+            <p>Accessibility is not an afterthought—it's a core principle in our design and development process. We strive to:</p>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-eye feature-icon"></i> Visual Accessibility</h4>
+                <ul>
+                    <li>High contrast color schemes for better readability</li>
+                    <li>Responsive text sizes that scale with browser settings</li>
+                    <li>Proper semantic HTML structure for screen readers</li>
+                    <li>Alternative text for all meaningful images</li>
+                    <li>Keyboard-friendly navigation throughout the site</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4><i class="fas fa-keyboard feature-icon"></i> Keyboard Navigation</h4>
+                <p>Our website can be fully navigated using only a keyboard:</p>
+                <ul>
+                    <li>Tab key navigation through all interactive elements</li>
+                    <li>Clear visual focus indicators</li>
+                    <li>Logical tab order following visual layout</li>
+                    <li>Keyboard shortcuts for common actions</li>
+                    <li>Skip navigation links for screen reader users</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4><i class="fas fa-assistive-listening-systems feature-icon"></i> Screen Reader Compatibility</h4>
+                <ul>
+                    <li>Proper ARIA labels for interactive elements</li>
+                    <li>Semantic HTML structure (headings, landmarks, lists)</li>
+                    <li>Descriptive link text (not just "click here")</li>
+                    <li>Code examples accessible via screen readers</li>
+                    <li>Alternative descriptions for visual content</li>
+                </ul>
+            </div>
+
+            <h2>Accessibility Standards</h2>
+            <p>We aim to comply with the following accessibility standards:</p>
+            
+            <div class="standards-grid">
+                <div class="standard-item">
+                    <div class="standard-icon">
+                        <i class="fab fa-accessible-icon"></i>
+                    </div>
+                    <h4>WCAG 2.1</h4>
+                    <p>Web Content Accessibility Guidelines Level AA</p>
+                    <span class="compliance-level">Target Level</span>
+                </div>
+                
+                <div class="standard-item">
+                    <div class="standard-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h4>Mobile Accessibility</h4>
+                    <p>Responsive design for all device sizes</p>
+                    <span class="compliance-level">Implemented</span>
+                </div>
+                
+                <div class="standard-item">
+                    <div class="standard-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h4>Semantic HTML</h4>
+                    <p>Proper HTML5 semantic elements</p>
+                    <span class="compliance-level">Implemented</span>
+                </div>
+                
+                <div class="standard-item">
+                    <div class="standard-icon">
+                        <i class="fas fa-font"></i>
+                    </div>
+                    <h4>Typography</h4>
+                    <p>Readable fonts and text scaling</p>
+                    <span class="compliance-level">Implemented</span>
+                </div>
+            </div>
+
+            <h2>Accessibility Features</h2>
+            
+            <div class="accessibility-tools">
+                <h3>Built-in Accessibility Tools</h3>
+                <div class="tools-grid">
+                    <div class="tool-item">
+                        <div class="tool-icon">
+                            <i class="fas fa-text-height"></i>
+                        </div>
+                        <h4>Text Size</h4>
+                        <p>Use Ctrl/Cmd + to increase text size</p>
+                    </div>
+                    
+                    <div class="tool-item">
+                        <div class="tool-icon">
+                            <i class="fas fa-highlighter"></i>
+                        </div>
+                        <h4>High Contrast</h4>
+                        <p>Built-in high contrast mode</p>
+                    </div>
+                    
+                    <div class="tool-item">
+                        <div class="tool-icon">
+                            <i class="fas fa-keyboard"></i>
+                        </div>
+                        <h4>Keyboard Navigation</h4>
+                        <p>Full keyboard accessibility</p>
+                    </div>
+                    
+                    <div class="tool-item">
+                        <div class="tool-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h4>Code Accessibility</h4>
+                        <p>Screen-readable code examples</p>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Code Examples Accessibility</h2>
+            <p>We make special efforts to ensure code examples are accessible:</p>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-code feature-icon"></i> Accessible Code Display</h4>
+                <ul>
+                    <li>Syntax highlighting with sufficient color contrast</li>
+                    <li>Copy buttons for code snippets</li>
+                    <li>Code descriptions for complex examples</li>
+                    <li>Keyboard navigation within code blocks</li>
+                    <li>Screen reader announcements for code changes</li>
+                </ul>
+            </div>
+
+            <h2>Feedback and Reporting Issues</h2>
+            <div class="feedback-section">
+                <p><strong>We welcome your feedback!</strong> If you encounter accessibility barriers on Poetic Codes:</p>
+                <ol>
+                    <li><strong>Email us:</strong> pansensoyglenn@gmail.com</li>
+                    <li><strong>GitHub Issues:</strong> Report accessibility issues on our repository</li>
+                    <li><strong>Contact Form:</strong> Use our contact form with "Accessibility" as the subject</li>
+                </ol>
+                <p>We aim to respond to accessibility feedback within 3 business days and to propose a solution within 10 business days.</p>
+            </div>
+
+            <h2>Continuous Improvement</h2>
+            <div class="improvement-plan">
+                <h3>Our Accessibility Roadmap</h3>
+                <p>We are continuously working to improve accessibility. Current focus areas:</p>
+                <ul>
+                    <li>Implementing more detailed ARIA labels</li>
+                    <li>Adding video tutorials with captions and transcripts</li>
+                    <li>Improving code example accessibility for screen readers</li>
+                    <li>Adding a dedicated accessibility settings panel</li>
+                    <li>Regular accessibility audits and user testing</li>
+                </ul>
+            </div>
+
+            <h2>Third-Party Content</h2>
+            <p>Some content on our site may be provided by third parties. While we strive to ensure accessibility of all content, we cannot guarantee the accessibility of third-party content such as:</p>
+            <ul>
+                <li>External code libraries and frameworks</li>
+                <li>Linked documentation from other sources</li>
+                <li>Embedded content from external platforms</li>
+            </ul>
+
+            <h2>Compliance Status</h2>
+            <p>Poetic Codes is partially compliant with the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA, due to the non-compliances listed below:</p>
+            
+            <div class="feature-card">
+                <h4><i class="fas fa-exclamation-triangle feature-icon"></i> Known Limitations</h4>
+                <ul>
+                    <li><strong>Some code visualizations:</strong> Complex interactive code examples may not be fully accessible to screen reader users</li>
+                    <li><strong>Older content:</strong> Some legacy tutorials may not meet current accessibility standards</li>
+                    <li><strong>Third-party integrations:</strong> External tools and libraries may have their own accessibility limitations</li>
+                </ul>
+                <p>We are actively working to address these limitations.</p>
+            </div>
+
+            <div class="commitment-banner" style="margin-top: 3rem;">
+                <h3>Our Promise to You</h3>
+                <p>Accessibility is an ongoing journey. We are committed to continuously improving the accessibility of Poetic Codes to ensure that programming education is available to everyone, regardless of ability.</p>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">
+                    <i class="fas fa-clock"></i> This statement was last reviewed: January 2026
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Learning Resources</h4>
+                    <a href="./index.html">Home</a>
+                    <a href="./python-intro.html">Python Introduction</a>
+                    <a href="./oop-intro.html">OOP Foundations</a>
+                    <a href="./encapsulation.html">Encapsulation</a>
+                    <a href="./abstraction.html">Abstraction</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Accessibility & Legal</h4>
+                    <a href="./accessibility.html">Accessibility Statement</a>
+                    <a href="./privacy.html">Privacy Policy</a>
+                    <a href="./terms.html">Terms of Service</a>
+                    <a href="./disclaimer.html">Disclaimer</a>
+                    <a href="./cookie.html">Cookie Policy</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Community</h4>
+                    <a href="./faq.html">FAQ</a>
+                    <a href="./contributing.html">Contributing</a>
+                    <a href="./newsletter.html">Newsletter</a>
+                    <a href="./contact.html">Contact</a>
+                    <a href="./about.html">About Us</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Accessibility Tools</h4>
+                    <a href="#" onclick="increaseTextSize()">
+                        <i class="fas fa-text-height"></i> Increase Text Size
+                    </a>
+                    <a href="#" onclick="toggleHighContrast()">
+                        <i class="fas fa-highlighter"></i> High Contrast Mode
+                    </a>
+                    <a href="#" onclick="toggleDyslexiaFont()">
+                        <i class="fas fa-font"></i> Dyslexia-Friendly Font
+                    </a>
+                    <a href="#main-content" onclick="skipToContent()">
+                        <i class="fas fa-forward"></i> Skip to Content
+                    </a>
+                </div>
+            </div>
+            <div class="legal">
+                <p>© 2026 Poetic Codes | Committed to accessible programming education</p>
+                <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+                    This website follows accessibility best practices and welcomes feedback for improvement.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Accessibility Tools Functions
+        function increaseTextSize() {
+            const html = document.documentElement;
+            const currentSize = parseFloat(getComputedStyle(html).fontSize);
+            html.style.fontSize = (currentSize * 1.1) + 'px';
+            localStorage.setItem('textSize', html.style.fontSize);
+            showAccessibilityToast('Text size increased');
+        }
+        
+        function toggleHighContrast() {
+            const body = document.body;
+            body.classList.toggle('high-contrast');
+            
+            if (body.classList.contains('high-contrast')) {
+                body.style.setProperty('--obsidian-bg', '#000000');
+                body.style.setProperty('--midnight-blue', '#111111');
+                body.style.setProperty('--text-main', '#ffffff');
+                body.style.setProperty('--text-muted', '#cccccc');
+                localStorage.setItem('highContrast', 'enabled');
+                showAccessibilityToast('High contrast mode enabled');
+            } else {
+                body.style.setProperty('--obsidian-bg', '#0d1117');
+                body.style.setProperty('--midnight-blue', '#161b22');
+                body.style.setProperty('--text-main', '#ffffff');
+                body.style.setProperty('--text-muted', '#f0f0f0');
+                localStorage.setItem('highContrast', 'disabled');
+                showAccessibilityToast('High contrast mode disabled');
+            }
+        }
+        
+        function toggleDyslexiaFont() {
+            const body = document.body;
+            body.classList.toggle('dyslexia-font');
+            
+            if (body.classList.contains('dyslexia-font')) {
+                body.style.fontFamily = 'Comic Sans MS, Arial, sans-serif';
+                localStorage.setItem('dyslexiaFont', 'enabled');
+                showAccessibilityToast('Dyslexia-friendly font enabled');
+            } else {
+                body.style.fontFamily = "'Inter', system-ui, sans-serif";
+                localStorage.setItem('dyslexiaFont', 'disabled');
+                showAccessibilityToast('Dyslexia-friendly font disabled');
+            }
+        }
+        
+        function skipToContent() {
+            const main = document.querySelector('main');
+            if (main) {
+                main.setAttribute('tabindex', '-1');
+                main.focus();
+                main.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+        
+        function showAccessibilityToast(message) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: var(--electric-blue);
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 8px;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+        
+        // Load saved accessibility settings
+        document.addEventListener('DOMContentLoaded', () => {
+            // Text size
+            const savedTextSize = localStorage.getItem('textSize');
+            if (savedTextSize) {
+                document.documentElement.style.fontSize = savedTextSize;
+            }
+            
+            // High contrast
+            if (localStorage.getItem('highContrast') === 'enabled') {
+                toggleHighContrast();
+            }
+            
+            // Dyslexia font
+            if (localStorage.getItem('dyslexiaFont') === 'enabled') {
+                toggleDyslexiaFont();
+            }
+            
+            // Add CSS for animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                
+                .high-contrast a {
+                    text-decoration: underline !important;
+                }
+                
+                .dyslexia-font {
+                    letter-spacing: 0.1em;
+                    line-height: 1.8;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
