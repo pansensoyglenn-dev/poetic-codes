@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Documentation | Poetic Codes</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --obsidian-dark: #0f172a;
+            --obsidian-card: #1e293b;
+            --accent-blue: #38bdf8;
+            --text-main: #ffffff;
+            --text-dim: #cbd5e1;
+            --footer-bg: #020617;
+            --code-bg: #000000;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--obsidian-dark); 
+            color: var(--text-main); 
+            line-height: 1.7; 
+        }
+
+        /* Documentation Layout */
+        .doc-nav {
+            background: var(--obsidian-card);
+            border-right: 1px solid #334155;
+            height: calc(100vh - 70px);
+            position: sticky;
+            top: 70px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .doc-content { padding: 40px 20px; }
+
+        .navbar { 
+            background-color: #020617 !important; 
+            border-bottom: 1px solid #334155; 
+        }
+        .navbar-brand { font-family: 'Cinzel', serif; color: var(--accent-blue) !important; }
+
+        h1, h2, h3 { font-family: 'Cinzel', serif; color: var(--accent-blue); margin-top: 30px; }
+        
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid #334155;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: #4ade80;
+            margin: 20px 0;
+        }
+
+        .info-note {
+            border-left: 4px solid var(--accent-blue);
+            background: rgba(56, 189, 248, 0.1);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .nav-link-custom {
+            color: var(--text-dim);
+            text-decoration: none;
+            display: block;
+            padding: 8px 0;
+            transition: 0.3s;
+            font-size: 0.95rem;
+        }
+        .nav-link-custom:hover { color: var(--accent-blue); padding-left: 5px; }
+
+        footer { background: var(--footer-bg); padding: 60px 0 20px; border-top: 1px solid #334155; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container-fluid px-4">
+        <a class="navbar-brand" href="index.html">POETIC CODES</a>
+        <div class="ms-auto">
+            <a href="index.html" class="btn btn-outline-info btn-sm">Exit Docs</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <aside class="col-md-3 col-lg-2 d-none d-md-block doc-nav">
+            <h6 class="text-uppercase fw-bold small text-secondary mb-3">Introduction</h6>
+            <a href="#overview" class="nav-link-custom">Project Overview</a>
+            <a href="#setup" class="nav-link-custom">Environment Setup</a>
+            
+            <h6 class="text-uppercase fw-bold small text-secondary mt-4 mb-3">Core Logic</h6>
+            <a href="#encapsulation" class="nav-link-custom">Encapsulation</a>
+            <a href="#oop" class="nav-link-custom">OOP Standards</a>
+            
+            <h6 class="text-uppercase fw-bold small text-secondary mt-4 mb-3">Simulations</h6>
+            <a href="#atm-logic" class="nav-link-custom">ATM System</a>
+            <a href="#store-logic" class="nav-link-custom">Store Logic</a>
+        </aside>
+
+        <main class="col-md-9 col-lg-10 doc-content px-md-5">
+            <section id="overview">
+                <h1>Technical Documentation</h1>
+                <p class="lead text-dim">Implementation details for Python-based Object-Oriented systems.</p>
+                <hr class="border-secondary">
+                
+                <h2>Project Overview</h2>
+                <p>Poetic Codes provides a series of "Mini Projects" designed to bridge the gap between basic syntax and professional architecture. The focus is on <strong>data integrity</strong> and <strong>modular design</strong>.</p>
+            </section>
+
+            
+
+            <section id="setup" class="mt-5">
+                <h2>Environment Setup</h2>
+                <p>To run any of the simulation scripts provided in these tutorials, ensure you have Python 3.8+ installed.</p>
+                <div class="code-block">
+                    # Check your version<br>
+                    python --version<br><br>
+                    # Clone repository (optional)<br>
+                    git clone https://github.com/pansensoyglenn-dev/poetic-codes.git
+                </div>
+            </section>
+
+            <section id="encapsulation" class="mt-5">
+                <h2>Encapsulation Implementation</h2>
+                <p>In our projects, we utilize "Private" attributes. In Python, this is signified by a single underscore (<code>_attribute</code>).</p>
+                
+                <div class="info-note">
+                    <strong>Note:</strong> While Python doesn't strictly enforce private variables like Java or C++, the convention is critical for signaling to other developers that these attributes should not be modified directly.
+                </div>
+
+                <div class="code-block">
+                    class Account:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;def __init__(self):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;self._balance = 0  # Encapsulated
+                </div>
+            </section>
+
+            <section id="atm-logic" class="mt-5">
+                <h2>ATM System Workflow</h2>
+                <p>The ATM system follows a strict authentication-first logic flow:</p>
+                <ol class="text-dim">
+                    <li>Initialization with a 16-digit card number validation.</li>
+                    <li>State check: <code>_is_authenticated</code> must be True for all mutation methods.</li>
+                    <li>Amount validation: Ensuring <code>amount > 0</code> and <code>amount <= _balance</code>.</li>
+                </ol>
+            </section>
+        </main>
+    </div>
+</div>
+
+<footer>
+    <div class="container text-center">
+        <p class="text-dim small mb-0">© 2026 Glenn Pansensoy | Built with Logic and Precision.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
