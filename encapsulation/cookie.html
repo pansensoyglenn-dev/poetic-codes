@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy | Poetic Codes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --obsidian-bg: #0d1117;
+            --midnight-blue: #161b22;
+            --electric-blue: #58a6ff;
+            --text-main: #ffffff;
+            --text-muted: #f0f0f0;
+            --accent-orange: #f0883e;
+            --border: #30363d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--obsidian-bg);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.75;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--midnight-blue);
+            border-bottom: 1px solid var(--border);
+            padding: 1.2rem 5vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--electric-blue);
+            font-weight: 700;
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn {
+            color: var(--electric-blue);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: var(--electric-blue);
+            color: white;
+        }
+
+        main {
+            flex: 1;
+            padding: clamp(2rem, 4vw, 3rem) 5vw;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .policy-container {
+            background: var(--midnight-blue);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: clamp(2rem, 4vw, 3rem);
+        }
+
+        h1 {
+            color: var(--electric-blue);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        h2 {
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+            margin: 2.5rem 0 1rem;
+        }
+
+        p, li {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        ul, ol {
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        .cookie-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            border: 1px solid var(--border);
+        }
+
+        .cookie-table th {
+            background: var(--midnight-blue);
+            color: var(--electric-blue);
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .cookie-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .cookie-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .cookie-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 0.5rem;
+        }
+
+        .essential { background: rgba(59, 130, 246, 0.2); color: #58a6ff; }
+        .analytics { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .functional { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+
+        .control-section {
+            background: rgba(88, 166, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        footer {
+            background: #0b0f1c;
+            border-top: 1px solid var(--border);
+            padding: 3rem 5vw 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+
+        .footer-links a {
+            color: var(--electric-blue);
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .cookie-table {
+                display: block;
+                overflow-x: auto;
+            }
+            .policy-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="./index.html" class="logo">
+            <i class="fas fa-code"></i>
+            POETIC CODES
+        </a>
+        <a href="./index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </header>
+
+    <main>
+        <div class="policy-container">
+            <h1>Cookie Policy</h1>
+            <p><strong>Last Updated:</strong> January 2026</p>
+
+            <h2>1. What Are Cookies?</h2>
+            <p>Cookies are small text files that are placed on your computer or mobile device when you visit a website. They are widely used to make websites work more efficiently and provide information to the website owners.</p>
+
+            <h2>2. How We Use Cookies</h2>
+            <p>Poetic Codes uses cookies for the following purposes:</p>
+            <ul>
+                <li><strong>Essential Cookies:</strong> Required for basic site functionality</li>
+                <li><strong>Analytics Cookies:</strong> Help us understand how visitors interact with our site</li>
+                <li><strong>Preference Cookies:</strong> Remember your settings and preferences</li>
+                <li><strong>Security Cookies:</strong> Help protect the website and our users</li>
+            </ul>
+
+            <h2>3. Types of Cookies We Use</h2>
+            <table class="cookie-table">
+                <thead>
+                    <tr>
+                        <th>Cookie Name</th>
+                        <th>Type</th>
+                        <th>Purpose</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>cookie_consent</code></td>
+                        <td><span class="cookie-type essential">Essential</span></td>
+                        <td>Stores your cookie preferences</td>
+                        <td>1 year</td>
+                    </tr>
+                    <tr>
+                        <td><code>session_id</code></td>
+                        <td><span class="cookie-type essential">Essential</span></td>
+                        <td>Maintains your session state</td>
+                        <td>Session</td>
+                    </tr>
+                    <tr>
+                        <td><code>_ga</code></td>
+                        <td><span class="cookie-type analytics">Analytics</span></td>
+                        <td>Google Analytics tracking</td>
+                        <td>2 years</td>
+                    </tr>
+                    <tr>
+                        <td><code>theme_preference</code></td>
+                        <td><span class="cookie-type functional">Functional</span></td>
+                        <td>Remembers your theme preference</td>
+                        <td>1 year</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>4. Third-Party Cookies</h2>
+            <p>We use the following third-party services that may set cookies:</p>
+            <ul>
+                <li><strong>Google Analytics:</strong> For understanding how visitors use our site</li>
+                <li><strong>GitHub:</strong> For code repository integration</li>
+                <li><strong>Font Awesome:</strong> For displaying icons</li>
+                <li><strong>Google Fonts:</strong> For typography</li>
+            </ul>
+
+            <div class="control-section">
+                <h2>5. Managing Your Cookie Preferences</h2>
+                <p>You can control and/or delete cookies as you wish. You can delete all cookies that are already on your computer and you can set most browsers to prevent them from being placed.</p>
+                <p><strong>Browser Controls:</strong></p>
+                <ul>
+                    <li><a href="https://support.google.com/chrome/answer/95647" target="_blank">Google Chrome</a></li>
+                    <li><a href="https://support.mozilla.org/en-US/kb/enable-and-disable-cookies-website-preferences" target="_blank">Mozilla Firefox</a></li>
+                    <li><a href="https://support.apple.com/guide/safari/manage-cookies-and-website-data-sfri11471/mac" target="_blank">Safari</a></li>
+                    <li><a href="https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank">Microsoft Edge</a></li>
+                </ul>
+            </div>
+
+            <h2>6. Changes to This Policy</h2>
+            <p>We may update this Cookie Policy from time to time. We will notify you of any changes by posting the new Cookie Policy on this page and updating the "Last Updated" date.</p>
+
+            <h2>7. Contact Us</h2>
+            <p>If you have any questions about our Cookie Policy, please contact us at:</p>
+            <p><i class="fas fa-envelope"></i> pansensoyglenn@gmail.com</p>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="./privacy.html">Privacy Policy</a>
+                <a href="./terms.html">Terms of Service</a>
+                <a href="./about.html">About Us</a>
+                <a href="./contact.html">Contact</a>
+            </div>
+            <p>© 2026 Poetic Codes. All rights reserved.</p>
+            <p style="margin-top: 1rem; font-size: 0.9rem;">This website is an educational resource for Python programming.</p>
+        </div>
+    </footer>
+</body>
+</html>
