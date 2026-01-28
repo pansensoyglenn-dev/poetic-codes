@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorials | POETIC CODES - Master Your Craft</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --obsidian-dark: #0f172a;
+            --obsidian-card: #1e293b;
+            --accent-blue: #00d4ff;
+            --text-main: #ffffff;
+            --text-dim: #8892b0;
+            --text-light: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #050a14 0%, #0a192f 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: rgba(10, 25, 47, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .navbar-brand {
+            font-family: 'Cinzel', serif;
+            color: var(--accent-blue) !important;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .page-header h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--accent-blue);
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Category Filters */
+        .filter-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--text-dim);
+            padding: 8px 20px;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent-blue);
+            color: var(--obsidian-dark);
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+        }
+
+        /* Tutorial Cards */
+        .tutorial-card {
+            background: var(--obsidian-card);
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tutorial-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--accent-blue);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-img-top {
+            height: 200px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--accent-blue);
+            background: linear-gradient(45deg, #0f172a, #1e293b);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .card-title {
+            color: var(--accent-blue);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .card-text {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        .btn-read {
+            background: transparent;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-read:hover {
+            background: var(--accent-blue);
+            color: var(--obsidian-dark);
+        }
+
+        footer {
+            background: #020c1b;
+            padding: 3rem 0;
+            margin-top: 5rem;
+            border-top: 1px solid rgba(30, 58, 138, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-code"></i> POETIC CODES
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="tutorials.html">Tutorials</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>The Archive</h1>
+            <p class="lead">Curated Python and Web Development tutorials designed for precision.</p>
+        </div>
+
+        <div class="filter-container">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">Python</button>
+            <button class="filter-btn">OOP</button>
+            <button class="filter-btn">Frontend</button>
+            <button class="filter-btn">Algorithms</button>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="tutorial-card">
+                    <div class="card-img-top">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="badge bg-info text-dark mb-2">Python OOP</span>
+                        <h5 class="card-title">Bookstore Management System</h5>
+                        <p class="card-text">Master Encapsulation and Data Classes by building a functional retail simulator for "The Readers Hub".</p>
+                        <a href="book.html" class="btn btn-read">Start Learning</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="tutorial-card">
+                    <div class="card-img-top">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="badge bg-info text-dark mb-2">Security</span>
+                        <h5 class="card-title">Secure Password Hashing</h5>
+                        <p class="card-text">Learn how to store user credentials safely using Python's bcrypt library and encryption best practices.</p>
+                        <button class="btn btn-read disabled">Coming Soon</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="tutorial-card">
+                    <div class="card-img-top">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div class="card-body">
+                        <span class="badge bg-info text-dark mb-2">Frontend</span>
+                        <h5 class="card-title">Responsive UI with CSS Grid</h5>
+                        <p class="card-text">Ditch Bootstrap for a moment and learn to build complex layouts with raw CSS Grid and Flexbox.</p>
+                        <button class="btn btn-read disabled">Coming Soon</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container text-center">
+            <p class="text-dim small mb-0">© 2026 POETIC CODES by Glenn Junsay Pansensoy.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
