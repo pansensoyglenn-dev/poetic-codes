@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ | Midnight Knowledge Base</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0e17;
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0c1a32 0%, #020813 100%);
+            color: #ffffff;
+            padding: 40px 0;
+            text-align: center;
+            border-bottom: 1px solid #1a2b4d;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1a5fb4, #26a269, #1a5fb4);
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #5dadec, #26ddfb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo i {
+            margin-right: 12px;
+        }
+        
+        nav {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        nav a {
+            color: #a0b3d6;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        nav a:hover {
+            background-color: rgba(26, 95, 180, 0.1);
+            color: #5dadec;
+            border-color: rgba(93, 173, 236, 0.3);
+        }
+        
+        nav a.active {
+            background-color: rgba(26, 95, 180, 0.2);
+            color: #5dadec;
+            border-color: rgba(93, 173, 236, 0.4);
+            box-shadow: 0 0 15px rgba(93, 173, 236, 0.2);
+        }
+        
+        h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ffffff, #a0b3d6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #8a9bba;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            line-height: 1.8;
+        }
+        
+        .faq-container {
+            background-color: #101826;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 50px;
+            margin-top: 40px;
+            border: 1px solid #1a2b4d;
+        }
+        
+        .faq-section {
+            margin-bottom: 50px;
+        }
+        
+        .faq-section h2 {
+            color: #5dadec;
+            border-bottom: 2px solid #1a2b4d;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .faq-section h2 i {
+            margin-right: 12px;
+            background-color: rgba(93, 173, 236, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .faq-item {
+            margin-bottom: 20px;
+            border: 1px solid #1a2b4d;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-item:hover {
+            border-color: #2a3c5d;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .faq-question {
+            font-size: 18px;
+            font-weight: 600;
+            color: #d0d9f0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            background-color: #151f32;
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            background-color: #1a273d;
+            color: #ffffff;
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            color: #b0bcd9;
+            line-height: 1.8;
+            background-color: #131b2b;
+        }
+        
+        .faq-answer.open {
+            max-height: 300px;
+        }
+        
+        .faq-answer-content {
+            padding: 25px;
+            border-top: 1px solid #1a2b4d;
+        }
+        
+        .toggle-icon {
+            font-size: 14px;
+            transition: transform 0.3s ease;
+            color: #5dadec;
+            background-color: rgba(93, 173, 236, 0.1);
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .faq-question.active .toggle-icon {
+            transform: rotate(180deg);
+            background-color: rgba(93, 173, 236, 0.2);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 60px;
+            color: #8a9bba;
+            border-top: 1px solid #1a2b4d;
+        }
+        
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 12px 28px;
+            background: linear-gradient(90deg, #1a5fb4, #2a6fd0);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(93, 173, 236, 0.3);
+        }
+        
+        .contact-link:hover {
+            background: linear-gradient(90deg, #2a6fd0, #3a7fe4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(26, 95, 180, 0.3);
+        }
+        
+        .copyright {
+            margin-top: 25px;
+            font-size: 14px;
+            color: #6a7b9a;
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px rgba(93, 173, 236, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .faq-container {
+                padding: 25px;
+            }
+            
+            nav {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            nav a {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
+            }
+            
+            .faq-question {
+                padding: 15px 20px;
+                font-size: 16px;
+            }
+            
+            .faq-answer-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-stars"></i> Midnight Knowledge
+            </div>
+            <h1 class="glow-text">Frequently Asked Questions</h1>
+            <p class="subtitle">Find answers to common questions about our services, support, and policies in our obsidian-themed knowledge base.</p>
+            
+            <nav>
+                <a href="midnight-faq.html" class="active"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="midnight-projects.html"><i class="fas fa-project-diagram"></i> Projects</a>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="faq-container">
+            <div class="faq-section">
+                <h2><i class="fas fa-cog"></i> General Questions</h2>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What services do you provide?
+                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            We offer a comprehensive range of services including web development, mobile app development, UI/UX design, digital marketing, and IT consulting. Our team specializes in creating custom solutions tailored to your business needs with a focus on performance and security.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How can I contact customer support?
+                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            You can reach our customer support team via email at support@midnighttech.com, by phone at 1-800-123-4567, or through the live chat feature on our website. Our support hours are Monday-Friday, 9am-6pm EST. For urgent matters, we offer 24/7 emergency support.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What are your business hours?
+                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Our main office operates Monday through Friday from 9:00 AM to 6:00 PM. For customer support, we're available 24/7 through our online ticketing system and emergency hotline for critical issues. Virtual consultations can be scheduled outside regular hours by appointment.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-section">
+                <h2><i class="fas fa-laptop-code"></i> Technical Support</h2>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How do I reset my password?
+                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            To reset your password, go to the login page and click on "Forgot Password". Enter your email address and we'll send you a secure link to create a new password. The link will expire in 24 hours for security reasons. For added security, we recommend enabling two-factor authentication.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What browsers are supported?
+                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Our platform supports the latest versions of Chrome, Firefox, Safari, and Edge. We recommend keeping your browser updated to ensure the best experience and security. Internet Explorer 11 is also supported but with limited functionality. For optimal performance, we recommend Chrome 90+ or Firefox 88+.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How do I update my account information?
+                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Log into your account and navigate to "Account Settings". From there, you can update your personal information, contact details, and preferences. Changes to your email address will require verification. For security purposes, certain changes may require additional authentication steps.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="faq-section">
+                <h2><i class="fas fa-credit-card"></i> Billing & Payments</h2>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        What payment methods do you accept?
+                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            We accept all major credit cards (Visa, MasterCard, American Express, Discover), PayPal, Apple Pay, Google Pay, and bank transfers for larger contracts. All transactions are encrypted and secure. For enterprise clients, we also offer invoicing with net-30 terms.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        Can I cancel my subscription anytime?
+                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Yes, you can cancel your subscription at any time from your account dashboard. If you cancel mid-billing cycle, you'll continue to have access until the end of your current billing period. No partial refunds are provided for mid-cycle cancellations. Annual subscribers receive a prorated refund if canceled within 30 days.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="faq-item">
+                    <div class="faq-question">
+                        How do I get an invoice for my purchase?
+                        <span class="toggle-icon"><i class="fas fa-chevron-down"></i></span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Invoices are automatically generated and sent to your email after each payment. You can also access and download all your past invoices from the "Billing History" section in your account. For custom invoices or multiple payment methods, please contact our billing department.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Still have questions? Our support team is ready to assist you.</p>
+            <a href="./contact.html" class="contact-link"><i class="fas fa-envelope"></i> Contact Support</a>
+            <div class="copyright">
+                &copy; 2026 Glenn Junsay Pansensoy. All rights reserved. | Obsidian Theme v2.0
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqQuestions = document.querySelectorAll('.faq-question');
+            
+            faqQuestions.forEach(question => {
+                question.addEventListener('click', () => {
+                    const answer = question.nextElementSibling;
+                    const isOpen = answer.classList.contains('open');
+                    
+                    // Close all answers
+                    document.querySelectorAll('.faq-answer').forEach(ans => {
+                        ans.classList.remove('open');
+                    });
+                    
+                    // Remove active class from all questions
+                    document.querySelectorAll('.faq-question').forEach(q => {
+                        q.classList.remove('active');
+                    });
+                    
+                    // If the clicked answer wasn't open, open it
+                    if (!isOpen) {
+                        answer.classList.add('open');
+                        question.classList.add('active');
+                    }
+                });
+            });
+            
+            // Open first FAQ item by default
+            if (faqQuestions.length > 0) {
+                faqQuestions[0].click();
+            }
+        });
+    </script>
+</body>
+</html>
