@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Master Python encapsulation in 2026: Protect object state with @property, name mangling, frozen dataclasses + slots for immutability, performance, and safe AI/agent code. Modern best practices explained.">
+    <title>Python Encapsulation 2026: @property, Name Mangling, Frozen Dataclasses + Slots</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --obsidian-bg: #0d1117;
+            --midnight-blue: #161b22;
+            --electric-blue: #58a6ff;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --accent-orange: #f0883e;
+            --border: #30363d;
+            --code-bg: #0d1117;
+            --code-border: #f0883e;
+            --success-green: #3fb950;
+            --warning-yellow: #d29922;
+            --purple-accent: #bc8cff;
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body {
+            background: var(--obsidian-bg);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Skip link for accessibility */
+        .skip-to-content {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--electric-blue);
+            color: white;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 1001;
+        }
+        
+        .skip-to-content:focus {
+            top: 0;
+        }
+
+        header {
+            background: var(--midnight-blue);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            background-color: rgba(22, 27, 34, 0.95);
+        }
+
+        .logo { 
+            color: var(--electric-blue); 
+            font-weight: 700; 
+            font-size: 1.5rem; 
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo::before {
+            content: "{}";
+            color: var(--accent-orange);
+            font-weight: 900;
+        }
+
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 1002;
+        }
+
+        .hamburger-menu span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background: var(--electric-blue);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-menu.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+
+        .hamburger-menu.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-menu.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        .nav-links { 
+            display: flex; 
+            gap: 2.5rem; 
+        }
+        
+        .nav-links a { 
+            color: var(--text-main); 
+            text-decoration: none; 
+            font-weight: 500; 
+            transition: color 0.2s; 
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+        
+        .nav-links a:hover, 
+        .nav-links a:focus { 
+            color: var(--electric-blue); 
+            background: rgba(88, 166, 255, 0.1);
+            outline: none;
+        }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100vh;
+            background: var(--midnight-blue);
+            border-left: 1px solid var(--border);
+            padding: 100px 2rem 2rem;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+            overflow-y: auto;
+        }
+
+        .mobile-nav.active {
+            transform: translateX(0);
+        }
+
+        .mobile-nav ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .mobile-nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1.2rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: block;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-nav a:hover,
+        .mobile-nav a:focus {
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--electric-blue);
+            outline: none;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            backdrop-filter: blur(3px);
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        main {
+            flex: 1;
+            padding: 2rem 1rem 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        article {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { 
+            color: var(--electric-blue); 
+            font-size: clamp(2.2rem, 5vw, 2.8rem);
+            margin-bottom: 1.5rem; 
+            line-height: 1.2;
+            font-weight: 800;
+        }
+        
+        h2 { 
+            color: var(--accent-orange); 
+            font-size: clamp(1.8rem, 4vw, 2rem); 
+            margin: 4rem 0 1.5rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border);
+            scroll-margin-top: 2rem;
+        }
+        
+        h3 { 
+            color: var(--text-main); 
+            font-size: clamp(1.3rem, 3vw, 1.5rem); 
+            margin: 2.5rem 0 1rem;
+        }
+
+        p, .intro, .note, li { 
+            margin-bottom: 1.5rem; 
+            font-size: clamp(1rem, 2vw, 1.15rem);
+        }
+
+        .article-meta {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .update-badge {
+            background: var(--warning-yellow);
+            color: var(--obsidian-bg);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .intro { 
+            font-size: clamp(1.2rem, 3vw, 1.35rem); 
+            color: var(--text-muted); 
+            margin: 3rem 0; 
+            line-height: 1.8; 
+            border-left: 4px solid var(--electric-blue); 
+            padding-left: 2rem; 
+            font-style: italic;
+        }
+
+        .intro strong {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .note {
+            background: rgba(88, 166, 255, 0.05);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--electric-blue);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2.5rem 0;
+            position: relative;
+        }
+
+        .note::before {
+            content: "💡";
+            position: absolute;
+            left: -12px;
+            top: -12px;
+            background: var(--midnight-blue);
+            padding: 4px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+        }
+
+        .warning {
+            background: rgba(240, 136, 62, 0.05);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--accent-orange);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2.5rem 0;
+            position: relative;
+        }
+
+        .warning::before {
+            content: "⚠️";
+            position: absolute;
+            left: -12px;
+            top: -12px;
+            background: var(--midnight-blue);
+            padding: 4px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+        }
+
+        .note strong {
+            color: var(--electric-blue);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .warning strong {
+            color: var(--accent-orange);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .code-snippet {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--code-border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-snippet::before {
+            content: "python";
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--code-border);
+            color: var(--obsidian-bg);
+            padding: 0.25rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-bottom-left-radius: 8px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .code-snippet code { 
+            display: block; 
+            white-space: pre; 
+            font-family: 'Fira Code', monospace; 
+            font-size: 0.95rem; 
+            line-height: 1.6;
+            tab-size: 4;
+        }
+
+        .code-snippet code .comment { color: #8b949e; }
+        .code-snippet code .keyword { color: #ff7b72; }
+        .code-snippet code .function { color: #d2a8ff; }
+        .code-snippet code .string { color: #a5d6ff; }
+        .code-snippet code .number { color: #79c0ff; }
+        .code-snippet code .decorator { color: var(--purple-accent); }
+
+        ul, ol {
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        li::marker {
+            color: var(--electric-blue);
+        }
+
+        .hub-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+            gap: 1.5rem; 
+            margin: 3rem 0;
+        }
+
+        .hub-card {
+            background: var(--midnight-blue);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px;
+        }
+        
+        .hub-card:hover, 
+        .hub-card:focus { 
+            transform: translateY(-5px); 
+            border-color: var(--electric-blue); 
+            box-shadow: 0 10px 30px rgba(88, 166, 255, 0.1);
+            outline: none;
+        }
+
+        .hub-card-icon { 
+            font-size: 2.5rem; 
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        .hub-card h3 { 
+            font-size: 1.2rem; 
+            color: var(--electric-blue); 
+            margin: 0 0 0.75rem 0;
+            flex-grow: 0;
+        }
+        
+        .hub-card p { 
+            font-size: 0.95rem; 
+            color: var(--text-muted); 
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .toc { 
+            background: var(--midnight-blue); 
+            padding: 2rem; 
+            border-radius: 10px; 
+            margin: 3rem 0; 
+            border: 1px solid var(--border);
+            position: sticky;
+            top: 100px;
+        }
+        
+        .toc h2 { 
+            font-size: 1.3rem; 
+            margin-top: 0; 
+            margin-bottom: 1.5rem; 
+            color: var(--text-main); 
+            border: none; 
+            padding: 0;
+        }
+        
+        .toc ul { 
+            list-style: none; 
+            padding-left: 0; 
+            margin-bottom: 0; 
+        }
+        
+        .toc li {
+            margin-bottom: 0.75rem;
+            padding-left: 1rem;
+            position: relative;
+        }
+        
+        .toc li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--electric-blue);
+        }
+        
+        .toc a { 
+            color: var(--electric-blue); 
+            text-decoration: none; 
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .toc a:hover,
+        .toc a:focus {
+            color: var(--accent-orange);
+            text-decoration: underline;
+            outline: none;
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2.5rem 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: var(--midnight-blue);
+            color: var(--electric-blue);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(88, 166, 255, 0.03);
+        }
+
+        /* Learning Objectives */
+        .learning-objectives {
+            background: rgba(59, 130, 246, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 3rem 0;
+        }
+
+        .learning-objectives h3 {
+            color: var(--electric-blue);
+            margin-top: 0;
+        }
+
+        .learning-objectives ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .learning-objectives li {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+        }
+
+        .learning-objectives li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success-green);
+            font-weight: bold;
+        }
+
+        /* Interactive Example */
+        .interactive-example {
+            background: var(--midnight-blue);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 3rem 0;
+        }
+
+        .example-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .example-tab {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .example-tab.active {
+            background: var(--electric-blue);
+            color: white;
+        }
+
+        .example-content {
+            display: none;
+        }
+
+        .example-content.active {
+            display: block;
+        }
+
+        footer {
+            background: var(--midnight-blue);
+            border-top: 1px solid var(--border);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: auto;
+        }
+
+        .footer-brand { 
+            font-size: 1.4rem; 
+            color: var(--electric-blue); 
+            font-weight: 700; 
+            margin-bottom: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .footer-links { 
+            margin: 2rem 0; 
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+        }
+        
+        .footer-links a { 
+            color: var(--electric-blue); 
+            text-decoration: none; 
+            padding: 0.5rem;
+        }
+        
+        .footer-links a:hover,
+        .footer-links a:focus {
+            text-decoration: underline;
+            outline: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hamburger-menu {
+                display: flex;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-nav {
+                display: block;
+            }
+
+            header {
+                padding: 1rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
+            
+            .toc {
+                position: static;
+            }
+            
+            .hub-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mobile-nav {
+                width: 100%;
+            }
+
+            .comparison-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .article-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .nav-links,
+            .hamburger-menu,
+            .mobile-nav,
+            .overlay,
+            .toc,
+            .hub-grid,
+            footer,
+            .example-tabs {
+                display: none;
+            }
+            
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .code-snippet {
+                background: #f5f5f5;
+                border: 1px solid #ddd;
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-to-content">Skip to main content</a>
+
+    <div class="overlay" id="overlay"></div>
+
+    <header>
+        <a href="../index.html" class="logo">POETIC CODES</a>
+        
+        <button class="hamburger-menu" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <nav class="nav-links" aria-label="Main Navigation">
+            <a href="../index.html">Tutorials</a>
+            <a href="#labs">Labs</a>
+            <a href="#toc" aria-label="Table of Contents">Contents</a>
+        </nav>
+    </header>
+
+    <nav class="mobile-nav" id="mobileNav" aria-label="Mobile Navigation">
+        <ul>
+            <li><a href="../index.html">Tutorials</a></li>
+            <li><a href="#why">Why Encapsulation Matters</a></li>
+            <li><a href="#section1">Private & Protected Conventions</a></li>
+            <li><a href="#section2">The @property Decorator</a></li>
+            <li><a href="#section3">2026 Standards</a></li>
+            <li><a href="#comparison">Method Comparison</a></li>
+            <li><a href="#labs">Practical Labs</a></li>
+            <li><a href="#best-practices">Best Practices</a></li>
+            <li><a href="#outro">Philosophy of State</a></li>
+            <li><a href="#toc">Table of Contents</a></li>
+        </ul>
+    </nav>
+
+    <main id="main-content">
+        <article>
+            <div class="article-meta">
+                <span>By: Glenn Junsay Pansensoy</span>
+                <span class="update-badge" aria-label="Updated January 2026">Updated January 2026</span>
+            </div>
+
+            <h1>Python Encapsulation – Mastering Object-Oriented Design (2026)</h1>
+
+            <div class="intro" role="contentinfo" aria-label="Introduction">
+                Encapsulation isn't just about underscores. It's about <strong>protecting an object's invariants</strong>, controlling how state changes, and making your code safer—especially for autonomous agents and performance-critical AI deployments.
+            </div>
+
+            <section class="learning-objectives">
+                <h3>Learning Objectives</h3>
+                <ul>
+                    <li>Understand the four levels of encapsulation in Python</li>
+                    <li>Master @property decorator for computed attributes</li>
+                    <li>Implement name mangling for true private attributes</li>
+                    <li>Use dataclasses with slots for memory efficiency</li>
+                    <li>Apply encapsulation patterns to real-world projects</li>
+                    <li>Choose the right encapsulation technique for each scenario</li>
+                </ul>
+            </section>
+
+            <section class="toc" id="toc" aria-labelledby="toc-heading">
+                <h2 id="toc-heading">Complete Guide Navigation</h2>
+                <ul>
+                    <li><a href="#why">Why Encapsulation Matters</a></li>
+                    <li><a href="#section1">Private & Protected Conventions</a></li>
+                    <li><a href="#section2">The @property Decorator</a></li>
+                    <li><a href="#section3">2026 Standards: Dataclasses & Slots</a></li>
+                    <li><a href="#comparison">Method Comparison Guide</a></li>
+                    <li><a href="#labs">Practical Applied Labs</a></li>
+                    <li><a href="#best-practices">Best Practices & Patterns</a></li>
+                    <li><a href="#outro">Conclusion: Philosophy of State</a></li>
+                </ul>
+            </section>
+
+            <section id="why" aria-labelledby="why-heading">
+                <h2 id="why-heading">Why Encapsulation Matters in Modern Python</h2>
+                <p>In high-stakes software engineering, encapsulation serves as the primary defense against <strong>"State Drift."</strong> If any part of your program can modify an object's internal data at any time, your system becomes unpredictable and nearly impossible to debug.</p>
+
+                <div class="note">
+                    <strong>Key Insight:</strong> Encapsulation isn't about hiding data—it's about <strong>protecting relationships</strong> between data points that must remain consistent.
+                </div>
+
+                <p>By enforcing encapsulation, you gain:</p>
+                <ul>
+                    <li><strong>Predictability:</strong> You control the entry point for all data changes.</li>
+                    <li><strong>Maintainability:</strong> You can swap internal logic without breaking the external API.</li>
+                    <li><strong>Safety:</strong> You prevent "impossible" states (like a negative bank balance) at the moment of assignment.</li>
+                    <li><strong>Performance:</strong> Proper encapsulation enables optimization opportunities.</li>
+                    <li><strong>Testability:</strong> Well-encapsulated code is easier to unit test.</li>
+                </ul>
+
+                <div class="interactive-example">
+                    <div class="example-tabs">
+                        <button class="example-tab active" data-target="example1">Problem</button>
+                        <button class="example-tab" data-target="example2">Solution</button>
+                    </div>
+                    <div id="example1" class="example-content active">
+                        <h4>Without Encapsulation (Problematic)</h4>
+                        <div class="code-snippet">
+<code><span class="keyword">class</span> <span class="function">BankAccount</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>, balance):
+        <span class="keyword">self</span>.balance = balance  <span class="comment"># Direct access - dangerous!</span>
+
+<span class="comment"># Anyone can do this:</span>
+account = BankAccount(1000)
+account.balance = -500  <span class="comment"># Invalid state!</span>
+account.balance = <span class="string">"invalid"</span>  <span class="comment"># Wrong type!</span></code>
+                        </div>
+                    </div>
+                    <div id="example2" class="example-content">
+                        <h4>With Encapsulation (Solution)</h4>
+                        <div class="code-snippet">
+<code><span class="keyword">class</span> <span class="function">BankAccount</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>, balance):
+        <span class="keyword">self</span>._balance = <span class="number">0</span>  <span class="comment"># Protected attribute</span>
+        <span class="keyword">self</span>.deposit(balance)  <span class="comment"># Use validation method</span>
+    
+    <span class="keyword">def</span> <span class="function">deposit</span>(<span class="keyword">self</span>, amount):
+        <span class="keyword">if</span> <span class="keyword">not</span> isinstance(amount, (int, float)):
+            <span class="keyword">raise</span> TypeError(<span class="string">"Amount must be numeric"</span>)
+        <span class="keyword">if</span> amount &lt;= <span class="number">0</span>:
+            <span class="keyword">raise</span> ValueError(<span class="string">"Deposit must be positive"</span>)
+        <span class="keyword">self</span>._balance += amount
+    
+    @property
+    <span class="keyword">def</span> <span class="function">balance</span>(<span class="keyword">self</span>):
+        <span class="keyword">return</span> <span class="keyword">self</span>._balance</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="section1" aria-labelledby="section1-heading">
+                <h2 id="section1-heading">Python's Four Levels of Encapsulation</h2>
+                
+                <h3>1. Public Attributes (No Encapsulation)</h3>
+                <p>Default Python behavior - anyone can read or modify the attribute.</p>
+                
+                <div class="code-snippet">
+<code><span class="keyword">class</span> <span class="function">PublicExample</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>):
+        <span class="keyword">self</span>.public_data = <span class="string">"Anyone can access this"</span></code>
+                </div>
+
+                <h3>2. Protected Attributes (Convention)</h3>
+                <p>Single underscore prefix - signals "internal use" to other developers.</p>
+                
+                <div class="code-snippet">
+<code><span class="keyword">class</span> <span class="function">ProtectedExample</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>):
+        <span class="keyword">self</span>._internal_data = <span class="string">"For internal use only"</span>
+        <span class="comment"># Can still be accessed: obj._internal_data</span>
+        <span class="comment"># But convention says "don't touch this"</span></code>
+                </div>
+
+                <h3>3. Private Attributes (Name Mangling)</h3>
+                <p>Double underscore prefix - Python renames the attribute to prevent accidental access.</p>
+                
+                <div class="code-snippet">
+<code><span class="keyword">class</span> <span class="function">PrivateExample</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>):
+        <span class="keyword">self</span>.__secret_data = <span class="string">"Truly private"</span>
+        <span class="comment"># Renamed to: _PrivateExample__secret_data</span>
+        <span class="comment"># Prevents accidental override in subclasses</span></code>
+                </div>
+
+                <div class="warning">
+                    <strong>Important:</strong> Name mangling is NOT security! It's a development aid to prevent accidental name collisions in inheritance hierarchies. Determined users can still access "private" attributes if they know the mangled name.
+                </div>
+
+                <h3>4. Properties (Complete Control)</h3>
+                <p>The most powerful encapsulation - full control over get/set behavior.</p>
+                
+                <div class="code-snippet">
+<code><span class="keyword">class</span> <span class="function">PropertyExample</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>):
+        <span class="keyword">self</span>._value = <span class="number">0</span>
+    
+    @property
+    <span class="keyword">def</span> <span class="function">value</span>(<span class="keyword">self</span>):
+        <span class="comment"># Getter: Compute or transform on access</span>
+        <span class="keyword">return</span> <span class="keyword">self</span>._value * <span class="number">2</span>
+    
+    @value.setter
+    <span class="keyword">def</span> <span class="function">value</span>(<span class="keyword">self</span>, new_value):
+        <span class="comment"># Setter: Validate before assignment</span>
+        <span class="keyword">if</span> new_value &lt; <span class="number">0</span>:
+            <span class="keyword">raise</span> ValueError(<span class="string">"Value cannot be negative"</span>)
+        <span class="keyword">self</span>._value = new_value
+    
+    @value.deleter
+    <span class="keyword">def</span> <span class="function">value</span>(<span class="keyword">self</span>):
+        <span class="comment"># Deleter: Custom cleanup logic</span>
+        <span class="keyword">del</span> <span class="keyword">self</span>._value</code>
+                </div>
+            </section>
+
+            <section id="section2" aria-labelledby="section2-heading">
+                <h2 id="section2-heading">Advanced @property Patterns</h2>
+                <p>The <code>@property</code> decorator allows you to expose an attribute as if it were a normal field while running validation logic behind the scenes.</p>
+
+                <div class="note">
+                    <strong>Pro Tip:</strong> Use properties for attributes that require validation, transformation, or computation on access.
+                </div>
+
+                <h3>Cached Properties with @functools.cached_property</h3>
+                <div class="code-snippet">
+<code><span class="keyword">from</span> functools <span class="keyword">import</span> cached_property
+
+<span class="keyword">class</span> <span class="function">Circle</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>, radius):
+        <span class="keyword">self</span>.radius = radius
+    
+    @cached_property
+    <span class="keyword">def</span> <span class="function">area</span>(<span class="keyword">self</span>):
+        <span class="comment"># Computed once, cached for future access</span>
+        <span class="keyword">import</span> math
+        <span class="keyword">return</span> math.pi * <span class="keyword">self</span>.radius ** <span class="number">2</span>
+    
+    @cached_property
+    <span class="keyword">def</span> <span class="function">circumference</span>(<span class="keyword">self</span>):
+        <span class="keyword">import</span> math
+        <span class="keyword">return</span> <span class="number">2</span> * math.pi * <span class="keyword">self</span>.radius</code>
+                </div>
+
+                <h3>Read-Only Properties</h3>
+                <div class="code-snippet">
+<code><span class="keyword">class</span> <span class="function">ReadOnlyExample</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>, initial_value):
+        <span class="keyword">self</span>._value = initial_value
+    
+    @property
+    <span class="keyword">def</span> <span class="function">value</span>(<span class="keyword">self</span>):
+        <span class="comment"># No setter = read-only property</span>
+        <span class="keyword">return</span> <span class="keyword">self</span>._value</code>
+                </div>
+
+                <h3>Property with Type Validation</h3>
+                <div class="code-snippet">
+<code><span class="keyword">class</span> <span class="function">TypeSafeExample</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>):
+        <span class="keyword">self</span>._items = []
+    
+    @property
+    <span class="keyword">def</span> <span class="function">items</span>(<span class="keyword">self</span>):
+        <span class="keyword">return</span> tuple(<span class="keyword">self</span>._items)  <span class="comment"># Return immutable copy</span>
+    
+    @items.setter
+    <span class="keyword">def</span> <span class="function">items</span>(<span class="keyword">self</span>, new_items):
+        <span class="keyword">if</span> <span class="keyword">not</span> isinstance(new_items, list):
+            <span class="keyword">raise</span> TypeError(<span class="string">"Items must be a list"</span>)
+        <span class="keyword">self</span>._items = new_items</code>
+                </div>
+            </section>
+
+            <section id="section3" aria-labelledby="section3-heading">
+                <h2 id="section3-heading">2026 Standards: Dataclasses, Slots, and Immutability</h2>
+                <p>For data-heavy classes, the 2026 standard is to use <code>dataclasses</code> with <code>slots=True</code> and <code>frozen=True</code>. This provides massive memory savings and prevents accidental mutation.</p>
+
+                <div class="note">
+                    <strong>2026 Mindset:</strong> Using <code>__slots__</code> eliminates the per-instance <code>__dict__</code>, which can reduce memory usage by up to 40% in large AI agent swarms.
+                </div>
+
+                <h3>Traditional Class vs. Modern Dataclass</h3>
+                
+                <div class="code-snippet">
+<code><span class="comment"># Traditional verbose class</span>
+<span class="keyword">class</span> <span class="function">TraditionalPoint</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>, x, y):
+        <span class="keyword">self</span>.x = x
+        <span class="keyword">self</span>.y = y
+    
+    <span class="keyword">def</span> <span class="function">__repr__</span>(<span class="keyword">self</span>):
+        <span class="keyword">return</span> <span class="string">f"Point(x=</span>{<span class="keyword">self</span>.x}<span class="string">, y=</span>{<span class="keyword">self</span>.y}<span class="string">)"</span>
+    
+    <span class="keyword">def</span> <span class="function">__eq__</span>(<span class="keyword">self</span>, other):
+        <span class="keyword">return</span> (<span class="keyword">self</span>.x == other.x <span class="keyword">and</span> 
+                <span class="keyword">self</span>.y == other.y)</code>
+                </div>
+
+                <div class="code-snippet">
+<code><span class="comment"># Modern dataclass (same functionality)</span>
+<span class="keyword">from</span> dataclasses <span class="keyword">import</span> dataclass
+
+@dataclass(slots=True, frozen=True, order=True)
+<span class="keyword">class</span> <span class="function">ModernPoint</span>:
+    x: float
+    y: float
+    
+    <span class="keyword">def</span> <span class="function">distance_to_origin</span>(<span class="keyword">self</span>):
+        <span class="keyword">import</span> math
+        <span class="keyword">return</span> math.sqrt(<span class="keyword">self</span>.x**<span class="number">2</span> + <span class="keyword">self</span>.y**<span class="number">2</span>)</code>
+                </div>
+
+                <h3>Memory Efficiency with __slots__</h3>
+                
+                <div class="code-snippet">
+<code><span class="comment"># Without slots: Each instance has a __dict__</span>
+<span class="keyword">class</span> <span class="function">WithoutSlots</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>, x, y):
+        <span class="keyword">self</span>.x = x
+        <span class="keyword">self</span>.y = y
+    <span class="comment"># Memory: ~120 bytes per instance</span>
+
+<span class="comment"># With slots: Fixed attribute storage</span>
+<span class="keyword">class</span> <span class="function">WithSlots</span>:
+    __slots__ = (<span class="string">'x'</span>, <span class="string">'y'</span>)  <span class="comment"># Only these attributes allowed</span>
+    
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>, x, y):
+        <span class="keyword">self</span>.x = x
+        <span class="keyword">self</span>.y = y
+    <span class="comment"># Memory: ~64 bytes per instance (46% reduction!)</span></code>
+                </div>
+
+                <div class="warning">
+                    <strong>Trade-off:</strong> Classes with <code>__slots__</code> cannot have dynamic attributes (no <code>obj.new_attribute = value</code>). This is usually a benefit for encapsulation!
+                </div>
+            </section>
+
+            <section id="comparison" aria-labelledby="comparison-heading">
+                <h2 id="comparison-heading">Encapsulation Method Comparison Guide</h2>
+                
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>When to Use</th>
+                            <th>Advantages</th>
+                            <th>Limitations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Public Attributes</strong><br><code>self.value</code></td>
+                            <td>Simple data containers, internal scripts, throwaway code</td>
+                            <td>Simple, readable, Pythonic for simple cases</td>
+                            <td>No protection, no validation, breaks easily</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Protected Attributes</strong><br><code>self._value</code></td>
+                            <td>Internal attributes in libraries, team projects</td>
+                            <td>Clear intent, prevents accidental use, no performance cost</td>
+                            <td>Only convention, not enforced</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Private Attributes</strong><br><code>self.__value</code></td>
+                            <td>Preventing name collisions in inheritance hierarchies</td>
+                            <td>Prevents accidental overriding, clear private intent</td>
+                            <td>Not truly private, can still be accessed with mangled name</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Properties</strong><br><code>@property</code></td>
+                            <td>Validation, computation, read-only attributes</td>
+                            <td>Full control, validation, computed values, clean API</td>
+                            <td>More verbose, slight performance overhead</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Dataclasses + Slots</strong><br><code>@dataclass(slots=True)</code></td>
+                            <td>Data-heavy objects, performance-critical code</td>
+                            <td>Memory efficient, immutable by default, auto-methods</td>
+                            <td>Less flexible, no dynamic attributes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Frozen Dataclasses</strong><br><code>@dataclass(frozen=True)</code></td>
+                            <td>Immutable data, functional programming, thread safety</td>
+                            <td>Truly immutable, hashable, thread-safe</td>
+                            <td>Cannot modify after creation</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="note">
+                    <strong>Rule of Thumb:</strong> Start with public attributes for prototypes. Add properties when validation is needed. Use dataclasses for data-heavy classes. Consider slots for performance-critical code with many instances.
+                </div>
+            </section>
+
+            <section id="labs" aria-labelledby="labs-heading">
+                <h2 id="labs-heading">Apply Encapsulation: Practical Labs</h2>
+                <p style="text-align: center; margin-bottom: 2rem; color: var(--text-muted);">
+                    Hands-on projects to master encapsulation in real-world scenarios
+                </p>
+                <div class="hub-grid">
+                    <a href="atm.html" class="hub-card" aria-label="Mini-ATM: Secure PIN and balance logic">
+                        <div class="hub-card-icon">🏦</div>
+                        <h3>Mini-ATM</h3>
+                        <p>Secure PIN and balance logic with transaction validation</p>
+                    </a>
+                    <a href="vegetable.html" class="hub-card" aria-label="Vegetable Store: Inventory validation logic">
+                        <div class="hub-card-icon">🥦</div>
+                        <h3>Vegetable Store</h3>
+                        <p>Inventory validation and perishable goods management</p>
+                    </a>
+                    <a href="book.html" class="hub-card" aria-label="Book Store: Immutable metadata records">
+                        <div class="hub-card-icon">📚</div>
+                        <h3>Book Store</h3>
+                        <p>Immutable metadata records with ISBN validation</p>
+                    </a>
+                    <a href="lechon.html" class="hub-card" aria-label="Lechon Hub: Pitmaster-only access control">
+                        <div class="hub-card-icon">🐖</div>
+                        <h3>Lechon Hub</h3>
+                        <p>Pitmaster-only access control and order validation</p>
+                    </a>
+                    <a href="flower.html" class="hub-card" aria-label="Flower Shop: Perishable state management">
+                        <div class="hub-card-icon">🌸</div>
+                        <h3>Flower Shop</h3>
+                        <p>Perishable state management with freshness tracking</p>
+                    </a>
+                </div>
+
+                <div class="note" style="margin-top: 2rem;">
+                    <strong>Lab Learning Path:</strong> Start with Mini-ATM (basic validation), progress to Vegetable Store (inventory management), then tackle Book Store (immutability patterns), and finally explore the advanced patterns in Lechon Hub and Flower Shop.
+                </div>
+            </section>
+
+            <section id="best-practices" aria-labelledby="best-practices-heading">
+                <h2 id="best-practices-heading">Encapsulation Best Practices & Patterns</h2>
+
+                <h3>1. The Builder Pattern with Validation</h3>
+                <div class="code-snippet">
+<code><span class="keyword">class</span> <span class="function">UserProfile</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>, username, email, age):
+        <span class="keyword">self</span>.username = username
+        <span class="keyword">self</span>.email = email
+        <span class="keyword">self</span>.age = age
+    
+    @classmethod
+    <span class="keyword">def</span> <span class="function">create</span>(<span class="keyword">cls</span>, username, email, age):
+        <span class="comment"># Factory method with validation</span>
+        <span class="keyword">if</span> <span class="keyword">not</span> username <span class="keyword">or</span> <span class="keyword">not</span> username.isalnum():
+            <span class="keyword">raise</span> ValueError(<span class="string">"Invalid username"</span>)
+        <span class="keyword">if</span> <span class="string">'@'</span> <span class="keyword">not</span> <span class="keyword">in</span> email:
+            <span class="keyword">raise</span> ValueError(<span class="string">"Invalid email"</span>)
+        <span class="keyword">if</span> age &lt; <span class="number">13</span> <span class="keyword">or</span> age &gt; <span class="number">120</span>:
+            <span class="keyword">raise</span> ValueError(<span class="string">"Invalid age"</span>)
+        <span class="keyword">return</span> <span class="keyword">cls</span>(username, email, age)</code>
+                </div>
+
+                <h3>2. Immutable Data Transfer Objects (DTOs)</h3>
+                <div class="code-snippet">
+<code><span class="keyword">from</span> dataclasses <span class="keyword">import</span> dataclass
+<span class="keyword">from</span> typing <span class="keyword">import</span> Optional
+<span class="keyword">from</span> datetime <span class="keyword">import</span> datetime
+
+@dataclass(frozen=True)
+<span class="keyword">class</span> <span class="function">TransactionDTO</span>:
+    <span class="comment"># Immutable data transfer object</span>
+    transaction_id: str
+    amount: float
+    currency: str = <span class="string">"USD"</span>
+    timestamp: datetime = datetime.now()
+    status: str = <span class="string">"pending"</span>
+    
+    @property
+    <span class="keyword">def</span> <span class="function">is_successful</span>(<span class="keyword">self</span>) -> bool:
+        <span class="keyword">return</span> <span class="keyword">self</span>.status == <span class="string">"completed"</span>
+    
+    <span class="keyword">def</span> <span class="function">mark_completed</span>(<span class="keyword">self</span>) -> <span class="string">'TransactionDTO'</span>:
+        <span class="comment"># Return new instance with updated status</span>
+        <span class="keyword">return</span> TransactionDTO(
+            transaction_id=<span class="keyword">self</span>.transaction_id,
+            amount=<span class="keyword">self</span>.amount,
+            currency=<span class="keyword">self</span>.currency,
+            timestamp=<span class="keyword">self</span>.timestamp,
+            status=<span class="string">"completed"</span>
+        )</code>
+                </div>
+
+                <h3>3. Encapsulation for API Boundaries</h3>
+                <div class="code-snippet">
+<code><span class="keyword">class</span> <span class="function">APIClient</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="keyword">self</span>, api_key: str):
+        <span class="keyword">self</span>._api_key = api_key  <span class="comment"># Private - don't expose secrets</span>
+        <span class="keyword">self</span>._session = self._create_session()
+        <span class="keyword">self</span>._rate_limiter = RateLimiter()
+    
+    <span class="keyword">def</span> <span class="function">_create_session</span>(<span class="keyword">self</span>):
+        <span class="comment"># Private method - internal implementation detail</span>
+        session = requests.Session()
+        session.headers.update({
+            <span class="string">'Authorization'</span>: <span class="string">f'Bearer </span>{<span class="keyword">self</span>._api_key}<span class="string">'</span>,
+            <span class="string">'Content-Type'</span>: <span class="string">'application/json'</span>
+        })
+        <span class="keyword">return</span> session
+    
+    <span class="keyword">def</span> <span class="function">get_data</span>(<span class="keyword">self</span>, endpoint: str):
+        <span class="comment"># Public method - clean API</span>
+        <span class="keyword">self</span>._rate_limiter.wait_if_needed()
+        response = <span class="keyword">self</span>._session.get(endpoint)
+        response.raise_for_status()
+        <span class="keyword">return</span> response.json()</code>
+                </div>
+            </section>
+
+            <section id="outro" aria-labelledby="outro-heading" style="margin-top: 4rem; padding-top: 3rem; border-top: 2px dashed var(--border);">
+                <h2 id="outro-heading">The Philosophy of State</h2>
+                <p>Encapsulation is ultimately about <strong>trust</strong>. By writing code that protects its own state, you allow other developers and your future self to trust your objects. Professional excellence isn't found in building walls, but in designing interfaces so intuitive that the "wrong" way to use your code becomes the hardest way to write it.</p>
+                
+                <div class="note">
+                    <strong>Remember:</strong> Good encapsulation reduces cognitive load. When developers can trust that your objects maintain their own invariants, they can focus on solving business problems rather than debugging invalid states.
+                </div>
+
+                <h3>Key Takeaways for Students</h3>
+                <ul>
+                    <li><strong>Start simple:</strong> Use public attributes for prototypes, then add encapsulation as needed</li>
+                    <li><strong>Validate early:</strong> Catch invalid states at the point of assignment, not later</li>
+                    <li><strong>Document intent:</strong> Use naming conventions (_protected, __private) to communicate purpose</li>
+                    <li><strong>Choose wisely:</strong> Different encapsulation methods serve different purposes</li>
+                    <li><strong>Think immutability:</strong> Consider making objects immutable by default</li>
+                    <li><strong>Performance matters:</strong> Use slots for memory efficiency in data-heavy applications</li>
+                </ul>
+
+                <div class="warning">
+                    <strong>Final Advice:</strong> The best encapsulation is invisible. Users of your classes shouldn't need to think about whether attributes are public or private—they should just work with a clean, intuitive interface. Focus on making your objects easy to use correctly and hard to use incorrectly.
+                </div>
+
+                <p style="text-align: center; margin-top: 3rem; font-style: italic; color: var(--text-muted);">
+                    "Encapsulation is not about hiding complexity, but about managing it responsibly."<br>
+                    — Principles of Modern Python Development
+                </p>
+            </section>
+        </article>
+    </main>
+
+    <footer>
+        <div class="footer-brand">POETIC CODES</div>
+        <div class="footer-links" aria-label="Footer Links">
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Service</a>
+            <a href="cookies.html">Cookie Policy</a>
+            <a href="disclaimer.html">Disclaimer</a>
+        </div>
+        <p>© 2026 Poetic Codes — Zamboanga Sibugay Province, Philippines</p>
+        <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+            Educational content created for programming students. Always write your own code examples.
+        </p>
+    </footer>
+
+    <script>
+        // Hamburger menu functionality
+        const hamburger = document.getElementById('hamburger');
+        const mobileNav = document.getElementById('mobileNav');
+        const overlay = document.getElementById('overlay');
+        const body = document.body;
+
+        function toggleMenu() {
+            const isExpanded = hamburger.getAttribute('aria-expanded') === 'true';
+            
+            hamburger.classList.toggle('active');
+            mobileNav.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            hamburger.setAttribute('aria-expanded', !isExpanded);
+            
+            // Prevent body scroll when menu is open
+            if (!isExpanded) {
+                body.style.overflow = 'hidden';
+            } else {
+                body.style.overflow = '';
+            }
+        }
+
+        function closeMenu() {
+            hamburger.classList.remove('active');
+            mobileNav.classList.remove('active');
+            overlay.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
+            body.style.overflow = '';
+        }
+
+        hamburger.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', closeMenu);
+
+        // Close menu when clicking on mobile nav links
+        document.querySelectorAll('.mobile-nav a').forEach(link => {
+            link.addEventListener('click', closeMenu);
+        });
+
+        // Close menu with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMenu();
+            }
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Update URL without page jump
+                    history.pushState(null, null, targetId);
+                }
+            });
+        });
+
+        // Interactive example tabs
+        document.querySelectorAll('.example-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                
+                // Update active tab
+                document.querySelectorAll('.example-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+                this.classList.add('active');
+                
+                // Show target content
+                document.querySelectorAll('.example-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // Highlight active section in TOC
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.toc a');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-100px 0px -50% 0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    navLinks.forEach(link => {
+                        link.classList.remove('active');
+                        if (link.getAttribute('href') === `#${id}`) {
+                            link.classList.add('active');
+                            link.style.color = 'var(--accent-orange)';
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // Enhanced syntax highlighting
+        document.querySelectorAll('.code-snippet code').forEach(codeBlock => {
+            const code = codeBlock.textContent;
+            const highlighted = code
+                .replace(/\b(class|def|if|else|return|raise|import|from|as|try|except|finally|with|while|for|in|is|not|and|or|True|False|None)\b/g, '<span class="keyword">$1</span>')
+                .replace(/\b(__init__|__str__|__repr__|__eq__|__hash__)\b/g, '<span class="function">$1</span>')
+                .replace(/\b(@\w+)\b/g, '<span class="decorator">$1</span>')
+                .replace(/(['"].*?['"])/g, '<span class="string">$1</span>')
+                .replace(/\b(\d+\.?\d*)\b/g, '<span class="number">$1</span>')
+                .replace(/#(.*?)(?=\n|$)/g, '<span class="comment">#$1</span>');
+            
+            codeBlock.innerHTML = highlighted;
+        });
+
+        // Keyboard navigation for cards
+        document.querySelectorAll('.hub-card').forEach(card => {
+            card.setAttribute('tabindex', '0');
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 992) {
+                closeMenu();
+            }
+        });
+
+        // Add subtle animation to cards on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.hub-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+        });
+    </script>
+</body>
+</html>
