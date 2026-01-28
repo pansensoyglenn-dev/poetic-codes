@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | POETIC CODES - Glenn Junsay Pansensoy</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --obsidian-dark: #0f172a;
+            --obsidian-card: #1e293b;
+            --accent-blue: #00d4ff;
+            --text-main: #ffffff;
+            --text-dim: #8892b0;
+            --text-light: #cbd5e1;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #050a14 0%, #0a192f 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding-top: 80px; /* Space for fixed navbar */
+        }
+
+        /* Navigation Style matching Main */
+        .navbar {
+            background-color: rgba(10, 25, 47, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .navbar-brand {
+            font-family: 'Cinzel', serif;
+            color: var(--accent-blue) !important;
+            letter-spacing: 2px;
+        }
+
+        .container-content {
+            max-width: 1000px;
+            background: rgba(10, 25, 47, 0.8);
+            padding: 3rem;
+            border-radius: 20px;
+            margin: 2rem auto;
+            border: 1px solid rgba(30, 58, 138, 0.3);
+            position: relative;
+        }
+
+        .profile-img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 3px solid var(--accent-blue);
+            padding: 5px;
+            margin-bottom: 1.5rem;
+            object-fit: cover;
+        }
+
+        h1, h2 {
+            color: var(--accent-blue);
+            font-family: 'Cinzel', serif;
+        }
+
+        .skill-badge {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 0.3rem;
+            font-size: 0.9rem;
+        }
+
+        .narrative-box {
+            border-left: 4px solid var(--accent-blue);
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            margin: 2rem 0;
+        }
+
+        footer {
+            background: #020c1b;
+            padding: 2rem 0;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(30, 58, 138, 0.3);
+        }
+
+        .back-btn {
+            color: var(--accent-blue);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 2rem;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-code"></i> POETIC CODES
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Tutorials</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container container-content">
+        <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Home</a>
+        
+        <div class="row align-items-center mb-5">
+            <div class="col-md-4 text-center">
+                <img src="https://via.placeholder.com/180" alt="My Hub" class="profile-img">
+            </div>
+            <div class="col-md-8">
+                <h1>Glenn Junsay Pansensoy</h1>
+                <p class="lead text-info">Creator of POETIC CODES | Developer | Educator</p>
+                <p>Based in Diplahan, Zamboanga Sibugay Province, Philippines, I specialize in bridging the gap between complex logic and human-readable code.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <h2>The Mission</h2>
+                <p>POETIC CODES was founded on the belief that programming is a form of modern-day literature. Every function tells a story, and every system is a living architecture. My goal is to provide high-quality, project-based learning that empowers the next generation of Filipino developers and global learners.</p>
+                
+                <div class="narrative-box">
+                    <p class="mb-0">"Logic is the foundation, but precision and elegance are what make code timeless."</p>
+                </div>
+
+                <h2 class="mt-5">Technical Expertise</h2>
+                <div class="py-3">
+                    <span class="skill-badge">Python (OOP)</span>
+                    <span class="skill-badge">Web Development (HTML/CSS/JS)</span>
+                    <span class="skill-badge">Bootstrap 5</span>
+                    <span class="skill-badge">Data Science</span>
+                    <span class="skill-badge">Technical Writing</span>
+                    <span class="skill-badge">System Design</span>
+                </div>
+
+                <h2 class="mt-5">Contact & Collaboration</h2>
+                <p>I am always open to discussing new projects, educational partnerships, or technical consultations. Whether you're a student starting out or a business looking for a solution, feel free to reach out.</p>
+                
+                <div class="mt-4">
+                    <p><i class="fas fa-envelope me-2 text-info"></i> pansensoyglenn@gmail.com</p>
+                    <p><i class="fas fa-map-marker-alt me-2 text-info"></i> Diplahan, Zamboanga Sibugay Province, Philippines</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container text-center">
+            <p class="text-dim small mb-0">© 2026 POETIC CODES by Glenn Junsay Pansensoy. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
