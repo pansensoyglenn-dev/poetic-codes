@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheat Sheets | Python OOP Tutorial</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0e17;
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0c1a32 0%, #020813 100%);
+            color: #ffffff;
+            padding: 40px 0;
+            text-align: center;
+            border-bottom: 1px solid #1a2b4d;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1a5fb4, #26a269, #1a5fb4);
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #5dadec, #26ddfb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo i {
+            margin-right: 12px;
+        }
+        
+        nav {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        nav a {
+            color: #a0b3d6;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        
+        nav a:hover {
+            background-color: rgba(26, 95, 180, 0.1);
+            color: #5dadec;
+            border-color: rgba(93, 173, 236, 0.3);
+        }
+        
+        nav a.active {
+            background-color: rgba(26, 95, 180, 0.2);
+            color: #5dadec;
+            border-color: rgba(93, 173, 236, 0.4);
+            box-shadow: 0 0 15px rgba(93, 173, 236, 0.2);
+        }
+        
+        h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ffffff, #a0b3d6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #8a9bba;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            line-height: 1.8;
+        }
+        
+        .content-container {
+            background-color: #101826;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 50px;
+            margin-top: 40px;
+            border: 1px solid #1a2b4d;
+        }
+        
+        .cheatsheet-intro {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #1a2b4d;
+        }
+        
+        .cheatsheet-intro h2 {
+            color: #5dadec;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #1a2b4d;
+        }
+        
+        .category-btn {
+            padding: 12px 24px;
+            background-color: #151f32;
+            color: #a0b3d6;
+            border: 1px solid #1a2b4d;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .category-btn:hover {
+            background-color: #1a273d;
+            color: #5dadec;
+            border-color: #2a3c5d;
+            transform: translateY(-2px);
+        }
+        
+        .category-btn.active {
+            background: linear-gradient(90deg, #1a5fb4, #2a6fd0);
+            color: white;
+            border-color: rgba(93, 173, 236, 0.4);
+            box-shadow: 0 0 15px rgba(26, 95, 180, 0.3);
+        }
+        
+        .cheatsheet-category {
+            margin-bottom: 60px;
+        }
+        
+        .cheatsheet-category:last-child {
+            margin-bottom: 0;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #1a2b4d;
+        }
+        
+        .category-icon {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a5fb4, #2a6fd0);
+            color: white;
+            font-size: 30px;
+            border-radius: 12px;
+            margin-right: 20px;
+        }
+        
+        .category-title {
+            font-size: 28px;
+            color: #5dadec;
+            font-weight: 700;
+        }
+        
+        .cheatsheet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 30px;
+        }
+        
+        .cheatsheet-card {
+            background-color: #151f32;
+            border-radius: 10px;
+            padding: 30px;
+            border: 1px solid #1a2b4d;
+            transition: all 0.3s ease;
+        }
+        
+        .cheatsheet-card:hover {
+            transform: translateY(-5px);
+            border-color: #2a3c5d;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .cheatsheet-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .cheatsheet-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(93, 173, 236, 0.1);
+            color: #5dadec;
+            font-size: 26px;
+            border-radius: 10px;
+            margin-right: 20px;
+        }
+        
+        .cheatsheet-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #d0d9f0;
+        }
+        
+        .cheatsheet-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        .cheatsheet-table th {
+            background-color: rgba(26, 95, 180, 0.2);
+            color: #5dadec;
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            border: 1px solid #1a2b4d;
+        }
+        
+        .cheatsheet-table td {
+            padding: 15px;
+            border: 1px solid #1a2b4d;
+            color: #b0bcd9;
+        }
+        
+        .cheatsheet-table tr:nth-child(even) {
+            background-color: rgba(26, 95, 180, 0.05);
+        }
+        
+        .cheatsheet-table tr:hover {
+            background-color: rgba(93, 173, 236, 0.1);
+        }
+        
+        .command {
+            font-family: 'Courier New', monospace;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: #26a269;
+            font-weight: 600;
+        }
+        
+        .tag {
+            display: inline-block;
+            background-color: rgba(38, 162, 105, 0.1);
+            color: #26a269;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .quick-tip {
+            background-color: rgba(93, 173, 236, 0.1);
+            border-left: 4px solid #5dadec;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 25px;
+        }
+        
+        .quick-tip h4 {
+            color: #5dadec;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cheatsheet-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #1a2b4d;
+        }
+        
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: linear-gradient(90deg, #1a5fb4, #2a6fd0);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(93, 173, 236, 0.3);
+        }
+        
+        .download-btn:hover {
+            background: linear-gradient(90deg, #2a6fd0, #3a7fe4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(26, 95, 180, 0.3);
+        }
+        
+        .copy-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background-color: rgba(38, 162, 105, 0.1);
+            color: #26a269;
+            border: 1px solid rgba(38, 162, 105, 0.3);
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background-color: rgba(38, 162, 105, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .copy-btn.copied {
+            background-color: rgba(38, 162, 105, 0.3);
+            color: #ffffff;
+        }
+        
+        .essential-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+        }
+        
+        .cheatsheet-card.essential {
+            position: relative;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 60px;
+            color: #8a9bba;
+            border-top: 1px solid #1a2b4d;
+        }
+        
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 12px 28px;
+            background: linear-gradient(90deg, #1a5fb4, #2a6fd0);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(93, 173, 236, 0.3);
+        }
+        
+        .contact-link:hover {
+            background: linear-gradient(90deg, #2a6fd0, #3a7fe4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(26, 95, 180, 0.3);
+        }
+        
+        .copyright {
+            margin-top: 25px;
+            font-size: 14px;
+            color: #6a7b9a;
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px rgba(93, 173, 236, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .content-container {
+                padding: 25px;
+            }
+            
+            nav {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            nav a {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
+            }
+            
+            .cheatsheet-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .category-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .category-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .cheatsheet-table {
+                font-size: 14px;
+            }
+            
+            .cheatsheet-table th, .cheatsheet-table td {
+                padding: 10px;
+            }
+            
+            .cheatsheet-actions {
+                flex-direction: column;
+            }
+            
+            .category-filter {
+                gap: 8px;
+            }
+            
+            .category-btn {
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-stars"></i> Midnight Knowledge
+            </div>
+            <h1 class="glow-text">Developer Cheat Sheets</h1>
+            <p class="subtitle">Quick reference guides for commands, syntax, and best practices across various technologies.</p>
+            
+            <nav>
+                <a href="midnight-faq.html"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="midnight-projects.html"><i class="fas fa-project-diagram"></i> Projects</a>
+                <a href="best-practices.html"><i class="fas fa-graduation-cap"></i> Best Practices</a>
+                <a href="glossary.html"><i class="fas fa-book"></i> Glossary</a>
+                <a href="tools.html"><i class="fas fa-tools"></i> Tools</a>
+                <a href="cheat-sheet.html" class="active"><i class="fas fa-file-code"></i> Cheat Sheets</a>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="content-container">
+            <div class="cheatsheet-intro">
+                <h2>Quick Reference Guides</h2>
+                <p>Essential cheat sheets for developers. Filter by category or browse all reference materials.</p>
+            </div>
+            
+            <div class="category-filter">
+                <button class="category-btn active" data-category="all">
+                    <i class="fas fa-layer-group"></i> All Sheets
+                </button>
+                <button class="category-btn" data-category="git">
+                    <i class="fab fa-git-alt"></i> Git
+                </button>
+                <button class="category-btn" data-category="terminal">
+                    <i class="fas fa-terminal"></i> Terminal
+                </button>
+                <button class="category-btn" data-category="css">
+                    <i class="fab fa-css3-alt"></i> CSS
+                </button>
+                <button class="category-btn" data-category="docker">
+                    <i class="fab fa-docker"></i> Docker
+                </button>
+                <button class="category-btn" data-category="npm">
+                    <i class="fab fa-npm"></i> NPM
+                </button>
+            </div>
+            
+            <div id="cheatsheetContent">
+                <!-- Git Cheat Sheet -->
+                <div class="cheatsheet-category" data-category="git">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fab fa-git-alt"></i>
+                        </div>
+                        <h2 class="category-title">Git Commands Cheat Sheet</h2>
+                    </div>
+                    
+                    <div class="cheatsheet-grid">
+                        <div class="cheatsheet-card essential">
+                            <div class="essential-badge">ESSENTIAL</div>
+                            <div class="cheatsheet-header">
+                                <div class="cheatsheet-icon">
+                                    <i class="fas fa-code-branch"></i>
+                                </div>
+                                <h3 class="cheatsheet-name">Basic Git Commands</h3>
+                            </div>
+                            
+                            <table class="cheatsheet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="command">git init</span></td>
+                                        <td>Initialize a new Git repository</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git clone [url]</span></td>
+                                        <td>Clone a repository from a remote source</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git add [file]</span></td>
+                                        <td>Stage a file for commit</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git commit -m "[message]"</span></td>
+                                        <td>Commit staged changes with a message</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git status</span></td>
+                                        <td>Show the working tree status</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git push [remote] [branch]</span></td>
+                                        <td>Push commits to remote repository</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git pull [remote] [branch]</span></td>
+                                        <td>Fetch and merge from remote repository</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="quick-tip">
+                                <h4><i class="fas fa-lightbulb"></i> Pro Tip</h4>
+                                <p>Use <span class="command">git add .</span> to stage all changes in the current directory. Use <span class="command">git add -p</span> to interactively stage specific changes within files.</p>
+                            </div>
+                            
+                            <div class="cheatsheet-actions">
+                                <button class="copy-btn" data-copy="git init
+git clone [url]
+git add [file]
+git commit -m '[message]'
+git status
+git push [remote] [branch]
+git pull [remote] [branch]">
+                                    <i class="far fa-copy"></i> Copy Commands
+                                </button>
+                                <a href="#" class="download-btn">
+                                    <i class="fas fa-download"></i> Download PDF
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="cheatsheet-card">
+                            <div class="cheatsheet-header">
+                                <div class="cheatsheet-icon">
+                                    <i class="fas fa-code-merge"></i>
+                                </div>
+                                <h3 class="cheatsheet-name">Branching & Merging</h3>
+                            </div>
+                            
+                            <table class="cheatsheet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="command">git branch</span></td>
+                                        <td>List all branches</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git branch [branch-name]</span></td>
+                                        <td>Create a new branch</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git checkout [branch-name]</span></td>
+                                        <td>Switch to a branch</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git checkout -b [branch-name]</span></td>
+                                        <td>Create and switch to a new branch</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git merge [branch-name]</span></td>
+                                        <td>Merge a branch into current branch</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git branch -d [branch-name]</span></td>
+                                        <td>Delete a branch</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">git stash</span></td>
+                                        <td>Temporarily store modified files</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="cheatsheet-actions">
+                                <button class="copy-btn" data-copy="git branch
+git branch [branch-name]
+git checkout [branch-name]
+git checkout -b [branch-name]
+git merge [branch-name]
+git branch -d [branch-name]
+git stash">
+                                    <i class="far fa-copy"></i> Copy Commands
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Terminal Cheat Sheet -->
+                <div class="cheatsheet-category" data-category="terminal">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <h2 class="category-title">Terminal Commands</h2>
+                    </div>
+                    
+                    <div class="cheatsheet-grid">
+                        <div class="cheatsheet-card essential">
+                            <div class="essential-badge">ESSENTIAL</div>
+                            <div class="cheatsheet-header">
+                                <div class="cheatsheet-icon">
+                                    <i class="fas fa-folder"></i>
+                                </div>
+                                <h3 class="cheatsheet-name">File & Directory Operations</h3>
+                            </div>
+                            
+                            <table class="cheatsheet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="command">pwd</span></td>
+                                        <td>Print working directory</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">ls</span></td>
+                                        <td>List directory contents</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">cd [directory]</span></td>
+                                        <td>Change directory</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">mkdir [name]</span></td>
+                                        <td>Create a new directory</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">touch [file]</span></td>
+                                        <td>Create a new file</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">cp [source] [dest]</span></td>
+                                        <td>Copy files or directories</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">mv [source] [dest]</span></td>
+                                        <td>Move or rename files/directories</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">rm [file]</span></td>
+                                        <td>Remove files</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="quick-tip">
+                                <h4><i class="fas fa-lightbulb"></i> Pro Tip</h4>
+                                <p>Use <span class="command">ls -la</span> to see all files (including hidden ones) with detailed information. Use <span class="command">cd ~</span> to go to home directory and <span class="command">cd -</span> to go back to previous directory.</p>
+                            </div>
+                            
+                            <div class="cheatsheet-actions">
+                                <button class="copy-btn" data-copy="pwd
+ls
+cd [directory]
+mkdir [name]
+touch [file]
+cp [source] [dest]
+mv [source] [dest]
+rm [file]">
+                                    <i class="far fa-copy"></i> Copy Commands
+                                </button>
+                                <a href="#" class="download-btn">
+                                    <i class="fas fa-download"></i> Download PDF
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="cheatsheet-card">
+                            <div class="cheatsheet-header">
+                                <div class="cheatsheet-icon">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <h3 class="cheatsheet-name">System & Process Management</h3>
+                            </div>
+                            
+                            <table class="cheatsheet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="command">ps aux</span></td>
+                                        <td>List all running processes</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">kill [PID]</span></td>
+                                        <td>Terminate a process by ID</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">kill -9 [PID]</span></td>
+                                        <td>Force kill a process</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">top</span></td>
+                                        <td>Display Linux processes</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">df -h</span></td>
+                                        <td>Show disk space usage (human-readable)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">du -sh [directory]</span></td>
+                                        <td>Show directory size</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">chmod [permissions] [file]</span></td>
+                                        <td>Change file permissions</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="cheatsheet-actions">
+                                <button class="copy-btn" data-copy="ps aux
+kill [PID]
+kill -9 [PID]
+top
+df -h
+du -sh [directory]
+chmod [permissions] [file]">
+                                    <i class="far fa-copy"></i> Copy Commands
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CSS Cheat Sheet -->
+                <div class="cheatsheet-category" data-category="css">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fab fa-css3-alt"></i>
+                        </div>
+                        <h2 class="category-title">CSS Quick Reference</h2>
+                    </div>
+                    
+                    <div class="cheatsheet-grid">
+                        <div class="cheatsheet-card">
+                            <div class="cheatsheet-header">
+                                <div class="cheatsheet-icon">
+                                    <i class="fas fa-box"></i>
+                                </div>
+                                <h3 class="cheatsheet-name">Box Model & Positioning</h3>
+                            </div>
+                            
+                            <table class="cheatsheet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Property</th>
+                                        <th>Description</th>
+                                        <th>Common Values</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="command">margin</span></td>
+                                        <td>Space outside element</td>
+                                        <td>10px, 2em, auto</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">padding</span></td>
+                                        <td>Space inside element</td>
+                                        <td>15px, 5%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">border</span></td>
+                                        <td>Element border</td>
+                                        <td>1px solid #000</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">display</span></td>
+                                        <td>Display behavior</td>
+                                        <td>block, inline, flex, grid</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">position</span></td>
+                                        <td>Positioning method</td>
+                                        <td>static, relative, absolute, fixed</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">z-index</span></td>
+                                        <td>Stack order</td>
+                                        <td>1, 10, 100, auto</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="quick-tip">
+                                <h4><i class="fas fa-lightbulb"></i> Pro Tip</h4>
+                                <p>Use <span class="command">box-sizing: border-box;</span> to make padding and border included in element's total width and height, making layouts more predictable.</p>
+                            </div>
+                            
+                            <div class="cheatsheet-actions">
+                                <button class="copy-btn" data-copy="margin: 10px;
+padding: 15px;
+border: 1px solid #000;
+display: flex;
+position: relative;
+z-index: 10;">
+                                    <i class="far fa-copy"></i> Copy CSS
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="cheatsheet-card essential">
+                            <div class="essential-badge">ESSENTIAL</div>
+                            <div class="cheatsheet-header">
+                                <div class="cheatsheet-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </div>
+                                <h3 class="cheatsheet-name">Flexbox Quick Guide</h3>
+                            </div>
+                            
+                            <table class="cheatsheet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Property</th>
+                                        <th>Description</th>
+                                        <th>Common Values</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="command">display: flex</span></td>
+                                        <td>Enable flexbox</td>
+                                        <td>flex, inline-flex</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">flex-direction</span></td>
+                                        <td>Main axis direction</td>
+                                        <td>row, column, row-reverse</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">justify-content</span></td>
+                                        <td>Align items on main axis</td>
+                                        <td>center, space-between, flex-start</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">align-items</span></td>
+                                        <td>Align items on cross axis</td>
+                                        <td>center, stretch, flex-start</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">flex-wrap</span></td>
+                                        <td>Allow items to wrap</td>
+                                        <td>wrap, nowrap, wrap-reverse</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">gap</span></td>
+                                        <td>Space between items</td>
+                                        <td>10px, 1rem, 2em</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="cheatsheet-actions">
+                                <button class="copy-btn" data-copy=".container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}">
+                                    <i class="far fa-copy"></i> Copy CSS
+                                </button>
+                                <a href="#" class="download-btn">
+                                    <i class="fas fa-download"></i> Download PDF
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Docker Cheat Sheet -->
+                <div class="cheatsheet-category" data-category="docker">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fab fa-docker"></i>
+                        </div>
+                        <h2 class="category-title">Docker Commands</h2>
+                    </div>
+                    
+                    <div class="cheatsheet-grid">
+                        <div class="cheatsheet-card">
+                            <div class="cheatsheet-header">
+                                <div class="cheatsheet-icon">
+                                    <i class="fas fa-cube"></i>
+                                </div>
+                                <h3 class="cheatsheet-name">Container Management</h3>
+                            </div>
+                            
+                            <table class="cheatsheet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="command">docker run [image]</span></td>
+                                        <td>Run a container from an image</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker ps</span></td>
+                                        <td>List running containers</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker ps -a</span></td>
+                                        <td>List all containers</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker stop [container]</span></td>
+                                        <td>Stop a running container</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker start [container]</span></td>
+                                        <td>Start a stopped container</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker rm [container]</span></td>
+                                        <td>Remove a container</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker logs [container]</span></td>
+                                        <td>View container logs</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="quick-tip">
+                                <h4><i class="fas fa-lightbulb"></i> Pro Tip</h4>
+                                <p>Use <span class="command">docker run -d --name mycontainer -p 8080:80 nginx</span> to run Nginx in detached mode with custom name and port mapping.</p>
+                            </div>
+                            
+                            <div class="cheatsheet-actions">
+                                <button class="copy-btn" data-copy="docker run [image]
+docker ps
+docker ps -a
+docker stop [container]
+docker start [container]
+docker rm [container]
+docker logs [container]">
+                                    <i class="far fa-copy"></i> Copy Commands
+                                </button>
+                                <a href="#" class="download-btn">
+                                    <i class="fas fa-download"></i> Download PDF
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="cheatsheet-card essential">
+                            <div class="essential-badge">ESSENTIAL</div>
+                            <div class="cheatsheet-header">
+                                <div class="cheatsheet-icon">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <h3 class="cheatsheet-name">Image Management</h3>
+                            </div>
+                            
+                            <table class="cheatsheet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="command">docker images</span></td>
+                                        <td>List all images</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker pull [image]</span></td>
+                                        <td>Download an image</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker build -t [name] .</span></td>
+                                        <td>Build an image from Dockerfile</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker tag [image] [new-name]</span></td>
+                                        <td>Tag an image</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker push [image]</span></td>
+                                        <td>Push an image to registry</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker rmi [image]</span></td>
+                                        <td>Remove an image</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">docker system prune -a</span></td>
+                                        <td>Clean up unused resources</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="cheatsheet-actions">
+                                <button class="copy-btn" data-copy="docker images
+docker pull [image]
+docker build -t [name] .
+docker tag [image] [new-name]
+docker push [image]
+docker rmi [image]
+docker system prune -a">
+                                    <i class="far fa-copy"></i> Copy Commands
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- NPM Cheat Sheet -->
+                <div class="cheatsheet-category" data-category="npm">
+                    <div class="category-header">
+                        <div class="category-icon">
+                            <i class="fab fa-npm"></i>
+                        </div>
+                        <h2 class="category-title">NPM Commands</h2>
+                    </div>
+                    
+                    <div class="cheatsheet-grid">
+                        <div class="cheatsheet-card essential">
+                            <div class="essential-badge">ESSENTIAL</div>
+                            <div class="cheatsheet-header">
+                                <div class="cheatsheet-icon">
+                                    <i class="fas fa-cogs"></i>
+                                </div>
+                                <h3 class="cheatsheet-name">Package Management</h3>
+                            </div>
+                            
+                            <table class="cheatsheet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="command">npm init</span></td>
+                                        <td>Initialize a new package.json</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm install [package]</span></td>
+                                        <td>Install a package</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm install --save-dev [package]</span></td>
+                                        <td>Install as dev dependency</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm uninstall [package]</span></td>
+                                        <td>Remove a package</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm update [package]</span></td>
+                                        <td>Update a package</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm list</span></td>
+                                        <td>List installed packages</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm audit</span></td>
+                                        <td>Check for vulnerabilities</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="quick-tip">
+                                <h4><i class="fas fa-lightbulb"></i> Pro Tip</h4>
+                                <p>Use <span class="command">npm ci</span> instead of <span class="command">npm install</span> in CI/CD pipelines for faster, more reliable installs.</p>
+                            </div>
+                            
+                            <div class="cheatsheet-actions">
+                                <button class="copy-btn" data-copy="npm init
+npm install [package]
+npm install --save-dev [package]
+npm uninstall [package]
+npm update [package]
+npm list
+npm audit">
+                                    <i class="far fa-copy"></i> Copy Commands
+                                </button>
+                                <a href="#" class="download-btn">
+                                    <i class="fas fa-download"></i> Download PDF
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="cheatsheet-card">
+                            <div class="cheatsheet-header">
+                                <div class="cheatsheet-icon">
+                                    <i class="fas fa-play-circle"></i>
+                                </div>
+                                <h3 class="cheatsheet-name">Scripts & Running</h3>
+                            </div>
+                            
+                            <table class="cheatsheet-table">
+                                <thead>
+                                    <tr>
+                                        <th>Command</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="command">npm run [script]</span></td>
+                                        <td>Run a script from package.json</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm start</span></td>
+                                        <td>Run the start script</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm test</span></td>
+                                        <td>Run the test script</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm publish</span></td>
+                                        <td>Publish a package to registry</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm link</span></td>
+                                        <td>Link a local package</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm cache clean --force</span></td>
+                                        <td>Clear npm cache</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="command">npm outdated</span></td>
+                                        <td>Check for outdated packages</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <div class="cheatsheet-actions">
+                                <button class="copy-btn" data-copy="npm run [script]
+npm start
+npm test
+npm publish
+npm link
+npm cache clean --force
+npm outdated">
+                                    <i class="far fa-copy"></i> Copy Commands
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Need a cheat sheet for a specific technology?</p>
+            <a href="./cheat-sheet.html" class="contact-link"><i class="fas fa-file-code"></i> Request a Cheat Sheet</a>
+            <div class="copyright">
+                &copy; 2026 Midnight Knowledge. All rights reserved. | Python OOP Tutorial v2.0
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryButtons = document.querySelectorAll('.category-btn');
+            const cheatsheetCategories = document.querySelectorAll('.cheatsheet-category');
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            
+            // Filter by category
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const category = button.getAttribute('data-category');
+                    
+                    // Update active button
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Show/hide categories based on filter
+                    if (category === 'all') {
+                        cheatsheetCategories.forEach(category => {
+                            category.style.display = 'block';
+                        });
+                    } else {
+                        cheatsheetCategories.forEach(cat => {
+                            if (cat.getAttribute('data-category') === category) {
+                                cat.style.display = 'block';
+                            } else {
+                                cat.style.display = 'none';
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Copy to clipboard functionality
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const textToCopy = this.getAttribute('data-copy');
+                    const originalText = this.innerHTML;
+                    
+                    // Use the Clipboard API
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        // Visual feedback
+                        this.classList.add('copied');
+                        this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        
+                        // Reset after 2 seconds
+                        setTimeout(() => {
+                            this.classList.remove('copied');
+                            this.innerHTML = originalText;
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = textToCopy;
+                        document.body.appendChild(textArea);
+                        textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            this.classList.add('copied');
+                            this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                            
+                            setTimeout(() => {
+                                this.classList.remove('copied');
+                                this.innerHTML = originalText;
+                            }, 2000);
+                        } catch (err) {
+                            console.error('Fallback copy failed: ', err);
+                        }
+                        document.body.removeChild(textArea);
+                    });
+                });
+            });
+            
+            // Simulate PDF download (in a real app, this would link to actual PDFs)
+            document.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const cardTitle = this.closest('.cheatsheet-card').querySelector('.cheatsheet-name').textContent;
+                    alert(`In a real application, this would download a PDF for: ${cardTitle}`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
