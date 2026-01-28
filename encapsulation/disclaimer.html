@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disclaimer | Poetic Codes - Educational Programming Platform</title>
+    <meta name="description" content="Disclaimer for Poetic Codes - An educational platform providing Python programming tutorials and resources. Important legal information about code usage and educational content.">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --obsidian-bg: #0d1117;
+            --midnight-blue: #161b22;
+            --electric-blue: #58a6ff;
+            --text-main: #ffffff;
+            --text-muted: #f0f0f0;
+            --accent-orange: #f0883e;
+            --warning-yellow: #d29922;
+            --danger-red: #f85149;
+            --border: #30363d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--obsidian-bg);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.75;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--midnight-blue);
+            border-bottom: 1px solid var(--border);
+            padding: 1.2rem 5vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            color: var(--electric-blue);
+            font-weight: 700;
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            color: var(--accent-orange);
+        }
+
+        .back-btn {
+            color: var(--electric-blue);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: var(--electric-blue);
+            color: white;
+        }
+
+        main {
+            flex: 1;
+            padding: clamp(2rem, 4vw, 3rem) 5vw;
+            max-width: 1000px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .disclaimer-container {
+            background: var(--midnight-blue);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: clamp(2rem, 4vw, 3rem);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            color: var(--electric-blue);
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100px;
+            height: 4px;
+            background: var(--accent-orange);
+        }
+
+        h2 {
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+            margin: 3rem 0 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        h3 {
+            color: var(--electric-blue);
+            font-size: 1.2rem;
+            margin: 2rem 0 0.75rem;
+        }
+
+        p, li {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        ul, ol {
+            padding-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.75rem;
+            position: relative;
+        }
+
+        li::marker {
+            color: var(--electric-blue);
+        }
+
+        .warning-banner {
+            background: linear-gradient(135deg, rgba(240, 136, 62, 0.1), rgba(248, 81, 73, 0.1));
+            border: 2px solid var(--danger-red);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .warning-icon {
+            font-size: 3rem;
+            color: var(--danger-red);
+            margin-bottom: 1rem;
+        }
+
+        .warning-banner h3 {
+            color: var(--danger-red);
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+
+        .info-box {
+            background: rgba(88, 166, 255, 0.05);
+            border-left: 4px solid var(--electric-blue);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .info-box strong {
+            color: var(--electric-blue);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .legal-section {
+            background: rgba(210, 153, 34, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .disclaimer-item {
+            background: rgba(88, 166, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .disclaimer-item:hover {
+            border-color: var(--electric-blue);
+            transform: translateY(-2px);
+        }
+
+        .disclaimer-item h4 {
+            color: var(--electric-blue);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-block {
+            background: #0d1117;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .contact-section {
+            background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(240, 136, 62, 0.1));
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+
+        .contact-section h3 {
+            color: var(--electric-blue);
+            margin-top: 0;
+        }
+
+        footer {
+            background: #0b0f1c;
+            border-top: 1px solid var(--border);
+            padding: 3rem 5vw 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-col h4 {
+            color: var(--electric-blue);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-col a {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer-col a:hover {
+            color: var(--electric-blue);
+            transform: translateX(5px);
+        }
+
+        .legal {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .disclaimer-container {
+                padding: 1.5rem;
+            }
+            
+            .warning-banner {
+                padding: 1.5rem;
+            }
+            
+            .contact-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .back-btn {
+                width: 100%;
+                max-width: 200px;
+                justify-content: center;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="./index.html" class="logo">
+            <i class="fas fa-code"></i>
+            POETIC CODES
+        </a>
+        <a href="./index.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Home
+        </a>
+    </header>
+
+    <main>
+        <div class="disclaimer-container">
+            <h1>Website Disclaimer</h1>
+            <p><strong>Last Updated:</strong> January 2026</p>
+
+            <div class="warning-banner">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Important Legal Notice</h3>
+                <p>This disclaimer governs your use of Poetic Codes. By using this website, you accept this disclaimer in full. If you disagree with any part of this disclaimer, do not use our website.</p>
+            </div>
+
+            <h2>1. Educational Purpose Only</h2>
+            <p>Poetic Codes is an <strong>educational platform</strong> providing programming tutorials, code examples, and learning resources. All content is for educational purposes only.</p>
+            
+            <div class="info-box">
+                <strong>🚨 Important Notice:</strong> The information on this website is not professional advice. Always consult with qualified professionals for production systems and commercial applications.
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-code"></i> Code Examples Disclaimer</h4>
+                <p>All code examples provided on this website are:</p>
+                <ul>
+                    <li>Intended for educational purposes only</li>
+                    <li>Provided "as is" without warranties of any kind</li>
+                    <li>Not guaranteed to be production-ready or secure</li>
+                    <li>Subject to errors, bugs, and compatibility issues</li>
+                </ul>
+                <div class="code-block">
+                    # WARNING: Code examples are for learning only
+                    # Always test thoroughly before production use
+                    # Review security considerations for your specific use case
+                </div>
+            </div>
+
+            <h2>2. No Professional Advice</h2>
+            <p>The content on Poetic Codes does not constitute professional advice of any kind, including but not limited to:</p>
+            <ul>
+                <li><strong>Programming Advice:</strong> Not a substitute for professional software development consultation</li>
+                <li><strong>Legal Advice:</strong> Does not constitute legal advice regarding software licensing or compliance</li>
+                <li><strong>Security Advice:</strong> Not security audit recommendations for production systems</li>
+                <li><strong>Career Advice:</strong> Personal opinions about programming careers and industry trends</li>
+            </ul>
+
+            <div class="legal-section">
+                <h3>Consultation Recommendation</h3>
+                <p>For professional projects, we recommend:</p>
+                <ol>
+                    <li>Consulting with certified software architects</li>
+                    <li>Performing security audits by qualified professionals</li>
+                    <li>Reviewing legal compliance with software licensing experts</li>
+                    <li>Testing code in staging environments before production deployment</li>
+                </ol>
+            </div>
+
+            <h2>3. Accuracy of Information</h2>
+            <p>While we strive to keep information accurate and up-to-date, we make no representations or warranties of any kind about:</p>
+            
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-check-circle"></i> What We Strive For</h4>
+                <ul>
+                    <li>Accurate Python syntax and examples</li>
+                    <li>Current best practices (2026 standards)</li>
+                    <li>Clear explanations of programming concepts</li>
+                    <li>Working code examples for educational purposes</li>
+                </ul>
+            </div>
+
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-exclamation-circle"></i> What We Cannot Guarantee</h4>
+                <ul>
+                    <li>100% error-free code (all code has bugs)</li>
+                    <li>Compatibility with all systems and configurations</li>
+                    <li>Future-proof solutions (technology evolves rapidly)</li>
+                    <li>Suitability for specific production environments</li>
+                </ul>
+            </div>
+
+            <h2>4. Limitation of Liability</h2>
+            <p>To the fullest extent permitted by applicable law, Poetic Codes shall not be liable for:</p>
+            <ul>
+                <li>Any direct, indirect, incidental, or consequential damages</li>
+                <li>Loss of data, profits, or business opportunities</li>
+                <li>Security breaches or data loss from using code examples</li>
+                <li>Any errors or omissions in the website content</li>
+                <li>Any actions taken based on information from this website</li>
+            </ul>
+
+            <div class="info-box">
+                <strong>💡 User Responsibility:</strong> You are solely responsible for testing, validating, and securing any code before use in production environments. Always use version control, testing frameworks, and security best practices.
+            </div>
+
+            <h2>5. External Links Disclaimer</h2>
+            <p>Our website may contain links to external websites that are not provided or maintained by Poetic Codes. We:</p>
+            <ul>
+                <li>Do not guarantee the accuracy, relevance, or quality of external content</li>
+                <li>Are not responsible for the privacy practices of external sites</li>
+                <li>Do not endorse products or services on external sites</li>
+                <li>Cannot control changes to external content</li>
+            </ul>
+
+            <h2>6. Code Usage and Licensing</h2>
+            <div class="disclaimer-item">
+                <h4><i class="fas fa-balance-scale"></i> Educational Use License</h4>
+                <p>Code examples are provided under an <strong>educational use license</strong>:</p>
+                <ul>
+                    <li><strong>You may:</strong> Use, modify, and distribute code for learning and personal projects</li>
+                    <li><strong>You should:</strong> Provide attribution when possible (not required but appreciated)</li>
+                    <li><strong>You may not:</strong> Claim authorship of our original code examples</li>
+                    <li><strong>You must:</strong> Review and understand code before using in any project</li>
+                </ul>
+                
+                <div class="code-block">
+                    # Example attribution (optional but appreciated):
+                    # Adapted from Poetic Codes Python OOP Tutorial
+                    # Original source: https://poetic-codes/tutorial.html
+                    # Educational use license
+                </div>
+            </div>
+
+            <h2>7. Changes to This Disclaimer</h2>
+            <p>We may update this disclaimer from time to time. We will notify users of any changes by:</p>
+            <ul>
+                <li>Updating the "Last Updated" date at the top of this page</li>
+                <li>Posting notice on our website for significant changes</li>
+                <li>Updating the GitHub repository for transparency</li>
+            </ul>
+            <p>Your continued use of the website after changes constitutes acceptance of the updated disclaimer.</p>
+
+            <h2>8. Contact for Clarification</h2>
+            <div class="contact-section">
+                <h3>Questions About This Disclaimer?</h3>
+                <p>If you have questions about this disclaimer or need clarification, please contact us:</p>
+                <div style="margin-top: 1.5rem;">
+                    <p><i class="fas fa-envelope"></i> <strong>Email:</strong> pansensoyglenn@gmail.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Location:</strong> Zamboanga Sibugay, Philippines</p>
+                    <p><i class="fab fa-github"></i> <strong>GitHub Issues:</strong> pansensoyglenn-dev/poetic-codes</p>
+                </div>
+                <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                    This disclaimer was last reviewed and updated in January 2026.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Learning Resources</h4>
+                    <a href="./index.html">Home</a>
+                    <a href="./python-intro.html">Python Introduction</a>
+                    <a href="./oop-intro.html">OOP Foundations</a>
+                    <a href="./projects.html">Projects</a>
+                    <a href="./best-practices.html">Best Practices</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal Documents</h4>
+                    <a href="./disclaimer.html">Disclaimer</a>
+                    <a href="./privacy.html">Privacy Policy</a>
+                    <a href="./terms.html">Terms of Service</a>
+                    <a href="./cookie.html">Cookie Policy</a>
+                    <a href="./accessibility.html">Accessibility</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Community</h4>
+                    <a href="./faq.html">FAQ</a>
+                    <a href="./contributing.html">Contributing</a>
+                    <a href="./newsletter.html">Newsletter</a>
+                    <a href="./contact.html">Contact</a>
+                    <a href="./about.html">About Us</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Connect</h4>
+                    <a href="https://github.com/pansensoyglenn-dev" target="_blank" rel="noopener noreferrer">
+                        <i class="fab fa-github"></i> GitHub
+                    </a>
+                    <a href="#">
+                        <i class="fab fa-linkedin"></i> LinkedIn
+                    </a>
+                    <a href="#">
+                        <i class="fab fa-twitter"></i> Twitter
+                    </a>
+                    <a href="mailto:pansensoyglenn@gmail.com">
+                        <i class="fas fa-envelope"></i> Email
+                    </a>
+                </div>
+            </div>
+            <div class="legal">
+                <p>© 2026 Poetic Codes | Educational Programming Platform</p>
+                <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+                    This website provides educational content for programming students. Use code examples responsibly.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
