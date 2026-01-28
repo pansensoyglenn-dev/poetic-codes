@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary | Python Tutorial</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0e17;
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0c1a32 0%, #020813 100%);
+            color: #ffffff;
+            padding: 40px 0;
+            text-align: center;
+            border-bottom: 1px solid #1a2b4d;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1a5fb4, #26a269, #1a5fb4);
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #5dadec, #26ddfb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo i {
+            margin-right: 12px;
+        }
+        
+        nav {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        nav a {
+            color: #a0b3d6;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        
+        nav a:hover {
+            background-color: rgba(26, 95, 180, 0.1);
+            color: #5dadec;
+            border-color: rgba(93, 173, 236, 0.3);
+        }
+        
+        nav a.active {
+            background-color: rgba(26, 95, 180, 0.2);
+            color: #5dadec;
+            border-color: rgba(93, 173, 236, 0.4);
+            box-shadow: 0 0 15px rgba(93, 173, 236, 0.2);
+        }
+        
+        h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ffffff, #a0b3d6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #8a9bba;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            line-height: 1.8;
+        }
+        
+        .content-container {
+            background-color: #101826;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 50px;
+            margin-top: 40px;
+            border: 1px solid #1a2b4d;
+        }
+        
+        .search-container {
+            margin-bottom: 40px;
+        }
+        
+        .search-box {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 16px 20px 16px 55px;
+            background-color: #151f32;
+            border: 1px solid #1a2b4d;
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #5dadec;
+            box-shadow: 0 0 0 3px rgba(93, 173, 236, 0.2);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #5dadec;
+            font-size: 18px;
+        }
+        
+        .alphabet-filter {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #1a2b4d;
+        }
+        
+        .letter-btn {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #151f32;
+            color: #a0b3d6;
+            border: 1px solid #1a2b4d;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .letter-btn:hover, .letter-btn.active {
+            background-color: #1a5fb4;
+            color: white;
+            border-color: #5dadec;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(26, 95, 180, 0.3);
+        }
+        
+        .glossary-section {
+            margin-bottom: 50px;
+        }
+        
+        .glossary-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #1a2b4d;
+        }
+        
+        .section-letter {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a5fb4, #2a6fd0);
+            color: white;
+            font-size: 28px;
+            font-weight: 800;
+            border-radius: 12px;
+            margin-right: 20px;
+        }
+        
+        .section-title {
+            font-size: 28px;
+            color: #5dadec;
+            font-weight: 700;
+        }
+        
+        .term-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .term-card {
+            background-color: #151f32;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #1a2b4d;
+            transition: all 0.3s ease;
+        }
+        
+        .term-card:hover {
+            border-color: #2a3c5d;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .term-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #5dadec;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .term-category {
+            display: inline-block;
+            background-color: rgba(38, 162, 105, 0.1);
+            color: #26a269;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .term-definition {
+            color: #b0bcd9;
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+        
+        .term-example {
+            background-color: rgba(93, 173, 236, 0.05);
+            border-left: 3px solid #5dadec;
+            padding: 15px;
+            border-radius: 0 5px 5px 0;
+            font-style: italic;
+            color: #a0b3d6;
+            font-size: 14px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #8a9bba;
+            font-size: 18px;
+        }
+        
+        .no-results i {
+            font-size: 48px;
+            color: #5dadec;
+            margin-bottom: 20px;
+            display: block;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 60px;
+            color: #8a9bba;
+            border-top: 1px solid #1a2b4d;
+        }
+        
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 12px 28px;
+            background: linear-gradient(90deg, #1a5fb4, #2a6fd0);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(93, 173, 236, 0.3);
+        }
+        
+        .contact-link:hover {
+            background: linear-gradient(90deg, #2a6fd0, #3a7fe4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(26, 95, 180, 0.3);
+        }
+        
+        .copyright {
+            margin-top: 25px;
+            font-size: 14px;
+            color: #6a7b9a;
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px rgba(93, 173, 236, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .content-container {
+                padding: 25px;
+            }
+            
+            nav {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            nav a {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
+            }
+            
+            .term-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .alphabet-filter {
+                gap: 6px;
+            }
+            
+            .letter-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-stars"></i> Midnight Knowledge
+            </div>
+            <h1 class="glow-text">Technical Glossary</h1>
+            <p class="subtitle">A comprehensive reference of technical terms, acronyms, and concepts used in software development and technology.</p>
+            
+            <nav>
+                <a href="midnight-faq.html"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="midnight-projects.html"><i class="fas fa-project-diagram"></i> Projects</a>
+                <a href="best-practices.html"><i class="fas fa-graduation-cap"></i> Best Practices</a>
+                <a href="glossary.html" class="active"><i class="fas fa-book"></i> Glossary</a>
+                <a href="tools.html"><i class="fas fa-tools"></i> Tools</a>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="content-container">
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" id="searchInput" placeholder="Search for terms, acronyms, or concepts...">
+                </div>
+            </div>
+            
+            <div class="alphabet-filter" id="alphabetFilter">
+                <!-- Alphabet buttons will be generated by JavaScript -->
+            </div>
+            
+            <div id="glossaryContent">
+                <!-- A Terms -->
+                <div class="glossary-section" data-letter="A">
+                    <div class="section-header">
+                        <div class="section-letter">A</div>
+                        <h2 class="section-title">A Terms</h2>
+                    </div>
+                    
+                    <div class="term-grid">
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-code"></i> API</h3>
+                            <span class="term-category">Development</span>
+                            <p class="term-definition">Application Programming Interface - A set of rules and protocols that allows different software applications to communicate with each other.</p>
+                            <div class="term-example">Example: REST API, GraphQL API, SOAP API</div>
+                        </div>
+                        
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-sitemap"></i> Agile</h3>
+                            <span class="term-category">Methodology</span>
+                            <p class="term-definition">A project management and software development approach that emphasizes iterative development, collaboration, and flexibility.</p>
+                            <div class="term-example">Example: Scrum, Kanban, Extreme Programming (XP)</div>
+                        </div>
+                        
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-user-lock"></i> Authentication</h3>
+                            <span class="term-category">Security</span>
+                            <p class="term-definition">The process of verifying the identity of a user, device, or system before granting access to resources.</p>
+                            <div class="term-example">Example: Username/password, biometric authentication, multi-factor authentication</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- B Terms -->
+                <div class="glossary-section" data-letter="B">
+                    <div class="section-header">
+                        <div class="section-letter">B</div>
+                        <h2 class="section-title">B Terms</h2>
+                    </div>
+                    
+                    <div class="term-grid">
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-server"></i> Backend</h3>
+                            <span class="term-category">Development</span>
+                            <p class="term-definition">The server-side of an application that handles data processing, business logic, database interactions, and server configuration.</p>
+                            <div class="term-example">Example: Node.js, Python Django, Ruby on Rails, Java Spring</div>
+                        </div>
+                        
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-box"></i> Bootstrap</h3>
+                            <span class="term-category">Framework</span>
+                            <p class="term-definition">A popular open-source CSS framework directed at responsive, mobile-first front-end web development.</p>
+                            <div class="term-example">Example: Bootstrap 5, used for rapid UI development with pre-designed components</div>
+                        </div>
+                        
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-bug"></i> Bug</h3>
+                            <span class="term-category">Testing</span>
+                            <p class="term-definition">An error, flaw, or fault in a computer program that causes it to produce an incorrect or unexpected result.</p>
+                            <div class="term-example">Example: Logic error, syntax error, runtime error, off-by-one error</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- C Terms -->
+                <div class="glossary-section" data-letter="C">
+                    <div class="section-header">
+                        <div class="section-letter">C</div>
+                        <h2 class="section-title">C Terms</h2>
+                    </div>
+                    
+                    <div class="term-grid">
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-cloud"></i> CI/CD</h3>
+                            <span class="term-category">DevOps</span>
+                            <p class="term-definition">Continuous Integration and Continuous Deployment/Delivery - Practices that automate the integration and delivery of code changes.</p>
+                            <div class="term-example">Example: Jenkins, GitHub Actions, GitLab CI, CircleCI</div>
+                        </div>
+                        
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-database"></i> Cache</h3>
+                            <span class="term-category">Performance</span>
+                            <p class="term-definition">A hardware or software component that stores data temporarily so future requests for that data can be served faster.</p>
+                            <div class="term-example">Example: Browser cache, CDN cache, Redis, Memcached</div>
+                        </div>
+                        
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-mobile-alt"></i> CSS</h3>
+                            <span class="term-category">Frontend</span>
+                            <p class="term-definition">Cascading Style Sheets - A stylesheet language used to describe the presentation of a document written in HTML.</p>
+                            <div class="term-example">Example: CSS3, Sass, Less, Tailwind CSS</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- D Terms -->
+                <div class="glossary-section" data-letter="D">
+                    <div class="section-header">
+                        <div class="section-letter">D</div>
+                        <h2 class="section-title">D Terms</h2>
+                    </div>
+                    
+                    <div class="term-grid">
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-database"></i> Database</h3>
+                            <span class="term-category">Data</span>
+                            <p class="term-definition">An organized collection of structured information, or data, typically stored electronically in a computer system.</p>
+                            <div class="term-example">Example: MySQL, PostgreSQL, MongoDB, Redis</div>
+                        </div>
+                        
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-ship"></i> Docker</h3>
+                            <span class="term-category">DevOps</span>
+                            <p class="term-definition">A platform for developing, shipping, and running applications in containers.</p>
+                            <div class="term-example">Example: Docker containers, Docker images, Docker Compose</div>
+                        </div>
+                        
+                        <div class="term-card">
+                            <h3 class="term-name"><i class="fas fa-desktop"></i> DOM</h3>
+                            <span class="term-category">Frontend</span>
+                            <p class="term-definition">Document Object Model - A programming interface for web documents that represents the structure of a document as a tree of objects.</p>
+                            <div class="term-example">Example: DOM manipulation with JavaScript, virtual DOM in React</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- No Results Message (hidden by default) -->
+                <div id="noResults" class="no-results" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <h3>No matching terms found</h3>
+                    <p>Try searching for a different term or browse the glossary by letter.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Need clarification on a technical term?</p>
+            <a href="./contact.html" class="contact-link"><i class="fas fa-question-circle"></i> Ask Our Experts</a>
+            <div class="copyright">
+                &copy; 2026 Glenn Junsay Pansensoy. All rights reserved. | Python OOP Tutorial v2.0
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const glossarySections = document.querySelectorAll('.glossary-section');
+            const termCards = document.querySelectorAll('.term-card');
+            const alphabetFilter = document.getElementById('alphabetFilter');
+            const noResults = document.getElementById('noResults');
+            
+            // Generate alphabet filter buttons
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+            alphabet.forEach(letter => {
+                const button = document.createElement('button');
+                button.className = 'letter-btn';
+                button.textContent = letter;
+                button.setAttribute('data-letter', letter);
+                alphabetFilter.appendChild(button);
+            });
+            
+            // Add "All" button
+            const allButton = document.createElement('button');
+            allButton.className = 'letter-btn active';
+            allButton.textContent = 'ALL';
+            allButton.setAttribute('data-letter', 'all');
+            alphabetFilter.prepend(allButton);
+            
+            // Filter by letter
+            const letterButtons = document.querySelectorAll('.letter-btn');
+            letterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const letter = button.getAttribute('data-letter');
+                    
+                    // Update active button
+                    letterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Show/hide sections based on letter
+                    if (letter === 'all') {
+                        glossarySections.forEach(section => {
+                            section.style.display = 'block';
+                        });
+                        noResults.style.display = 'none';
+                    } else {
+                        let foundSection = false;
+                        glossarySections.forEach(section => {
+                            if (section.getAttribute('data-letter') === letter) {
+                                section.style.display = 'block';
+                                foundSection = true;
+                            } else {
+                                section.style.display = 'none';
+                            }
+                        });
+                        
+                        if (!foundSection) {
+                            noResults.style.display = 'block';
+                        } else {
+                            noResults.style.display = 'none';
+                        }
+                    }
+                });
+            });
+            
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                let foundAny = false;
+                
+                if (searchTerm === '') {
+                    // Show all sections when search is cleared
+                    glossarySections.forEach(section => {
+                        section.style.display = 'block';
+                        const terms = section.querySelectorAll('.term-card');
+                        terms.forEach(term => {
+                            term.style.display = 'block';
+                        });
+                    });
+                    noResults.style.display = 'none';
+                    return;
+                }
+                
+                // Search through all term cards
+                glossarySections.forEach(section => {
+                    const terms = section.querySelectorAll('.term-card');
+                    let foundInSection = false;
+                    
+                    terms.forEach(term => {
+                        const termName = term.querySelector('.term-name').textContent.toLowerCase();
+                        const termDefinition = term.querySelector('.term-definition').textContent.toLowerCase();
+                        const termExample = term.querySelector('.term-example') ? term.querySelector('.term-example').textContent.toLowerCase() : '';
+                        
+                        if (termName.includes(searchTerm) || termDefinition.includes(searchTerm) || termExample.includes(searchTerm)) {
+                            term.style.display = 'block';
+                            foundInSection = true;
+                            foundAny = true;
+                        } else {
+                            term.style.display = 'none';
+                        }
+                    });
+                    
+                    // Show/hide section based on whether it contains matching terms
+                    if (foundInSection) {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                });
+                
+                // Show no results message if nothing found
+                if (!foundAny) {
+                    noResults.style.display = 'block';
+                } else {
+                    noResults.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
