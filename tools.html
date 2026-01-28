@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Tools | Python OOP Tutorial</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0e17;
+            color: #e0e0e0;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0c1a32 0%, #020813 100%);
+            color: #ffffff;
+            padding: 40px 0;
+            text-align: center;
+            border-bottom: 1px solid #1a2b4d;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1a5fb4, #26a269, #1a5fb4);
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #5dadec, #26ddfb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .logo i {
+            margin-right: 12px;
+        }
+        
+        nav {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        nav a {
+            color: #a0b3d6;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+        
+        nav a:hover {
+            background-color: rgba(26, 95, 180, 0.1);
+            color: #5dadec;
+            border-color: rgba(93, 173, 236, 0.3);
+        }
+        
+        nav a.active {
+            background-color: rgba(26, 95, 180, 0.2);
+            color: #5dadec;
+            border-color: rgba(93, 173, 236, 0.4);
+            box-shadow: 0 0 15px rgba(93, 173, 236, 0.2);
+        }
+        
+        h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #ffffff, #a0b3d6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            font-size: 18px;
+            color: #8a9bba;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            line-height: 1.8;
+        }
+        
+        .content-container {
+            background-color: #101826;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            padding: 50px;
+            margin-top: 40px;
+            border: 1px solid #1a2b4d;
+        }
+        
+        .tools-intro {
+            text-align: center;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid #1a2b4d;
+        }
+        
+        .tools-intro h2 {
+            color: #5dadec;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .tool-category {
+            margin-bottom: 60px;
+        }
+        
+        .tool-category:last-child {
+            margin-bottom: 0;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #1a2b4d;
+        }
+        
+        .category-icon {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a5fb4, #2a6fd0);
+            color: white;
+            font-size: 30px;
+            border-radius: 12px;
+            margin-right: 20px;
+        }
+        
+        .category-title {
+            font-size: 28px;
+            color: #5dadec;
+            font-weight: 700;
+        }
+        
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        
+        .tool-card {
+            background-color: #151f32;
+            border-radius: 10px;
+            padding: 30px;
+            border: 1px solid #1a2b4d;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: #2a3c5d;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tool-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(93, 173, 236, 0.1);
+            color: #5dadec;
+            font-size: 26px;
+            border-radius: 10px;
+            margin-right: 20px;
+        }
+        
+        .tool-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #d0d9f0;
+        }
+        
+        .tool-description {
+            color: #b0bcd9;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        
+        .tool-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .tool-tag {
+            background-color: rgba(38, 162, 105, 0.1);
+            color: #26a269;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .tool-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .tool-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background-color: rgba(93, 173, 236, 0.1);
+            color: #5dadec;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(93, 173, 236, 0.2);
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .tool-link:hover {
+            background-color: rgba(93, 173, 236, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .tool-link.primary {
+            background: linear-gradient(90deg, #1a5fb4, #2a6fd0);
+            color: white;
+            border: 1px solid rgba(93, 173, 236, 0.3);
+        }
+        
+        .tool-link.primary:hover {
+            background: linear-gradient(90deg, #2a6fd0, #3a7fe4);
+            box-shadow: 0 5px 15px rgba(26, 95, 180, 0.3);
+        }
+        
+        .tool-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid #1a2b4d;
+            font-size: 14px;
+            color: #8a9bba;
+        }
+        
+        .tool-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tool-stat i {
+            color: #5dadec;
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+        }
+        
+        .tool-card.popular {
+            position: relative;
+            border: 2px solid rgba(255, 107, 107, 0.3);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            margin-top: 60px;
+            color: #8a9bba;
+            border-top: 1px solid #1a2b4d;
+        }
+        
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 12px 28px;
+            background: linear-gradient(90deg, #1a5fb4, #2a6fd0);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(93, 173, 236, 0.3);
+        }
+        
+        .contact-link:hover {
+            background: linear-gradient(90deg, #2a6fd0, #3a7fe4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(26, 95, 180, 0.3);
+        }
+        
+        .copyright {
+            margin-top: 25px;
+            font-size: 14px;
+            color: #6a7b9a;
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 10px rgba(93, 173, 236, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .content-container {
+                padding: 25px;
+            }
+            
+            nav {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            nav a {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
+            }
+            
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tool-links {
+                flex-direction: column;
+            }
+            
+            .category-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .category-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-stars"></i> Midnight Knowledge
+            </div>
+            <h1 class="glow-text">Developer Tools & Resources</h1>
+            <p class="subtitle">Essential tools, frameworks, and utilities for modern software development and web design.</p>
+            
+            <nav>
+                <a href="midnight-faq.html"><i class="fas fa-question-circle"></i> FAQ</a>
+                <a href="midnight-projects.html"><i class="fas fa-project-diagram"></i> Projects</a>
+                <a href="best-practices.html"><i class="fas fa-graduation-cap"></i> Best Practices</a>
+                <a href="glossary.html"><i class="fas fa-book"></i> Glossary</a>
+                <a href="tools.html" class="active"><i class="fas fa-tools"></i> Tools</a>
+            </nav>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="content-container">
+            <div class="tools-intro">
+                <h2>Essential Development Toolkit</h2>
+                <p>Discover the tools that power modern software development. From code editors to deployment platforms, these are the essential resources every developer should know.</p>
+            </div>
+            
+            <div class="tool-category">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h2 class="category-title">Code Editors & IDEs</h2>
+                </div>
+                
+                <div class="tools-grid">
+                    <div class="tool-card popular">
+                        <div class="popular-badge">MOST POPULAR</div>
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fab fa-microsoft"></i>
+                            </div>
+                            <h3 class="tool-name">Visual Studio Code</h3>
+                        </div>
+                        <p class="tool-description">A free, open-source code editor developed by Microsoft with built-in Git support, debugging, extensions, and IntelliSense.</p>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Free</span>
+                            <span class="tool-tag">Cross-platform</span>
+                            <span class="tool-tag">Extensible</span>
+                        </div>
+                        <div class="tool-links">
+                            <a href="https://code.visualstudio.com/" class="tool-link primary" target="_blank"><i class="fas fa-external-link-alt"></i> Official Site</a>
+                            <a href="https://marketplace.visualstudio.com/VSCode" class="tool-link" target="_blank"><i class="fas fa-cube"></i> Extensions</a>
+                        </div>
+                        <div class="tool-stats">
+                            <div class="tool-stat"><i class="fas fa-download"></i> 10M+ Downloads</div>
+                            <div class="tool-stat"><i class="fas fa-star"></i> 145K+ Stars</div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fab fa-jetbrains"></i>
+                            </div>
+                            <h3 class="tool-name">IntelliJ IDEA</h3>
+                        </div>
+                        <p class="tool-description">A powerful IDE for Java development with excellent support for other JVM languages and web technologies.</p>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Paid/Free</span>
+                            <span class="tool-tag">Java</span>
+                            <span class="tool-tag">Productivity</span>
+                        </div>
+                        <div class="tool-links">
+                            <a href="https://www.jetbrains.com/idea/" class="tool-link primary" target="_blank"><i class="fas fa-external-link-alt"></i> Official Site</a>
+                            <a href="https://plugins.jetbrains.com/idea" class="tool-link" target="_blank"><i class="fas fa-puzzle-piece"></i> Plugins</a>
+                        </div>
+                        <div class="tool-stats">
+                            <div class="tool-stat"><i class="fas fa-code"></i> Java-focused</div>
+                            <div class="tool-stat"><i class="fas fa-rocket"></i> Smart Completion</div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fab fa-sublime"></i>
+                            </div>
+                            <h3 class="tool-name">Sublime Text</h3>
+                        </div>
+                        <p class="tool-description">A sophisticated text editor for code, markup and prose with a minimalist interface and powerful features.</p>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Paid</span>
+                            <span class="tool-tag">Fast</span>
+                            <span class="tool-tag">Lightweight</span>
+                        </div>
+                        <div class="tool-links">
+                            <a href="https://www.sublimetext.com/" class="tool-link primary" target="_blank"><i class="fas fa-external-link-alt"></i> Official Site</a>
+                            <a href="https://packagecontrol.io/" class="tool-link" target="_blank"><i class="fas fa-box-open"></i> Packages</a>
+                        </div>
+                        <div class="tool-stats">
+                            <div class="tool-stat"><i class="fas fa-bolt"></i> Lightning Fast</div>
+                            <div class="tool-stat"><i class="fas fa-palette"></i> Customizable</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h2 class="category-title">Version Control & Collaboration</h2>
+                </div>
+                
+                <div class="tools-grid">
+                    <div class="tool-card popular">
+                        <div class="popular-badge">ESSENTIAL</div>
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fab fa-git-alt"></i>
+                            </div>
+                            <h3 class="tool-name">Git</h3>
+                        </div>
+                        <p class="tool-description">A distributed version control system for tracking changes in source code during software development.</p>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Free</span>
+                            <span class="tool-tag">Version Control</span>
+                            <span class="tool-tag">Open Source</span>
+                        </div>
+                        <div class="tool-links">
+                            <a href="https://git-scm.com/" class="tool-link primary" target="_blank"><i class="fas fa-external-link-alt"></i> Official Site</a>
+                            <a href="https://git-scm.com/doc" class="tool-link" target="_blank"><i class="fas fa-book"></i> Documentation</a>
+                        </div>
+                        <div class="tool-stats">
+                            <div class="tool-stat"><i class="fas fa-code-branch"></i> Branching</div>
+                            <div class="tool-stat"><i class="fas fa-history"></i> History Tracking</div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fab fa-github"></i>
+                            </div>
+                            <h3 class="tool-name">GitHub</h3>
+                        </div>
+                        <p class="tool-description">A web-based platform for version control and collaboration using Git, offering hosting for software development.</p>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Free/Paid</span>
+                            <span class="tool-tag">Collaboration</span>
+                            <span class="tool-tag">CI/CD</span>
+                        </div>
+                        <div class="tool-links">
+                            <a href="https://github.com/" class="tool-link primary" target="_blank"><i class="fas fa-external-link-alt"></i> Official Site</a>
+                            <a href="https://github.com/features/actions" class="tool-link" target="_blank"><i class="fas fa-cogs"></i> GitHub Actions</a>
+                        </div>
+                        <div class="tool-stats">
+                            <div class="tool-stat"><i class="fas fa-users"></i> 100M+ Developers</div>
+                            <div class="tool-stat"><i class="fas fa-code"></i> 200M+ Repositories</div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fab fa-gitlab"></i>
+                            </div>
+                            <h3 class="tool-name">GitLab</h3>
+                        </div>
+                        <p class="tool-description">A complete DevOps platform, delivered as a single application, from project planning to monitoring.</p>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Free/Paid</span>
+                            <span class="tool-tag">DevOps</span>
+                            <span class="tool-tag">Self-hosted</span>
+                        </div>
+                        <div class="tool-links">
+                            <a href="https://about.gitlab.com/" class="tool-link primary" target="_blank"><i class="fas fa-external-link-alt"></i> Official Site</a>
+                            <a href="https://docs.gitlab.com/ee/ci/" class="tool-link" target="_blank"><i class="fas fa-tasks"></i> CI/CD</a>
+                        </div>
+                        <div class="tool-stats">
+                            <div class="tool-stat"><i class="fas fa-infinity"></i> End-to-end</div>
+                            <div class="tool-stat"><i class="fas fa-server"></i> Self-host option</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-category">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h2 class="category-title">Performance & Testing</h2>
+                </div>
+                
+                <div class="tools-grid">
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fab fa-google"></i>
+                            </div>
+                            <h3 class="tool-name">Lighthouse</h3>
+                        </div>
+                        <p class="tool-description">An open-source, automated tool for improving the quality of web pages with audits for performance, accessibility, SEO, and more.</p>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Free</span>
+                            <span class="tool-tag">Auditing</span>
+                            <span class="tool-tag">Performance</span>
+                        </div>
+                        <div class="tool-links">
+                            <a href="https://developers.google.com/web/tools/lighthouse" class="tool-link primary" target="_blank"><i class="fas fa-external-link-alt"></i> Official Site</a>
+                            <a href="https://github.com/GoogleChrome/lighthouse" class="tool-link" target="_blank"><i class="fab fa-github"></i> GitHub</a>
+                        </div>
+                        <div class="tool-stats">
+                            <div class="tool-stat"><i class="fas fa-chart-line"></i> Performance</div>
+                            <div class="tool-stat"><i class="fas fa-universal-access"></i> Accessibility</div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card">
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-vial"></i>
+                            </div>
+                            <h3 class="tool-name">Jest</h3>
+                        </div>
+                        <p class="tool-description">A delightful JavaScript testing framework with a focus on simplicity, supporting projects using Babel, TypeScript, Node, React, and more.</p>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Free</span>
+                            <span class="tool-tag">Testing</span>
+                            <span class="tool-tag">JavaScript</span>
+                        </div>
+                        <div class="tool-links">
+                            <a href="https://jestjs.io/" class="tool-link primary" target="_blank"><i class="fas fa-external-link-alt"></i> Official Site</a>
+                            <a href="https://jestjs.io/docs/getting-started" class="tool-link" target="_blank"><i class="fas fa-book"></i> Docs</a>
+                        </div>
+                        <div class="tool-stats">
+                            <div class="tool-stat"><i class="fas fa-bolt"></i> Fast</div>
+                            <div class="tool-stat"><i class="fas fa-snapchat-ghost"></i> Snapshot Testing</div>
+                        </div>
+                    </div>
+                    
+                    <div class="tool-card popular">
+                        <div class="popular-badge">MODERN</div>
+                        <div class="tool-header">
+                            <div class="tool-icon">
+                                <i class="fas fa-spider"></i>
+                            </div>
+                            <h3 class="tool-name">Playwright</h3>
+                        </div>
+                        <p class="tool-description">A framework for Web Testing and Automation that allows testing Chromium, Firefox and WebKit with a single API.</p>
+                        <div class="tool-tags">
+                            <span class="tool-tag">Free</span>
+                            <span class="tool-tag">Testing</span>
+                            <span class="tool-tag">Automation</span>
+                        </div>
+                        <div class="tool-links">
+                            <a href="https://playwright.dev/" class="tool-link primary" target="_blank"><i class="fas fa-external-link-alt"></i> Official Site</a>
+                            <a href="https://playwright.dev/docs/intro" class="tool-link" target="_blank"><i class="fas fa-graduation-cap"></i> Getting Started</a>
+                        </div>
+                        <div class="tool-stats">
+                            <div class="tool-stat"><i class="fas fa-crosshairs"></i> Cross-browser</div>
+                            <div class="tool-stat"><i class="fas fa-robot"></i> Auto-waiting</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Looking for a specific tool recommendation?</p>
+            <a href="mailto:tools@midnighttech.com" class="contact-link"><i class="fas fa-tools"></i> Get Tool Advice</a>
+            <div class="copyright">
+                &copy; 2026 GLenn Junsay Pansensoy. All rights reserved. | Python OOP Tutorial v2.0
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
