@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poetic Codes - Master Python Through Practical Projects</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Enhanced Color Scheme */
+        :root {
+            --midnight-blue: #0a1931;
+            --obsidian: #060c14;
+            --blue-accent: #185adb;
+            --light-blue: #47b5ff;
+            --text-light: #e8f1f5;
+            --text-muted: #9db2bf;
+            --card-bg: #0f2742;
+            --hover-blue: #2a75f3;
+            --python-yellow: #ffde57;
+            --python-blue: #4584b6;
+            --success-green: #2ecc71;
+            --warning-orange: #f39c12;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Header Styles - Enhanced Responsive */
+        header {
+            background-color: var(--midnight-blue);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--blue-accent);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 10, 30, 0.5);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .logo h1 {
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            background: linear-gradient(to right, var(--light-blue), var(--python-yellow));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .logo .python-icon {
+            color: var(--python-yellow);
+            margin-right: 10px;
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+        }
+
+        /* Hamburger Menu */
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: var(--light-blue);
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .menu-toggle:hover {
+            background-color: var(--card-bg);
+            color: var(--python-yellow);
+            transform: scale(1.1);
+        }
+
+        .nav-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: min(320px, 85vw);
+            height: 100vh;
+            background-color: var(--midnight-blue);
+            border-left: 2px solid var(--blue-accent);
+            padding: 2rem 1.5rem;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+            overflow-y: auto;
+        }
+
+        .nav-menu.active {
+            transform: translateX(0);
+        }
+
+        .nav-menu ul {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .nav-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-menu a {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .nav-menu a:hover {
+            background-color: var(--card-bg);
+            color: var(--light-blue);
+            transform: translateX(8px);
+        }
+
+        .nav-menu i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content - Responsive */
+        main {
+            flex: 1;
+            padding: 2rem 5%;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Hero Section - Enhanced */
+        .hero {
+            text-align: center;
+            padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 3vw, 2rem);
+            background: linear-gradient(135deg, var(--midnight-blue), var(--card-bg));
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            border: 1px solid var(--blue-accent);
+            box-shadow: 0 8px 24px rgba(0, 20, 60, 0.3);
+        }
+
+        .hero h2 {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            margin-bottom: 1.5rem;
+            color: var(--light-blue);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            max-width: 900px;
+            margin: 0 auto 2rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+        }
+
+        .highlight {
+            color: var(--python-yellow);
+            font-weight: 700;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(to right, var(--blue-accent), var(--python-blue));
+            color: white;
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(24, 90, 219, 0.3);
+        }
+
+        .cta-button:hover {
+            background: linear-gradient(to right, var(--hover-blue), var(--light-blue));
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(24, 90, 219, 0.4);
+        }
+
+        /* Stats Section - New Addition */
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 2rem 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid var(--blue-accent);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(71, 181, 255, 0.2);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            color: var(--python-yellow);
+            margin-bottom: 1rem;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            color: var(--light-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Courses Section - Improved Grid */
+        .courses {
+            margin-bottom: 3rem;
+        }
+
+        .courses h2 {
+            color: var(--light-blue);
+            margin-bottom: 2.5rem;
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+            text-align: center;
+        }
+
+        .courses-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+            gap: 2rem;
+        }
+
+        .course-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--blue-accent);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(71, 181, 255, 0.2);
+            border-color: var(--light-blue);
+        }
+
+        .course-header {
+            background: linear-gradient(135deg, var(--midnight-blue), var(--blue-accent));
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .course-header h3 {
+            font-size: clamp(1.2rem, 3vw, 1.4rem);
+            color: var(--text-light);
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .course-level {
+            background: var(--python-yellow);
+            color: var(--obsidian);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .course-content {
+            padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .course-content > p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .course-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+
+        .course-features li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.8rem;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .course-features i {
+            color: var(--success-green);
+            margin-right: 10px;
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        .course-button {
+            display: block;
+            background: linear-gradient(to right, var(--blue-accent), var(--python-blue));
+            color: white;
+            padding: 0.9rem 1.5rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: auto;
+        }
+
+        .course-button:hover {
+            background: linear-gradient(to right, var(--hover-blue), var(--light-blue));
+            box-shadow: 0 4px 15px rgba(24, 90, 219, 0.3);
+        }
+
+        /* Philosophy Section - Enhanced Layout */
+        .philosophy {
+            background: var(--card-bg);
+            padding: clamp(2rem, 5vw, 3rem);
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            border: 1px solid var(--blue-accent);
+        }
+
+        .philosophy h2 {
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+            color: var(--light-blue);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .philosophy-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .philosophy-text p {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            font-size: clamp(0.95rem, 2vw, 1.05rem);
+        }
+
+        .philosophy-text ul {
+            list-style: none;
+            margin-top: 1.5rem;
+        }
+
+        .philosophy-text li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            font-size: clamp(0.95rem, 2vw, 1rem);
+            line-height: 1.6;
+        }
+
+        .philosophy-text li i {
+            color: var(--python-yellow);
+            margin-right: 12px;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .philosophy-image {
+            text-align: center;
+            font-size: clamp(8rem, 15vw, 12rem);
+            color: var(--blue-accent);
+            opacity: 0.3;
+        }
+
+        /* Learning Path Section - New */
+        .learning-path {
+            margin-bottom: 3rem;
+        }
+
+        .learning-path h2 {
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+            color: var(--light-blue);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .path-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: 1.5rem;
+        }
+
+        .path-step {
+            background: var(--card-bg);
+            padding: 2rem 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid var(--python-yellow);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .path-step:hover {
+            transform: translateX(10px);
+            box-shadow: 0 4px 15px rgba(71, 181, 255, 0.2);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 15px;
+            background: var(--python-yellow);
+            color: var(--obsidian);
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .path-step h3 {
+            color: var(--light-blue);
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+        }
+
+        .path-step p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Testimonials Section - New */
+        .testimonials {
+            background: var(--midnight-blue);
+            padding: clamp(2rem, 5vw, 3rem);
+            border-radius: 12px;
+            margin-bottom: 3rem;
+            border: 1px solid var(--blue-accent);
+        }
+
+        .testimonials h2 {
+            font-size: clamp(1.8rem, 4vw, 2.2rem);
+            color: var(--light-blue);
+            margin-bottom: 2.5rem;
+            text-align: center;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: 2rem;
+        }
+
+        .testimonial-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid var(--blue-accent);
+            transition: all 0.3s;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(71, 181, 255, 0.2);
+        }
+
+        .testimonial-text {
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--python-yellow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--obsidian);
+            flex-shrink: 0;
+        }
+
+        .author-info h4 {
+            color: var(--light-blue);
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .author-info p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Footer - Enhanced Responsive */
+        footer {
+            background-color: var(--midnight-blue);
+            border-top: 2px solid var(--blue-accent);
+            padding: 3rem 5% 1.5rem;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-section h3 {
+            color: var(--light-blue);
+            margin-bottom: 1.2rem;
+            font-size: 1.3rem;
+        }
+
+        .footer-section p {
+            color: var(--text-muted);
+            margin-bottom: 0.8rem;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .footer-section a {
+            display: block;
+            color: var(--text-muted);
+            padding: 0.5rem 0;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .footer-section a:hover {
+            color: var(--light-blue);
+            padding-left: 10px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .social-links a {
+            width: 45px;
+            height: 45px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s;
+            padding: 0;
+        }
+
+        .social-links a:hover {
+            background: var(--python-yellow);
+            color: var(--obsidian);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--card-bg);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .copyright p {
+            margin: 0.5rem 0;
+        }
+
+        .copyright i {
+            color: #e74c3c;
+            margin: 0 5px;
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            header {
+                padding: 0.8rem 4%;
+            }
+
+            main {
+                padding: 1.5rem 4%;
+            }
+
+            footer {
+                padding: 2rem 4% 1rem;
+            }
+
+            .nav-menu {
+                padding: 1.5rem 1rem;
+            }
+
+            .hero {
+                margin-bottom: 2rem;
+            }
+
+            .courses-container,
+            .path-steps,
+            .testimonial-grid {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-card {
+                padding: 1.5rem 1rem;
+            }
+
+            .stat-card i {
+                font-size: 2rem;
+            }
+
+            .stat-card h3 {
+                font-size: 1.5rem;
+            }
+
+            .course-header {
+                padding: 1.2rem;
+            }
+
+            .course-content {
+                padding: 1.2rem;
+            }
+        }
+
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Animation for scroll-in elements */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Overlay for menu */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 998;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <i class="fab fa-python python-icon"></i>
+            <h1>Poetic Codes</h1>
+        </div>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav class="nav-menu" id="navMenu">
+            <ul>
+                <li><a href="#courses"><i class="fas fa-graduation-cap"></i> Courses</a></li>
+                <li><a href="#learning-path"><i class="fas fa-route"></i> Learning Path</a></li>
+                <li><a href="#testimonials"><i class="fas fa-comments"></i> Testimonials</a></li>
+                <li><a href="#"><i class="fas fa-code"></i> Code Playground</a></li>
+                <li><a href="#"><i class="fas fa-book"></i> Resources</a></li>
+                <li><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                <li><a href="#"><i class="fas fa-user"></i> My Account</a></li>
+                <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Overlay for mobile menu -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section class="hero fade-in">
+            <h2>Learn Python Through Working Code That Makes Sense</h2>
+            <p>Stop struggling with complex theories. We teach <span class="highlight">Python through practical, working examples</span> that you can understand and build upon from day one. Real projects, real skills, real results.</p>
+            <a href="#courses" class="cta-button">Start Your Python Journey Free</a>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="stat-card fade-in">
+                <i class="fas fa-users"></i>
+                <h3>10,000+</h3>
+                <p>Active Learners</p>
+            </div>
+            <div class="stat-card fade-in">
+                <i class="fas fa-code"></i>
+                <h3>500+</h3>
+                <p>Working Projects</p>
+            </div>
+            <div class="stat-card fade-in">
+                <i class="fas fa-trophy"></i>
+                <h3>95%</h3>
+                <p>Success Rate</p>
+            </div>
+            <div class="stat-card fade-in">
+                <i class="fas fa-star"></i>
+                <h3>4.9/5</h3>
+                <p>Student Rating</p>
+            </div>
+        </section>
+
+        <!-- Courses Section -->
+        <section class="courses" id="courses">
+            <h2>Our Practical Python Courses</h2>
+            <div class="courses-container">
+                <!-- Course 1 -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Python Fundamentals</h3>
+                        <span class="course-level">Beginner</span>
+                    </div>
+                    <div class="course-content">
+                        <p>Master Python basics through hands-on coding. Learn by building 10+ working programs from scratch, with clear explanations and practical examples you can use immediately.</p>
+                        <ul class="course-features">
+                            <li><i class="fas fa-check-circle"></i> Build 10 working programs in the first week</li>
+                            <li><i class="fas fa-check-circle"></i> Clear explanations without technical jargon</li>
+                            <li><i class="fas fa-check-circle"></i> Common error solutions and debugging tips</li>
+                            <li><i class="fas fa-check-circle"></i> Interactive coding exercises with instant feedback</li>
+                            <li><i class="fas fa-check-circle"></i> Lifetime access to course materials</li>
+                        </ul>
+                        <a href="#" class="course-button">Start Free Trial</a>
+                    </div>
+                </div>
+
+                <!-- Course 2 -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Real-World Python Projects</h3>
+                        <span class="course-level">Intermediate</span>
+                    </div>
+                    <div class="course-content">
+                        <p>Build professional applications that solve real problems. Create web scrapers, data analyzers, automation tools, and more. Every project is production-ready and portfolio-worthy.</p>
+                        <ul class="course-features">
+                            <li><i class="fas fa-check-circle"></i> 8 complete, deployable projects</li>
+                            <li><i class="fas fa-check-circle"></i> Step-by-step project building methodology</li>
+                            <li><i class="fas fa-check-circle"></i> Code that handles edge cases and errors</li>
+                            <li><i class="fas fa-check-circle"></i> Best practices for maintainable code</li>
+                            <li><i class="fas fa-check-circle"></i> GitHub portfolio assistance included</li>
+                        </ul>
+                        <a href="#" class="course-button">Start Free Trial</a>
+                    </div>
+                </div>
+
+                <!-- Course 3 -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Production Web Apps with Flask</h3>
+                        <span class="course-level">Advanced</span>
+                    </div>
+                    <div class="course-content">
+                        <p>Create and deploy professional web applications using Flask. Learn database integration, user authentication, API development, and deployment strategies used by industry professionals.</p>
+                        <ul class="course-features">
+                            <li><i class="fas fa-check-circle"></i> Build 4 production-ready web applications</li>
+                            <li><i class="fas fa-check-circle"></i> PostgreSQL and MongoDB integration</li>
+                            <li><i class="fas fa-check-circle"></i> RESTful API design and implementation</li>
+                            <li><i class="fas fa-check-circle"></i> Deploy to AWS, Heroku, and DigitalOcean</li>
+                            <li><i class="fas fa-check-circle"></i> Security best practices and testing</li>
+                        </ul>
+                        <a href="#" class="course-button">Start Free Trial</a>
+                    </div>
+                </div>
+
+                <!-- Course 4 - New -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Data Analysis with Python</h3>
+                        <span class="course-level">Intermediate</span>
+                    </div>
+                    <div class="course-content">
+                        <p>Transform raw data into actionable insights. Master pandas, NumPy, and data visualization libraries to analyze real datasets and create compelling visualizations.</p>
+                        <ul class="course-features">
+                            <li><i class="fas fa-check-circle"></i> Analyze 6 real-world datasets</li>
+                            <li><i class="fas fa-check-circle"></i> Master pandas and NumPy libraries</li>
+                            <li><i class="fas fa-check-circle"></i> Create interactive visualizations</li>
+                            <li><i class="fas fa-check-circle"></i> Statistical analysis techniques</li>
+                            <li><i class="fas fa-check-circle"></i> Export reports and dashboards</li>
+                        </ul>
+                        <a href="#" class="course-button">Start Free Trial</a>
+                    </div>
+                </div>
+
+                <!-- Course 5 - New -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Python Automation Mastery</h3>
+                        <span class="course-level">Beginner-Intermediate</span>
+                    </div>
+                    <div class="course-content">
+                        <p>Automate repetitive tasks and save hours every week. Learn to create scripts that handle file operations, web scraping, email automation, and system administration.</p>
+                        <ul class="course-features">
+                            <li><i class="fas fa-check-circle"></i> 15+ automation scripts you can use daily</li>
+                            <li><i class="fas fa-check-circle"></i> File and folder management automation</li>
+                            <li><i class="fas fa-check-circle"></i> Web scraping and data extraction</li>
+                            <li><i class="fas fa-check-circle"></i> Email and scheduling automation</li>
+                            <li><i class="fas fa-check-circle"></i> Task scheduling on Windows and Linux</li>
+                        </ul>
+                        <a href="#" class="course-button">Start Free Trial</a>
+                    </div>
+                </div>
+
+                <!-- Course 6 - New -->
+                <div class="course-card fade-in">
+                    <div class="course-header">
+                        <h3>Machine Learning Fundamentals</h3>
+                        <span class="course-level">Advanced</span>
+                    </div>
+                    <div class="course-content">
+                        <p>Build intelligent applications with machine learning. Understand algorithms through practical implementation using scikit-learn and TensorFlow on real-world problems.</p>
+                        <ul class="course-features">
+                            <li><i class="fas fa-check-circle"></i> 5 complete ML projects from scratch</li>
+                            <li><i class="fas fa-check-circle"></i> Supervised and unsupervised learning</li>
+                            <li><i class="fas fa-check-circle"></i> Neural networks with TensorFlow</li>
+                            <li><i class="fas fa-check-circle"></i> Model evaluation and optimization</li>
+                            <li><i class="fas fa-check-circle"></i> Deploy ML models to production</li>
+                        </ul>
+                        <a href="#" class="course-button">Start Free Trial</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Learning Path Section -->
+        <section class="learning-path fade-in" id="learning-path">
+            <h2>Your Python Learning Journey</h2>
+            <div class="path-steps">
+                <div class="path-step">
+                    <div class="step-number">1</div>
+                    <h3>Foundation</h3>
+                    <p>Start with Python basics. Learn syntax, data types, and control structures through simple, working examples.</p>
+                </div>
+                <div class="path-step">
+                    <div class="step-number">2</div>
+                    <h3>Practice</h3>
+                    <p>Build small projects to reinforce concepts. Create calculators, games, and useful utilities.</p>
+                </div>
+                <div class="path-step">
+                    <div class="step-number">3</div>
+                    <h3>Real Projects</h3>
+                    <p>Develop applications that solve actual problems. Web scrapers, data analyzers, and automation tools.</p>
+                </div>
+                <div class="path-step">
+                    <div class="step-number">4</div>
+                    <h3>Advanced Skills</h3>
+                    <p>Master frameworks like Flask and Django. Build web applications and APIs ready for production.</p>
+                </div>
+                <div class="path-step">
+                    <div class="step-number">5</div>
+                    <h3>Specialization</h3>
+                    <p>Choose your path: Data Science, Machine Learning, Web Development, or Automation.</p>
+                </div>
+                <div class="path-step">
+                    <div class="step-number">6</div>
+                    <h3>Career Ready</h3>
+                    <p>Build a portfolio of real projects. Get job-ready skills that employers are looking for.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Philosophy Section -->
+        <section class="philosophy fade-in">
+            <h2>Our Teaching Philosophy</h2>
+            <div class="philosophy-content">
+                <div class="philosophy-text">
+                    <p>At <strong>Poetic Codes</strong>, we believe learning programming should be straightforward and practical. The best way to master Python is through <strong>working examples</strong> that you can understand, modify, and build upon.</p>
+                    <p>Too many courses overwhelm students with abstract theories and leave them with non-functional code. We take a different approach:</p>
+                    <ul>
+                        <li><i class="fas fa-code"></i> Every code example runs correctly from the start</li>
+                        <li><i class="fas fa-lightbulb"></i> Clear explanations that make complex concepts simple</li>
+                        <li><i class="fas fa-rocket"></i> Projects designed for real-world application</li>
+                        <li><i class="fas fa-check-double"></i> Progressive learning that builds confidence</li>
+                        <li><i class="fas fa-users"></i> Community support when you need help</li>
+                        <li><i class="fas fa-chart-line"></i> Track your progress with measurable milestones</li>
+                    </ul>
+                    <p>Our students don't just learn syntax—they develop the problem-solving skills and practical knowledge needed to build real applications and advance their careers.</p>
+                </div>
+                <div class="philosophy-image">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="testimonials fade-in" id="testimonials">
+            <h2>What Our Students Say</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"After struggling with other courses for months, Poetic Codes finally made Python click for me. The working examples and practical projects gave me the confidence to build my own applications."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>Sarah Martinez</h4>
+                            <p>Career Changer, now Junior Developer</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"I learned more in 2 weeks with Poetic Codes than I did in 6 months trying to figure it out on my own. The code actually works, and the explanations are crystal clear."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>James Chen</h4>
+                            <p>Data Analyst</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The Flask course was outstanding. I built and deployed my first web application in 3 weeks. The step-by-step approach made everything manageable and fun."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="author-info">
+                            <h4>Emily Rodriguez</h4>
+                            <p>Freelance Web Developer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Poetic Codes</h3>
+                <p>Teaching Python through simple, working examples. No complex theories—just functional code that builds real skills and launches careers.</p>
+                <p><i class="fas fa-map-marker-alt"></i> Online Learning Platform</p>
+                <p><i class="fas fa-envelope"></i> support->pansensoyglenn@gmail.com</p>
+                <p><i class="fas fa-phone"></i> Available 24/7 via chat</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Courses</h3>
+                <a href="#"><i class="fas fa-chevron-right"></i> Python Fundamentals</a>
+                <a href="#"><i class="fas fa-chevron-right"></i> Real-World Projects</a>
+                <a href="#"><i class="fas fa-chevron-right"></i> Flask Web Development</a>
+                <a href="#"><i class="fas fa-chevron-right"></i> Data Analysis</a>
+                <a href="#"><i class="fas fa-chevron-right"></i> Automation Mastery</a>
+                <a href="#"><i class="fas fa-chevron-right"></i> Machine Learning</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <a href="#"><i class="fas fa-chevron-right"></i> Free Python Cheat Sheet</a>
+                <a href="#"><i class="fas fa-chevron-right"></i> Code Playground</a>
+                <a href="#"><i class="fas fa-chevron-right"></i> Community Forum</a>
+                <a href="#"><i class="fas fa-chevron-right"></i> Student Showcase</a>
+                <a href="#"><i class="fas fa-chevron-right"></i> Blog & Tutorials</a>
+                <a href="#"><i class="fas fa-chevron-right"></i> Career Resources</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Connect With Us</h3>
+                <p>Join 10,000+ learners building practical Python skills. Get support, share projects, and grow together.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" aria-label="Discord"><i class="fab fa-discord"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2026 Glenn Junsay Pansensoy. All rights reserved. <i class="fas fa-heart"></i> Made for learners who value working code.</p>
+            <p>Python is a registered trademark of the Python Software Foundation.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Hamburger Menu and Overlay Functionality
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        const overlay = document.getElementById('overlay');
+        
+        function toggleMenu() {
+            const isActive = navMenu.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            if (isActive) {
+                menuToggle.innerHTML = '<i class="fas fa-times"></i>';
+                document.body.style.overflow = 'hidden';
+            } else {
+                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                document.body.style.overflow = '';
+            }
+        }
+        
+        menuToggle.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
+        
+        // Close menu when clicking a nav link
+        navMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                if (navMenu.classList.contains('active')) {
+                    toggleMenu();
+                }
+            });
+        });
+        
+        // Intelligent Footer Year Update
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentYear = new Date().getFullYear();
+            const copyrightText = document.querySelector('.copyright p');
+            if (copyrightText) {
+                copyrightText.innerHTML = copyrightText.innerHTML.replace('2026', currentYear);
+            }
+            
+            // Enhanced Course Button Interactions
+            const courseButtons = document.querySelectorAll('.course-button');
+            courseButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                    this.style.pointerEvents = 'none';
+                    
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="fas fa-check"></i> Trial Started!';
+                        this.style.background = 'linear-gradient(to right, #2ecc71, #27ae60)';
+                        
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                            this.style.background = '';
+                            this.style.pointerEvents = '';
+                        }, 2000);
+                    }, 1000);
+                });
+            });
+            
+            // Scroll Animation Observer
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe all fade-in elements
+            document.querySelectorAll('.fade-in').forEach(element => {
+                observer.observe(element);
+            });
+            
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href !== '#' && href.length > 1) {
+                        e.preventDefault();
+                        const target = document.querySelector(href);
+                        if (target) {
+                            target.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Prevent menu from closing when clicking inside it
+        navMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    </script>
+</body>
+</html>
