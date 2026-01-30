@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vegetable Store OOP Project – Overview | Poetic Codes</title>
+  
+  <!-- Favicon (you can replace with your own) -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  
+  <style>
+    :root {
+      --obsidian:      #0d1117;
+      --midnight:      #0f172a;
+      --card:          #161b22;
+      --border:        #30363d;
+      --text:          #c9d1d9;
+      --text-dim:      #8b949e;
+      --accent:        #58a6ff;
+      --accent-dark:   #388bfd;
+      --success:       #3fb950;
+      --danger:        #f85149;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--obsidian);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      background: rgba(13, 17, 23, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      padding: 1rem 5%;
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: 1px;
+    }
+
+    .hamburger {
+      display: none;
+      font-size: 1.8rem;
+      color: var(--text);
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.25s ease;
+    }
+
+    .nav-links a:hover,
+    .nav-links a.active {
+      color: var(--accent);
+    }
+
+    /* ── Main Content ── */
+    main {
+      flex: 1;
+      padding: 140px 5% 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    h1 {
+      font-family: 'Cinzel', serif;
+      color: var(--accent);
+      font-size: 2.8rem;
+      margin-bottom: 1.4rem;
+      text-align: center;
+    }
+
+    .lead {
+      font-size: 1.22rem;
+      color: var(--text-dim);
+      text-align: center;
+      max-width: 780px;
+      margin: 0 auto 3rem;
+      line-height: 1.7;
+    }
+
+    .overview-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.4rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
+
+    .overview-card h2 {
+      color: var(--accent);
+      font-size: 1.6rem;
+      margin-bottom: 1.1rem;
+      border-left: 4px solid var(--accent-dark);
+      padding-left: 1rem;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.6rem;
+      margin: 2rem 0;
+    }
+
+    .feature-item {
+      background: rgba(88,166,255,0.06);
+      border: 1px solid rgba(88,166,255,0.15);
+      border-radius: 10px;
+      padding: 1.4rem;
+      transition: all 0.25s ease;
+    }
+
+    .feature-item:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 25px rgba(88,166,255,0.12);
+    }
+
+    .feature-item h3 {
+      color: var(--accent);
+      margin-bottom: 0.7rem;
+      font-size: 1.15rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--midnight);
+      border-top: 1px solid var(--border);
+      padding: 3rem 5% 1.5rem;
+      margin-top: auto;
+    }
+
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 2.5rem;
+    }
+
+    .footer-brand {
+      font-family: 'Cinzel', serif;
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1.2rem;
+      margin-top: 1.2rem;
+    }
+
+    .social-links a {
+      color: var(--text-dim);
+      font-size: 1.4rem;
+      transition: all 0.3s;
+    }
+
+    .social-links a:hover {
+      color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .footer-links h4 {
+      color: var(--text);
+      margin-bottom: 1rem;
+      font-size: 1.05rem;
+    }
+
+    .footer-links ul {
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.6rem;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    .copyright {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 0.95rem;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .hamburger { display: block; }
+      .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--midnight);
+        border-top: 1px solid var(--border);
+        padding: 1.5rem 5%;
+      }
+      .nav-links.active { display: flex; }
+      main { padding-top: 100px; }
+      h1 { font-size: 2.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navbar ── -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="/" class="logo">POETIC CODES</a>
+      
+      <button class="hamburger" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/python" class="active">Python Labs</a></li>
+        <li><a href="/oop-basics">OOP Basics</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ── Main Content ── -->
+  <main>
+    <h1>Vegetable Store Inventory System</h1>
+    <p class="lead">
+      A clean, educational Python OOP project that demonstrates <strong>encapsulation</strong>, 
+      <strong>composition</strong>, basic error handling, and clean separation of concerns 
+      through a realistic vegetable store point-of-sale simulation.
+    </p>
+
+    <div class="overview-card">
+      <h2>Project Purpose</h2>
+      <p>
+        This lab teaches core object-oriented programming principles by building a small 
+        but meaningful inventory + transaction system — the kind of logic found in 
+        real-world retail, warehouse, and e-commerce applications.
+      </p>
+    </div>
+
+    <div class="overview-card">
+      <h2>Core Learning Objectives</h2>
+      <div class="features">
+        <div class="feature-item">
+          <h3>Encapsulation</h3>
+          <p>Protecting object state (stock, price) and exposing behavior only through methods (<code>sell()</code>, <code>get_info()</code>).</p>
+        </div>
+        <div class="feature-item">
+          <h3>Composition</h3>
+          <p><code>VegetableStore</code> “has-a” collection of <code>Vegetable</code> objects managed via dictionary.</p>
+        </div>
+        <div class="feature-item">
+          <h3>Error Handling</h3>
+          <p>Graceful validation of stock levels and item existence using exceptions.</p>
+        </div>
+        <div class="feature-item">
+          <h3>Single Responsibility</h3>
+          <p>Clear separation: <code>Vegetable</code> manages one item, <code>VegetableStore</code> manages the collection, <code>main()</code> handles UI loop.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="overview-card">
+      <h2>Key Features Implemented</h2>
+      <ul style="padding-left: 1.8rem; margin: 1.2rem 0;">
+        <li>10 hardcoded vegetables with realistic Philippine prices (₱)</li>
+        <li>Interactive console menu + transaction loop</li>
+        <li>Stock deduction on successful sale</li>
+        <li>Clear formatting of inventory status</li>
+        <li>Basic user input validation & friendly error messages</li>
+      </ul>
+    </div>
+
+    <div class="overview-card" style="text-align:center; padding: 2.8rem;">
+      <h2 style="margin-bottom: 1.5rem;">Ready to Start?</h2>
+      <p style="margin-bottom: 1.8rem; color: var(--text-dim);">
+        Jump into the complete code and step-by-step explanation:
+      </p>
+      <a href="vegetable.html" style="
+        display: inline-block;
+        background: var(--accent-dark);
+        color: white;
+        padding: 1rem 2.2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+      " onmouseover="this.style.background='#1f6feb'" onmouseout="this.style.background='#388bfd'">
+        View Full Implementation →
+      </a>
+    </div>
+  </main>
+
+  <!-- ── Intelligent Footer ── -->
+  <footer>
+    <div class="footer-content">
+      <div>
+        <div class="footer-brand">POETIC CODES</div>
+        <p style="color:var(--text-dim); max-width:320px;">
+          Elegant Python tutorials • Logical design • Modern OOP thinking
+        </p>
+        <div class="social-links">
+          <a href="https://github.com/pansensoyglenn-dev" target="_blank"><i class="fab fa-github"></i></a>
+          <a href="https://twitter.com/glennpansensoy" target="_blank"><i class="fab fa-x-twitter"></i></a>
+          <a href="https://linkedin.com/in/glennpansensoy" target="_blank"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <h4>Python Labs</h4>
+        <ul>
+          <li><a href="vegetable.html">Vegetable Store</a></li>
+          <li><a href="atm.html">Mini-ATM</a></li>
+          <li><a href="book.html">Book Store</a></li>
+          <li><a href="flower.html">Flower Shop</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="/oop-basics">OOP Fundamentals</a></li>
+          <li><a href="/python-tips">Python Tips</a></li>
+          <li><a href="/documentation">Documentation</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-links">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="/about-us">About Glenn</a></li>
+          <li><a href="/contact">Get in Touch</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="copyright">
+      © <span id="year"></span> Glenn Pansensoy • 
+      <span style="color:var(--text-dim);">Crafted with logic & midnight elegance</span>
+    </div>
+  </footer>
+
+  <script>
+    // Dynamic year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Hamburger menu toggle
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('active');
+      hamburger.innerHTML = navLinks.classList.contains('active')
+        ? '<i class="fas fa-times"></i>'
+        : '<i class="fas fa-bars"></i>';
+    });
+  </script>
+</body>
+</html>
