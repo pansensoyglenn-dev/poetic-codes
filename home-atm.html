@@ -1,0 +1,2477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    
+    <!-- Preconnect to CDNs for performance -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Primary Meta Tags -->
+    <title>Python Mini ATM Project: Encapsulation & OOP Tutorial | Poetic Codes</title>
+    <meta name="title" content="Python Mini ATM Project: Encapsulation & OOP Tutorial">
+    <meta name="description" content="Learn Python OOP and Encapsulation with this Mini ATM project tutorial. Learn secure coding practices, class organization, and management from Glenn Junsay Pansensoy.">
+    <meta name="keywords" content="Python ATM project, Python encapsulation, Python OOP, Python banking system, Python tutorial, secure coding, class organization, Python beginner, Glenn Pansensoy">
+    <meta name="author" content="Glenn Pansensoy">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://pansensoyglenn-dev.github.io/poetic-codes/atm.html" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Python Mini ATM Project: Encapsulation & OOP Tutorial">
+    <meta property="og:description" content="Learn Python OOP and Encapsulation with this Mini ATM project tutorial. Learn secure coding practices, class organization, and management.">
+    <meta property="og:url" content="https://pansensoyglenn-dev.github.io/poetic-codes/atm.html">
+    <meta property="og:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-atm-og.jpg">
+    <meta property="og:site_name" content="Poetic Codes">
+    <meta property="article:published_time" content="2026-01-28T00:00:00Z">
+    <meta property="article:author" content="Glenn Junsay Pansensoy">
+    <meta property="article:section" content="Python Tutorial">
+    <meta property="article:tag" content="Python">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Python Mini ATM Project: Encapsulation & OOP Tutorial">
+    <meta name="twitter:description" content="Master Python OOP and Encapsulation with this Mini ATM project tutorial. Learn secure coding practices, class organization, and management.">
+    <meta name="twitter:url" content="https://pansensoyglenn-dev.github.io/poetic-codes/atm.html">
+    <meta name="twitter:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-atm-twitter.jpg">
+    <meta name="twitter:creator" content="@GlennPansensoy">
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Python Mini ATM Project: Learn Encapsulation & OOP",
+        "description": "Learn Python OOP and Encapsulation with this Mini ATM project tutorial. Master secure coding practices, class organization, and management.",
+        "author": {
+            "@type": "Person",
+            "name": "Glenn Junsay Pansensoy",
+            "url": "https://pansensoyglenn-dev.github.io/poetic-codes"
+        },
+        "datePublished": "2026-01-28",
+        "dateModified": "2026-01-28",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Poetic Codes",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://pansensoyglenn-dev.github.io/poetic-codes/logo.png"
+            }
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://pansensoyglenn-dev.github.io/poetic-codes/atm.html"
+        },
+        "image": "https://pansensoyglenn-dev.github.io/poetic-codes/images/python-atm-og.jpg",
+        "keywords": ["Python", "OOP", "Encapsulation", "ATM", "Tutorial", "Programming", "Banking System"],
+        "educationalLevel": "Beginner",
+        "timeRequired": "PT30M",
+        "proficiencyLevel": "Beginner"
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://pansensoyglenn-dev.github.io/poetic-codes"
+        },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Python Tutorials",
+            "item": "https://pansensoyglenn-dev.github.io/poetic-codes/python"
+        },{
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Practical Labs",
+            "item": "https://pansensoyglenn-dev.github.io/poetic-codes#labs"
+        },{
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Mini ATM Project"
+        }]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "Build a Python Mini ATM System",
+        "description": "Step-by-step guide to building a secure ATM system with Python encapsulation",
+        "totalTime": "PT30M",
+        "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "USD",
+            "value": "0"
+        },
+        "tool": [
+            {
+                "@type": "HowToTool",
+                "name": "Python 3.x"
+            }
+        ],
+        "step": [
+            {
+                "@type": "HowToStep",
+                "name": "Set up the ATM class structure",
+                "text": "Create the main ATM class with private attributes for secure data handling"
+            },
+            {
+                "@type": "HowToStep",
+                "name": "Implement encapsulation",
+                "text": "Use @property decorators and private methods to protect sensitive banking data"
+            },
+            {
+                "@type": "HowToStep",
+                "name": "Add transaction methods",
+                "text": "Implement deposit, withdraw, and balance inquiry methods with validation"
+            }
+        ]
+    }
+    </script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            /* Midnight Blue & Obsidian Theme */
+            --obsidian-dark: #0d1117;
+            --obsidian-card: #161b22;
+            --obsidian-light: #21262d;
+            --midnight-blue: #0a1929;
+            --midnight-light: #132f4c;
+            --accent-blue: #58a6ff;
+            --accent-cyan: #79c0ff;
+            --accent-green: #56d364;
+            --accent-red: #ff7b72;
+            --accent-purple: #d2a8ff;
+            --accent-yellow: #e3b341;
+            --text-main: #f0f6fc;
+            --text-dim: #8b949e;
+            --text-muted: #6e7681;
+            --footer-bg: #010409;
+            --terminal-bg: #0d1117;
+            --border-color: #30363d;
+            --gradient-primary: linear-gradient(135deg, #0a1929 0%, #161b22 100%);
+            --gradient-accent: linear-gradient(135deg, #58a6ff 0%, #1f6feb 100%);
+            --gradient-cyan: linear-gradient(135deg, #79c0ff 0%, #58a6ff 100%);
+            --transition-speed: 0.3s;
+            --border-radius: 8px;
+            --glow-blue: 0 0 20px rgba(88, 166, 255, 0.15);
+            --glow-cyan: 0 0 20px rgba(121, 192, 255, 0.15);
+            --glow-green: 0 0 20px rgba(86, 211, 100, 0.15);
+        }
+        
+        /* Performance optimization */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            font-size: 16px;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--obsidian-dark); 
+            color: var(--text-main); 
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-size: 1rem;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(88, 166, 255, 0.03) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(86, 211, 100, 0.03) 0%, transparent 20%);
+        }
+        
+        /* Mobile-first responsive typography */
+        @media (max-width: 576px) {
+            html {
+                font-size: 14px;
+            }
+            
+            body {
+                line-height: 1.5;
+            }
+        }
+        
+        /* Skip to main content for accessibility */
+        .skip-to-main {
+            position: absolute;
+            left: -9999px;
+            top: auto;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            z-index: -9999;
+        }
+        
+        .skip-to-main:focus {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: auto;
+            height: auto;
+            padding: 12px 20px;
+            background: var(--accent-blue);
+            color: var(--text-main);
+            z-index: 9999;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: bold;
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Reduce motion for accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+        
+        /* Header & Hero Improvements */
+        .hero-section { 
+            background: var(--gradient-primary); 
+            padding: 80px 0 60px;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        @media (min-width: 768px) {
+            .hero-section {
+                padding: 100px 0 80px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .hero-section {
+                padding: 120px 0 90px;
+            }
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+            box-shadow: var(--glow-blue);
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Improved Card Design - Obsidian Glass Effect */
+        .section-card { 
+            background: rgba(22, 27, 34, 0.95); 
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius); 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border: 1px solid var(--border-color);
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: all var(--transition-speed) ease;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        @media (min-width: 768px) {
+            .section-card {
+                padding: 30px;
+                margin-bottom: 25px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .section-card {
+                padding: 40px;
+                margin-bottom: 30px;
+            }
+        }
+        
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+            opacity: 0;
+            transition: opacity var(--transition-speed) ease;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 10px 25px rgba(0, 0, 0, 0.3),
+                var(--glow-blue),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border-color: rgba(88, 166, 255, 0.3);
+        }
+        
+        @media (min-width: 768px) {
+            .section-card:hover {
+                transform: translateY(-5px);
+            }
+        }
+        
+        .section-card:hover::before {
+            opacity: 1;
+        }
+        
+        /* Typography Improvements - Mobile Responsive */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Cinzel', serif;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.5px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 10px rgba(88, 166, 255, 0.2);
+            line-height: 1.2;
+        }
+        
+        @media (min-width: 576px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            h1 {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            h1 {
+                font-size: 3.5rem;
+            }
+        }
+        
+        h2 { 
+            color: var(--accent-cyan); 
+            border-bottom: 2px solid rgba(88, 166, 255, 0.3); 
+            padding-bottom: 10px; 
+            margin-bottom: 20px;
+            font-size: 1.6rem;
+            position: relative;
+            line-height: 1.3;
+        }
+        
+        @media (min-width: 576px) {
+            h2 {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            h2 {
+                font-size: 2rem;
+                margin-bottom: 25px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            h2 {
+                font-size: 2.3rem;
+                margin-bottom: 30px;
+            }
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: var(--gradient-cyan);
+        }
+        
+        h4 { 
+            color: var(--accent-blue); 
+            margin-top: 25px; 
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            line-height: 1.4;
+        }
+        
+        @media (min-width: 768px) {
+            h4 {
+                font-size: 1.3rem;
+                margin-top: 30px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            h4 {
+                font-size: 1.5rem;
+            }
+        }
+        
+        p, li, .text-dim {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        @media (min-width: 768px) {
+            p, li, .text-dim {
+                font-size: 1.05rem;
+            }
+        }
+        
+        /* Quote Box Enhancement */
+        .quote-box { 
+            font-style: italic; 
+            background: rgba(88, 166, 255, 0.05); 
+            border-left: 4px solid var(--accent-cyan); 
+            padding: 20px; 
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            position: relative;
+            border-top: 1px solid rgba(88, 166, 255, 0.1);
+            border-right: 1px solid rgba(88, 166, 255, 0.1);
+            border-bottom: 1px solid rgba(88, 166, 255, 0.1);
+            font-size: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .quote-box {
+                padding: 25px;
+                margin: 25px 0;
+                font-size: 1.1rem;
+            }
+        }
+        
+        .quote-box::before {
+            content: '"';
+            font-size: 3rem;
+            color: var(--accent-cyan);
+            opacity: 0.2;
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-family: serif;
+        }
+        
+        @media (min-width: 768px) {
+            .quote-box::before {
+                font-size: 4rem;
+            }
+        }
+        
+        .step-badge { 
+            background: var(--gradient-cyan); 
+            color: var(--obsidian-dark); 
+            padding: 5px 12px; 
+            border-radius: 20px; 
+            font-weight: bold; 
+            margin-right: 10px; 
+            margin-bottom: 8px;
+            font-size: 0.8rem; 
+            text-transform: uppercase;
+            display: inline-block;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(121, 192, 255, 0.3);
+            box-shadow: 0 2px 8px rgba(88, 166, 255, 0.2);
+        }
+        
+        @media (min-width: 768px) {
+            .step-badge {
+                font-size: 0.85em;
+                margin-right: 12px;
+                margin-bottom: 0;
+            }
+        }
+        
+        /* Navigation Improvements - Obsidian Glass */
+        .navbar { 
+            background-color: rgba(13, 17, 23, 0.98) !important; 
+            backdrop-filter: blur(15px);
+            padding: 0.8rem 0;
+            transition: all var(--transition-speed) ease;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .navbar.scrolled {
+            padding: 0.6rem 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+        }
+        
+        .navbar-brand { 
+            font-family: 'Cinzel', serif; 
+            color: var(--accent-cyan) !important; 
+            font-weight: bold;
+            font-size: 1.3rem;
+            text-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
+        }
+        
+        @media (min-width: 768px) {
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .navbar-brand {
+                font-size: 1.6rem;
+            }
+        }
+        
+        .nav-link {
+            position: relative;
+            padding: 0.5rem 1rem !important;
+            margin: 0.25rem;
+            border-radius: 6px;
+            transition: all var(--transition-speed) ease;
+            color: var(--text-dim) !important;
+            font-weight: 500;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        
+        @media (min-width: 992px) {
+            .nav-link {
+                padding: 0.6rem 1.2rem !important;
+                margin: 0 0.25rem;
+                text-align: left;
+            }
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--gradient-cyan);
+            transition: width var(--transition-speed) ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--text-main) !important;
+            background: rgba(88, 166, 255, 0.1);
+        }
+        
+        .nav-link:hover::before {
+            width: 80%;
+        }
+        
+        .nav-link.active {
+            background: rgba(88, 166, 255, 0.15);
+            color: var(--accent-cyan) !important;
+            border: 1px solid rgba(88, 166, 255, 0.3);
+        }
+        
+        .nav-link.active::before {
+            width: 100%;
+        }
+        
+        .navbar-toggler {
+            border: 1px solid var(--border-color);
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 2px rgba(88, 166, 255, 0.3);
+        }
+        
+        /* Accessibility: Focus states */
+        .nav-link:focus,
+        .run-btn:focus,
+        .footer-link:focus,
+        .btn:focus {
+            outline: 2px solid var(--accent-cyan);
+            outline-offset: 3px;
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.3);
+        }
+        
+        /* Terminal Simulation Enhancement - Midnight Blue */
+        .terminal-window { 
+            background: var(--terminal-bg); 
+            border-radius: var(--border-radius); 
+            border: 1px solid var(--border-color); 
+            overflow: hidden; 
+            margin-top: 15px; 
+            box-shadow: 
+                0 10px 20px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            transition: transform var(--transition-speed) ease;
+            position: relative;
+            width: 100%;
+        }
+        
+        @media (min-width: 768px) {
+            .terminal-window {
+                margin-top: 20px;
+                box-shadow: 
+                    0 20px 40px rgba(0, 0, 0, 0.6),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            }
+        }
+        
+        .terminal-window::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(10, 25, 41, 0.5) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 1;
+            border-radius: var(--border-radius);
+        }
+        
+        .terminal-window:hover {
+            transform: scale(1.01);
+            border-color: rgba(88, 166, 255, 0.4);
+            box-shadow: 
+                0 15px 30px rgba(0, 0, 0, 0.5),
+                var(--glow-blue),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .terminal-header { 
+            background: var(--midnight-blue); 
+            padding: 10px 15px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            z-index: 2;
+        }
+        
+        @media (min-width: 768px) {
+            .terminal-header {
+                padding: 12px 20px;
+            }
+        }
+        
+        .terminal-dots { display: flex; gap: 6px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        
+        @media (min-width: 768px) {
+            .dot {
+                width: 14px;
+                height: 14px;
+            }
+            .terminal-dots {
+                gap: 8px;
+            }
+        }
+        
+        .dot-red { background: #ff5f56; } 
+        .dot-yellow { background: #ffbd2e; } 
+        .dot-green { background: #27c93f; }
+        
+        .terminal-body { 
+            padding: 15px; 
+            font-family: 'Fira Code', monospace; 
+            font-size: 0.85rem; 
+            color: var(--accent-green); 
+            height: 250px; 
+            overflow-y: auto; 
+            white-space: pre-wrap;
+            line-height: 1.5;
+            background: var(--terminal-bg);
+            position: relative;
+            z-index: 2;
+            word-break: break-word;
+        }
+        
+        @media (min-width: 576px) {
+            .terminal-body {
+                height: 280px;
+                font-size: 0.9rem;
+                padding: 20px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .terminal-body {
+                height: 300px;
+                font-size: 0.95rem;
+                padding: 25px;
+            }
+        }
+        
+        /* Custom scrollbar for terminal */
+        .terminal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        @media (min-width: 768px) {
+            .terminal-body::-webkit-scrollbar {
+                width: 8px;
+            }
+        }
+        
+        .terminal-body::-webkit-scrollbar-track {
+            background: var(--obsidian-light);
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb {
+            background: var(--accent-blue);
+            border-radius: 4px;
+        }
+        
+        .terminal-body::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+        
+        /* Run Button - Glowing Effect */
+        .run-btn { 
+            background: var(--gradient-cyan); 
+            color: var(--obsidian-dark); 
+            border: none; 
+            padding: 14px 25px; 
+            font-weight: bold; 
+            border-radius: var(--border-radius); 
+            transition: all var(--transition-speed) ease; 
+            margin-bottom: 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 4px 15px rgba(88, 166, 255, 0.3),
+                0 0 15px rgba(121, 192, 255, 0.2);
+            border: 1px solid rgba(121, 192, 255, 0.4);
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        @media (min-width: 576px) {
+            .run-btn {
+                width: auto;
+                max-width: none;
+                padding: 14px 30px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .run-btn {
+                padding: 16px 35px;
+                margin-bottom: 20px;
+                font-size: 1.1rem;
+            }
+        }
+        
+        .run-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s ease;
+        }
+        
+        .run-btn:hover { 
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 20px rgba(88, 166, 255, 0.4),
+                0 0 25px rgba(121, 192, 255, 0.3);
+        }
+        
+        .run-btn:hover::before {
+            left: 100%;
+        }
+        
+        .run-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none;
+        }
+        
+        /* Button group responsiveness */
+        .btn-group {
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        @media (min-width: 768px) {
+            .btn-group {
+                flex-direction: row;
+                width: auto;
+                gap: 0;
+            }
+        }
+        
+        .btn-group .btn {
+            width: 100%;
+            max-width: 300px;
+            margin: 5px 0;
+        }
+        
+        @media (min-width: 768px) {
+            .btn-group .btn {
+                width: auto;
+                max-width: none;
+                margin: 0;
+            }
+        }
+        
+        /* Footer Styling Enhancement - Dark Obsidian */
+        footer { 
+            background: var(--footer-bg); 
+            padding: 50px 0 20px; 
+            border-top: 1px solid var(--border-color); 
+            margin-top: 60px; 
+            position: relative;
+        }
+        
+        @media (min-width: 768px) {
+            footer {
+                padding: 60px 0 20px;
+                margin-top: 80px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            footer {
+                padding: 80px 0 20px;
+                margin-top: 100px;
+            }
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+            box-shadow: var(--glow-blue);
+        }
+        
+        .footer-heading { 
+            color: var(--accent-cyan); 
+            font-family: 'Cinzel', serif; 
+            font-size: 1.1rem; 
+            margin-bottom: 20px; 
+            letter-spacing: 1px; 
+            position: relative;
+            display: inline-block;
+        }
+        
+        @media (min-width: 768px) {
+            .footer-heading {
+                font-size: 1.2rem;
+                margin-bottom: 25px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .footer-heading {
+                font-size: 1.3rem;
+            }
+        }
+        
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--gradient-cyan);
+        }
+        
+        .footer-link { 
+            color: var(--text-dim); 
+            text-decoration: none; 
+            transition: all var(--transition-speed) ease; 
+            font-size: 0.9rem; 
+            display: block; 
+            margin-bottom: 10px;
+            padding: 5px 0;
+            border-left: 2px solid transparent;
+            padding-left: 10px;
+        }
+        
+        @media (min-width: 768px) {
+            .footer-link {
+                font-size: 0.95rem;
+                margin-bottom: 12px;
+                padding-left: 12px;
+            }
+        }
+        
+        .footer-link:hover { 
+            color: var(--accent-cyan); 
+            transform: translateX(5px);
+            border-left-color: var(--accent-cyan);
+            padding-left: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .footer-link:hover {
+                padding-left: 18px;
+            }
+        }
+        
+        .social-icons a { 
+            color: var(--text-dim); 
+            margin-right: 15px; 
+            font-size: 1.2rem; 
+            transition: all var(--transition-speed) ease;
+            display: inline-block;
+        }
+        
+        @media (min-width: 768px) {
+            .social-icons a {
+                margin-right: 20px;
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .social-icons a {
+                font-size: 1.4rem;
+            }
+        }
+        
+        .social-icons a:hover { 
+            color: var(--accent-cyan); 
+            transform: translateY(-3px) scale(1.1);
+            text-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+        }
+        
+        /* Code Block Improvements - Midnight Blue */
+        pre[class*="language-"] {
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+            background: var(--midnight-blue) !important;
+            padding: 15px !important;
+            margin: 15px 0;
+            box-shadow: 
+                0 5px 15px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow-x: auto;
+            font-size: 0.85rem;
+        }
+        
+        @media (min-width: 576px) {
+            pre[class*="language-"] {
+                padding: 20px !important;
+                margin: 20px 0;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            pre[class*="language-"] {
+                padding: 25px !important;
+                margin: 25px 0;
+            }
+        }
+        
+        pre[class*="language-"]::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-cyan);
+            opacity: 0.8;
+        }
+        
+        code[class*="language-"] {
+            font-family: 'Fira Code', monospace;
+            line-height: 1.5;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            font-size: inherit;
+        }
+        
+        /* Mistake List Enhancement */
+        .mistake-list { 
+            list-style-type: none; 
+            padding-left: 0; 
+        }
+        
+        .mistake-list li { 
+            margin-bottom: 20px; 
+            padding: 15px; 
+            padding-left: 55px; 
+            position: relative;
+            background: rgba(255, 123, 114, 0.05);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--accent-red);
+            border-top: 1px solid rgba(255, 123, 114, 0.1);
+            border-right: 1px solid rgba(255, 123, 114, 0.1);
+            border-bottom: 1px solid rgba(255, 123, 114, 0.1);
+            transition: all var(--transition-speed) ease;
+        }
+        
+        @media (min-width: 768px) {
+            .mistake-list li {
+                padding: 20px;
+                padding-left: 65px;
+                margin-bottom: 25px;
+            }
+        }
+        
+        .mistake-list li:hover {
+            background: rgba(255, 123, 114, 0.08);
+            transform: translateX(5px);
+        }
+        
+        .mistake-list li::before { 
+            content: "\f00d"; 
+            font-family: "Font Awesome 6 Free"; 
+            font-weight: 900; 
+            color: var(--accent-red); 
+            position: absolute; 
+            left: 20px;
+            top: 15px;
+            font-size: 1.2rem;
+            text-shadow: 0 0 10px rgba(255, 123, 114, 0.3);
+        }
+        
+        @media (min-width: 768px) {
+            .mistake-list li::before {
+                left: 25px;
+                top: 20px;
+                font-size: 1.3rem;
+            }
+        }
+        
+        .fix-text { 
+            color: var(--accent-green); 
+            display: block; 
+            margin-top: 10px; 
+            font-weight: 600;
+            padding: 10px;
+            background: rgba(86, 211, 100, 0.05);
+            border-radius: 6px;
+            border-left: 3px solid var(--accent-green);
+            border-top: 1px solid rgba(86, 211, 100, 0.1);
+            border-right: 1px solid rgba(86, 211, 100, 0.1);
+            border-bottom: 1px solid rgba(86, 211, 100, 0.1);
+            box-shadow: var(--glow-green);
+            font-size: 0.9rem;
+        }
+        
+        @media (min-width: 768px) {
+            .fix-text {
+                font-size: 1rem;
+                padding: 12px;
+            }
+        }
+        
+        /* Alert Boxes */
+        .alert {
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.95rem;
+        }
+        
+        @media (min-width: 768px) {
+            .alert {
+                padding: 20px;
+                margin: 20px 0;
+                font-size: 1rem;
+            }
+        }
+        
+        .alert-info {
+            background: rgba(88, 166, 255, 0.08);
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            color: var(--accent-cyan);
+            border-radius: var(--border-radius);
+        }
+        
+        .alert-success {
+            background: rgba(86, 211, 100, 0.08);
+            border: 1px solid rgba(86, 211, 100, 0.3);
+            color: var(--accent-green);
+            border-radius: var(--border-radius);
+        }
+        
+        .alert-warning {
+            background: rgba(227, 179, 65, 0.08);
+            border: 1px solid rgba(227, 179, 65, 0.3);
+            color: var(--accent-yellow);
+            border-radius: var(--border-radius);
+        }
+        
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 45px;
+            height: 45px;
+            background: var(--gradient-cyan);
+            color: var(--obsidian-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-speed) ease;
+            z-index: 1000;
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.4),
+                0 0 12px rgba(88, 166, 255, 0.3);
+            border: 1px solid rgba(121, 192, 255, 0.4);
+        }
+        
+        @media (min-width: 768px) {
+            .back-to-top {
+                bottom: 30px;
+                right: 30px;
+                width: 50px;
+                height: 50px;
+            }
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 
+                0 8px 20px rgba(0, 0, 0, 0.5),
+                0 0 20px rgba(121, 192, 255, 0.4);
+        }
+        
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(121, 192, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-cyan);
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Badges */
+        .badge {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.85rem;
+            padding: 0.4em 0.8em;
+            margin: 0.2em;
+        }
+        
+        @media (min-width: 576px) {
+            .badge {
+                font-size: 0.9rem;
+                padding: 0.5em 1em;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .badge {
+                font-size: 1rem;
+            }
+        }
+        
+        .bg-info {
+            background: rgba(88, 166, 255, 0.15) !important;
+            color: var(--accent-cyan) !important;
+        }
+        
+        .bg-success {
+            background: rgba(86, 211, 100, 0.15) !important;
+            color: var(--accent-green) !important;
+        }
+        
+        .bg-warning {
+            background: rgba(227, 179, 65, 0.15) !important;
+            color: var(--accent-yellow) !important;
+        }
+        
+        .bg-purple {
+            background: rgba(210, 168, 255, 0.15) !important;
+            color: var(--accent-purple) !important;
+        }
+        
+        /* Cards in analysis section */
+        .card.bg-dark {
+            background: rgba(22, 27, 34, 0.8) !important;
+            border: 1px solid var(--border-color);
+            transition: all var(--transition-speed) ease;
+            margin-bottom: 15px;
+        }
+        
+        @media (min-width: 768px) {
+            .card.bg-dark {
+                margin-bottom: 0;
+            }
+        }
+        
+        .card.bg-dark:hover {
+            transform: translateY(-5px);
+            border-color: rgba(88, 166, 255, 0.4);
+            box-shadow: var(--glow-blue);
+        }
+        
+        /* Grid system adjustments */
+        .row {
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+        
+        .col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto, .col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        @media (min-width: 768px) {
+            .row {
+                margin-left: -15px;
+                margin-right: -15px;
+            }
+            
+            .col, .col-1, .col-10, .col-11, .col-12, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-auto, .col-lg, .col-lg-1, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-auto, .col-md, .col-md-1, .col-md-10, .col-md-11, .col-md-12, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-auto, .col-sm, .col-sm-1, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-auto, .col-xl, .col-xl-1, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-auto {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+        }
+        
+        /* Container adjustments */
+        .container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        
+        @media (min-width: 576px) {
+            .container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+        
+        @media (min-width: 768px) {
+            .container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+                padding-left: 30px;
+                padding-right: 30px;
+            }
+        }
+        
+        @media (min-width: 992px) {
+            .container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+                padding-left: 40px;
+                padding-right: 40px;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            .navbar, .run-btn, .terminal-window, .back-to-top, footer,
+            .skip-to-main, .social-icons {
+                display: none !important;
+            }
+            
+            .section-card {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                break-inside: avoid;
+            }
+            
+            body {
+                color: #000;
+                background: #fff !important;
+                font-size: 12pt;
+            }
+            
+            h1, h2, h3, h4 {
+                color: #000 !important;
+            }
+            
+            pre[class*="language-"] {
+                border: 1px solid #ccc !important;
+                background: #f8f8f8 !important;
+                color: #000 !important;
+            }
+        }
+
+        /* ========================
+           SOCIAL SHARE BUTTONS IN FOOTER
+        ======================== */
+        .footer-share-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .share-buttons-footer {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .share-btn-footer {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .share-btn-footer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .share-btn-footer i {
+            font-size: 1rem;
+        }
+
+        .share-facebook-footer {
+            background: linear-gradient(135deg, #1877f2, #0d65d9);
+        }
+
+        .share-facebook-footer:hover {
+            background: linear-gradient(135deg, #0d65d9, #084fa0);
+        }
+
+        .share-linkedin-footer {
+            background: linear-gradient(135deg, #0077b5, #005885);
+        }
+
+        .share-linkedin-footer:hover {
+            background: linear-gradient(135deg, #005885, #003d5c);
+        }
+
+        .share-twitter-footer {
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+        }
+
+        .share-twitter-footer:hover {
+            background: linear-gradient(135deg, #1a1a1a, #333333);
+        }
+
+        @media (max-width: 768px) {
+            .share-buttons-footer {
+                flex-direction: column;
+            }
+
+            .share-btn-footer {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Skip to main content for keyboard users -->
+<a href="#main-content" class="skip-to-main">
+    Skip to main content
+</a>
+
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="atm.html" aria-label="Mini-ATM Tutorial">
+            <i class="fas fa-code me-2"></i>POETIC CODES 
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="encapsulation.html">← Back to Labs></li>
+                <li class="nav-item"><a class="nav-link" href="#intro">Logic</a></li>
+                <li class="nav-item"><a class="nav-link" href="#intro">Logic</a></li>
+                <li class="nav-item"><a class="nav-link" href="#code">Code</a></li>
+                <li class="nav-item"><a class="nav-link" href="#analysis">Analysis</a></li>
+                <li class="nav-item"><a class="nav-link" href="#pitfalls">Mistakes</a></li>
+                <li class="nav-item"><a class="nav-link" href="#interactive">Demo</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<a href="#" class="back-to-top" id="backToTop" aria-label="Back to top">
+    <i class="fas fa-arrow-up"></i>
+</a>
+
+<header class="hero-section text-center">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10 hero-content">
+                <h1 class="display-4 fw-bold">Python Mini ATM Tutorial</h1>
+                <p class="lead fs-4 mb-4" style="color: var(--accent-cyan);">Learn bject-Oriented Programming & Encapsulation Principles</p>
+                <div class="row justify-content-center mt-4">
+                    <div class="col-auto">
+                        <span class="badge bg-info fs-6 px-3 py-2 me-2 mb-2">
+                            <i class="fas fa-shield-alt me-1" aria-hidden="true"></i> Security
+                        </span>
+                        <span class="badge bg-success fs-6 px-3 py-2 me-2 mb-2">
+                            <i class="fas fa-code me-1" aria-hidden="true"></i> OOP
+                        </span>
+                        <span class="badge bg-warning fs-6 px-3 py-2 me-2 mb-2">
+                            <i class="fas fa-lock me-1" aria-hidden="true"></i> Encapsulation
+                        </span>
+                        <span class="badge bg-purple fs-6 px-3 py-2 mb-2">
+                            <i class="fas fa-cube me-1" aria-hidden="true"></i> Modular Design
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container text-center my-4">
+    <a href="encapsulation.html" class="btn btn-outline-info btn-lg px-4 py-3" 
+       style="border-color: var(--accent-blue); color: var(--accent-cyan);">
+        <i class="fas fa-arrow-left me-2" aria-hidden="true"></i> Return to Encapsulation Hub
+    </a>
+</div>
+
+<div class="container mt-4" id="main-content">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+
+            <section class="section-card">
+                <h2><i class="fas fa-chess-queen me-3" aria-hidden="true"></i>The  vision</h2>
+                <p class="fs-5">Python ensures code can be read like poetry. In this project, we transition from simple scripts to organized, secure Object-Oriented systems that reflect real-world banking architecture.</p>
+                
+                <div class="quote-box mt-4" role="complementary">
+                    "Encapsulation is the protective wrapper that prevents global variables from corrupting your logic. It's the foundation of maintainable, secure, and scalable software systems."
+                </div>
+                
+                <div class="alert alert-info mt-4" role="alert">
+                    <i class="fas fa-lightbulb me-2" aria-hidden="true"></i>
+                    <strong>Learning Objective:</strong> By the end of this tutorial, you'll understand how to build secure systems using encapsulation, preventing unauthorized access to sensitive data while maintaining clean, modular code architecture.
+                </div>
+            </section>
+
+            <section class="section-card" id="intro">
+                <h2><i class="fas fa-brain me-3" aria-hidden="true"></i>Logical Introduction: Why OOP?</h2>
+                <p class="fs-5">Before writing a single line of code, we must understand the <strong>Problem-Solution</strong> landscape. A banking system requires three pillars: <strong>Security, Data Integrity, and Modular Logic.</strong></p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center p-3 h-100">
+                            <div class="mb-3">
+                                <i class="fas fa-shield-alt fa-3x" style="color: var(--accent-cyan);" aria-hidden="true"></i>
+                            </div>
+                            <h5 style="color: var(--accent-cyan);">Security</h5>
+                            <p class="small">Protect sensitive data from unauthorized access and modification</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center p-3 h-100">
+                            <div class="mb-3">
+                                <i class="fas fa-database fa-3x" style="color: var(--accent-green);" aria-hidden="true"></i>
+                            </div>
+                            <h5 style="color: var(--accent-green);">Data Integrity</h5>
+                            <p class="small">Ensure consistent state and prevent data corruption</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="text-center p-3 h-100">
+                            <div class="mb-3">
+                                <i class="fas fa-cubes fa-3x" style="color: var(--accent-yellow);" aria-hidden="true"></i>
+                            </div>
+                            <h5 style="color: var(--accent-yellow);">Modular Logic</h5>
+                            <p class="small">Separate concerns for maintainable, testable code</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="mt-4">By using <strong>Object-Oriented Programming (OOP)</strong>, we treat the ATM as a distinct entity. This bundles the user's balance and authentication status directly with the actions they can perform (Deposit, Withdraw), preventing accidental modification by external functions and creating a clear boundary between interface and implementation.</p>
+            </section>
+
+            <section class="section-card" id="code">
+                <h2><i class="fas fa-code me-3" aria-hidden="true"></i>Full ATM Implementation (Python)</h2>
+                <p>This script uses private attributes (<code>_variable</code>) to maintain data integrity and prevent unauthorized access. Each method has a single responsibility, following the SOLID principles.</p>
+                
+                <div class="code-header d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="mb-0"><i class="fas fa-file-code me-2" aria-hidden="true"></i>atm_system.py</h4>
+                    <button class="btn btn-sm btn-outline-info" onclick="copyCode(event)"
+                            style="border-color: var(--accent-blue); color: var(--accent-cyan);">
+                        <i class="fas fa-copy me-1" aria-hidden="true"></i> Copy Code
+                    </button>
+                </div>
+                
+<pre><code class="language-python">#!/usr/bin/env python3
+"""
+Secure ATM System Implementation
+Author: Glenn Pansensoy
+Description: A Python OOP demonstration of encapsulation principles
+             with proper error handling and security measures.
+"""
+
+import sys
+from typing import Optional
+
+
+class ATM:
+    """
+    Secure ATM class implementing encapsulation principles.
+    
+    Attributes:
+        _card_number (str): Validated 16-digit card number
+        _balance (float): Account balance (private)
+        _is_authenticated (bool): Authentication state
+        _attempts (int): Failed PIN attempts counter
+        _max_attempts (int): Maximum allowed attempts
+        _correct_pin (str): Predefined correct PIN
+    """
+    
+    def __init__(self, card_number: str, initial_balance: float = 0.0):
+        """
+        Initialize ATM instance with validation.
+        
+        Args:
+            card_number (str): 16-digit card number
+            initial_balance (float): Starting balance
+        
+        Raises:
+            ValueError: If card number validation fails
+        """
+        self._card_number = self._validate_card_number(card_number)
+        self._balance = float(initial_balance)
+        self._is_authenticated = False
+        self._attempts = 0
+        self._max_attempts = 3
+        self._correct_pin = "2468"  # In production, use secure storage
+        
+        print(f"✓ ATM initialized for card: {self._mask_card_number()}")
+
+    def _validate_card_number(self, card_number: str) -> str:
+        """
+        Validate and clean card number input.
+        
+        Args:
+            card_number (str): Raw card number input
+        
+        Returns:
+            str: Cleaned 16-digit card number
+        
+        Raises:
+            ValueError: If card number is invalid
+        """
+        cleaned = ''.join(filter(str.isdigit, str(card_number)))
+        if len(cleaned) != 16:
+            raise ValueError("Card number must contain exactly 16 digits.")
+        return cleaned
+
+    def _mask_card_number(self) -> str:
+        """Return masked card number for security."""
+        return f"**** **** **** {self._card_number[-4:]}"
+
+    def authenticate(self) -> bool:
+        """
+        Handle user authentication with PIN verification.
+        
+        Returns:
+            bool: True if authentication successful
+        """
+        if self._is_authenticated:
+            return True
+            
+        print(f"\n{'='*40}")
+        print(f"Authentication Required")
+        print(f"{'='*40}")
+        
+        while self._attempts < self._max_attempts:
+            attempts_left = self._max_attempts - self._attempts
+            pin = input(f"Enter PIN ({attempts_left} attempt(s) left): ").strip()
+            
+            if pin == self._correct_pin:
+                self._is_authenticated = True
+                print("✓ Authentication successful. Access granted.")
+                return True
+                
+            self._attempts += 1
+            print("✗ Invalid PIN. Please try again.")
+            
+            if self._attempts == self._max_attempts:
+                print("\n" + "!"*40)
+                print("SECURITY ALERT: Card locked due to multiple failed attempts.")
+                print("!"*40)
+                return False
+        
+        return False
+
+    def _get_amount(self, prompt: str) -> Optional[float]:
+        """
+        Safely get amount input from user with validation.
+        
+        Args:
+            prompt (str): Input prompt message
+        
+        Returns:
+            Optional[float]: Validated amount or None if cancelled
+        """
+        while True:
+            try:
+                val = input(f"\n{prompt} (or 'c' to cancel): ").strip().lower()
+                
+                if val == 'c':
+                    print("Transaction cancelled.")
+                    return None
+                    
+                # Remove commas and validate
+                amount = float(val.replace(',', ''))
+                
+                if amount <= 0:
+                    print("✗ Amount must be positive.")
+                    continue
+                    
+                if len(str(amount).split('.')[-1]) > 2:
+                    print("✗ Amount can have at most 2 decimal places.")
+                    continue
+                    
+                return amount
+                
+            except ValueError:
+                print("✗ Invalid input. Please enter a valid number.")
+
+    def check_balance(self) -> None:
+        """Display current account balance if authenticated."""
+        if not self._is_authenticated:
+            print("✗ Authentication required.")
+            return
+            
+        print(f"\n{'='*40}")
+        print(f"ACCOUNT BALANCE")
+        print(f"{'='*40}")
+        print(f"Card: {self._mask_card_number()}")
+        print(f"Balance: ₱{self._balance:,.2f}")
+        print(f"{'='*40}")
+
+    def deposit(self) -> None:
+        """Handle deposit transaction with validation."""
+        if not self._is_authenticated:
+            print("✗ Authentication required.")
+            return
+            
+        amount = self._get_amount("Enter deposit amount")
+        
+        if amount:
+            self._balance += amount
+            print(f"\n✓ Deposit successful!")
+            print(f"  Amount: ₱{amount:,.2f}")
+            print(f"  New Balance: ₱{self._balance:,.2f}")
+
+    def withdraw(self) -> None:
+        """Handle withdrawal transaction with balance validation."""
+        if not self._is_authenticated:
+            print("✗ Authentication required.")
+            return
+            
+        amount = self._get_amount("Enter withdrawal amount")
+        
+        if amount:
+            if amount <= self._balance:
+                self._balance -= amount
+                print(f"\n✓ Withdrawal successful!")
+                print(f"  Amount: ₱{amount:,.2f}")
+                print(f"  New Balance: ₱{self._balance:,.2f}")
+            else:
+                print(f"\n✗ Transaction failed: Insufficient funds.")
+                print(f"  Requested: ₱{amount:,.2f}")
+                print(f"  Available: ₱{self._balance:,.2f}")
+
+    def display_menu(self) -> None:
+        """Display main ATM menu."""
+        print(f"\n{'='*40}")
+        print(f"ATM MAIN MENU")
+        print(f"{'='*40}")
+        print(f"1. Check Balance")
+        print(f"2. Deposit Funds")
+        print(f"3. Withdraw Funds")
+        print(f"4. Exit")
+        print(f"{'='*40}")
+
+
+def main() -> None:
+    """Main program entry point."""
+    print(f"\n{'#'*50}")
+    print(f"PYTHON ATM SYSTEM v1.0")
+    print(f"Implementing Secure Encapsulation Principles")
+    print(f"{'#'*50}")
+    
+    try:
+        # Initialize ATM with sample account
+        my_atm = ATM("1234567890123456", 5000.0)
+        
+        # Authentication required before any operations
+        if not my_atm.authenticate():
+            sys.exit("Program terminated due to security violation.")
+        
+        # Main transaction loop
+        while True:
+            my_atm.display_menu()
+            choice = input("\nSelect option (1-4): ").strip()
+            
+            if choice == "1":
+                my_atm.check_balance()
+            elif choice == "2":
+                my_atm.deposit()
+            elif choice == "3":
+                my_atm.withdraw()
+            elif choice == "4":
+                print(f"\n{'='*40}")
+                print(f"Thank you for using Python ATM System!")
+                print(f"Final Balance: ₱{my_atm._balance:,.2f}")
+                print(f"{'='*40}")
+                break
+            else:
+                print("✗ Invalid selection. Please choose 1-4.")
+                
+            # Pause for user to read output
+            input("\nPress Enter to continue...")
+            
+    except ValueError as e:
+        print(f"\n✗ Initialization error: {e}")
+        sys.exit(1)
+    except KeyboardInterrupt:
+        print("\n\n✗ Program interrupted by user.")
+        sys.exit(0)
+    except Exception as e:
+        print(f"\n✗ Unexpected error: {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()</code></pre>
+            </section>
+
+            <section class="section-card" id="interactive">
+                <h2><i class="fas fa-play-circle me-3" aria-hidden="true"></i>Interactive Output Simulation</h2>
+                <p>Visualize the code execution. Click <strong>Run Program</strong> to see how the encapsulation logic handles a typical banking session. This simulation demonstrates the complete user flow with realistic responses.</p>
+                
+                <div class="text-center mb-4">
+                    <div class="d-flex flex-column flex-sm-row justify-content-center align-items-center gap-3">
+                        <button class="run-btn" id="run-button" onclick="runAtmSimulation()">
+                            <i class="fas fa-play me-2" aria-hidden="true"></i> Run Program Simulation
+                        </button>
+                        <button class="btn btn-outline-secondary px-4 py-3" onclick="resetSimulation()"
+                                style="border-color: var(--text-muted); color: var(--text-dim);">
+                            <i class="fas fa-redo me-2" aria-hidden="true"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="small text-secondary fw-bold">
+                            <i class="fas fa-terminal me-1" aria-hidden="true"></i> atm_system.py — Terminal Simulation
+                        </span>
+                        <div class="small">
+                            <span id="sim-status" style="color: var(--accent-yellow);">Ready</span>
+                        </div>
+                    </div>
+                    <div class="terminal-body" id="terminal-output">
+<span style="color:var(--accent-cyan)">> python3 atm_system.py</span><br><br>
+<span style="color:var(--accent-green)"># Welcome to Python ATM System v1.0</span><br>
+<span style="color:var(--accent-green)"># Type 'run' or click the button above to start simulation</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-info-circle me-2" aria-hidden="true"></i>
+                        <strong>Note:</strong> This is a simulation. The actual Python code must be run in a Python environment for full functionality.
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-card" id="analysis">
+                <h2><i class="fas fa-search me-3" aria-hidden="true"></i>Logical Analysis & Step-by-Step Explanation</h2>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <h4><i class="fas fa-cube me-2" aria-hidden="true"></i>1. Class Initialization & Encapsulation</h4>
+                        <p><span class="step-badge">Significance</span> It establishes a private state. The <code>_balance</code> is shielded from external tampering by using leading underscores, signaling internal use only.</p>
+                        
+                        <p><span class="step-badge">Step-by-Step</span> When <code>ATM()</code> is called, <code>__init__</code> runs. It cleans the input, validates the 16-digit card requirement, and sets the initial session states.</p>
+                        
+                        <div class="alert alert-secondary mt-3" style="background: rgba(139, 148, 158, 0.08); border-color: rgba(139, 148, 158, 0.3); color: var(--text-dim);">
+                            <i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>
+                            <strong>Key Principle:</strong> The underscore prefix (<code>_variable</code>) is a Python convention indicating "private" attributes, though they're still technically accessible (Python trusts developers).
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h4><i class="fas fa-exchange-alt me-2" aria-hidden="true"></i>2. State Mutation</h4>
+                        <p><span class="step-badge">Significance</span> Methods are the only authorized way to change the balance, enforcing business rules like "Insufficient Funds" automatically.</p>
+                        
+                        <p><span class="step-badge">Step-by-Step</span> The <code>withdraw()</code> method first verifies the <code>_is_authenticated</code> flag, then calculates if the <code>amount <= _balance</code> before subtracting, ensuring the account never goes negative.</p>
+                        
+                        <div class="alert alert-secondary mt-3" style="background: rgba(139, 148, 158, 0.08); border-color: rgba(139, 148, 158, 0.3); color: var(--text-dim);">
+                            <i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>
+                            <strong>Key Principle:</strong> All state changes happen through class methods, never directly. This maintains data integrity and allows for validation at every step.
+                        </div>
+                    </div>
+                </div>
+                
+                <h4 class="mt-5"><i class="fas fa-sitemap me-2" aria-hidden="true"></i>3. Design Pattern: The Facade</h4>
+                <p>This ATM implementation follows the <strong>Facade Pattern</strong> - providing a simple interface (deposit, withdraw, check balance) that hides the complexity of validation, authentication, and state management.</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4 mb-4">
+                        <div class="card bg-dark border-info h-100">
+                            <div class="card-body">
+                                <h5 class="card-title" style="color: var(--accent-cyan);">Abstraction</h5>
+                                <p class="card-text" style="color:white;">Complex operations simplified through method calls</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card bg-dark border-success h-100">
+                            <div class="card-body">
+                                <h5 class="card-title" style="color: var(--accent-blue);">Encapsulation</h5>
+                                <p class="card-text" style="color:white;">Data protection through private attributes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card bg-dark border-warning h-100">
+                            <div class="card-body">
+                                <h5 class="card-title" style="color: var(--accent-blue);">Modularity</h5>
+                                <p class="card-text" style="color:white;">Independent, reusable components</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-card" id="pitfalls">
+                <h2><i class="fas fa-exclamation-triangle me-3" aria-hidden="true"></i>5 Common Pitfalls & Professional Fixes</h2>
+                <p class="mb-4">Understanding these common mistakes will help you write more robust, production-ready code.</p>
+                
+                <ul class="mistake-list">
+                    <li>
+                        <strong>Direct State Manipulation:</strong> Modifying <code>_balance</code> outside the class bypasses validation logic.
+                        <span class="fix-text">Fix: Always use class methods to ensure validation logic runs every time. Implement properties with setters for controlled access.</span>
+                    </li>
+                    <li>
+                        <strong>Missing Guard Clauses:</strong> Forgetting to return <code>False</code> on failure can lead to security vulnerabilities.
+                        <span class="fix-text">Fix: Implement explicit exits if security checks fail. Use early returns to prevent fall-through execution.</span>
+                    </li>
+                    <li>
+                        <strong>Floating Point Errors:</strong> Using floats for currency math can cause rounding errors in financial applications.
+                        <span class="fix-text">Fix: Use Python's <code>decimal</code> module for high-precision apps or represent currency as integer cents.</span>
+                    </li>
+                    <li>
+                        <strong>Lack of Input Sanitization:</strong> Crashing on non-numeric input creates poor user experience.
+                        <span class="fix-text">Fix: Use <code>try...except</code> blocks for all user inputs. Implement input validation before processing.</span>
+                    </li>
+                    <li>
+                        <strong>"Super Object" Pattern:</strong> Putting UI and Database logic inside one class violates Single Responsibility Principle.
+                        <span class="fix-text">Fix: Separate concerns into different classes (ATM, Account, TransactionHandler, UI).</span>
+                    </li>
+                </ul>
+                
+                <div class="alert alert-success mt-4">
+                    <i class="fas fa-check-circle me-2" aria-hidden="true"></i>
+                    <strong>Pro Tip:</strong> Always write unit tests for your ATM class to ensure each method behaves correctly with various inputs (valid, invalid, edge cases).
+                </div>
+            </section>
+
+            <section class="section-card" id="next-steps">
+                <h2><i class="fas fa-road me-3" aria-hidden="true"></i>Next Steps & Further Learning</h2>
+                <p>Now that you understand the basics, here's how to extend this project:</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-4">
+                        <div class="card bg-dark border-primary h-100">
+                            <div class="card-body">
+                                <h5 class="card-title" style="color: var(--accent-cyan);">
+                                    <i class="fas fa-database me-2" aria-hidden="true" style="color:white;"></i>Database Integration
+                                </h5>
+                                <ul class="text-dim" style="color:white;">
+                                    <li>Connect to SQLite or PostgreSQL</li>
+                                    <li>Implement persistent storage</li>
+                                    <li>Add transaction history logging</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card bg-dark border-success h-100">
+                            <div class="card-body">
+                                <h5 class="card-title" style="color: var(--accent-green);">
+                                    <i class="fas fa-network-wired me-2" aria-hidden="true"></i>API Development
+                                </h5>
+                                <ul class="text-dim" style="color:white;">
+                                    <li>Create REST API with Flask/FastAPI</li>
+                                    <li>Implement JWT authentication</li>
+                                    <li>Add rate limiting and logging</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-5">
+                    <div class="btn-group" role="group" aria-label="Action buttons">
+                        <a href="encapsulation.html" class="btn btn-outline-info px-4 py-3"
+                           style="border-color: var(--accent-blue); color: var(--accent-cyan);">
+                            <i class="fas fa-undo-alt me-2" aria-hidden="true"></i> Return to Encapsulation Hub
+                        </a>
+                        <button class="btn btn-outline-success px-4 py-3" onclick="downloadCode()"
+                                style="border-color: var(--accent-green); color: var(--accent-green);">
+                            <i class="fas fa-download me-2" aria-hidden="true"></i> Download Full Code
+                        </button>
+                        <a href="documentation.html" class="btn btn-outline-warning px-4 py-3"
+                           style="border-color: var(--accent-yellow); color: var(--accent-yellow);">
+                            <i class="fas fa-book me-2" aria-hidden="true"></i> Read Documentation
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <h5 class="footer-heading">About the Developer</h5>
+                <p class="text-dim small">Glenn Junsay Pansensoy is a Web Developer specializing in Python systems and logical design. This tutorial is part of a series dedicated to bridging the gap between raw code and professional software engineering principles.</p>
+                <a href="about-us.html" class="footer-link mb-3">
+                    <i class="fas fa-user me-2" aria-hidden="true"></i> Learn more about Glenn Junsay Pansensoy 
+                </a>
+                <div class="social-icons mt-3">
+                    <a href="https://github.com/pansensoyglenn-dev" title="GitHub" rel="noopener noreferrer" target="_blank">
+                        <i class="fab fa-github" aria-hidden="true"></i>
+                        <span class="visually-hidden">GitHub</span>
+                    </a>
+                    <a href="https://linkedin.com/in/glennpansensoy" title="LinkedIn" rel="noopener noreferrer" target="_blank">
+                        <i class="fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="visually-hidden">LinkedIn</span>
+                    </a>
+                    <a href="https://twitter.com/GlennPansensoy" title="Twitter" rel="noopener noreferrer" target="_blank">
+                        <i class="fab fa-twitter" aria-hidden="true"></i>
+                        <span class="visually-hidden">Twitter</span>
+                    </a>
+                    <a href="https://youtube.com/c/GlennPansensoy" title="YouTube" rel="noopener noreferrer" target="_blank">
+                        <i class="fab fa-youtube" aria-hidden="true"></i>
+                        <span class="visually-hidden">YouTube</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-6 col-lg-2 mb-4">
+                <h5 class="footer-heading">Other Labs</h5>
+                <a href="vegetable.html" class="footer-link">
+                    <i class="fas fa-carrot me-1" aria-hidden="true"></i> Vegetable Store
+                </a>
+                <a href="book.html" class="footer-link">
+                    <i class="fas fa-book me-1" aria-hidden="true"></i> Book Store
+                </a>
+                <a href="lechon.html" class="footer-link">
+                    <i class="fas fa-fire me-1" aria-hidden="true"></i> Lechon Hub
+                </a>
+                <a href="flower.html" class="footer-link">
+                    <i class="fas fa-leaf me-1" aria-hidden="true"></i> Flower Shop
+                </a>
+                <a href="index.html" class="footer-link">
+                    <i class="fas fa-home me-1" aria-hidden="true"></i> All Labs
+                </a>
+            </div>
+            
+            <div class="col-6 col-lg-2 mb-4">
+                <h5 class="footer-heading">Resources</h5>
+                <a href="resources.html" class="footer-link">
+                    <i class="fas fa-book me-1" aria-hidden="true"></i> Documentation
+                </a>
+                <a href="source-files.html" class="footer-link">
+                    <i class="fas fa-file-code me-1" aria-hidden="true"></i> Source Files
+                </a>
+                <a href="oop-basics.html" class="footer-link">
+                    <i class="fas fa-cube me-1" aria-hidden="true"></i> OOP Basics
+                </a>
+                <a href="python-tips.html" class="footer-link">
+                    <i class="fas fa-lightbulb me-1" aria-hidden="true"></i> Python Tips
+                </a>
+            </div>
+            
+            <div class="col-6 col-lg-2 mb-4">
+                <h5 class="footer-heading">Legal</h5>
+                <a href="privacy.html" class="footer-link">
+                    <i class="fas fa-shield-alt me-1" aria-hidden="true"></i> Privacy Policy
+                </a>
+                <a href="terms.html" class="footer-link">
+                    <i class="fas fa-file-contract me-1" aria-hidden="true"></i> Terms of Service
+                </a>
+                <a href="cookie.html" class="footer-link">
+                    <i class="fas fa-cookie me-1" aria-hidden="true"></i> Cookie Policy
+                </a>
+                <a href="disclaimer.html" class="footer-link">
+                    <i class="fas fa-exclamation-triangle me-1" aria-hidden="true"></i> Disclaimers
+                </a>
+            </div>
+            
+            <div class="col-lg-3 mb-4">
+                <h5 class="footer-heading">Stay Updated</h5>
+                <p class="text-dim small">Get the latest Python tutorials and coding tips delivered to your inbox.</p>
+                <form class="newsletter-form mt-3" onsubmit="return false;">
+                    <div class="input-group input-group-sm">
+                        <input type="email" class="form-control" placeholder="Your email" aria-label="Email for newsletter" required style="background: var(--obsidian-card); border-color: var(--border-color); color: var(--text-main);">
+                        <button class="btn btn-outline-info" type="submit" style="border-color: var(--accent-blue); color: var(--accent-cyan);">Subscribe</button>
+                    </div>
+                </form>
+                
+                <h5 class="footer-heading mt-4">Contact</h5>
+                <a href="./contact.html" class="footer-link">
+                    <i class="fas fa-envelope me-2" aria-hidden="true"></i> Get in Touch
+                </a>
+                <p class="text-dim small mt-2">
+                    <i class="fas fa-map-marker-alt me-2" aria-hidden="true"></i> Diplahan, Zamboanga Sibugay Province, Philippines
+                </p>
+
+                <!-- SOCIAL SHARING SECTION -->
+                <div class="footer-share-section">
+                    <h5 class="footer-heading">
+                        <i class="fas fa-share-nodes me-2" aria-hidden="true"></i> Share This Tutorial
+                    </h5>
+                    <p class="text-dim small">Help others learn Python OOP! Share this tutorial:</p>
+                    <div class="share-buttons-footer">
+                        <button class="share-btn-footer share-facebook-footer" onclick="shareOnFacebook()" aria-label="Share on Facebook">
+                            <i class="fab fa-facebook-f"></i> Facebook
+                        </button>
+                        <button class="share-btn-footer share-linkedin-footer" onclick="shareOnLinkedIn()" aria-label="Share on LinkedIn">
+                            <i class="fab fa-linkedin-in"></i> LinkedIn
+                        </button>
+                        <button class="share-btn-footer share-twitter-footer" onclick="shareOnTwitter()" aria-label="Share on X">
+                            <i class="fab fa-x-twitter"></i> X
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4 border-secondary">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="text-dim small mb-0">
+                    <i class="fas fa-code me-1" aria-hidden="true"></i> Built with 
+                    <i class="fas fa-heart text-danger mx-1" aria-hidden="true"></i> 
+                    and precision logic
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="text-dim small mb-0">
+                    © <span id="current-year">2026</span> Glenn Junsay Pansensoy · <a href="https://pansensoyglenn-dev.github.io/poetic-codes" style="color: var(--accent-cyan); text-decoration: none;">Python OOP Tutorial</a> · All Rights Reserved
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    // Check for browser features (progressive enhancement)
+    (function() {
+        // Check for clipboard API support
+        if (!navigator.clipboard) {
+            document.querySelectorAll('[onclick*="copyCode"]').forEach(btn => {
+                btn.style.display = 'none';
+            });
+        }
+        
+        // Check for prefers-reduced-motion
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (prefersReducedMotion.matches) {
+            document.body.classList.add('reduced-motion');
+        }
+    })();
+
+    // Improved terminal simulation
+    const output = document.getElementById('terminal-output');
+    const runBtn = document.getElementById('run-button');
+    const statusEl = document.getElementById('sim-status');
+    
+    // Simulation steps with realistic delays
+    const simulationSteps = [
+        {text: "<span style='color:var(--accent-cyan)'>python3 atm_system.py</span>", delay: 300},
+        {text: "<br><span style='color:var(--accent-green)'>" + "=".repeat(40) + "</span>", delay: 200},
+        {text: "<span style='color:var(--accent-green)'>PYTHON ATM SYSTEM v1.0</span>", delay: 200},
+        {text: "<span style='color:var(--accent-green)'>Implementing Secure Encapsulation Principles</span>", delay: 200},
+        {text: "<span style='color:var(--accent-green)'>" + "=".repeat(40) + "</span>", delay: 200},
+        {text: "<br><span style='color:var(--accent-green)'>✓ ATM initialized for card: **** **** **** 3456</span>", delay: 400},
+        {text: "<br>" + "=".repeat(30), delay: 200},
+        {text: "<span style='color:var(--text-main)'>Authentication Required</span>", delay: 200},
+        {text: "=".repeat(30), delay: 200},
+        {text: "<br>Enter PIN (3 attempt(s) left): <span style='color:var(--text-main)'>****</span>", delay: 800},
+        {text: "<span style='color:var(--accent-green)'>✓ Authentication successful. Access granted.</span>", delay: 600},
+        {text: "<br>" + "=".repeat(30), delay: 200},
+        {text: "<span style='color:var(--text-main)'>ATM MAIN MENU</span>", delay: 200},
+        {text: "=".repeat(30), delay: 200},
+        {text: "<span style='color:var(--text-dim)'>1. Check Balance</span>", delay: 150},
+        {text: "<span style='color:var(--text-dim)'>2. Deposit Funds</span>", delay: 150},
+        {text: "<span style='color:var(--text-dim)'>3. Withdraw Funds</span>", delay: 150},
+        {text: "<span style='color:var(--text-dim)'>4. Exit</span>", delay: 150},
+        {text: "=".repeat(30), delay: 200},
+        {text: "<br>Select option (1-4): <span style='color:var(--text-main)'>1</span>", delay: 600},
+        {text: "<br>" + "=".repeat(30), delay: 200},
+        {text: "<span style='color:var(--text-main)'>ACCOUNT BALANCE</span>", delay: 200},
+        {text: "=".repeat(30), delay: 200},
+        {text: "<span style='color:var(--text-dim)'>Card: **** **** **** 3456</span>", delay: 200},
+        {text: "<span style='color:var(--accent-cyan)'>Balance: ₱5,000.00</span>", delay: 400},
+        {text: "=".repeat(30), delay: 300},
+        {text: "<br>Press Enter to continue...<span style='color:var(--text-main)'>_</span>", delay: 500},
+        {text: "<br><br>Select option (1-4): <span style='color:var(--text-main)'>2</span>", delay: 600},
+        {text: "<br>Enter deposit amount (or 'c' to cancel): <span style='color:var(--text-main)'>1500</span>", delay: 600},
+        {text: "<br><span style='color:var(--accent-green)'>✓ Deposit successful!</span>", delay: 400},
+        {text: "<span style='color:var(--text-dim)'>  Amount: ₱1,500.00</span>", delay: 200},
+        {text: "<span style='color:var(--text-dim)'>  New Balance: ₱6,500.00</span>", delay: 400},
+        {text: "<br>Press Enter to continue...<span style='color:var(--text-main)'>_</span>", delay: 500},
+        {text: "<br><br>Select option (1-4): <span style='color:var(--text-main)'>3</span>", delay: 600},
+        {text: "<br>Enter withdrawal amount (or 'c' to cancel): <span style='color:var(--text-main)'>2000</span>", delay: 600},
+        {text: "<br><span style='color:var(--accent-green)'>✓ Withdrawal successful!</span>", delay: 400},
+        {text: "<span style='color:var(--text-dim)'>  Amount: ₱2,000.00</span>", delay: 200},
+        {text: "<span style='color:var(--text-dim)'>  New Balance: ₱4,500.00</span>", delay: 400},
+        {text: "<br>Press Enter to continue...<span style='color:var(--text-main)'>_</span>", delay: 500},
+        {text: "<br><br>Select option (1-4): <span style='color:var(--text-main)'>4</span>", delay: 600},
+        {text: "<br>" + "=".repeat(30), delay: 200},
+        {text: "<span style='color:var(--text-main)'>Thank you for using Python ATM System!</span>", delay: 300},
+        {text: "<span style='color:var(--accent-cyan)'>Final Balance: ₱4,500.00</span>", delay: 400},
+        {text: "=".repeat(30), delay: 200},
+        {text: "<br><br><span style='color:var(--accent-cyan)'> Simulation complete. Program terminated successfully.</span>", delay: 500}
+    ];
+    
+    async function writeStep(step, index) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                if (index === 0) {
+                    output.innerHTML = step.text;
+                } else {
+                    output.innerHTML += step.text;
+                }
+                output.scrollTop = output.scrollHeight;
+                resolve();
+            }, step.delay);
+        });
+    }
+    
+    async function runAtmSimulation() {
+        runBtn.disabled = true;
+        runBtn.innerHTML = '<span class="loading me-2"></span> Running...';
+        statusEl.textContent = "Running";
+        statusEl.style.color = "var(--accent-green)";
+        
+        output.innerHTML = "";
+        
+        try {
+            // Run simulation steps
+            for (let i = 0; i < simulationSteps.length; i++) {
+                await writeStep(simulationSteps[i], i);
+            }
+            
+            statusEl.textContent = "Complete";
+            statusEl.style.color = "var(--accent-green)";
+        } catch (error) {
+            console.error('Simulation error:', error);
+            output.innerHTML += '<br><span style="color:var(--accent-red)">✗ Simulation error occurred</span>';
+            statusEl.textContent = "Error";
+            statusEl.style.color = "var(--accent-red)";
+        } finally {
+            runBtn.disabled = false;
+            runBtn.innerHTML = '<i class="fas fa-play me-2" aria-hidden="true"></i> Run Program Simulation';
+        }
+    }
+    
+    function resetSimulation() {
+        output.innerHTML = '<span style="color:var(--accent-cyan)">> python3 atm_system.py</span><br><br>' +
+                          '<span style="color:var(--accent-green)"># Welcome to Python ATM System v1.0</span><br>' +
+                          '<span style="color:var(--accent-green)"># Type \'run\' or click the button above to start simulation</span>';
+        statusEl.textContent = "Ready";
+        statusEl.style.color = "var(--accent-yellow)";
+    }
+    
+    // Copy code functionality with error handling
+    async function copyCode(event) {
+        const btn = event.target.closest('button') || event.target;
+        const originalHTML = btn.innerHTML;
+        
+        try {
+            const codeElement = document.querySelector('pre[class*="language-"]');
+            const codeText = codeElement.textContent;
+            
+            await navigator.clipboard.writeText(codeText);
+            
+            // Success feedback
+            btn.innerHTML = '<i class="fas fa-check me-1" aria-hidden="true"></i> Copied!';
+            btn.style.backgroundColor = 'var(--accent-green)';
+            btn.style.color = 'var(--obsidian-dark)';
+            btn.style.borderColor = 'var(--accent-green)';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                btn.style.borderColor = '';
+            }, 2000);
+            
+        } catch (err) {
+            console.error('Failed to copy:', err);
+            // Fallback for older browsers
+            const codeElement = document.querySelector('pre[class*="language-"]');
+            const codeText = codeElement.textContent;
+            
+            const textarea = document.createElement('textarea');
+            textarea.value = codeText;
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                btn.innerHTML = '<i class="fas fa-check me-1" aria-hidden="true"></i> Copied!';
+                btn.style.backgroundColor = 'var(--accent-green)';
+                btn.style.color = 'var(--obsidian-dark)';
+                btn.style.borderColor = 'var(--accent-green)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            } catch (fallbackErr) {
+                alert('Copy failed. Please select and copy manually.');
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+    }
+    
+    // Download code functionality
+    function downloadCode() {
+        const codeElement = document.querySelector('pre[class*="language-"]');
+        const codeText = codeElement.textContent;
+        const blob = new Blob([codeText], { type: 'text/x-python' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'atm_system.py';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+    
+    // Back to top functionality
+    const backToTop = document.getElementById('backToTop');
+    let scrollTimeout;
+    
+    window.addEventListener('scroll', () => {
+        // Debounce scroll events for performance
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+            
+            // Navbar scroll effect
+            const navbar = document.querySelector('.navbar');
+            if (window.pageYOffset > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        }, 100);
+    });
+    
+    backToTop.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+    
+    // Active nav link highlighting
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    window.addEventListener('scroll', () => {
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            
+            if (pageYOffset >= sectionTop - 150) {
+                current = section.getAttribute('id');
+            }
+        });
+        
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === `#${current}`) {
+                link.classList.add('active');
+                link.setAttribute('aria-current', 'page');
+            } else {
+                link.removeAttribute('aria-current');
+            }
+        });
+    });
+    
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function(tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Update copyright year dynamically
+        const yearSpan = document.getElementById('current-year');
+        if (yearSpan) {
+            yearSpan.textContent = new Date().getFullYear();
+        }
+    });
+    
+    // Console logging for debugging
+    console.log('ATM Tutorial loaded successfully');
+    console.log('Features available:', {
+        clipboard: !!navigator.clipboard,
+        prefersReducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    });
+
+    // ========================
+    // SOCIAL SHARING FUNCTIONS
+    // ========================
+    
+    // Get page details for sharing
+    function getPageDetails() {
+        return {
+            url: encodeURIComponent(window.location.href),
+            title: encodeURIComponent('Python Mini ATM Project: Encapsulation & OOP Tutorial'),
+            description: encodeURIComponent('Learn Python OOP and Encapsulation with this Mini ATM project tutorial. Master secure coding practices, class organization, and management.')
+        };
+    }
+
+    // Share on Facebook
+    function shareOnFacebook() {
+        const { url } = getPageDetails();
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        window.open(facebookUrl, 'facebook-share', 'width=600,height=400,scrollbars=yes');
+    }
+
+    // Share on LinkedIn
+    function shareOnLinkedIn() {
+        const { url } = getPageDetails();
+        const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+        window.open(linkedInUrl, 'linkedin-share', 'width=600,height=600,scrollbars=yes');
+    }
+
+    // Share on X (Twitter)
+    function shareOnTwitter() {
+        const { url } = getPageDetails();
+        const twitterText = encodeURIComponent('Learn Python OOP with this Mini ATM tutorial! Master encapsulation and secure coding practices.');
+        const twitterUrl = `https://twitter.com/intent/tweet?url=${url}&text=${twitterText}&hashtags=Python,OOP,Encapsulation,Programming`;
+        window.open(twitterUrl, 'twitter-share', 'width=600,height=400,scrollbars=yes');
+    }
+
+    // Add keyboard accessibility for share buttons
+    document.addEventListener('DOMContentLoaded', () => {
+        const shareButtons = document.querySelectorAll('.share-btn-footer');
+        shareButtons.forEach(btn => {
+            btn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+
