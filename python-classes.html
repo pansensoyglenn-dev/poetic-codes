@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- SEO Meta Tags -->
+    <title>Python Classes Guide | Poetic Codes - OOP Programming Examples</title>
+    <meta name="description" content="Comprehensive guide to Python classes with practical examples, explanations, and best practices. Learn OOP concepts with real-world code examples.">
+    <meta name="keywords" content="Python classes, OOP, object-oriented programming, Python examples, class inheritance, encapsulation, polymorphism">
+    <meta name="author" content="Glenn Pansensoy">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="Python Classes Guide | Poetic Codes">
+    <meta property="og:description" content="Master Python classes with comprehensive examples and explanations">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pansensoyglenn-dev.github.io/poetic-codes">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://pansensoyglenn-dev.github.io/poetic-codes/python-classes">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐍</text></svg>">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Midnight Blue & Obsidian Theme Variables */
+        :root {
+            /* Primary Colors - Midnight Blue & Obsidian */
+            --midnight-blue: #0a0e17;
+            --obsidian-dark: #121826;
+            --obsidian-light: #1c2233;
+            
+            /* Accent Colors */
+            --electric-blue: #4fc3f7;
+            --cyber-purple: #9c27b0;
+            --python-blue: #3776ab;
+            --python-blue: #3776ab;
+            
+            /* Text Colors */
+            --text-primary: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --text-tertiary: #8a8d91;
+            
+            /* UI Colors */
+            --border-color: #2a2f45;
+            --shadow-color: rgba(0, 0, 0, 0.5);
+            --overlay-color: rgba(10, 14, 23, 0.9);
+            
+            /* Code Colors */
+            --code-bg: #0d1117;
+            --code-border: #30363d;
+            --code-text: #c9d1d9;
+            
+            /* Sizing */
+            --max-content-width: 1000px;
+            --mobile-breakpoint: 768px;
+            --tablet-breakpoint: 1024px;
+            
+            /* Spacing */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+            --space-xxl: 4rem;
+            
+            /* Borders */
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 8px var(--shadow-color);
+            --shadow-md: 0 4px 16px var(--shadow-color);
+            --shadow-lg: 0 8px 32px var(--shadow-color);
+            
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-normal: 250ms ease;
+            --transition-slow: 350ms ease;
+        }
+
+        /* Base Styles */
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--midnight-blue) 0%, var(--obsidian-dark) 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: var(--max-content-width);
+            margin: 0 auto;
+            padding: 0 var(--space-md);
+        }
+
+        section {
+            padding: var(--space-xl) 0;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            background: linear-gradient(90deg, var(--electric-blue), var(--cyber-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: var(--space-md);
+        }
+
+        h2 {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            color: var(--electric-blue);
+            position: relative;
+            padding-bottom: var(--space-xs);
+            margin-top: var(--space-xl);
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--electric-blue), transparent);
+            border-radius: var(--border-radius-sm);
+        }
+
+        h3 {
+            font-size: clamp(1.25rem, 3vw, 1.5rem);
+            color: var(--text-primary);
+            margin-top: var(--space-lg);
+        }
+
+        p {
+            margin-bottom: var(--space-md);
+            color: var(--text-secondary);
+            font-size: clamp(0.95rem, 2vw, 1.1rem);
+        }
+
+        a {
+            color: var(--electric-blue);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        a:hover {
+            color: var(--matrix-green);
+        }
+
+        ul, ol {
+            margin-left: var(--space-md);
+            margin-bottom: var(--space-md);
+        }
+
+        li {
+            margin-bottom: var(--space-xs);
+            color: var(--text-secondary);
+        }
+
+        /* Header Styles */
+        header {
+            background-color: rgba(10, 14, 23, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: var(--space-sm) 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        /* Logo Styles */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .logo-icon {
+            font-size: 1.5rem;
+            color: var(--electric-blue);
+        }
+
+        .logo-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--matrix-green);
+        }
+
+        /* Hamburger Menu Styles */
+        .hamburger-menu {
+            position: relative;
+        }
+
+        .hamburger-btn {
+            background: var(--obsidian-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            font-size: 1.25rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-normal);
+        }
+
+        .hamburger-btn:hover {
+            background: var(--border-color);
+            color: var(--electric-blue);
+        }
+
+        .menu-dropdown {
+            position: fixed;
+            top: 70px;
+            right: var(--space-md);
+            background: var(--obsidian-dark);
+            width: 280px;
+            max-width: 90vw;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px) scale(0.95);
+            transition: all var(--transition-normal);
+            z-index: 1001;
+        }
+
+        .menu-dropdown.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .menu-dropdown ul {
+            margin: 0;
+            padding: var(--space-sm);
+            list-style: none;
+        }
+
+        .menu-dropdown li {
+            margin: 0;
+        }
+
+        .menu-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            color: var(--text-secondary);
+            border-radius: var(--border-radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .menu-dropdown a:hover {
+            background: var(--obsidian-light);
+            color: var(--electric-blue);
+            padding-left: var(--space-md);
+        }
+
+        .menu-dropdown i {
+            width: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        /* Introduction Section */
+        .intro-section {
+            padding-top: var(--space-xxl);
+            padding-bottom: var(--space-xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .intro-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(79, 195, 247, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+
+        .intro-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .intro-title {
+            margin-bottom: var(--space-lg);
+        }
+
+        .intro-subtitle {
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-xl);
+        }
+
+        /* Code Styling */
+        .code-container {
+            background: var(--code-bg);
+            border: 1px solid var(--code-border);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            margin: var(--space-lg) 0;
+            position: relative;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--obsidian-light);
+            border-bottom: 1px solid var(--code-border);
+        }
+
+        .code-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .code-copy-btn {
+            background: var(--obsidian-dark);
+            color: var(--text-secondary);
+            border: 1px solid var(--code-border);
+            border-radius: var(--border-radius-sm);
+            padding: var(--space-xs) var(--space-sm);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .code-copy-btn:hover {
+            background: var(--border-color);
+            color: var(--matrix-green);
+        }
+
+        pre {
+            margin: 0;
+            padding: var(--space-md);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(0.85rem, 2vw, 0.95rem);
+            line-height: 1.5;
+            color: var(--code-text);
+        }
+
+        /* Syntax Highlighting */
+        .python-keyword {
+            color: #ff79c6;
+            font-weight: 600;
+        }
+
+        .python-class {
+            color: #50fa7b;
+            font-weight: 600;
+        }
+
+        .python-function {
+            color: #66d9ef;
+        }
+
+        .python-string {
+            color: #f1fa8c;
+        }
+
+        .python-comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .python-number {
+            color: #bd93f9;
+        }
+
+        /* Class Cards */
+        .class-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+            gap: var(--space-lg);
+            margin: var(--space-xl) 0;
+        }
+
+        .class-card {
+            background: var(--obsidian-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-lg);
+            transition: all var(--transition-normal);
+        }
+
+        .class-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--electric-blue);
+            box-shadow: var(--shadow-md);
+        }
+
+        .class-card-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .class-icon {
+            color: var(--matrix-green);
+            font-size: 1.25rem;
+        }
+
+        .card-description {
+            font-size: 0.95rem;
+            margin-bottom: var(--space-md);
+        }
+
+        .card-features {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .card-features li {
+            position: relative;
+            padding-left: var(--space-md);
+            margin-bottom: var(--space-xs);
+            font-size: 0.9rem;
+        }
+
+        .card-features li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--matrix-green);
+        }
+
+        /* Outro Section */
+        .outro-section {
+            background: linear-gradient(135deg, var(--obsidian-dark) 0%, var(--midnight-blue) 100%);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            margin: var(--space-xl) 0;
+        }
+
+        .outro-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .outro-title {
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .outro-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: var(--space-xl);
+        }
+
+        .cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: var(--space-md);
+            margin-top: var(--space-xl);
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--border-radius-md);
+            font-weight: 500;
+            transition: all var(--transition-normal);
+        }
+
+        .cta-btn.primary {
+            background: linear-gradient(135deg, var(--electric-blue), var(--cyber-purple));
+            color: white;
+            border: none;
+        }
+
+        .cta-btn.secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .cta-btn.primary:hover {
+            background: linear-gradient(135deg, var(--cyber-purple), var(--electric-blue));
+        }
+
+        .cta-btn.secondary:hover {
+            border-color: var(--electric-blue);
+            color: var(--electric-blue);
+        }
+
+        /* Footer Styles */
+        footer {
+            background: var(--midnight-blue);
+            border-top: 1px solid var(--border-color);
+            margin-top: var(--space-xxl);
+        }
+
+        .footer-top {
+            padding: var(--space-xl) 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: var(--space-xl);
+        }
+
+        .footer-column h3 {
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: var(--space-md);
+            padding-bottom: var(--space-xs);
+            border-bottom: 2px solid var(--electric-blue);
+        }
+
+        .footer-links {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: var(--space-xs);
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-xs) 0;
+            transition: all var(--transition-fast);
+        }
+
+        .footer-links a:hover {
+            color: var(--electric-blue);
+            transform: translateX(4px);
+        }
+
+        .intelligence-panel {
+            background: var(--obsidian-light);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        @media (min-width: 768px) {
+            .intelligence-panel {
+                flex-direction: row;
+                align-items: flex-start;
+            }
+        }
+
+        .intelligence-icon {
+            font-size: 2rem;
+            color: var(--electric-blue);
+            flex-shrink: 0;
+        }
+
+        .intelligence-text {
+            flex: 1;
+        }
+
+        .intelligence-text h4 {
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+
+        .intelligence-text p {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .footer-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-lg);
+            margin-top: var(--space-md);
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--matrix-green);
+            margin-bottom: var(--space-xs);
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-bottom {
+            background: rgba(0, 0, 0, 0.2);
+            padding: var(--space-md) 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-bottom-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .footer-bottom-content {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                text-align: left;
+            }
+        }
+
+        .copyright {
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+            flex: 1;
+        }
+
+        .footer-extra {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+        }
+
+        @media (min-width: 768px) {
+            .footer-extra {
+                justify-content: flex-end;
+            }
+        }
+
+        .page-load {
+            background: var(--obsidian-light);
+            color: var(--matrix-green);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--border-radius-sm);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 500;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 var(--space-sm);
+            }
+            
+            section {
+                padding: var(--space-lg) 0;
+            }
+            
+            .header-content {
+                padding: 0 var(--space-sm);
+            }
+            
+            .menu-dropdown {
+                position: fixed;
+                top: 70px;
+                left: var(--space-sm);
+                right: var(--space-sm);
+                width: auto;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .cta-btn {
+                justify-content: center;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+            }
+            
+            .footer-stats {
+                justify-content: center;
+            }
+            
+            .stat-item {
+                min-width: 80px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            :root {
+                --space-md: 1rem;
+                --space-lg: 1.5rem;
+                --space-xl: 2rem;
+            }
+            
+            .code-container {
+                margin: var(--space-md) -0.5rem;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+            
+            pre {
+                padding: var(--space-sm);
+            }
+            
+            .class-card {
+                padding: var(--space-md);
+            }
+            
+            .intelligence-panel {
+                padding: var(--space-md);
+            }
+        }
+
+        /* Utility Classes */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--obsidian-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: var(--border-radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--electric-blue);
+        }
+
+        /* Selection Styling */
+        ::selection {
+            background-color: rgba(79, 195, 247, 0.3);
+            color: var(--text-primary);
+        }
+
+        /* Focus Styles */
+        :focus {
+            outline: 2px solid var(--electric-blue);
+            outline-offset: 2px;
+        }
+
+        :focus:not(:focus-visible) {
+            outline: none;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--electric-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: var(--space-lg);
+            right: var(--space-lg);
+            width: 44px;
+            height: 44px;
+            background: var(--obsidian-light);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--transition-normal);
+            z-index: 999;
+        }
+
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            background: var(--electric-blue);
+            color: var(--midnight-blue);
+            border-color: var(--electric-blue);
+        }
+
+        /* Code Block Line Numbers */
+        pre {
+            position: relative;
+        }
+
+        pre code {
+            display: block;
+            counter-reset: line;
+        }
+
+        pre code .line {
+            position: relative;
+            padding-left: 3.5em;
+        }
+
+        pre code .line::before {
+            counter-increment: line;
+            content: counter(line);
+            position: absolute;
+            left: 0;
+            width: 2.5em;
+            text-align: right;
+            color: var(--text-tertiary);
+            padding-right: 1em;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Skip to Content -->
+    <a href="#main-content" class="visually-hidden">Skip to main content</a>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <!-- Top Left: POETIC CODES -->
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="logo-text" style="color:#3776ab">
+                        POETIC <span>CODES</span>
+                    </div>
+                </div>
+                
+                <!-- Top Right: Interactive Hamburger Menu -->
+                <nav class="hamburger-menu" aria-label="Main navigation">
+                    <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="menu-dropdown" id="menuDropdown">
+                        <ul>
+                            <li><a href="#introduction"><i class="fas fa-home"></i> Introduction</a></li>
+                            <li><a href="basics.html"><i class="fas fa-cube"></i> Basic Class</a></li>
+                            <li><a href="inheritance/inheritance"><i class="fas fa-sitemap"></i> Inheritance</a></li>
+                            <li><a href="encapsulation/encapsulation.html"><i class="fas fa-shield-alt"></i> Encapsulation</a></li>
+                            <li><a href="#more-examples"><i class="fas fa-layer-group"></i> More Examples</a></li>
+                            <li><a href="#outro"><i class="fas fa-bookmark"></i> Conclusion</a></li>
+                            <li><a href="contact.html"><i class="fas fa-envelope"></i> Contact</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Introduction -->
+        <section class="intro-section" id="introduction">
+            <div class="container">
+                <div class="intro-content">
+                    <h1 class="intro-title">Python Classes: OOP Mastery</h1>
+                    <p class="intro-subtitle">
+                        A comprehensive guide to Python classes with practical examples and explanations
+                    </p>
+                    <p>
+                        Python classes form the foundation of object-oriented programming (OOP), allowing developers 
+                        to create structured, reusable, and maintainable code. This guide explores Python classes 
+                        through practical examples in a clean, modern design.
+                    </p>
+                    
+                    <!-- Basic Code Example -->
+                    <div class="code-container">
+                        <div class="code-header">
+                            <span class="code-title">Basic Python Class Structure</span>
+                            <button class="code-copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code><span class="python-keyword">class</span> <span class="python-class">ClassName</span>:
+    <span class="python-string">"""Class documentation string"""</span>
+    
+    <span class="python-keyword">def</span> <span class="python-function">__init__</span>(<span class="python-keyword">self</span>, parameters):
+        <span class="python-string">"""Initialize instance attributes"""</span>
+        <span class="python-keyword">self</span>.attribute = value
+    
+    <span class="python-keyword">def</span> <span class="python-function">method_name</span>(<span class="python-keyword">self</span>):
+        <span class="python-string">"""Instance method definition"""</span>
+        <span class="python-keyword">return</span> <span class="python-keyword">self</span>.attribute</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Basic Class Example -->
+        <section id="basic-class">
+            <div class="container">
+                <h2>Basic Class Example</h2>
+                <p>
+                    Let's start with a simple Person class to demonstrate the fundamental structure 
+                    of a Python class with constructor, methods, and attributes.
+                </p>
+                
+                <div class="code-container">
+                    <div class="code-header">
+                        <span class="code-title">person.py</span>
+                        <button class="code-copy-btn" onclick="copyCode(this)">Copy</button>
+                    </div>
+                    <pre><code><span class="python-keyword">class</span> <span class="python-class">Person</span>:
+    <span class="python-string">"""A class to represent a person."""</span>
+    
+    <span class="python-keyword">def</span> <span class="python-function">__init__</span>(<span class="python-keyword">self</span>, name: <span class="python-class">str</span>, age: <span class="python-class">int</span>):
+        <span class="python-keyword">self</span>.name = name
+        <span class="python-keyword">self</span>.age = age
+    
+    <span class="python-keyword">def</span> <span class="python-function">greet</span>(<span class="python-keyword">self</span>) -> <span class="python-class">str</span>:
+        <span class="python-keyword">return</span> <span class="python-string">f"Hello, I'm {self.name}"</span>
+    
+    <span class="python-keyword">def</span> <span class="python-function">__str__</span>(<span class="python-keyword">self</span>) -> <span class="python-class">str</span>:
+        <span class="python-keyword">return</span> <span class="python-string">f"Person(name='{self.name}', age={self.age})"</span></code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inheritance Section -->
+        <section id="inheritance">
+            <div class="container">
+                <h2>Class Inheritance</h2>
+                <p>
+                    Inheritance allows creating new classes based on existing ones, 
+                    promoting code reuse and logical organization.
+                </p>
+                
+                <div class="class-cards">
+                    <div class="class-card">
+                        <div class="class-card-title">
+                            <i class="fas fa-users class-icon"></i>
+                            <h3>Employee Class</h3>
+                        </div>
+                        <p class="card-description">
+                            Demonstrates single inheritance where Employee extends Person.
+                        </p>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span class="code-title">employee.py</span>
+                                <button class="code-copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code><span class="python-keyword">class</span> <span class="python-class">Employee</span>(Person):
+    <span class="python-keyword">def</span> <span class="python-function">__init__</span>(<span class="python-keyword">self</span>, name, age, employee_id):
+        <span class="python-keyword">super</span>().<span class="python-function">__init__</span>(name, age)
+        <span class="python-keyword">self</span>.employee_id = employee_id
+        <span class="python-keyword">self</span>.position = <span class="python-string">"Developer"</span></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- More Class Examples -->
+        <section id="more-examples">
+            <div class="container">
+                <h2>Advanced Examples</h2>
+                <p>Practical class implementations demonstrating real-world use cases.</p>
+                
+                <div class="class-cards">
+                    <div class="class-card">
+                        <div class="class-card-title">
+                            <i class="fas fa-shopping-cart class-icon"></i>
+                            <h3>Product Class</h3>
+                        </div>
+                        <p class="card-description">
+                            E-commerce product management with inventory tracking.
+                        </p>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span class="code-title">product.py</span>
+                                <button class="code-copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code><span class="python-keyword">class</span> <span class="python-class">Product</span>:
+    <span class="python-keyword">def</span> <span class="python-function">__init__</span>(<span class="python-keyword">self</span>, id, name, price):
+        <span class="python-keyword">self</span>.id = id
+        <span class="python-keyword">self</span>.name = name
+        <span class="python-keyword">self</span>.price = price
+        <span class="python-keyword">self</span>.stock = <span class="python-number">0</span>
+    
+    <span class="python-keyword">def</span> <span class="python-function">update_stock</span>(<span class="python-keyword">self</span>, quantity):
+        <span class="python-keyword">self</span>.stock += quantity</code></pre>
+                        </div>
+                    </div>
+                    
+                    <div class="class-card">
+                        <div class="class-card-title">
+                            <i class="fas fa-gamepad class-icon"></i>
+                            <h3>Game Character</h3>
+                        </div>
+                        <p class="card-description">
+                            RPG character system with combat mechanics.
+                        </p>
+                        <div class="code-container">
+                            <div class="code-header">
+                                <span class="code-title">game_character.py</span>
+                                <button class="code-copy-btn" onclick="copyCode(this)">Copy</button>
+                            </div>
+                            <pre><code><span class="python-keyword">class</span> <span class="python-class">GameCharacter</span>:
+    <span class="python-keyword">def</span> <span class="python-function">__init__</span>(<span class="python-keyword">self</span>, name, health=100):
+        <span class="python-keyword">self</span>.name = name
+        <span class="python-keyword">self</span>.health = health
+        <span class="python-keyword">self</span>.level = <span class="python-number">1</span>
+    
+    <span class="python-keyword">def</span> <span class="python-function">attack</span>(<span class="python-keyword">self</span>, damage):
+        <span class="python-keyword">return</span> damage * <span class="python-keyword">self</span>.level</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Outro / Conclusion -->
+        <section class="outro-section" id="outro">
+            <div class="container">
+                <div class="outro-content">
+                    <h2 class="outro-title">Master Python Classes</h2>
+                    <p class="outro-text">
+                        Python classes are essential for building scalable, maintainable applications. 
+                        By mastering OOP principles, you can write cleaner, more efficient code.
+                    </p>
+                    
+                    <div class="cta-buttons">
+                        <a href="https://github.com/pansensoyglenn-dev" class="cta-btn primary" target="_blank">
+                            <i class="fab fa-github"></i> View GitHub
+                        </a>
+                        <a href="mailto:pansensoyglenn@gmail.com" class="cta-btn secondary">
+                            <i class="fas fa-envelope"></i> Contact Me
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-top">
+                <!-- Intelligence Panel -->
+                <div class="intelligence-panel">
+                    <div class="intelligence-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="intelligence-text">
+                        <h4>Smart Footer System</h4>
+                        <p id="dynamicGreeting">Welcome! This page adapts to provide relevant information.</p>
+                        <div class="footer-stats">
+                            <div class="stat-item">
+                                <span class="stat-number" id="classCount">5</span>
+                                <span class="stat-label">Classes</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="exampleCount">7</span>
+                                <span class="stat-label">Examples</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="updateYear">2026</span>
+                                <span class="stat-label">Updated</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer Columns -->
+                <div class="footer-content">
+                    <div class="footer-column">
+                        <h3>Quick Links</h3>
+                        <ul class="footer-links">
+                            <li><a href="#introduction"><i class="fas fa-chevron-right"></i> Introduction</a></li>
+                            <li><a href="#basic-class"><i class="fas fa-chevron-right"></i> Basic Class</a></li>
+                            <li><a href="#inheritance"><i class="fas fa-chevron-right"></i> Inheritance</a></li>
+                            <li><a href="#more-examples"><i class="fas fa-chevron-right"></i> Examples</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h3>Resources</h3>
+                        <ul class="footer-links">
+                            <li><a href="https://docs.python.org/3/" target="_blank"><i class="fas fa-book"></i> Python Docs</a></li>
+                            <li><a href="https://github.com/pansensoyglenn-dev" target="_blank"><i class="fab fa-github"></i> GitHub</a></li>
+                            <li><a href="https://realpython.com" target="_blank"><i class="fas fa-graduation-cap"></i> Real Python</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h3>Contact</h3>
+                        <ul class="footer-links">
+                            <li><a href="mailto:pansensoyglenn@gmail.com"><i class="fas fa-envelope"></i> Email</a></li>
+                            <li><a href="https://pansensoyglenn-dev.github.io/" target="_blank"><i class="fas fa-globe"></i> Website</a></li>
+                            <li><a href="https://github.com/pansensoyglenn-dev/poetic-codes" target="_blank"><i class="fab fa-github"></i> Repository</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="container">
+                    <div class="footer-bottom-content">
+                        <div class="copyright">
+                            <p>&copy; <span id="currentYear">2024</span> Poetic Codes | Created by Glenn Pansensoy</p>
+                            <p style="margin-top: 0.5rem; font-size: 0.85rem;">
+                                <a href="https://pansensoyglenn-dev.github.io/poetic-codes" style="color: var(--matrix-green);">
+                                    pansensoyglenn-dev.github.io/poetic-codes
+                                </a>
+                            </p>
+                        </div>
+                        
+                        <div class="footer-extra">
+                            <p><i class="fas fa-code"></i> Python 3.8+</p>
+                            <p class="page-load">Load: <span id="loadTime">0.0</span>s</p>
+                            <p><i class="fas fa-moon"></i> Encoding Mode</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Mobile-First JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hamburger Menu
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const menuDropdown = document.getElementById('menuDropdown');
+            
+            hamburgerBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isExpanded = this.getAttribute('aria-expanded') === 'true';
+                this.setAttribute('aria-expanded', !isExpanded);
+                menuDropdown.classList.toggle('active');
+                
+                // Update icon
+                const icon = this.querySelector('i');
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!hamburgerBtn.contains(e.target) && !menuDropdown.contains(e.target)) {
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    menuDropdown.classList.remove('active');
+                    const icon = hamburgerBtn.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Close menu on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    hamburgerBtn.setAttribute('aria-expanded', 'false');
+                    menuDropdown.classList.remove('active');
+                    const icon = hamburgerBtn.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Dynamic Greeting
+            function updateGreeting() {
+                const hour = new Date().getHours();
+                const greetingEl = document.getElementById('dynamicGreeting');
+                let greeting;
+                
+                if (hour < 12) greeting = "Good morning! Ready to code?";
+                else if (hour < 18) greeting = "Good afternoon! Exploring Python classes?";
+                else greeting = "Good evening! Perfect time for some Python.";
+                
+                greetingEl.textContent = greeting;
+            }
+            
+            // Update Year
+            function updateYear() {
+                const year = new Date().getFullYear();
+                document.getElementById('currentYear').textContent = year;
+                document.getElementById('updateYear').textContent = year;
+            }
+            
+            // Load Time
+            function updateLoadTime() {
+                const loadTime = (performance.now() / 1000).toFixed(2);
+                document.getElementById('loadTime').textContent = loadTime;
+            }
+            
+            // Code Copy Functionality
+            window.copyCode = function(button) {
+                const codeBlock = button.closest('.code-container').querySelector('code');
+                const textToCopy = codeBlock.textContent;
+                
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalText = button.textContent;
+                    button.textContent = 'Copied!';
+                    button.style.color = 'var(--matrix-green)';
+                    
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.color = '';
+                    }, 2000);
+                });
+            };
+            
+            // Animate Statistics
+            function animateStats() {
+                const stats = [
+                    { id: 'classCount', target: 5 },
+                    { id: 'exampleCount', target: 7 }
+                ];
+                
+                stats.forEach(stat => {
+                    const element = document.getElementById(stat.id);
+                    let current = 0;
+                    const increment = stat.target / 20;
+                    
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= stat.target) {
+                            element.textContent = stat.target;
+                            clearInterval(timer);
+                        } else {
+                            element.textContent = Math.floor(current);
+                        }
+                    }, 50);
+                });
+            }
+            
+            // Back to Top Button
+            const backToTopBtn = document.getElementById('backToTop');
+            
+            window.addEventListener('scroll', function() {
+                if (window.pageYOffset > 300) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+            });
+            
+            backToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Smooth Scrolling for Anchor Links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    const href = this.getAttribute('href');
+                    if (href === '#') return;
+                    
+                    e.preventDefault();
+                    const targetElement = document.querySelector(href);
+                    if (targetElement) {
+                        // Close mobile menu if open
+                        hamburgerBtn.setAttribute('aria-expanded', 'false');
+                        menuDropdown.classList.remove('active');
+                        const icon = hamburgerBtn.querySelector('i');
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                        
+                        // Scroll to target
+                        const headerHeight = document.querySelector('header').offsetHeight;
+                        const targetPosition = targetElement.offsetTop - headerHeight;
+                        
+                        window.scrollTo({
+                            top: targetPosition,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Responsive Code Blocks
+            function handleCodeBlocks() {
+                const codeContainers = document.querySelectorAll('.code-container');
+                codeContainers.forEach(container => {
+                    const code = container.querySelector('code');
+                    if (code.scrollWidth > container.clientWidth) {
+                        container.style.overflowX = 'auto';
+                    }
+                });
+            }
+            
+            // Initialize everything
+            updateGreeting();
+            updateYear();
+            updateLoadTime();
+            handleCodeBlocks();
+            
+            // Animate stats after a delay
+            setTimeout(animateStats, 500);
+            
+            // Update on resize
+            window.addEventListener('resize', handleCodeBlocks);
+            
+            // Touch device detection
+            let isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            if (isTouchDevice) {
+                document.body.classList.add('touch-device');
+            }
+        });
+    </script>
+</body>
+</html>
