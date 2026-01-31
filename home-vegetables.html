@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>Python Vegetable Store OOP Project: Encapsulation & Inventory Management | Poetic Codes</title>
+    <meta name="title" content="Python Vegetable Store OOP Project: Encapsulation & Inventory Management | Poetic Codes">
+    <meta name="description" content="Master Python OOP and encapsulation with this Vegetable Store inventory system tutorial. Learn composition, error handling, and object-oriented design principles with Glenn Junsay Pansensoy">
+    <meta name="keywords" content="Python vegetable store, Python inventory system, Python OOP, Python encapsulation, composition, error handling, Python tutorial, inventory management, Glenn Pansensoy">
+    <meta name="author" content="Glenn Junsay Pansensoy">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://pansensoyglenn-dev.github.io/poetic-codes/vegetables.html" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Python Vegetable Store OOP Project: Encapsulation & Inventory Management">
+    <meta property="og:description" content="Master Python OOP and encapsulation with this Vegetable Store inventory system tutorial. Learn composition, error handling, and object-oriented design principles.">
+    <meta property="og:url" content="https://pansensoyglenn-dev.github.io/poetic-codes/vegetables.html">
+    <meta property="og:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-vegetables-og.jpg">
+    <meta property="og:site_name" content="Poetic Codes">
+    <meta property="article:published_time" content="2026-01-29T00:00:00Z">
+    <meta property="article:author" content="Glenn Junsay Pansensoy">
+    <meta property="article:section" content="Python Tutorial">
+    <meta property="article:tag" content="Python OOP">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Python Vegetable Store OOP Project: Encapsulation & Inventory Management">
+    <meta name="twitter:description" content="Master Python OOP and encapsulation with this Vegetable Store inventory system tutorial. Learn composition, error handling, and object-oriented design principles.">
+    <meta name="twitter:url" content="https://pansensoyglenn-dev.github.io/poetic-codes/vegetables.html">
+    <meta name="twitter:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-vegetable-twitter.jpg">
+    <meta name="twitter:creator" content="@GlennPansensoy">
+
+    <!-- Structured Data / Schema.org -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Python Vegetable Store OOP Project: Encapsulation & Inventory Management",
+        "description": "Master Python OOP and encapsulation with this Vegetable Store inventory system tutorial. Learn composition, error handling, and object-oriented design principles.",
+        "author": {
+            "@type": "Person",
+            "name": "Glenn Junsay Pansensoy",
+            "url": "https://pansensoyglenn-dev.github.io/poetic-codes"
+        },
+        "datePublished": "2026-01-29",
+        "dateModified": "2026-01-29",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Poetic Codes",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://pansensoyglenn-dev.github.io/poetic-codes/logo.png"
+            }
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://pansensoyglenn-dev.github.io/poetic-codes/vegetables.html"
+        },
+        "image": "https://pansensoyglenn-dev.github.io/poetic-codes/images/python-vegetable-og.jpg",
+        "keywords": ["Python", "OOP", "Encapsulation", "Inventory", "Tutorial", "Programming", "Composition"],
+        "educationalLevel": "Beginner",
+        "timeRequired": "PT45M",
+        "proficiencyLevel": "Beginner to Intermediate"
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://pansensoyglenn-dev.github.io/poetic-codes"
+        },{
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Python Tutorials",
+            "item": "https://pansensoyglenn-dev.github.io/poetic-codes/python"
+        },{
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Practical Labs",
+            "item": "https://pansensoyglenn-dev.github.io/poetic-codes#labs"
+        },{
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Vegetable Store Project"
+        }]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "Build a Python Vegetable Store Inventory System",
+        "description": "Step-by-step guide to building an inventory management system with Python OOP",
+        "totalTime": "PT45M",
+        "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "USD",
+            "value": "0"
+        },
+        "tool": [
+            {
+                "@type": "HowToTool",
+                "name": "Python 3.x"
+            }
+        ],
+        "step": [
+            {
+                "@type": "HowToStep",
+                "name": "Create the Vegetable class",
+                "text": "Define a Vegetable class with encapsulation for price, stock, and sales methods"
+            },
+            {
+                "@type": "HowToStep",
+                "name": "Build the VegetableStore class",
+                "text": "Use composition to manage a collection of Vegetable objects"
+            },
+            {
+                "@type": "HowToStep",
+                "name": "Implement error handling",
+                "text": "Add validation for stock levels and transaction processing"
+            }
+        ]
+    }
+    </script>
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4575646748966866"
+         crossorigin="anonymous"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <style>
+        /* Global overflow prevention for mobile */
+        html {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            position: relative;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --obsidian-dark: #0a0e1a;
+            --obsidian-card: #121828;
+            --obsidian-border: #1e2a44;
+            --accent-blue: #3d8bfd;
+            --accent-cyan: #00d4ff;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --footer-bg: #0a0e1a;
+            --terminal-bg: #000814;
+            --success-green: #10b981;
+            --warning-yellow: #f59e0b;
+            --error-red: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--obsidian-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+        }
+
+        p, ul, li, section, div {
+            text-align: justify;
+        }
+
+        /* Container width constraints */
+        .container {
+            max-width: 1400px;
+        }
+
+        /* Ensure content doesn't stretch too wide on large screens */
+        .col-12.col-xl-10.col-xxl-9 {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Improve text readability on wide screens */
+        @media (min-width: 1400px) {
+            .section-card p, 
+            .section-card li, 
+            .section-card div {
+                font-size: 1.05rem;
+                line-height: 1.7;
+                max-width: 100%;
+            }
+            
+            /* Limit code containers from getting too wide */
+            .code-container {
+                max-width: 1100px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            /* Control terminal width */
+            .terminal-window {
+                max-width: 900px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
+
+        /* Prevent tables from overflowing */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Better handling for wide content sections */
+        .section-card {
+            width: 100%;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+
+        /* Ensure images and media don't break layout */
+        img, video, iframe {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: rgba(10, 14, 26, 0.95) !important;
+            border-bottom: 1px solid var(--obsidian-border);
+            padding: 0.75rem 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .navbar .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .navbar-brand {
+            font-family: 'Cinzel', serif;
+            color: var(--accent-blue) !important;
+            font-weight: bold;
+            letter-spacing: 1px;
+            font-size: 1.3rem;
+        }
+
+        .nav-link {
+            color: var(--text-dim) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-blue) !important;
+        }
+
+        .navbar-toggler {
+            border-color: var(--accent-blue);
+        }
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%2861, 139, 253, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        /* Mobile menu improvements */
+        @media (max-width: 768px) {
+            .navbar-collapse {
+                padding: 15px;
+                background: var(--obsidian-card);
+                border-radius: 0 0 10px 10px;
+                border-top: 1px solid var(--obsidian-border);
+            }
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--obsidian-dark) 0%, #0f172a 100%);
+            padding: 60px 0;
+            border-bottom: 1px solid var(--obsidian-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+        }
+
+        .hero-section h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--accent-blue);
+            font-weight: 700;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-section .lead {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Hub Button */
+        .hub-btn {
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent-blue);
+            text-decoration: none;
+            border: 1px solid var(--accent-blue);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            background: rgba(61, 139, 253, 0.05);
+        }
+
+        .hub-btn:hover {
+            background: var(--accent-blue);
+            color: #000;
+            box-shadow: 0 0 20px rgba(61, 139, 253, 0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: var(--obsidian-card);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--obsidian-border);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            color: var(--accent-blue);
+            font-family: 'Cinzel', serif;
+            border-bottom: 2px solid var(--accent-blue);
+            display: inline-block;
+            padding-bottom: 8px;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: var(--accent-cyan);
+            font-family: 'Inter', sans-serif;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+        }
+
+        h4 {
+            color: var(--accent-blue);
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.95rem;
+            letter-spacing: 1px;
+        }
+
+        /* Logic Label */
+        .logic-label {
+            color: var(--accent-blue);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            display: block;
+            border-left: 3px solid var(--accent-blue);
+            padding-left: 12px;
+        }
+
+        /* Code Containers */
+        .code-container {
+            position: relative;
+            margin: 25px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .code-header {
+            background: linear-gradient(90deg, #1e2a44, #2d3b5e);
+            color: var(--accent-blue);
+            padding: 10px 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            font-family: 'Fira Code', monospace;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .code-header::after {
+            content: 'Python';
+            background: rgba(0, 0, 0, 0.3);
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+        }
+
+        pre[class*="language-"] {
+            margin: 0;
+            border-radius: 0;
+            background: #0f172a;
+            padding: 20px;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        code[class*="language-"] {
+            font-family: 'Fira Code', monospace;
+            text-shadow: none;
+        }
+
+        /* Terminal Window */
+        .terminal-window {
+            background: var(--terminal-bg);
+            border-radius: 10px;
+            border: 1px solid var(--obsidian-border);
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+        }
+
+        .terminal-header {
+            background: linear-gradient(90deg, #1e2a44, #2d3b5e);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .terminal-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: var(--error-red); }
+        .dot-yellow { background: var(--warning-yellow); }
+        .dot-green { background: var(--success-green); }
+
+        .terminal-body {
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--success-green);
+            min-height: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        /* Run Button */
+        .run-btn {
+            background: linear-gradient(90deg, var(--accent-blue), #2d6efd);
+            color: #fff;
+            border: none;
+            padding: 14px 32px;
+            font-weight: 600;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(61, 139, 253, 0.3);
+        }
+
+        .run-btn:hover {
+            background: linear-gradient(90deg, #2d6efd, var(--accent-blue));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(61, 139, 253, 0.5);
+        }
+
+        /* Table Styling */
+        .table-dark-custom {
+            background-color: var(--obsidian-card);
+            border-color: var(--obsidian-border);
+            color: var(--text-dim);
+        }
+
+        .table-dark-custom th {
+            color: var(--accent-blue);
+            border-color: var(--obsidian-border);
+            font-weight: 600;
+        }
+
+        .table-dark-custom td {
+            border-color: var(--obsidian-border);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--footer-bg);
+            padding: 60px 0 25px;
+            border-top: 1px solid var(--obsidian-border);
+            margin-top: 60px;
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+        }
+
+        .footer-heading {
+            color: var(--accent-blue);
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--accent-cyan);
+        }
+
+        .footer-link {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-blue);
+            transform: translateX(3px);
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .social-icons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(61, 139, 253, 0.1);
+            border: 1px solid var(--obsidian-border);
+            border-radius: 8px;
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icons a:hover {
+            background: var(--accent-blue);
+            color: var(--obsidian-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 15px rgba(61, 139, 253, 0.3);
+        }
+
+        hr.footer-divider {
+            border-color: var(--obsidian-border);
+            opacity: 0.5;
+        }
+        
+        .newsletter-form .input-group {
+            margin-top: 10px;
+        }
+        
+        .newsletter-form .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(61, 139, 253, 0.25);
+            border-color: var(--accent-blue);
+        }
+
+        /* Mobile Optimizations */
+        @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+            }
+            
+            .container {
+                max-width: 100%;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .navbar {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            
+            .navbar-brand {
+                font-size: 1rem;
+                white-space: nowrap;
+            }
+            
+            .navbar-toggler {
+                margin-left: auto;
+            }
+            
+            .hero-section {
+                padding: 40px 15px;
+            }
+            
+            .hero-section h1 {
+                font-size: 1.8rem;
+                word-wrap: break-word;
+            }
+            
+            .hero-section .lead {
+                font-size: 1rem;
+            }
+            
+            .section-card {
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            h3 {
+                font-size: 1.2rem;
+            }
+            
+            .terminal-body {
+                font-size: 0.8rem;
+                padding: 15px;
+                min-height: 250px;
+                max-height: 300px;
+            }
+            
+            .run-btn {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+            
+            .code-header {
+                padding: 8px 15px;
+                font-size: 0.75rem;
+            }
+            
+            pre[class*="language-"] {
+                padding: 15px;
+                font-size: 0.8rem;
+                overflow-x: auto;
+            }
+            
+            footer {
+                padding: 40px 0 20px;
+            }
+            
+            .footer-heading {
+                font-size: 1.1rem;
+                margin-bottom: 20px;
+            }
+            
+            .hub-btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+                margin-bottom: 20px;
+            }
+            
+            .table-responsive {
+                font-size: 0.85rem;
+            }
+            
+            .section-card {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            html, body {
+                overflow-x: hidden;
+                width: 100%;
+            }
+            
+            * {
+                max-width: 100%;
+            }
+            
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .navbar-brand {
+                font-size: 0.9rem;
+            }
+            
+            .hero-section {
+                padding: 30px 10px;
+            }
+            
+            .hero-section h1 {
+                font-size: 1.5rem;
+            }
+            
+            .hero-section .lead {
+                font-size: 0.9rem;
+            }
+            
+            .section-card {
+                padding: 15px;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            h3 {
+                font-size: 1.1rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.85rem;
+            }
+            
+            pre[class*="language-"] {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Better handling for ultra-wide screens */
+        @media (min-width: 1600px) {
+            body {
+                background: linear-gradient(90deg, 
+                    var(--obsidian-dark) 0%, 
+                    var(--obsidian-dark) 50%, 
+                    rgba(10, 14, 26, 0.8) 100%);
+            }
+            
+            .container {
+                background-color: var(--obsidian-dark);
+                padding-left: 30px;
+                padding-right: 30px;
+                border-radius: 10px;
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--obsidian-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--obsidian-border);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-blue);
+        }
+
+        /* Prism Theme Override */
+        .token.keyword {
+            color: #ff79c6;
+        }
+
+        .token.function {
+            color: #50fa7b;
+        }
+
+        .token.string {
+            color: #f1fa8c;
+        }
+
+        .token.comment {
+            color: #6272a4;
+        }
+
+        .token.number {
+            color: #bd93f9;
+        }
+
+        /* Responsive Ad Container Styles */
+        .ad-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 2rem auto;
+            padding: 0.5rem;
+            text-align: center;
+            overflow: hidden;
+        }
+        
+        .ad-container-top {
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .ad-container-middle {
+            margin: 2.5rem auto;
+        }
+        
+        .ad-container-bottom {
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .responsive-ad-wrapper {
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        /* Mobile-first responsive breakpoints */
+        @media (max-width: 767px) {
+            .ad-container {
+                padding: 0.25rem;
+                margin: 1.5rem auto;
+            }
+            
+            .ad-container ins {
+                display: block;
+                width: 100%;
+                min-height: 100px;
+            }
+        }
+        
+        /* Tablet */
+        @media (min-width: 768px) and (max-width: 991px) {
+            .ad-container {
+                max-width: 728px;
+            }
+        }
+        
+        /* Desktop */
+        @media (min-width: 992px) {
+            .ad-container {
+                max-width: 970px;
+            }
+        }
+        
+        .ad-label {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        /* Main content container - responsive width */
+        .main-content-container {
+            max-width: 1400px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content-container {
+                max-width: 100%;
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-content-container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+        }
+
+        .floating-share {
+            position: fixed;
+            right: 20px;
+            top: 40%;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .floating-share a {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            transition: all 0.3s;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Updated Navbar Section -->
+<nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="index.html" aria-label="Poetic Codes Home">
+            <i class="fas fa-code me-2"></i>POETIC CODES
+        </a>
+        
+        <!-- Back to Hub button - Outside hamburger menu -->
+        <a href="index.html" class="btn btn-outline-info btn-sm d-none d-lg-inline-flex me-3" 
+           style="border-color: var(--accent-blue); color: var(--accent-blue); text-decoration: none;">
+            <i class="fas fa-arrow-left me-1"></i> Back to Hub
+        </a>
+        
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" 
+                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto">
+                <!-- This link now only shows in mobile/tablet view -->
+                <li class="nav-item d-lg-none">
+                    <a class="nav-link" href="index.html">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Hub
+                    </a>
+                </li>
+                <li class="nav-item"><a class="nav-link" href="overview.html">Overview</a></li>
+                <li class="nav-item"><a class="nav-link" href="#code">Code</a></li>
+                <li class="nav-item"><a class="nav-link" href="#logic">Logic</a></li>
+                <li class="nav-item"><a class="nav-link" href="#demo">Demo</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Updated Hero Section -->
+<header class="hero-section text-center">
+    <div class="container">
+        <!-- Back to Hub Button in Hero -->
+        <div class="d-flex justify-content-center mb-4">
+            <a href="index.html" class="hub-btn">
+                <i class="fas fa-arrow-left me-2"></i> Back to Hub
+            </a>
+        </div>
+        
+        <h1 class="display-4">🥦 Vegetable Store Inventory System</h1>
+        <p class="lead text-dim">Mastering Python OOP: Encapsulation, Composition & Inventory Management</p>
+        <p class="text-dim small mt-3">
+            <i class="fas fa-clock me-2"></i>45 minutes
+            <span class="mx-3">|</span>
+            <i class="fas fa-signal me-2"></i>Beginner to Intermediate
+        </p>
+    </div>
+</header>
+
+<!-- Top Advertisement -->
+<div class="container">
+    <div class="ad-container ad-container-top">
+        <div class="ad-label">Advertisement</div>
+        <div class="responsive-ad-wrapper">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-4575646748966866"
+                 data-ad-slot="6447477860"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+        </div>
+    </div>
+</div>
+
+<div class="container main-content-container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10 col-xxl-9">
+            
+            <section class="section-card" id="overview">
+                <h2>Architectural Overview & Core Principles</h2>
+                <p>This Python script models a simple yet elegant vegetable store inventory system using <strong>Object-Oriented Programming (OOP)</strong> principles. It demonstrates encapsulation (bundling data and methods within classes to protect internal state), composition (a store object "owns" multiple vegetable objects), and error handling to ensure data integrity.</p>
+                <p>At its core, the code promotes modular, maintainable design: The <code>Vegetable</code> class handles individual item logic, the <code>VegetableStore</code> class manages the collection, and the <code>main()</code> function orchestrates user interaction. This separation follows the <strong>Single Responsibility Principle (SRP)</strong>.</p>
+            </section>
+
+            <section class="section-card" id="code">
+                <h2>Complete Implementation</h2>
+                <div class="code-container">
+                    <div class="code-header">VEGETABLE_STORE.PY</div>
+<pre><code class="language-python">class Vegetable:
+    def __init__(self, name, price_per_kilo, initial_stock):
+        self.name = name
+        self.price_per_kilo = price_per_kilo
+        self.stock = initial_stock 
+
+    def sell(self, quantity):
+        if quantity > self.stock:
+            raise ValueError(f"Insufficient stock for {self.name}. Available: {self.stock}kg")
+        self.stock -= quantity
+        return quantity * self.price_per_kilo
+
+    def get_info(self):
+        return f"{self.name:<12} | Price: ₱{self.price_per_kilo}/kg | Stock: {self.stock}kg"
+
+class VegetableStore:
+    def __init__(self):
+        self.inventory = {
+            "asparagus": Vegetable("Asparagus", 180, 100),
+            "broccoli": Vegetable("Broccoli", 230, 100),
+            "cabbage": Vegetable("Cabbage", 140, 100),
+            "garlic": Vegetable("Garlic", 190, 100),
+            "onion": Vegetable("Onion", 180, 100),
+            "tomatoes": Vegetable("Tomatoes", 160, 100),
+            "lettuce": Vegetable("Lettuce", 180, 100),
+            "cauliflower": Vegetable("Cauliflower", 220, 100),
+            "potatoes": Vegetable("Potatoes", 180, 100),
+            "carrots": Vegetable("Carrots", 150, 100)
+        }
+
+    def display_menu(self):
+        print("\n" + "="*45 + "\nPoetic Codes INVENTORY STATUS\n" + "="*45)
+        for veg in self.inventory.values():
+            print(veg.get_info())
+
+    def process_transaction(self, item_name, quantity):
+        name_key = item_name.lower()
+        if name_key not in self.inventory:
+            raise ValueError(f"'{item_name}' not found in database.")
+        return self.inventory[name_key].sell(quantity)
+
+def main():
+    store = VegetableStore()
+    while True:
+        store.display_menu()
+        choice = input("\nBuy (or 'exit'): ").strip()
+        if choice.lower() == 'exit': break
+        try:
+            qty = float(input("Quantity in kilos: "))
+            print(f"Total: ₱{store.process_transaction(choice, qty):,.2f}")
+        except ValueError as e:
+            print(f"Error: {e}")
+
+if __name__ == "__main__": main()</code></pre>
+                </div>
+            </section>
+
+            <section class="section-card" id="logic">
+                <h2>🧠 Logic Analysis: Understanding the Classes</h2>
+                
+                <h4>1. The Constructor Logic</h4>
+                <p><span class="logic-label">Step-by-Step Explanation</span> <code>class Vegetable:</code> defines the blueprint. The <code>__init__</code> method is called automatically during instantiation. It captures the name, price per kilo, and initial stock, assigning them to instance variables using <code>self</code>.</p>
+                <p><span class="logic-label">Significance</span> This constructor is the foundation of encapsulation in OOP. By bundling attributes (data) with the object, it ensures each vegetable maintains its own state independently. In real-world systems, this prevents global variables from causing conflicts.</p>
+                <p><span class="logic-label">Logical Analysis</span> Logically, this setup assumes positive numeric inputs for price and stock. The use of <code>self</code> binds data to the instance, enabling object-specific mutations without affecting others.</p>
+
+                <h4>2. The Sell Method Logic</h4>
+                <p><span class="logic-label">Step-by-Step Explanation</span> Defines a method to handle selling a given quantity. It first checks if the requested quantity exceeds available stock. If true, it raises a <code>ValueError</code>. Otherwise, it subtracts from stock and returns the total cost.</p>
+                <p><span class="logic-label">Significance</span> This method exemplifies data integrity through controlled mutation—stock can only decrease via this gatekeeper, preventing invalid states.</p>
+                <p><span class="logic-label">Logical Analysis</span> The logic follows a "guard clause" pattern: Early exit on invalid input via exception. This is efficient (\( O(1) \) time) and enforces a business invariant: "Stock must always reflect reality."</p>
+
+                <div class="mt-4">
+                    <h4>Object State Tracking</h4>
+                    <p>To understand how Python distinguishes between these objects in memory, consider this comparison of the store's state before and after a transaction:</p>
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom table-bordered small">
+                            <thead>
+                                <tr>
+                                    <th>Attribute</th>
+                                    <th>Initial State (Broccoli)</th>
+                                    <th>After 5kg Sale</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>self.name</code></td><td>"Broccoli"</td><td>"Broccoli" (Unchanged)</td></tr>
+                                <tr><td><code>self.stock</code></td><td>100.0</td><td>95.0 (Mutated)</td></tr>
+                                <tr><td><code>id(self)</code></td><td>0x7f8... (Unique)</td><td>0x7f8... (Identity Persists)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <h3>New: Improving Encapsulation with Properties</h3>
+                <p>Currently, <code>stock</code> and <code>price_per_kilo</code> are public attributes. In production-grade code, we often protect them using <strong>@property</strong> decorators to control read/write access and add validation.</p>
+                <div class="code-container">
+                    <div class="code-header">Enhanced Vegetable Class (Snippet)</div>
+<pre><code class="language-python">class Vegetable:
+    def __init__(self, name, price_per_kilo, initial_stock):
+        self.name = name
+        self._price_per_kilo = price_per_kilo      # protected by convention
+        self._stock = initial_stock
+
+    @property
+    def stock(self):
+        return self._stock
+
+    @stock.setter
+    def stock(self, value):
+        if value < 0:
+            raise ValueError("Stock cannot be negative")
+        self._stock = value
+...</code></pre>
+                </div>
+            </section>
+
+            <section class="section-card">
+                <h2>Analysis: The VegetableStore Class</h2>
+                <h4>Inventory Composition Logic</h4>
+                <p><span class="logic-label">Step-by-Step Explanation</span> The <code>VegetableStore</code> initializes a dictionary where keys are lowercase names and values are <code>Vegetable</code> objects.</p>
+                <p><span class="logic-label">Significance</span> This showcases composition: The store "has-a" collection of vegetables. Dictionaries enable average \( O(1) \) access.</p>
+                
+                <h3>New: Adding Restock & Low-Stock Warning Methods</h3>
+                <div class="code-container">
+                    <div class="code-header">Suggested VegetableStore Extensions</div>
+<pre><code class="language-python">class VegetableStore:
+    def restock(self, item_name, amount):
+        name_key = item_name.lower()
+        self.inventory[name_key].stock += amount</code></pre>
+                </div>
+            </section>
+
+            <section class="section-card" id="advanced">
+                <h2>Memory Management & Identity</h2>
+                <p>Understanding object references prevents "aliasing" bugs. Our architecture ensures complete <strong>Object Isolation</strong>.</p>
+            </section>
+
+            <section class="section-card">
+                <h2>Scalability: From Dict to Database</h2>
+                <p>To scale this system, we would replace the <code>self.inventory</code> dictionary with an SQL connection, separating the Model from the Data Access Layer.</p>
+            </section>
+
+            <section class="section-card">
+                <h2>The main() Function Orchestration</h2>
+                <p><span class="logic-label">Logical Analysis</span> This is a finite state machine: Display → Input → Process → Repeat. Try-except localizes errors to transactions.</p>
+            </section>
+
+            <section class="section-card" id="demo">
+                <h2>🎮 Interactive Demo</h2>
+                <p class="text-dim mb-3">See the vegetable store system in action. Click the button below to simulate a purchase transaction.</p>
+                <button class="run-btn" onclick="simulateStore()"><i class="fas fa-play me-2"></i> Launch POS Simulation</button>
+                <div class="terminal-window">
+                    <div class="terminal-header">
+                        <div class="terminal-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="small text-secondary fw-bold">vegetable_store.py</span>
+                    </div>
+                    <div class="terminal-body" id="terminal-output">> Ready for execution...</div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<!-- Middle Advertisement -->
+<div class="container">
+    <div class="ad-container ad-container-middle">
+        <div class="ad-label">Advertisement</div>
+        <div class="responsive-ad-wrapper">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-4575646748966866"
+                 data-ad-slot="6447477860"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+        </div>
+    </div>
+</div>
+
+<div class="container main-content-container mt-5 pt-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10 col-xxl-9">
+
+            <section class="section-card" id="best-practices">
+                <h2>🎯 Best Practices & Design Patterns</h2>
+                
+                <h3>1. Input Validation and Error Handling</h3>
+                <p><span class="logic-label">Defensive Programming</span> Always validate user input before processing. In our implementation, the <code>sell()</code> method checks stock availability before allowing a transaction. This prevents the system from entering an invalid state.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">ROBUST ERROR HANDLING</div>
+<pre><code class="language-python">def sell(self, quantity):
+    # Guard clause pattern - fail fast
+    if quantity <= 0:
+        raise ValueError("Quantity must be positive")
+    if quantity > self.stock:
+        raise ValueError(f"Insufficient stock for {self.name}")
+    
+    # Only mutate state after validation
+    self.stock -= quantity
+    return quantity * self.price_per_kilo</code></pre>
+                </div>
+
+                <h3>2. Encapsulation: Private vs Public</h3>
+                <p><span class="logic-label">Design Principle</span> While Python doesn't have true private variables, we can use naming conventions to signal intent. Consider using <code>_private</code> (single underscore) for internal use or <code>__very_private</code> (double underscore) for name mangling.</p>
+                
+                <div class="code-container">
+                    <div class="code-header">ENHANCED ENCAPSULATION</div>
+<pre><code class="language-python">class Vegetable:
+    def __init__(self, name, price_per_kilo, initial_stock):
+        self._name = name  # Protected (convention)
+        self._price_per_kilo = price_per_kilo
+        self.__stock = initial_stock  # Private (name mangled)
+    
+    @property
+    def name(self):
+        """Read-only access to name"""
+        return self._name
+    
+    @property
+    def stock(self):
+        """Read-only access to stock"""
+        return self.__stock
+    
+    @property
+    def price(self):
+        """Read-only access to price"""
+        return self._price_per_kilo</code></pre>
+                </div>
+
+                <h3>3. Single Responsibility Principle</h3>
+                <p><span class="logic-label">Design Insight</span> Each class should have one reason to change. The <code>Vegetable</code> class manages individual items, the <code>VegetableStore</code> class manages the collection, and <code>main()</code> handles user interaction. This separation makes testing and maintenance easier.</p>
+            </section>
+
+            <section class="section-card" id="real-world">
+                <h2>🌐 Real-World Applications</h2>
+                
+                <h3>Scaling to Production Systems</h3>
+                <p>This simple inventory system demonstrates core concepts used in real-world applications like:</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <div style="background: rgba(61, 139, 253, 0.05); padding: 20px; border-radius: 10px; border-left: 3px solid var(--accent-blue);">
+                            <h4 style="color: var(--accent-blue); font-size: 1.1rem;"><i class="fas fa-shopping-cart me-2"></i>E-Commerce Platforms</h4>
+                            <p class="small text-dim mb-0">Product catalogs, inventory tracking, and shopping cart management use similar object-oriented structures. Companies like Amazon and Shopify handle millions of products using these principles.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div style="background: rgba(0, 212, 255, 0.05); padding: 20px; border-radius: 10px; border-left: 3px solid var(--accent-cyan);">
+                            <h4 style="color: var(--accent-cyan); font-size: 1.1rem;"><i class="fas fa-warehouse me-2"></i>Warehouse Management</h4>
+                            <p class="small text-dim mb-0">Real-time stock tracking, automated reordering, and supply chain logistics rely on similar encapsulation patterns to maintain data integrity across distributed systems.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div style="background: rgba(16, 185, 129, 0.05); padding: 20px; border-radius: 10px; border-left: 3px solid var(--success-green);">
+                            <h4 style="color: var(--success-green); font-size: 1.1rem;"><i class="fas fa-store me-2"></i>Point of Sale Systems</h4>
+                            <p class="small text-dim mb-0">Retail POS systems process transactions, manage inventory, and generate receipts using OOP principles to ensure consistency and reliability.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div style="background: rgba(245, 158, 11, 0.05); padding: 20px; border-radius: 10px; border-left: 3px solid var(--warning-yellow);">
+                            <h4 style="color: var(--warning-yellow); font-size: 1.1rem;"><i class="fas fa-chart-line me-2"></i>Financial Systems</h4>
+                            <p class="small text-dim mb-0">Banking and trading platforms use encapsulation to protect sensitive data like account balances and transaction histories, similar to our stock tracking.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="mt-4">From Dictionary to Database</h3>
+                <p><span class="logic-label">Scalability Path</span> While our current implementation uses a Python dictionary for simplicity, production systems typically use databases:</p>
+                
+                <div class="code-container">
+                    <div class="code-header">DATABASE INTEGRATION EXAMPLE</div>
+<pre><code class="language-python">import sqlite3
+from typing import Optional
+
+class DatabaseVegetableStore:
+    def __init__(self, db_path: str = "store.db"):
+        self.conn = sqlite3.connect(db_path)
+        self._init_database()
+    
+    def _init_database(self):
+        """Create tables if they don't exist"""
+        self.conn.execute('''
+            CREATE TABLE IF NOT EXISTS vegetables (
+                id INTEGER PRIMARY KEY,
+                name TEXT UNIQUE NOT NULL,
+                price_per_kilo REAL NOT NULL,
+                stock REAL NOT NULL
+            )
+        ''')
+        self.conn.commit()
+    
+    def add_vegetable(self, name: str, price: float, stock: float):
+        """Add new vegetable to inventory"""
+        self.conn.execute(
+            'INSERT INTO vegetables (name, price_per_kilo, stock) VALUES (?, ?, ?)',
+            (name, price, stock)
+        )
+        self.conn.commit()
+    
+    def update_stock(self, name: str, quantity: float) -> bool:
+        """Update stock after transaction"""
+        cursor = self.conn.execute(
+            'SELECT stock FROM vegetables WHERE name = ?',
+            (name,)
+        )
+        result = cursor.fetchone()
+        
+        if not result or result[0] < quantity:
+            return False
+        
+        self.conn.execute(
+            'UPDATE vegetables SET stock = stock - ? WHERE name = ?',
+            (quantity, name)
+        )
+        self.conn.commit()
+        return True</code></pre>
+                </div>
+            </section>
+
+            <section class="section-card" id="testing">
+                <h2>🧪 Testing & Quality Assurance</h2>
+                
+                <h3>Unit Testing Best Practices</h3>
+                <p><span class="logic-label">Professional Standards</span> In production environments, every class and method should have corresponding unit tests. Here's how to test our vegetable store:</p>
+                
+                <div class="code-container">
+                    <div class="code-header">test_vegetable_store.py</div>
+<pre><code class="language-python">import unittest
+from vegetable_store import Vegetable, VegetableStore
+
+class TestVegetable(unittest.TestCase):
+    def setUp(self):
+        """Create a test vegetable before each test"""
+        self.veg = Vegetable("Tomato", 150, 50)
+    
+    def test_initialization(self):
+        """Test if vegetable initializes correctly"""
+        self.assertEqual(self.veg.name, "Tomato")
+        self.assertEqual(self.veg.price_per_kilo, 150)
+        self.assertEqual(self.veg.stock, 50)
+    
+    def test_successful_sell(self):
+        """Test selling within available stock"""
+        cost = self.veg.sell(10)
+        self.assertEqual(cost, 1500)  # 10 * 150
+        self.assertEqual(self.veg.stock, 40)  # 50 - 10
+    
+    def test_insufficient_stock(self):
+        """Test that selling more than available raises error"""
+        with self.assertRaises(ValueError):
+            self.veg.sell(60)  # More than 50 available
+    
+    def test_get_info(self):
+        """Test info string generation"""
+        info = self.veg.get_info()
+        self.assertIn("Tomato", info)
+        self.assertIn("₱150", info)
+
+class TestVegetableStore(unittest.TestCase):
+    def setUp(self):
+        """Create a test store before each test"""
+        self.store = VegetableStore()
+    
+    def test_store_initialization(self):
+        """Test if store initializes with correct items"""
+        self.assertIn("tomatoes", self.store.inventory)
+        self.assertEqual(len(self.store.inventory), 10)
+    
+    def test_process_transaction(self):
+        """Test successful transaction"""
+        cost = self.store.process_transaction("broccoli", 5)
+        self.assertEqual(cost, 1150)  # 5 * 230
+    
+    def test_invalid_item(self):
+        """Test transaction with non-existent item"""
+        with self.assertRaises(ValueError):
+            self.store.process_transaction("banana", 5)
+
+if __name__ == '__main__':
+    unittest.main()</code></pre>
+                </div>
+
+                <h3>Test Coverage & Continuous Integration</h3>
+                <p><span class="logic-label">Industry Practice</span> Modern development teams aim for 80%+ test coverage and use CI/CD pipelines to automatically run tests on every code change.</p>
+            </section>
+
+            <section class="section-card" id="performance">
+                <h2>⚡ Performance Optimization Tips</h2>
+                
+                <h3>1. Time Complexity Analysis</h3>
+                <p><span class="logic-label">Big O Notation</span> Understanding the performance characteristics of your code is crucial:</p>
+                
+                <div class="table-responsive">
+                <table class="table table-dark table-bordered small mt-3">
+                    <thead style="background: rgba(61, 139, 253, 0.1);">
+                        <tr>
+                            <th>Operation</th>
+                            <th>Time Complexity</th>
+                            <th>Explanation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>store.process_transaction()</code></td>
+                            <td><span style="color: var(--success-green);">O(1)</span></td>
+                            <td>Dictionary lookup is constant time</td>
+                        </tr>
+                        <tr>
+                            <td><code>vegetable.sell()</code></td>
+                            <td><span style="color: var(--success-green);">O(1)</span></td>
+                            <td>Simple arithmetic operations</td>
+                        </tr>
+                        <tr>
+                            <td><code>store.display_menu()</code></td>
+                            <td><span style="color: var(--warning-yellow);">O(n)</span></td>
+                            <td>Iterates through all vegetables</td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+
+                <h3>2. Memory Optimization</h3>
+                <p><span class="logic-label">Efficient Design</span> Our current implementation keeps all data in memory. For large-scale systems, consider:</p>
+                <ul>
+                    <li><strong>Lazy Loading:</strong> Load data only when needed</li>
+                    <li><strong>Caching:</strong> Store frequently accessed items in memory</li>
+                    <li><strong>Pagination:</strong> Display results in chunks rather than all at once</li>
+                    <li><strong>Connection Pooling:</strong> Reuse database connections</li>
+                </ul>
+
+                <h3>3. Concurrency Considerations</h3>
+                <p><span class="logic-label">Thread Safety</span> In multi-threaded environments (like web applications), you need to protect shared state:</p>
+                
+                <div class="code-container">
+                    <div class="code-header">THREAD-SAFE IMPLEMENTATION</div>
+<pre><code class="language-python">import threading
+
+class ThreadSafeVegetableStore:
+    def __init__(self):
+        self.inventory = {
+            "broccoli": Vegetable("Broccoli", 230, 100),
+            # ... other vegetables
+        }
+        self._lock = threading.Lock()
+    
+    def process_transaction(self, item_name, quantity):
+        """Thread-safe transaction processing"""
+        with self._lock:  # Acquire lock before modifying state
+            name_key = item_name.lower()
+            if name_key not in self.inventory:
+                raise ValueError(f"'{item_name}' not found")
+            return self.inventory[name_key].sell(quantity)</code></pre>
+                </div>
+            </section>
+
+            <section class="section-card" id="next-steps">
+                <h2>🚀 Next Steps & Further Learning</h2>
+                
+                <h3>Expand Your Knowledge</h3>
+                <p>Now that you understand the basics of OOP with this vegetable store system, here are recommended next steps:</p>
+                
+                <div class="row mt-3">
+                    <div class="col-md-4 mb-3">
+                        <div style="background: var(--obsidian-card); padding: 15px; border-radius: 8px; border: 1px solid var(--obsidian-border);">
+                            <h4 style="color: var(--accent-blue); font-size: 1rem;"><i class="fas fa-database me-2"></i>Add Persistence</h4>
+                            <p class="small text-dim mb-2">Implement SQLite or PostgreSQL integration to save inventory data permanently.</p>
+                            <a href="#real-world" class="small" style="color: var(--accent-cyan); text-decoration: none;">See database example ↑</a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div style="background: var(--obsidian-card); padding: 15px; border-radius: 8px; border: 1px solid var(--obsidian-border);">
+                            <h4 style="color: var(--accent-blue); font-size: 1rem;"><i class="fas fa-flask me-2"></i>Write Tests</h4>
+                            <p class="small text-dim mb-2">Create comprehensive unit tests using unittest or pytest frameworks.</p>
+                            <a href="#testing" class="small" style="color: var(--accent-cyan); text-decoration: none;">See testing example ↑</a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div style="background: var(--obsidian-card); padding: 15px; border-radius: 8px; border: 1px solid var(--obsidian-border);">
+                            <h4 style="color: var(--accent-blue); font-size: 1rem;"><i class="fas fa-globe me-2"></i>Build Web UI</h4>
+                            <p class="small text-dim mb-2">Create a Flask or Django web interface for the inventory system.</p>
+                            <a href="https://flask.palletsprojects.com" target="_blank" class="small" style="color: var(--accent-cyan); text-decoration: none;">Learn Flask →</a>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="mt-4">Related Tutorials</h3>
+                <div class="d-flex flex-column gap-2">
+                    <a href="atm.html" class="btn btn-sm" style="background: rgba(61, 139, 253, 0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue);">
+                        <i class="fas fa-university me-1"></i> Mini-ATM System
+                    </a>
+                    <a href="book.html" class="btn btn-sm" style="background: rgba(61, 139, 253, 0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue);">
+                        <i class="fas fa-book me-1"></i> Book Store System
+                    </a>
+                    <a href="lechon.html" class="btn btn-sm" style="background: rgba(61, 139, 253, 0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue);">
+                        <i class="fas fa-fire me-1"></i> Lechon Hub
+                    </a>
+                    <a href="flower.html" class="btn btn-sm" style="background: rgba(61, 139, 253, 0.1); border: 1px solid var(--accent-blue); color: var(--accent-blue);">
+                        <i class="fas fa-leaf me-1"></i> Flower Shop
+                    </a>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Advertisement -->
+<div class="container">
+    <div class="ad-container ad-container-bottom">
+        <div class="ad-label">Advertisement</div>
+        <div class="responsive-ad-wrapper">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-4575646748966866"
+                 data-ad-slot="6447477860"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 mb-4">
+                <h5 class="footer-heading">About the Developer</h5>
+                <p class="text-dim small">Glenn Pansensoy is a Web Developer specializing in Python systems and logical design. This tutorial is part of a series dedicated to bridging the gap between raw code and professional software engineering principles.</p>
+                <a href="about-us.html" class="footer-link mb-3">
+                    <i class="fas fa-user me-2" aria-hidden="true"></i> Learn more about Glenn
+                </a>
+                <div class="social-icons mt-3">
+                    <a href="https://github.com/pansensoyglenn-dev" title="GitHub" rel="noopener noreferrer" target="_blank">
+                        <i class="fab fa-github" aria-hidden="true"></i>
+                        <span class="visually-hidden">GitHub</span>
+                    </a>
+                    <a href="https://linkedin.com/in/glenn-pansensoy-6228453a2" title="LinkedIn" rel="noopener noreferrer" target="_blank">
+                        <i class="fab fa-linkedin" aria-hidden="true"></i>
+                        <span class="visually-hidden">LinkedIn</span>
+                    </a>
+                    <a href="https://twitter.com/GlennPansensoy" title="Twitter" rel="noopener noreferrer" target="_blank">
+                        <i class="fab fa-twitter" aria-hidden="true"></i>
+                        <span class="visually-hidden">Twitter</span>
+                    </a>
+                    <a href="https://youtube.com/@GlennPansensoy" title="YouTube" rel="noopener noreferrer" target="_blank">
+                        <i class="fab fa-youtube" aria-hidden="true"></i>
+                        <span class="visually-hidden">YouTube</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-6 col-lg-2 mb-4">
+                <h5 class="footer-heading">Other Labs</h5>
+                <a href="atm.html" class="footer-link">
+                    <i class="fas fa-university me-1" aria-hidden="true"></i> Mini-ATM
+                </a>
+                <a href="book.html" class="footer-link">
+                    <i class="fas fa-book me-1" aria-hidden="true"></i> Book Store
+                </a>
+                <a href="lechon.html" class="footer-link">
+                    <i class="fas fa-fire me-1" aria-hidden="true"></i> Lechon Hub
+                </a>
+                <a href="flower.html" class="footer-link">
+                    <i class="fas fa-leaf me-1" aria-hidden="true"></i> Flower Shop
+                </a>
+                <a href="index.html" class="footer-link">
+                    <i class="fas fa-home me-1" aria-hidden="true"></i> All Labs
+                </a>
+            </div>
+            
+            <div class="col-6 col-lg-2 mb-4">
+                <h5 class="footer-heading">Resources</h5>
+                <a href="documentation.html" class="footer-link">
+                    <i class="fas fa-book me-1" aria-hidden="true"></i> Documentation
+                </a>
+                <a href="source-files.html" class="footer-link">
+                    <i class="fas fa-file-code me-1" aria-hidden="true"></i> Source Files
+                </a>
+                <a href="oop-basics.html" class="footer-link">
+                    <i class="fas fa-cube me-1" aria-hidden="true"></i> OOP Basics
+                </a>
+                <a href="python-tips.html" class="footer-link">
+                    <i class="fas fa-lightbulb me-1" aria-hidden="true"></i> Python Tips
+                </a>
+            </div>
+            
+            <div class="col-6 col-lg-2 mb-4">
+                <h5 class="footer-heading">Legal</h5>
+                <a href="privacy.html" class="footer-link">
+                    <i class="fas fa-shield-alt me-1" aria-hidden="true"></i> Privacy Policy
+                </a>
+                <a href="terms.html" class="footer-link">
+                    <i class="fas fa-file-contract me-1" aria-hidden="true"></i> Terms of Service
+                </a>
+                <a href="cookie.html" class="footer-link">
+                    <i class="fas fa-cookie me-1" aria-hidden="true"></i> Cookie Policy
+                </a>
+                <a href="disclaimer.html" class="footer-link">
+                    <i class="fas fa-exclamation-triangle me-1" aria-hidden="true"></i> Disclaimers
+                </a>
+            </div>
+            
+            <div class="col-lg-3 mb-4">
+                <h5 class="footer-heading">Stay Updated</h5>
+                <p class="text-dim small">Get the latest Python tutorials and coding tips delivered to your inbox.</p>
+                <form class="newsletter-form mt-3" onsubmit="subscribeNewsletter(event)">
+                    <div class="input-group input-group-sm">
+                        <input type="email" class="form-control" placeholder="Your email" aria-label="Email for newsletter" required style="background: var(--obsidian-card); border-color: var(--obsidian-border); color: var(--text-main);">
+                        <button class="btn btn-outline-info" type="submit" style="border-color: var(--accent-blue); color: var(--accent-cyan);">Subscribe</button>
+                    </div>
+                </form>
+                
+                <h5 class="footer-heading mt-4">Contact</h5>
+                <a href="contact.html" class="footer-link">
+                    <i class="fas fa-envelope me-1" aria-hidden="true"></i> Contact Us
+                </a>
+                <p class="text-dim small mt-2">
+                    <i class="fas fa-map-marker-alt me-2" aria-hidden="true"></i> Diplahan, Zamboanga Sibugay Province, Philippines
+                </p>
+            </div>
+        </div>
+        <hr class="my-4 footer-divider">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="text-dim small mb-0">
+                    <i class="fas fa-code me-1" aria-hidden="true"></i> Built with 
+                    <i class="fas fa-heart text-danger mx-1" aria-hidden="true"></i> 
+                    logical precision 
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="text-dim small mb-0">
+                    © <span id="current-year">2026</span> Glenn Junsay Pansensoy · <a href="https://pansensoyglenn-dev.github.io/poetic-codes" style="color: var(--accent-cyan); text-decoration: none;">Poetic Codes</a> · All Rights Reserved
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+<script>
+    // Update copyright year dynamically
+    document.addEventListener('DOMContentLoaded', function() {
+        const yearSpan = document.getElementById('current-year');
+        if (yearSpan) {
+            yearSpan.textContent = new Date().getFullYear();
+        }
+    });
+
+    async function simulateStore() {
+        const out = document.getElementById('terminal-output');
+        out.innerHTML = "> python3 vegetable_store.py<br>";
+        const lines = [
+            "=============================================",
+            "POETIC CODES INVENTORY STATUS",
+            "=============================================",
+            "Asparagus   | Price: ₱180.00 | Stock: 100kg",
+            "Broccoli    | Price: ₱230.00 | Stock: 100kg",
+            "Cabbage     | Price: ₱140.00 | Stock: 100kg",
+            "Garlic      | Price: ₱190.00 | Stock: 100kg",
+            "Onion       | Price: ₱180.00 | Stock: 100kg",
+            "Tomatoes    | Price: ₱160.00 | Stock: 100kg",
+            "Lettuce     | Price: ₱180.00 | Stock: 100kg",
+            "Cauliflower | Price: ₱220.00 | Stock: 100kg",
+            "Potatoes    | Price: ₱180.00 | Stock: 100kg",
+            "Carrots     | Price: ₱150.00 | Stock: 100kg",
+            "\nBuy: <span style='color:#fff'>broccoli</span>",
+            "Quantity: <span style='color:#fff'>5</span>",
+            "<span style='color:#10b981'>✓ Total: ₱1,150.00</span>",
+            "\n<span style='color:#f59e0b'>[INFO] Transaction completed successfully.</span>",
+            "Selling 5kg of Broccoli"
+        ];
+
+        let i = 0;
+        const interval = setInterval(() => {
+            if (i < lines.length) {
+                out.innerHTML += lines[i] + "<br>";
+                i++;
+            } else {
+                clearInterval(interval);
+            }
+        }, 200);
+    }
+
+    // Newsletter subscription handler
+    function subscribeNewsletter(e) {
+        e.preventDefault();
+        const email = e.target.querySelector('input[type="email"]').value;
+        
+        // Basic email validation
+        if (!email || !email.includes('@')) {
+            alert('Please enter a valid email address.');
+            return;
+        }
+        
+        // In a real implementation, you would send this to your server
+        alert('Thank you for subscribing to Poetic Codes! You will receive updates about new tutorials.');
+        e.target.reset();
+    }
+
+    // Integrated Social Share Buttons
+    document.addEventListener('DOMContentLoaded', () => {
+        const url = encodeURIComponent(window.location.href);
+        const title = encodeURIComponent(document.title);
+        const desc = encodeURIComponent(document.querySelector('meta[name="description"]')?.content || 'Python OOP tutorial from Poetic Codes');
+        const via = 'GlennPansensoy';
+        const hashtags = 'Python,OOP,Programming,Encapsulation';
+
+        const shareData = {
+            facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+            linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}&summary=${desc}&source=Poetic%20Codes`,
+            x: `https://twitter.com/intent/tweet?url=${url}&text=${title}&via=${via}&hashtags=${hashtags}`
+        };
+
+        // Create buttons container
+        const container = document.createElement('div');
+        container.className = 'text-center mt-5 mb-4';
+        container.innerHTML = '<h4 style="color:var(--accent-cyan);">Quick Share This Page</h4>';
+
+        ['facebook', 'linkedin', 'x'].forEach(platform => {
+            const btn = document.createElement('a');
+            btn.href = shareData[platform];
+            btn.target = '_blank';
+            btn.rel = 'noopener noreferrer';
+            btn.className = 'btn mx-2 my-1';
+            btn.style = 'background:rgba(61,139,253,0.15); border:1px solid var(--accent-blue); color:var(--accent-blue); min-width:120px;';
+            btn.innerHTML = `<i class="fab fa-${platform === 'x' ? 'x-twitter' : platform} me-2"></i> ${platform.toUpperCase()}`;
+            btn.onmouseover = () => { btn.style.background = 'var(--accent-blue)'; btn.style.color = '#000'; };
+            btn.onmouseout = () => { btn.style.background = 'rgba(61,139,253,0.15)'; btn.style.color = 'var(--accent-blue)'; };
+            container.appendChild(btn);
+        });
+
+        // Web Share API button (mobile-friendly)
+        if (navigator.share) {
+            const nativeBtn = document.createElement('button');
+            nativeBtn.className = 'btn btn-outline-info mt-3';
+            nativeBtn.innerHTML = '<i class="fas fa-share-alt me-2"></i>Share via Apps';
+            nativeBtn.onclick = async () => {
+                try {
+                    await navigator.share({
+                        title: document.title,
+                        text: desc,
+                        url: window.location.href
+                    });
+                } catch (err) { console.log('Share failed', err); }
+            };
+            container.appendChild(nativeBtn);
+        }
+
+        // Insert after .section-card or footer
+        document.querySelector('#next-steps')?.appendChild(container) ||
+        document.querySelector('footer')?.prepend(container);
+    });
+</script>
+
+<!-- Initialize Google AdSense Ads -->
+<script>
+    // Push each ad unit to initialize them
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    (adsbygoogle = window.adsbygoogle || []).push({});
+    (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+</body>
+</html>
