@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OOP Basics | Python Obsidian Theme</title>
+    <style>
+        :root {
+            --bg-dark: #1e1e1e;
+            --sidebar-bg: #262626;
+            --text-main: #dcddde;
+            --py-blue: #306998;
+            --py-yellow: #FFE082;
+            --accent: #4eb3fd;
+            --code-bg: #000000;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        header {
+            border-bottom: 2px solid var(--py-blue);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        h1 { color: var(--py-yellow); margin-bottom: 5px; }
+        h2 { color: var(--py-blue); border-left: 4px solid var(--py-blue); padding-left: 15px; margin-top: 40px; }
+        h3 { color: var(--accent); }
+
+        .card {
+            background: var(--sidebar-bg);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        code {
+            font-family: 'Fira Code', 'Courier New', monospace;
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--py-yellow);
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #333;
+        }
+
+        .keyword { color: #ff7b72; }
+        .class-name { color: #f0883e; }
+        .func-name { color: #d2a8ff; }
+        .comment { color: #8b949e; }
+        .string { color: #a5d6ff; }
+
+        ul { list-style: none; padding-left: 0; }
+        li::before { content: "• "; color: var(--py-blue); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Object-Oriented Programming</h1>
+        <p>A Python-centric guide to the four pillars of OOP.</p>
+    </header>
+
+    <section>
+        <h2>1. Classes & Objects</h2>
+        <div class="card">
+            <p>A <strong>Class</strong> is a blueprint; an <strong>Object</strong> is an instance of that blueprint.</p>
+            <pre>
+<span class="keyword">class</span> <span class="class-name">Dog</span>:
+    <span class="keyword">def</span> <span class="func-name">__init__</span>(self, name):
+        <span class="keyword">self</span>.name = name <span class="comment"># Attribute</span>
+
+    <span class="keyword">def</span> <span class="func-name">bark</span>(self):
+        <span class="keyword">return</span> <span class="string">"Woof!"</span>
+
+my_dog = Dog(<span class="string">"Buddy"</span>) <span class="comment"># Object creation</span></pre>
+        </div>
+    </section>
+
+    <section>
+        <h2>2. The Four Pillars</h2>
+        
+        <div class="card">
+            <h3>Encapsulation</h3>
+            <p>Restricting access to methods and variables to prevent direct data modification. In Python, we use a single <code>_</code> (protected) or double <code>__</code> (private) underscore.</p>
+        </div>
+
+        <div class="card">
+            <h3>Inheritance</h3>
+            <p>Allowing a class (child) to derive attributes and methods from another class (parent).</p>
+            <pre><span class="keyword">class</span> <span class="class-name">Puppy</span>(Dog): <span class="comment"># Inherits from Dog</span>
+    <span class="keyword">def</span> <span class="func-name">wobble</span>(self):
+        <span class="keyword">return</span> <span class="string">"Puppy is walking!"</span></pre>
+        </div>
+
+        <div class="card">
+            <h3>Polymorphism</h3>
+            <p>The ability of different classes to be treated as instances of the same general class through the same interface (e.g., different animals having the same <code>speak()</code> method).</p>
+        </div>
+
+        <div class="card">
+            <h3>Abstraction</h3>
+            <p>Hiding complex implementation details and only showing the necessary features of an object. Usually handled via <code>abc</code> module in Python.</p>
+        </div>
+    </section>
+</div>
+
+</body>
+</html>
