@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Python Tips • 2025–Future (Obsidian + Python Blue)</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 920px;
+            margin: 2.2rem auto;
+            padding: 0 1.2rem;
+            line-height: 1.65;
+            background: #1e1e1e;
+            color: #dcddde;
+        }
+        h1, h2, h3 {
+            color: #4B8BBE;          /* Python medium blue */
+        }
+        h1 {
+            border-bottom: 2px solid #306998;  /* Python dark blue */
+            padding-bottom: .6em;
+            margin-bottom: 1.8rem;
+        }
+        code, pre {
+            font-family: 'SF Mono', 'Consolas', 'DejaVu Sans Mono', monospace;
+            background: #161b22;
+            border-radius: 6px;
+            color: #e0e0e5;
+        }
+        code {
+            padding: .18em .38em;
+            color: #95d4ff;          /* light blue for inline code */
+        }
+        pre {
+            padding: 1.2rem;
+            overflow-x: auto;
+            margin: 1.3rem 0;
+            border: 1px solid #2a2f38;
+        }
+        .tip {
+            background: #161b22;
+            padding: 1.3rem 1.6rem;
+            margin: 1.6rem 0;
+            border-left: 4px solid #306998;   /* Python dark blue border */
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+        .category {
+            color: #3776ab;                    /* Python vibrant blue */
+            font-weight: 600;
+            margin: 2.6rem 0 .9rem;
+            font-size: 1.25rem;
+        }
+        .new {
+            color: #56d364;
+            font-weight: bold;
+        }
+        .future {
+            color: #ffa657;
+            font-style: italic;
+        }
+        a {
+            color: #4B8BBE;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+            color: #5a9ddf;
+        }
+        strong {
+            color: #95d4ff;
+        }
+        footer {
+            margin: 5rem 0 3rem;
+            text-align: center;
+            color: #8b949e;
+            font-size: .95rem;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Python Tips • 2025–Future (3.14 / 3.15+)</h1>
+
+<div class="tip">
+    <strong>2025–2026 landscape</strong>: Python 3.14 (Oct 2025) brought free-threading + t-strings to stable.<br>
+    3.15 (expected ~Oct 2026) refines profiling, UTF-8 defaults, JIT coverage.<br>
+    Tooling standard: <code>uv</code> + <code>ruff</code> + <code>mypy/pyright</code> — fast, typed, explicit.
+</div>
+
+<h2 class="category">1. Language Features (Stabilized in 3.14+)</h2>
+
+<div class="tip">
+    <span class="new">t-strings (template strings) — safer interpolation</span><br>
+    <code>t"SELECT * FROM users WHERE id = {user_id}"</code> → structured output (avoids injection)<br>
+    Ideal for SQL, logging, CLI, HTML templating.
+</div>
+
+<div class="tip">
+    <span class="new">Deferred evaluation of annotations (no quotes needed)</span><br>
+    <code>def fetch(id: int | str, items: list[Item]) -> dict[str, Any]: ...</code><br>
+    → Clean generics, unions, forward refs without <code>from __future__ import annotations</code>.
+</div>
+
+<div class="tip">
+    <span class="new">Free-threaded mode (no-GIL build)</span><br>
+    <code>python3.14t script.py   # or PYTHON_GIL=0 env var</code><br>
+    → Threading finally useful for CPU + I/O mixed workloads (test carefully — perf varies).
+</div>
+
+<h2 class="category">2. Performance & Workflow 2025+</h2>
+
+<div class="tip">
+    <strong>Modern toolchain</strong><br>
+    <code>uv venv --python 3.14</code><br>
+    <code>uv add ruff mypy pytest pydantic polars httpx anyio</code><br>
+    <code>uv run ruff check --fix .</code> → blazing fast lint/format.
+</div>
+
+<div class="tip">
+    <strong>Concurrency preference 2026</strong><br>
+    • <code>asyncio</code> / <code>anyio</code> → most network/IO<br>
+    • <code>ThreadPoolExecutor</code> + free-threading → light CPU tasks<br>
+    • <code>multiprocessing</code> / <code>joblib</code> / <code>dask</code> → heavy CPU
+</div>
+
+<div class="tip">
+    <strong>Data crunching</strong><br>
+    <code>import polars as pl</code><br>
+    <code>df = pl.scan_csv("data.csv").filter(pl.col("value") > 100).collect()</code><br>
+    → Often 10–100× faster than pandas for large datasets.
+</div>
+
+<h2 class="category">3. Typing & Safety (Core in 2025–2026)</h2>
+
+<div class="tip">
+    <code>from typing import assert_never, TypeAlias</code><br>
+    <code>UserID: TypeAlias = int | str</code><br><br>
+    <code>match user_id:</code><br>
+    &nbsp;&nbsp;<code>case int() | str(): ... </code><br>
+    &nbsp;&nbsp;<code>case _: assert_never(user_id)  # mypy/pyright exhaustive</code>
+</div>
+
+<div class="tip">
+    <strong>Fast immutable objects</strong><br>
+    <code>from dataclasses import dataclass</code><br>
+    <code>@dataclass(slots=True, frozen=True)</code><br>
+    <code>class Point:</code><br>
+    &nbsp;&nbsp;<code>x: float</code><br>
+    &nbsp;&nbsp;<code>y: float</code>
+</div>
+
+<h2 class="category">4. Handy Idioms That Stay Relevant</h2>
+
+<div class="tip">
+    <code># Deduplicate preserving order</code><br>
+    <code>unique = list(dict.fromkeys(items))</code><br><br>
+
+    <code># Debug print 2026 style</code><br>
+    <code>print(f"{result   = }")</code><br>
+    <code>from rich import inspect; inspect(obj, all=True)</code>
+</div>
+
+<div class="tip">
+    <code># Flatten 2D → 1D</code><br>
+    <code>flat = [item for row in nested_list for item in row]</code><br><br>
+
+    <code># Group without pandas</code><br>
+    <code>from itertools import groupby</code><br>
+    <code>from operator import itemgetter</code><br>
+    <code>for key, group in groupby(sorted(data, key=itemgetter('key')), itemgetter('key')):</code><br>
+    &nbsp;&nbsp;<code>print(key, list(group))</code>
+</div>
+
+<h2 class="category">5. Horizon (3.15+ & Proposals)</h2>
+
+<div class="tip">
+    <span class="future">Lazy / on-demand imports</span> → faster startup<br>
+    <span class="future">Low-overhead sampling profiler</span> → production insights<br>
+    <span class="future">Full UTF-8 default</span> → no more encoding surprises<br>
+    <span class="future">Expanding JIT</span> → more pure-Python speedups
+</div>
+
+<footer>
+    Curated Feb 2026 • Python 3.14+ mindset • Stay fast & typed • Happy coding! 🐍 #306998
+</footer>
+
+</body>
+</html>
