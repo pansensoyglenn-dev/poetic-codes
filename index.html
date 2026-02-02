@@ -255,9 +255,6 @@
             text-justify: inter-word;
         }
 
-        /* ========================
-           HEADER & NAVIGATION
-        ======================== */
         header {
             background: rgba(22,27,34,0.98);
             backdrop-filter: blur(20px);
@@ -293,9 +290,6 @@
             font-size: 1.6rem;
         }
 
-        /* ========================
-           HAMBURGER MENU - FIXED
-        ======================== */
         .menu-toggle {
             cursor: pointer;
             display: flex;
@@ -1213,12 +1207,7 @@
         .delay-1 { animation-delay: 0.2s; }
         .delay-2 { animation-delay: 0.4s; }
         .delay-3 { animation-delay: 0.6s; }
-
-        /* ========================
-           TEXT LAYOUT IMPROVEMENTS
-           ======================== */
         
-        /* Text justification for better readability */
         .intro-content p,
         .fundamental-topic p,
         .card p:not(.feature-card p),
@@ -1249,9 +1238,6 @@
             word-break: break-word;
         }
 
-        /* Specific fixes for common overlap areas */
-
-        /* Fix for headings in narrow viewports */
         .topic-title,
         .concept-card h3,
         .feature-card h3,
@@ -1262,7 +1248,6 @@
             line-height: 1.3;
         }
 
-        /* Fix for long code lines in code blocks */
         .code-block {
             overflow-x: auto;
             white-space: pre;
@@ -1276,7 +1261,6 @@
             overflow-x: auto;
         }
 
-        /* Fix for lists to prevent overlap */
         .concept-features {
             padding-right: 0.5rem;
         }
@@ -1288,7 +1272,6 @@
             overflow-wrap: break-word;
         }
 
-        /* Responsive text sizing with minimum constraints */
         .hero-subtitle,
         .intro-content p,
         .card p,
@@ -1304,7 +1287,6 @@
             text-justify: inter-word;
         }
 
-        /* Prevent overlap in grid layouts */
         .path-steps,
         .concept-cards,
         .feature-grid,
@@ -1316,12 +1298,10 @@
             gap: 2rem;
         }
 
-        /* Ensure proper spacing between text elements */
         p, ul, ol {
             margin-bottom: 1.2rem;
         }
 
-        /* Fix for footer links to prevent overlap */
         footer a {
             display: inline-block;
             max-width: 100%;
@@ -1330,7 +1310,7 @@
             text-overflow: ellipsis;
         }
 
-        /* Fix for buttons with long text */
+        
         .btn {
             white-space: nowrap;
             overflow: hidden;
@@ -1395,14 +1375,13 @@
                 padding: 1rem 2rem;
             }
 
-            /* Improve text readability on mobile */
+            
             body {
                 text-rendering: optimizeLegibility;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
             }
             
-            /* Adjust text justification on smaller screens */
             .hero-subtitle,
             .intro-content p,
             .card p,
@@ -1414,21 +1393,18 @@
                 hyphens: manual;
             }
             
-            /* Increase spacing for better readability */
             .card,
             .fundamental-topic,
             .toc-section {
                 padding: 1.5rem;
             }
             
-            /* Prevent text overflow in headings */
             .hero-title,
             .section-title {
                 word-break: break-word;
                 overflow-wrap: break-word;
             }
-            
-            /* Adjust grid layouts for mobile */
+        
             .path-steps,
             .concept-cards,
             .feature-grid {
@@ -1436,15 +1412,11 @@
                 gap: 1.5rem;
             }
             
-            /* Fix for long words/URLs */
         .code-block,
         pre {
             font-size: 0.85rem;
         }
 
-        /* ========================
-           SOCIAL SHARE BUTTONS
-        ======================== */
         .share-container {
             margin-top: 2rem;
             display: flex;
@@ -1511,7 +1483,6 @@
             background: linear-gradient(135deg, #1a1a1a, #333333);
         }
 
-        /* Responsive share buttons */
         @media (max-width: 768px) {
             .share-container {
                 flex-direction: column;
@@ -1537,15 +1508,13 @@
                 font-size: 0.85rem;
             }
 
-            /* Button text adjustments for mobile */
+            
             .btn {
                 white-space: normal;
                 line-height: 1.4;
                 padding-top: 0.9rem;
                 padding-bottom: 0.9rem;
-            }
-
-            /* AdSense adjustments for mobile */
+                
             .ad-container {
                 padding: 1rem;
                 margin: 1.5rem auto;
@@ -1602,12 +1571,11 @@
                 font-size: 1.8rem;
             }
             
-            /* Prevent any potential overlap */
+            
             * {
                 max-width: 100%;
             }
             
-            /* Ensure code blocks are scrollable */
             .code-block {
                 margin-left: -1rem;
                 margin-right: -1rem;
@@ -1620,7 +1588,6 @@
             }
         }
 
-        /* Fix for Firefox text rendering */
         @-moz-document url-prefix() {
             .intro-content p,
             .fundamental-topic p,
@@ -1629,7 +1596,6 @@
             }
         }
 
-        /* Print styles to prevent overlap */
         @media print {
             .card,
             .fundamental-topic,
@@ -1649,7 +1615,7 @@
                 word-wrap: break-word;
             }
 
-            /* Hide ads in print */
+            
             .ad-container {
                 display: none;
             }
@@ -1861,7 +1827,7 @@
     </style>
 </head>
 <body>
-    <!-- Reading Progress Bar -->
+    
     <div class="reading-progress" id="readingProgress"></div>
 
     <header>
@@ -1874,7 +1840,6 @@
         </button>
     </header>
 
-    <!-- Navigation Overlay -->
     <div class="nav-overlay" id="navOverlay">
         <button class="nav-close" id="navClose" aria-label="Close navigation menu">
             <i class="fas fa-times"></i>
@@ -1888,7 +1853,6 @@
             <a href="abstraction/abstraction.html" class="nav-link"><i class="fas fa-layer-group"></i> Abstraction</a>
             <a href="inheritance/inheritance.html" class="nav-link"><i class="fas fa-sitemap"></i> Inheritance</a>
             <a href="polymorphism/polymorphism.html" class="nav-link"><i class="fas fa-shapes"></i> Polymorphism</a>
-            
             <a href="./python-tuples.html" class="nav-link"><i class="fas fa-circle-nodes"></i> Tuples</a>
             <a href="./python-functions.html" class="nav-link"><i class="fas fa-bolt"></i> Functions</a>
             <a href="./python-strings" class="nav-link"><i class="fas fa-quote-right"></i> Strings</a>
@@ -1897,10 +1861,6 @@
             <a href="./projects.html" class="nav-link"><i class="fas fa-code"></i> Projects</a>
         </div>
     </div>
-
-    <!-- ========================
-         HERO SECTION
-    ======================== -->
     <section class="hero">
         <div class="hero-content">
             
@@ -1914,8 +1874,6 @@
                 best practices, and architectural principles used by top tech companies to build scalable, 
                 maintainable applications.
             </p>
-
-            <!-- TABLE OF CONTENTS -->
             <div class="toc-container fade-in">
                 <h2 class="toc-title">
                     <i class="fas fa-book-open"></i> Table of Contents
@@ -2192,10 +2150,6 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- ========================
-                 ADSENSE MID-CONTENT
-            ======================== -->
             <div class="ad-container fade-in">
                 <div class="ad-label">ADVERTISEMENT</div>
                 <!-- Programming_Tutorial -->
@@ -2209,8 +2163,7 @@
                     (adsbygoogle = window.adsbygoogle || []).push({});
                 </script>
             </div>
-            
-            <!-- 2: SIGNIFICANCE OF METHODS -->
+        
             <div class="fundamental-topic fade-in delay-1" id="methods">
                 <div class="topic-header">
                     <div class="topic-icon">
@@ -2271,7 +2224,6 @@
                 </div>
             </div>
             
-            <!-- 3: ROLES OF ATTRIBUTES -->
             <div class="fundamental-topic fade-in delay-2" id="attributes">
                 <div class="topic-header">
                     <div class="topic-icon">
@@ -2340,9 +2292,6 @@
                 </div>
             </div>
             
-            <!-- ========================
-                 ADSENSE MID-CONTENT 2
-            ======================== -->
             <div class="ad-container fade-in delay-1">
                 <div class="ad-label">ADVERTISEMENT</div>
                 <!-- Programming_Tutorial -->
@@ -2357,7 +2306,6 @@
                 </script>
             </div>
             
-            <!-- 4: ESSENCE OF INSTANTIATION -->
             <div class="fundamental-topic fade-in delay-3" id="instantiation">
                 <div class="topic-header">
                     <div class="topic-icon">
@@ -2453,10 +2401,6 @@ dynamic_obj = DynamicClass()</code></pre>
                 </div>
             </div>
         </section>
-
-        <!-- ========================
-             ADSENSE BETWEEN SECTIONS
-        ======================== -->
         <div class="ad-container fade-in">
             <div class="ad-label">ADVERTISEMENT</div>
             <!-- Programming_Tutorial -->
@@ -2470,10 +2414,6 @@ dynamic_obj = DynamicClass()</code></pre>
                 (adsbygoogle = window.adsbygoogle || []).push({});
             </script>
         </div>
-
-        <!-- ========================
-             WHY PYTHON OOP SECTION
-        ======================== -->
         <section id="why-oop" class="why-section fade-in">
             <h2 class="section-title">Why Master Python OOP in 2026?</h2>
             <p class="section-subtitle">
@@ -2503,10 +2443,6 @@ dynamic_obj = DynamicClass()</code></pre>
                 </div>
             </div>
         </section>
-
-        <!-- ========================
-             LEARNING OUTCOMES
-        ======================== -->
         <section class="learning-outcomes fade-in" id="master-outcomes">
             <h2 class="section-title">What You'll Learn</h2>
             <p class="section-subtitle">
@@ -2545,10 +2481,6 @@ dynamic_obj = DynamicClass()</code></pre>
                 </div>
             </div>
         </section>
-
-        <!-- ========================
-             ADSENSE BETWEEN SECTIONS 2
-        ======================== -->
         <div class="ad-container fade-in delay-1">
             <div class="ad-label">ADVERTISEMENT</div>
             <!-- Programming_Tutorial -->
@@ -2562,10 +2494,6 @@ dynamic_obj = DynamicClass()</code></pre>
                 (adsbygoogle = window.adsbygoogle || []).push({});
             </script>
         </div>
-
-        <!-- ========================
-             LEARNING PATH SECTION
-        ======================== -->
         <section id="learning-path" class="learning-path fade-in">
             <h2 class="section-title">Your 4-Week Python OOP Mastery Path</h2>
             <p class="section-subtitle">
@@ -2639,10 +2567,6 @@ dynamic_obj = DynamicClass()</code></pre>
                 </div>
             </div>
         </section>
-
-        <!-- ========================
-             FEATURES SECTION
-        ======================== -->
         <section class="features-section fade-in">
             <h2 class="section-title">Comprehensive Learning Experience</h2>
             <p class="section-subtitle">
@@ -2675,10 +2599,6 @@ dynamic_obj = DynamicClass()</code></pre>
                 </div>
             </div>
         </section>
-
-        <!-- ========================
-             ADSENSE BEFORE CONCEPTS
-        ======================== -->
         <div class="ad-container fade-in delay-2">
             <div class="ad-label">ADVERTISEMENT</div>
             <!-- Programming_Tutorial -->
@@ -2692,10 +2612,6 @@ dynamic_obj = DynamicClass()</code></pre>
                 (adsbygoogle = window.adsbygoogle || []).push({});
             </script>
         </div>
-
-        <!-- ========================
-             OOP CONCEPTS SECTION
-        ======================== -->
         <section id="concepts" class="concepts-section fade-in">
             <h2 class="section-title">Learn Essential Python OOP Concepts</h2>
             <p class="section-subtitle">
@@ -2777,10 +2693,6 @@ dynamic_obj = DynamicClass()</code></pre>
                 </div>
             </div>
         </section>
-
-        <!-- ========================
-             ADSENSE BEFORE FINAL CTA
-        ======================== -->
         <div class="ad-container fade-in delay-3">
             <div class="ad-label">ADVERTISEMENT</div>
             <!-- Programming_Tutorial -->
@@ -2794,10 +2706,6 @@ dynamic_obj = DynamicClass()</code></pre>
                 (adsbygoogle = window.adsbygoogle || []).push({});
             </script>
         </div>
-
-        <!-- ========================
-             FINAL CTA SECTION
-        ======================== -->
         <section class="final-cta fade-in">
             <h2 style="font-size:1.5 rem;">OOP in 2026?</h2>
             <p style="font-size: 1.1rem; color: var(--text-muted); margin-bottom: 3rem; max-width: 800px; margin-left: auto; margin-right: auto;text-align: justify;">
@@ -2824,9 +2732,6 @@ dynamic_obj = DynamicClass()</code></pre>
         </section>
     </main>
 
-    <!-- ========================
-         SOCIAL SHARING SECTION
-    ======================== -->
     <section style="background: var(--midnight-blue); padding: 4rem 5vw; margin-top: 3rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
         <div style="max-width: 900px; margin: 0 auto; text-align: center;">
             <h2 style="color: var(--electric-blue); font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 1rem; font-weight: 800;">
