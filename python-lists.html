@@ -1,0 +1,2372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Complete Python 3.10+ lists guide with detailed explanations, list methods with examples, list comprehensions, slicing, and practical use cases.">
+    <meta name="keywords" content="Python lists, Python 3.10 list methods, list comprehension, Python data structures, list slicing, Python tutorial, Glenn Junsay Pansensoy, Poetic Codes">
+    <meta name="author" content="Glenn Junsay Pansensoy">
+    <meta property="og:title" content="Python Lists Guide | Poetic Codes">
+    <meta property="og:description" content="Master Python 3.10+ lists with our comprehensive guide covering all methods, examples, and best practices.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pansensoyglenn-dev.github.io/poetic-codes/python-lists">
+    <meta property="og:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-lists-social.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Python 3.10+ Lists Guide Preview">
+    <meta property="og:site_name" content="Poetic Codes">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Glenn Junsay Pansensoy">
+    
+    <meta property="og:type" content="article">
+    <meta property="article:published_time" content="2026-01-01T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-01-01T00:00:00+00:00">
+    <meta property="article:tag" content="Python">
+    <meta property="article:tag" content="Programming">
+    <meta property="article:tag" content="Lists">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Python 3.10+ Lists Guide | Poetic Codes">
+    <meta name="twitter:description" content="Master Python 3.10+ lists with our comprehensive guide covering all methods, examples, and best practices.">
+    <meta name="twitter:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-lists-twitter.png">
+    <meta name="twitter:creator" content="@GlennPansensoy">
+    <meta name="twitter:site" content="@GlennPansensoy">
+    
+    <title>Python 3.10+ Lists Guide | Poetic Codes by Glenn Junsay Pansensoy</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        
+        .menu-toggle {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 1001;
+            padding: 8px;
+            background: transparent;
+            border: none;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-toggle span {
+            width: 28px;
+            height: 3px;
+            background: #3b82f6;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            display: block;
+            position: relative;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: translateY(10px) rotate(45deg);
+        }
+        
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+            transform: scale(0);
+        }
+        
+        .menu-toggle.active span:nth-child(3) {
+            transform: translateY(-10px) rotate(-45deg);
+        }
+
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13,17,23,0.98);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 5rem;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+            transform: translateX(100%);
+        }
+
+        .nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            width: 100%;
+            max-width: 350px;
+            padding: 0.5rem 0.8rem 1rem;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .nav-links a {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            background: #3b82f6;
+            border: 1.5px solid #60a5fa;
+            box-shadow: 0 1px 4px rgba(59, 130, 246, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.6rem;
+        }
+
+        .nav-links a:hover {
+            background: #60a5fa;
+            transform: translateX(3px);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+            border-color: #8b5cf6;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: #8b5cf6;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a:hover::before {
+            transform: translateX(0);
+        }
+
+        .nav-links a i {
+            font-size: 0.9rem;
+            color: #fbbf24;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .nav-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.8rem;
+            color: #3b82f6;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 8px;
+            z-index: 1002;
+            transition: all 0.3s ease;
+        }
+
+        .nav-close:hover {
+            transform: rotate(90deg);
+            color: #8b5cf6;
+        }
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1003;
+        
+        /* ===== SOCIAL SHARE BUTTONS ===== */
+        .share-container {
+            margin-top: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .share-btn i {
+            font-size: 1.1rem;
+        }
+
+        .share-facebook {
+            background: linear-gradient(135deg, #1877f2, #0d65d9);
+        }
+
+        .share-facebook:hover {
+            background: linear-gradient(135deg, #0d65d9, #084fa0);
+        }
+
+        .share-linkedin {
+            background: linear-gradient(135deg, #0077b5, #005885);
+        }
+
+        .share-linkedin:hover {
+            background: linear-gradient(135deg, #005885, #003d5c);
+        }
+
+        .share-twitter {
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+        }
+
+        .share-twitter:hover {
+            background: linear-gradient(135deg, #1a1a1a, #333333);
+        }
+
+        /* ===== FOOTER LEGAL LINKS ===== */
+        .footer-legal-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1e293b;
+        }
+        
+        .footer-legal-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+        
+        .footer-legal-links a:hover {
+            color: #60a5fa;
+        }
+        
+        
+        .return-home-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            text-align: center;
+            margin: 1rem auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .return-home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+            color: white;
+            text-decoration: none;
+            background: linear-gradient(135deg, #4f8ef7, #9b6df9);
+        }
+        
+        .return-home-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .return-home-btn i {
+            margin-right: 0.5rem;
+        }
+        
+        .return-container {
+            text-align: center;
+            margin: 1rem 0 2rem 0;
+        }
+        
+        .nav-links a.return-home-nav {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border-left: 4px solid #3b82f6;
+            margin-top: 1rem;
+        }
+        
+        .nav-links a.return-home-nav:hover {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+        }
+        
+        .python-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-left: 1rem;
+            vertical-align: middle;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .python-feature-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border-left: 4px solid #3b82f6;
+            padding: 1.2rem 1.5rem;
+            margin: 1.2rem 0;
+            border-radius: 0 8px 8px 0;
+            border: 1px solid #1e293b;
+        }
+        
+        .python-feature-box strong {
+            color: #60a5fa;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .method-card {
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #1e293b;
+            transition: all 0.3s ease;
+            height: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .method-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
+        }
+        
+        .method-card h4 {
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .method-card h4 i {
+            font-size: 1.1rem;
+            color: #8b5cf6;
+        }
+        
+        .method-syntax {
+            background-color: #0c1219;
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+            color: #f59e0b;
+            font-size: 0.9rem;
+            border: 1px solid #1e293b;
+            overflow-x: auto;
+        }
+        
+        /* Exercise Box */
+        .exercise-box {
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid #1e293b;
+            border-left: 4px solid #10b981;
+            transition: all 0.3s ease;
+        }
+        
+        .exercise-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.2);
+        }
+        
+        .exercise-box h4 {
+            color: #34d399;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .exercise-box h4 i {
+            color: #10b981;
+        }
+        
+        /* Tables */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #1e293b;
+            min-width: 600px;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #e2e8f0;
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #1e293b;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #0f172a;
+        }
+        
+        tr:hover {
+            background-color: #1e293b;
+        }
+        
+        /* Copy Button for Code Examples */
+        .copy-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: 'Segoe UI', sans-serif;
+            z-index: 2;
+        }
+        
+        .copy-button:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        /* All other CSS from the dictionaries page */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0e14;
+            color: #c7c9cb;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(18, 27, 39, 0.8) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(18, 27, 39, 0.6) 0%, transparent 20%);
+            overflow-x: hidden;
+        }
+        
+        /* Header styles */
+        header {
+            background: linear-gradient(135deg, #0c1219 0%, #111827 100%);
+            color: #e2e8f0;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #1e293b;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+        }
+        
+        .logo a {
+            color: transparent;
+            text-decoration: none;
+        }
+        
+        /* Main content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #1e293b;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+        
+        .hero h1 {
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.3;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto 1rem;
+            position: relative;
+            z-index: 1;
+            line-height: 1.5;
+        }
+        
+        .author {
+            margin-top: 1rem;
+            color: #8b5cf6;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        
+        /* Content sections */
+        section {
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border: 1px solid #1e293b;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+        
+        h2 {
+            color: #60a5fa;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #1e293b;
+            font-size: 1.6rem;
+            position: relative;
+            line-height: 1.3;
+        }
+        
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, transparent);
+        }
+        
+        h3 {
+            color: #a78bfa;
+            margin: 1.5rem 0 1rem;
+            font-size: 1.3rem;
+            line-height: 1.3;
+        }
+        
+        p {
+            margin-bottom: 1.2rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        
+        /* Code examples */
+        .code-example {
+            background-color: #0c1219;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+            -webkit-overflow-scrolling: touch;
+            font-size: 0.95rem;
+            position: relative;
+        }
+        
+        .code-example code {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            display: block;
+            min-width: min-content;
+        }
+        
+        .code-comment {
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .code-keyword {
+            color: #f472b6;
+        }
+        
+        .code-string {
+            color: #34d399;
+        }
+        
+        .code-function {
+            color: #60a5fa;
+        }
+        
+        .code-operator {
+            color: #fbbf24;
+        }
+        
+        .code-number {
+            color: #f59e0b;
+        }
+        
+        .code-list {
+            color: #8b5cf6;
+        }
+        
+        .example-output {
+            background-color: #0f172a;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+            border: 1px solid #1e293b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+        
+        .example-output strong {
+            color: #60a5fa;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* List styles */
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.8rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+        
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+            transition: color 0.3s;
+            word-break: break-word;
+        }
+        
+        a:hover {
+            color: #8b5cf6;
+            text-decoration: underline;
+        }
+        
+        /* Info boxes */
+        .info-box, .warning-box {
+            background-color: #0f172a;
+            border-left: 4px solid #10b981;
+            padding: 1.2rem 1.5rem;
+            margin: 1.2rem 0;
+            border-radius: 0 8px 8px 0;
+            border: 1px solid #1e293b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .warning-box {
+            border-left-color: #f59e0b;
+        }
+        
+        .info-box strong, .warning-box strong {
+            color: #60a5fa;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #0c1219 0%, #111827 100%);
+            color: #cbd5e1;
+            padding: 2.5rem 1.5rem 1.5rem;
+            margin-top: 3rem;
+            border-top: 1px solid #1e293b;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-section h3 {
+            color: #a78bfa;
+            margin-bottom: 1.2rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        
+        .footer-section h3::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, #8b5cf6, transparent);
+        }
+        
+        .footer-section p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.6rem;
+        }
+        
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            font-size: 0.95rem;
+        }
+        
+        .footer-links a:hover {
+            color: #60a5fa;
+            transform: translateX(5px);
+        }
+        
+        .social-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 50%;
+            color: #60a5fa;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid #334155;
+            flex-shrink: 0;
+        }
+        
+        .social-icons a:hover {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            transform: translateY(-3px);
+            border-color: #3b82f6;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1e293b;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .copyright p {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Social Sharing Widget Styles */
+        #social-sharing {
+            transition: all 0.3s ease;
+        }
+        
+        #social-sharing:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+        
+        .social-btn {
+            background: #1877F2;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 180px;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .social-btn[data-platform="linkedin"] {
+            background: #0A66C2;
+        }
+        
+        .social-btn[data-platform="twitter"] {
+            background: #000000;
+        }
+        
+        #copy-link-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        #copy-link-btn:hover {
+            background: linear-gradient(135deg, #4f8ef7, #9b6df9);
+            transform: translateY(-2px);
+        }
+        
+        #refresh-suggestion {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid #3b82f6;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        #refresh-suggestion:hover {
+            background: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        #shareable-link {
+            flex: 1;
+            background: #0c1219;
+            border: 1px solid #1e293b;
+            color: #cbd5e1;
+            padding: 0.8rem;
+            border-radius: 8px 0 0 8px;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .hero {
+                padding: 2rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+                border-radius: 12px;
+            }
+            
+            h2 {
+                font-size: 1.4rem;
+                margin-bottom: 1.2rem;
+            }
+            
+            h3 {
+                font-size: 1.2rem;
+                margin: 1.2rem 0 0.8rem;
+            }
+            
+            .code-example {
+                padding: 1.2rem;
+                margin: 1.2rem 0;
+                font-size: 0.9rem;
+                border-radius: 10px;
+            }
+            
+            .code-example code {
+                font-size: 0.9rem;
+            }
+            
+            .example-output, .info-box, .warning-box, .python-feature-box {
+                padding: 1rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            
+            table {
+                min-width: 700px;
+            }
+            
+            .method-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                gap: 1.5rem;
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-section {
+                margin-bottom: 1rem;
+            }
+            
+            .return-home-btn {
+                padding: 0.7rem 1.3rem;
+                font-size: 0.95rem;
+            }
+            
+            .footer-legal-links {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+            
+            /* Social sharing responsive */
+            #social-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .social-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .share-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .share-btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            #share-stats {
+                justify-content: center;
+            }
+            
+            #shareable-link {
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header {
+                padding: 0.8rem 1rem;
+            }
+            
+            .logo {
+                font-size: 1.3rem;
+            }
+            
+            .hero h1 {
+                font-size: 1.4rem;
+            }
+            
+            .hero p {
+                font-size: 0.95rem;
+            }
+            
+            .author {
+                font-size: 0.9rem;
+            }
+            
+            section {
+                padding: 1.2rem;
+                border-radius: 10px;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            h3 {
+                font-size: 1.1rem;
+            }
+            
+            .code-example {
+                padding: 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .code-example code {
+                font-size: 0.85rem;
+            }
+            
+            .nav-links a {
+                padding: 16px 20px;
+                font-size: 1rem;
+            }
+            
+            .social-icons a {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .copyright {
+                font-size: 0.8rem;
+            }
+            
+            .return-home-btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+                margin: 0.5rem auto;
+            }
+            
+            /* Social sharing extra small screens */
+            .social-btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.9rem;
+                min-width: auto;
+            }
+            
+            #shareable-link {
+                padding: 0.7rem;
+                font-size: 0.75rem;
+            }
+            
+            #copy-link-btn {
+                padding: 0.7rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .hero h1 {
+                font-size: 1.3rem;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            h2 {
+                font-size: 1.2rem;
+            }
+            
+            .code-example {
+                padding: 0.9rem;
+                font-size: 0.8rem;
+            }
+            
+            .return-home-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            /* Social sharing for very small screens */
+            #social-buttons {
+                gap: 0.5rem;
+            }
+            
+            .social-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0c1219;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #60a5fa, #a78bfa);
+        }
+        
+        /* Selection styling */
+        ::selection {
+            background-color: rgba(59, 130, 246, 0.5);
+            color: white;
+        }
+        
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        }
+        
+        /* Social sharing animations */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <a href="https://pansensoyglenn-dev.github.io/poetic-codes">POETIC CODES</a>
+        </div>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <!-- Navigation Overlay -->
+    <div class="nav-overlay" id="navOverlay">
+        <button class="nav-close" id="navClose" aria-label="Close navigation menu">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="#introduction" class="nav-link">Introduction</a>
+            <a href="#characteristics" class="nav-link">Key Characteristics</a>
+            <a href="#creation" class="nav-link">Creating Lists</a>
+            <a href="#methods" class="nav-link">List Methods</a>
+            <a href="#comprehensions" class="nav-link">List Comprehensions</a>
+            <a href="#slicing" class="nav-link">List Slicing</a>
+            <a href="#operations" class="nav-link">List Operations</a>
+            <a href="#exercises" class="nav-link">Practice Exercises</a>
+            <a href="#resources" class="nav-link">Resources</a>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <main class="container">
+        <section class="hero">
+            <h1>Python 3.10+ Lists: Complete Guide with Examples <span class="python-badge">Python 3.10+</span></h1>
+            <p>A comprehensive tutorial on Python 3.10+ lists, covering creation, manipulation, methods, comprehensions, slicing, and best practices with practical code examples.</p>
+            <p class="author">By Glenn Junsay Pansensoy</p>
+        </section>
+        
+        <!-- Added Return Home button after hero section -->
+        <div class="return-container">
+            <a href="index.html" class="return-home-btn">
+                <i class="fas fa-arrow-left"></i> Return Home
+            </a>
+        </div>
+        
+        <section id="introduction">
+            <h2>Introduction to Python Lists</h2>
+            <p>Python lists are one of the most versatile and commonly used data structures in the Python programming language. A list is an ordered, mutable collection of items that can hold elements of different data types.</p>
+            <p>Lists are fundamental to Python programming and provide a powerful way to organize, store, and manipulate data efficiently. They are especially useful in Python 3.10+ with improved pattern matching capabilities.</p>
+            
+            <div class="python-feature-box">
+                <strong>Python 3.10+ Feature:</strong> Python 3.10 introduced improved error messages and structural pattern matching, which can be particularly useful when working with lists and their operations.
+            </div>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Basic list examples in Python 3.10+</span><br>
+                    <span class="code-keyword">fruits</span> = [<span class="code-string">"apple"</span>, <span class="code-string">"banana"</span>, <span class="code-string">"cherry"</span>, <span class="code-string">"date"</span>]<br>
+                    <span class="code-keyword">numbers</span> = [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>, <span class="code-number">4</span>, <span class="code-number">5</span>]<br>
+                    <span class="code-keyword">mixed_list</span> = [<span class="code-string">"Python"</span>, <span class="code-number">3.10</span>, <span class="code-number">42</span>, <span class="code-keyword">True</span>, [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>]]<br>
+                    <br>
+                    <span class="code-comment"># Accessing list elements</span><br>
+                    <span class="code-keyword">first_fruit</span> = fruits[<span class="code-number">0</span>]  <span class="code-comment"># "apple"</span><br>
+                    <span class="code-keyword">last_number</span> = numbers[-<span class="code-number">1</span>]  <span class="code-comment"># 5</span><br>
+                    <br>
+                    <span class="code-comment"># Python 3.10+ structural pattern matching with lists</span><br>
+                    <span class="code-keyword">def</span> <span class="code-function">process_list</span>(lst):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">match</span> lst:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">case</span> []:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">"Empty list"</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">case</span> [x]:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">f"Single element: {x}"</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">case</span> [x, y, *rest]:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">f"First: {x}, Second: {y}, Rest: {rest}"</span>
+                </code>
+            </div>
+        </section>
+        
+        <section id="characteristics">
+            <h2>Key Characteristics of Python Lists</h2>
+            
+            <h3>Ordered Collection</h3>
+            <p>Lists maintain the order of elements as they are inserted. This means you can rely on the position of elements remaining consistent unless explicitly modified.</p>
+            
+            <h3>Mutable (Changeable)</h3>
+            <p>Unlike tuples, lists can be modified after creation. You can add, remove, or change elements within a list.</p>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Lists are mutable</span><br>
+                    <span class="code-keyword">colors</span> = [<span class="code-string">"red"</span>, <span class="code-string">"green"</span>, <span class="code-string">"blue"</span>]<br>
+                    colors[<span class="code-number">1</span>] = <span class="code-string">"yellow"</span>  <span class="code-comment"># Change element at index 1</span><br>
+                    <span class="code-comment"># colors is now ["red", "yellow", "blue"]</span>
+                </code>
+            </div>
+            
+            <div class="info-box">
+                <strong>Key Characteristics Summary:</strong>
+                <ul>
+                    <li>Ordered collection maintains element sequence</li>
+                    <li>Mutable - can be changed after creation</li>
+                    <li>Dynamic sizing - automatically resizes</li>
+                    <li>Heterogeneous elements - can mix data types</li>
+                    <li>Zero-based indexing with negative indexing support</li>
+                    <li>Efficient for most operations</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="creation">
+            <h2>Creating Lists in Python 3.10+</h2>
+            <p>There are several ways to create lists in Python, each suited for different scenarios:</p>
+            
+            <div class="method-grid">
+                <div class="method-card">
+                    <h4><i class="fas fa-square-bracket"></i> Square Brackets</h4>
+                    <p>The most common method using square brackets with comma-separated values.</p>
+                    <div class="method-syntax">my_list = [1, 2, 3, 4, 5]</div>
+                </div>
+                
+                <div class="method-card">
+                    <h4><i class="fas fa-list-alt"></i> list() Constructor</h4>
+                    <p>Using the list() constructor with an iterable (string, tuple, range, etc.).</p>
+                    <div class="method-syntax">numbers = list(range(10))</div>
+                </div>
+                
+                <div class="method-card">
+                    <h4><i class="fas fa-magic"></i> List Comprehension</h4>
+                    <p>Elegant way to create lists based on existing iterables with conditions.</p>
+                    <div class="method-syntax">squares = [x**2 for x in range(10)]</div>
+                </div>
+            </div>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Different ways to create lists</span><br>
+                    <span class="code-comment"># Method 1: Direct assignment with square brackets</span><br>
+                    <span class="code-keyword">colors</span> = [<span class="code-string">"red"</span>, <span class="code-string">"green"</span>, <span class="code-string">"blue"</span>]<br>
+                    <br>
+                    <span class="code-comment"># Method 2: Using list() constructor</span><br>
+                    <span class="code-keyword">empty_list</span> = <span class="code-function">list</span>()<br>
+                    <span class="code-keyword">char_list</span> = <span class="code-function">list</span>(<span class="code-string">"Python"</span>)  <span class="code-comment"># Creates ['P', 'y', 't', 'h', 'o', 'n']</span><br>
+                    <br>
+                    <span class="code-comment"># Method 3: From a range object</span><br>
+                    <span class="code-keyword">numbers</span> = <span class="code-function">list</span>(<span class="code-function">range</span>(<span class="code-number">1</span>, <span class="code-number">11</span>))  <span class="code-comment"># Creates [1, 2, 3, ..., 10]</span><br>
+                    <br>
+                    <span class="code-comment"># Method 4: Using split() method on strings</span><br>
+                    <span class="code-keyword">sentence</span> = <span class="code-string">"Python is amazing"</span><br>
+                    <span class="code-keyword">words</span> = sentence.<span class="code-function">split</span>()  <span class="code-comment"># Creates ['Python', 'is', 'amazing']</span><br>
+                    <br>
+                    <span class="code-comment"># Method 5: Using unpacking with * operator (Python 3.5+)</span><br>
+                    <span class="code-keyword">list1</span> = [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>]<br>
+                    <span class="code-keyword">list2</span> = [*list1, <span class="code-number">4</span>, <span class="code-number">5</span>]  <span class="code-comment"># Creates [1, 2, 3, 4, 5]</span>
+                </code>
+            </div>
+        </section>
+        
+        <section id="methods">
+            <h2>Complete List Methods Reference</h2>
+            <p>Python provides a rich set of built-in methods to manipulate lists. Here's a comprehensive table of all list methods:</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Description</th>
+                            <th>Time Complexity</th>
+                            <th>Python 3.10+ Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>append(x)</td>
+                            <td>Adds element x to the end of the list</td>
+                            <td>O(1)</td>
+                            <td>No changes</td>
+                        </tr>
+                        <tr>
+                            <td>extend(iterable)</td>
+                            <td>Extends list by appending elements from iterable</td>
+                            <td>O(k) where k is length of iterable</td>
+                            <td>Accepts any iterable</td>
+                        </tr>
+                        <tr>
+                            <td>insert(i, x)</td>
+                            <td>Inserts element x at position i</td>
+                            <td>O(n)</td>
+                            <td>Negative indices supported</td>
+                        </tr>
+                        <tr>
+                            <td>remove(x)</td>
+                            <td>Removes first occurrence of element x</td>
+                            <td>O(n)</td>
+                            <td>Raises ValueError if not found</td>
+                        </tr>
+                        <tr>
+                            <td>pop([i])</td>
+                            <td>Removes and returns element at position i (default last)</td>
+                            <td>O(1) for end, O(n) for arbitrary position</td>
+                            <td>Returns popped element</td>
+                        </tr>
+                        <tr>
+                            <td>clear()</td>
+                            <td>Removes all elements from the list</td>
+                            <td>O(1)</td>
+                            <td>Clears in place</td>
+                        </tr>
+                        <tr>
+                            <td>index(x[, start[, end]])</td>
+                            <td>Returns index of first occurrence of x</td>
+                            <td>O(n)</td>
+                            <td>Optional start/end parameters</td>
+                        </tr>
+                        <tr>
+                            <td>count(x)</td>
+                            <td>Returns count of how many times x appears</td>
+                            <td>O(n)</td>
+                            <td>Works with any hashable object</td>
+                        </tr>
+                        <tr>
+                            <td>sort(key=None, reverse=False)</td>
+                            <td>Sorts the list in place</td>
+                            <td>O(n log n)</td>
+                            <td>Stable sort, accepts key function</td>
+                        </tr>
+                        <tr>
+                            <td>reverse()</td>
+                            <td>Reverses elements of list in place</td>
+                            <td>O(n)</td>
+                            <td>Modifies list in place</td>
+                        </tr>
+                        <tr>
+                            <td>copy()</td>
+                            <td>Returns a shallow copy of the list</td>
+                            <td>O(n)</td>
+                            <td>Same as list[:]</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <h3>Detailed Method Examples</h3>
+            
+            <div class="method-grid">
+                <div class="method-card">
+                    <h4><i class="fas fa-plus-circle"></i> append() vs extend()</h4>
+                    <p>Understanding the difference between these two commonly confused methods:</p>
+                    <div class="code-example">
+                        <code>
+                            <span class="code-comment"># append() adds the entire object as a single element</span><br>
+                            list1 = [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>]<br>
+                            list1.<span class="code-function">append</span>([<span class="code-number">4</span>, <span class="code-number">5</span>])<br>
+                            <span class="code-output"># Result: [1, 2, 3, [4, 5]]</span><br>
+                            <br>
+                            <span class="code-comment"># extend() adds elements from the iterable individually</span><br>
+                            list2 = [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>]<br>
+                            list2.<span class="code-function">extend</span>([<span class="code-number">4</span>, <span class="code-number">5</span>])<br>
+                            <span class="code-output"># Result: [1, 2, 3, 4, 5]</span>
+                        </code>
+                    </div>
+                </div>
+                
+                <div class="method-card">
+                    <h4><i class="fas fa-sort"></i> Advanced Sorting</h4>
+                    <p>Using key functions and reverse parameters for complex sorting:</p>
+                    <div class="code-example">
+                        <code>
+                            <span class="code-keyword">students</span> = [<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;(<span class="code-string">"Alice"</span>, <span class="code-number">85</span>),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;(<span class="code-string">"Bob"</span>, <span class="code-number">92</span>),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;(<span class="code-string">"Charlie"</span>, <span class="code-number">78</span>)<br>
+                            ]<br>
+                            <br>
+                            <span class="code-comment"># Sort by score (second element of tuple)</span><br>
+                            students.<span class="code-function">sort</span>(key=<span class="code-keyword">lambda</span> x: x[<span class="code-number">1</span>], reverse=<span class="code-keyword">True</span>)<br>
+                            <span class="code-output"># Result: [('Bob', 92), ('Alice', 85), ('Charlie', 78)]</span>
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="comprehensions">
+            <h2>List Comprehensions: Pythonic Way to Create Lists</h2>
+            <p>List comprehensions provide a concise and readable way to create lists. They are generally faster than traditional for-loops and considered more "Pythonic".</p>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Basic list comprehension</span><br>
+                    <span class="code-keyword">squares</span> = [x**<span class="code-number">2</span> <span class="code-keyword">for</span> x <span class="code-keyword">in</span> <span class="code-function">range</span>(<span class="code-number">10</span>)]<br>
+                    <span class="code-output"># Output: [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]</span><br>
+                    <br>
+                    <span class="code-comment"># With conditional filtering</span><br>
+                    <span class="code-keyword">even_squares</span> = [x**<span class="code-number">2</span> <span class="code-keyword">for</span> x <span class="code-keyword">in</span> <span class="code-function">range</span>(<span class="code-number">10</span>) <span class="code-keyword">if</span> x % <span class="code-number">2</span> == <span class="code-number">0</span>]<br>
+                    <span class="code-output"># Output: [0, 4, 16, 36, 64]</span><br>
+                    <br>
+                    <span class="code-comment"># Complex transformation with if-else</span><br>
+                    <span class="code-keyword">numbers</span> = [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>, <span class="code-number">4</span>, <span class="code-number">5</span>, <span class="code-number">6</span>]<br>
+                    <span class="code-keyword">result</span> = [<span class="code-string">"even"</span> <span class="code-keyword">if</span> x % <span class="code-number">2</span> == <span class="code-number">0</span> <span class="code-keyword">else</span> <span class="code-string">"odd"</span> <span class="code-keyword">for</span> x <span class="code-keyword">in</span> numbers]<br>
+                    <span class="code-output"># Output: ['odd', 'even', 'odd', 'even', 'odd', 'even']</span>
+                </code>
+            </div>
+            
+            <div class="warning-box">
+                <strong>When to Avoid List Comprehensions:</strong>
+                <ul>
+                    <li>The logic is too complex (nested comprehensions can be hard to read)</li>
+                    <li>You need to handle exceptions within the transformation</li>
+                    <li>The transformation involves multiple steps that are clearer as separate statements</li>
+                    <li>You need to maintain intermediate variables for debugging</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="slicing">
+            <h2>Advanced List Slicing Techniques</h2>
+            <p>List slicing is a powerful feature that allows you to access subsets of lists. The syntax is <span class="highlight">list[start:stop:step]</span>.</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Slice Operation</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                            <th>Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>list[start:stop]</td>
+                            <td>Elements from start to stop-1</td>
+                            <td>numbers[2:5]</td>
+                            <td>[3, 4, 5]</td>
+                        </tr>
+                        <tr>
+                            <td>list[:stop]</td>
+                            <td>Elements from beginning to stop-1</td>
+                            <td>numbers[:3]</td>
+                            <td>[1, 2, 3]</td>
+                        </tr>
+                        <tr>
+                            <td>list[start:]</td>
+                            <td>Elements from start to end</td>
+                            <td>numbers[3:]</td>
+                            <td>[4, 5, 6, 7, 8, 9]</td>
+                        </tr>
+                        <tr>
+                            <td>list[::step]</td>
+                            <td>Every step-th element</td>
+                            <td>numbers[::2]</td>
+                            <td>[1, 3, 5, 7, 9]</td>
+                        </tr>
+                        <tr>
+                            <td>list[::-1]</td>
+                            <td>Reverse the list</td>
+                            <td>numbers[::-1]</td>
+                            <td>[9, 8, 7, 6, 5, 4, 3, 2, 1]</td>
+                        </tr>
+                        <tr>
+                            <td>list[-3:]</td>
+                            <td>Last three elements</td>
+                            <td>numbers[-3:]</td>
+                            <td>[7, 8, 9]</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Practical slicing examples</span><br>
+                    <span class="code-keyword">data</span> = [<span class="code-number">0</span>, <span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>, <span class="code-number">4</span>, <span class="code-number">5</span>, <span class="code-number">6</span>, <span class="code-number">7</span>, <span class="code-number">8</span>, <span class="code-number">9</span>]<br>
+                    <br>
+                    <span class="code-comment"># Get every 3rd element starting from index 1</span><br>
+                    <span class="code-keyword">slice1</span> = data[<span class="code-number">1</span>::<span class="code-number">3</span>]<br>
+                    <span class="code-output"># Output: [1, 4, 7]</span><br>
+                    <br>
+                    <span class="code-comment"># Get elements between index -6 and -2</span><br>
+                    <span class="code-keyword">slice2</span> = data[-<span class="code-number">6</span>:-<span class="code-number">2</span>]<br>
+                    <span class="code-output"># Output: [4, 5, 6, 7]</span><br>
+                    <br>
+                    <span class="code-comment"># Create a copy of the list using slicing</span><br>
+                    <span class="code-keyword">list_copy</span> = data[:]  <span class="code-comment"># This creates a shallow copy</span>
+                </code>
+            </div>
+        </section>
+        
+        <section id="operations">
+            <h2>Common List Operations and Performance</h2>
+            
+            <h3>Concatenation and Repetition</h3>
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># List concatenation using + operator</span><br>
+                    <span class="code-keyword">list1</span> = [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>]<br>
+                    <span class="code-keyword">list2</span> = [<span class="code-number">4</span>, <span class="code-number">5</span>, <span class="code-number">6</span>]<br>
+                    <span class="code-keyword">combined</span> = list1 + list2<br>
+                    <span class="code-output"># Output: [1, 2, 3, 4, 5, 6]</span><br>
+                    <br>
+                    <span class="code-comment"># List repetition using * operator</span><br>
+                    <span class="code-keyword">repeated</span> = [<span class="code-number">0</span>] * <span class="code-number">5</span><br>
+                    <span class="code-output"># Output: [0, 0, 0, 0, 0]</span><br>
+                    <br>
+                    <span class="code-comment"># Membership testing with 'in' operator</span><br>
+                    <span class="code-keyword">fruits</span> = [<span class="code-string">"apple"</span>, <span class="code-string">"banana"</span>, <span class="code-string">"cherry"</span>]<br>
+                    <span class="code-keyword">has_banana</span> = <span class="code-string">"banana"</span> <span class="code-keyword">in</span> fruits  <span class="code-comment"># True</span><br>
+                    <span class="code-keyword">has_orange</span> = <span class="code-string">"orange"</span> <span class="code-keyword">in</span> fruits  <span class="code-comment"># False</span>
+                </code>
+            </div>
+            
+            <h3>Performance Considerations</h3>
+            <p>Understanding time complexity is crucial for writing efficient code:</p>
+            <ul>
+                <li><span class="highlight">O(1)</span>: Accessing element by index (list[i]), append(), pop() from end</li>
+                <li><span class="highlight">O(n)</span>: Searching (in operator), insert(), remove(), pop() from arbitrary position</li>
+                <li><span class="highlight">O(k)</span>: extend() where k is length of added iterable</li>
+                <li><span class="highlight">O(n log n)</span>: sort()</li>
+                <li><span class="highlight">O(n)</span>: copy(), reverse(), count(), index()</li>
+            </ul>
+            
+            <div class="info-box">
+                <strong>Optimization Tips for Python 3.10+:</strong>
+                <ul>
+                    <li>Use <span class="highlight">append()</span> instead of <span class="highlight">insert(0, x)</span> when possible (O(1) vs O(n))</li>
+                    <li>Prefer list comprehensions over for-loops for simple transformations</li>
+                    <li>Use sets for membership testing when order doesn't matter (O(1) vs O(n))</li>
+                    <li>Consider using <span class="highlight">collections.deque</span> for frequent insertions/deletions at both ends</li>
+                    <li>Use <span class="highlight">bisect</span> module for maintaining sorted lists</li>
+                    <li>Consider <span class="highlight">array.array</span> or <span class="highlight">numpy</span> for large numerical lists</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="exercises">
+            <h2>Practice Exercises</h2>
+            <p>Test your understanding of Python lists with these exercises:</p>
+            
+            <div class="exercise-box">
+                <h4><i class="fas fa-question-circle"></i> Exercise 1: Remove Duplicates</h4>
+                <p>Write a function that takes a list and returns a new list with duplicates removed while maintaining the original order.</p>
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Example input/output</span><br>
+                        <span class="code-keyword">input_list</span> = [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>, <span class="code-number">2</span>, <span class="code-number">4</span>, <span class="code-number">3</span>, <span class="code-number">5</span>]<br>
+                        <span class="code-comment"># Expected output: [1, 2, 3, 4, 5]</span><br>
+                        <br>
+                        <span class="code-comment"># Python 3.10+ solution using dict.fromkeys()</span><br>
+                        <span class="code-keyword">def</span> <span class="code-function">remove_duplicates</span>(lst):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-function">list</span>(<span class="code-function">dict</span>.<span class="code-function">fromkeys</span>(lst))
+                    </code>
+                </div>
+            </div>
+            
+            <div class="exercise-box">
+                <h4><i class="fas fa-question-circle"></i> Exercise 2: Flatten Nested List</h4>
+                <p>Write a function to flatten an arbitrarily nested list of integers.</p>
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Example input/output</span><br>
+                        <span class="code-keyword">nested_list</span> = [<span class="code-number">1</span>, [<span class="code-number">2</span>, [<span class="code-number">3</span>, <span class="code-number">4</span>], <span class="code-number">5</span>], <span class="code-number">6</span>]<br>
+                        <span class="code-comment"># Expected output: [1, 2, 3, 4, 5, 6]</span><br>
+                        <br>
+                        <span class="code-comment"># Recursive solution</span><br>
+                        <span class="code-keyword">def</span> <span class="code-function">flatten_list</span>(lst):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;result = []<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> item <span class="code-keyword">in</span> lst:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> <span class="code-function">isinstance</span>(item, list):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result.<span class="code-function">extend</span>(<span class="code-function">flatten_list</span>(item))<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">else</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;result.<span class="code-function">append</span>(item)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> result
+                    </code>
+                </div>
+            </div>
+        </section>
+        
+        <!-- AI-Powered Social Sharing Widget -->
+        <section id="social-sharing">
+            <h2><i class="fas fa-share-alt"></i> Share This Guide</h2>
+            
+            <div id="social-widget">
+                <!-- Manual Sharing Buttons -->
+                <div id="social-buttons" style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                    <button class="social-btn" data-platform="facebook">
+                        <i class="fab fa-facebook-f"></i> Share on Facebook
+                    </button>
+                    <button class="social-btn" data-platform="linkedin">
+                        <i class="fab fa-linkedin-in"></i> Share on LinkedIn
+                    </button>
+                    <button class="social-btn" data-platform="twitter">
+                        <i class="fab fa-x-twitter"></i> Share on X
+                    </button>
+                </div>
+                
+                <!-- AI Suggestion -->
+                <div id="ai-suggestion" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1)); border-left: 4px solid #3b82f6; padding: 1.2rem; border-radius: 0 8px 8px 0; margin: 1.5rem 0; text-align: left; border: 1px solid #1e293b;">
+                    <h4 style="color: #60a5fa; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-robot"></i> AI Sharing Suggestion
+                    </h4>
+                    <p id="ai-suggestion-text" style="color: #cbd5e1; margin-bottom: 0.5rem;">
+                        <!-- AI-generated suggestion will appear here -->
+                    </p>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 1rem;">
+                        <span style="color: #94a3b8; font-size: 0.9rem;">
+                            <i class="fas fa-lightbulb"></i> Based on page content
+                        </span>
+                        <button id="refresh-suggestion">
+                            <i class="fas fa-redo-alt"></i> New Suggestion
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Share Statistics -->
+                <div id="share-stats" style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 1rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #1e293b;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; color: #60a5fa; font-weight: bold;" id="total-shares">0</div>
+                        <div style="color: #94a3b8; font-size: 0.9rem;">Total Shares</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; color: #60a5fa; font-weight: bold;" id="facebook-shares">0</div>
+                        <div style="color: #94a3b8; font-size: 0.9rem;">Facebook</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; color: #60a5fa; font-weight: bold;" id="linkedin-shares">0</div>
+                        <div style="color: #94a3b8; font-size: 0.9rem;">LinkedIn</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1.5rem; color: #60a5fa; font-weight: bold;" id="twitter-shares">0</div>
+                        <div style="color: #94a3b8; font-size: 0.9rem;">X/Twitter</div>
+                    </div>
+                </div>
+                
+                <!-- Copy Link -->
+                <div style="margin-top: 1.5rem;">
+                    <div style="display: flex; gap: 0.5rem; max-width: 600px; margin: 0 auto;">
+                        <input type="text" id="shareable-link" readonly value="https://pansensoyglenn-dev.github.io/poetic-codes/python-lists">
+                        <button id="copy-link-btn">
+                            <i class="far fa-copy"></i> Copy Link
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="resources">
+            <h2>Additional Resources</h2>
+            <p>To further your Python lists knowledge, consider these resources:</p>
+            <ul>
+                <li>Official Python Documentation: <a href="https://docs.python.org/3/tutorial/datastructures.html#more-on-lists" target="_blank">Python Lists</a></li>
+                <li>Python List Methods: <a href="https://www.w3schools.com/python/python_ref_list.asp" target="_blank">W3Schools Python List Methods</a></li>
+                <li>Real Python List Tutorials: <a href="https://realpython.com/python-lists-tuples/" target="_blank">Lists and Tuples in Python</a></li>
+                <li>Python 3.10 What's New: <a href="https://docs.python.org/3/whatsnew/3.10.html" target="_blank">Python 3.10 New Features</a></li>
+                <li>Practice Problems: <a href="https://www.hackerrank.com/domains/python?filters%5Bsubdomains%5D%5B%5D=py-data-structures" target="_blank">HackerRank List Challenges</a></li>
+            </ul>
+            
+            <div class="info-box">
+                <strong>Best Practices for Python 3.10+ Lists:</strong>
+                <ol>
+                    <li>Use list comprehensions for simple transformations and filtering</li>
+                    <li>Consider using pattern matching for complex list processing</li>
+                    <li>Use appropriate data structures for your use case (list vs tuple vs set)</li>
+                    <li>Be mindful of time complexity when working with large lists</li>
+                    <li>Take advantage of Python 3.10+ improved error messages for debugging</li>
+                </ol>
+            </div>
+            
+            <!-- Added another Return Home button at the end of the page -->
+            <div class="return-container" style="margin-top: 2rem;">
+                <a href="index.html" class="return-home-btn">
+                    <i class="fas fa-home"></i> Return to Homepage
+                </a>
+            </div>
+        </section>
+    </main>
+    
+    <!-- ========================
+         SOCIAL SHARING SECTION
+    ======================== -->
+    <section id="social-sharing" style="background: #111827; padding: 4rem 5vw; margin-top: 3rem; border-top: 1px solid #1e293b; border-bottom: 1px solid #1e293b;">
+        <div style="max-width: 900px; margin: 0 auto; text-align: center;">
+            <h2 style="color: #3b82f6; font-size: clamp(1.8rem, 4vw, 2.5rem); margin-bottom: 1rem; font-weight: 800;">
+                <i class="fas fa-share-nodes"></i> Share This Guide
+            </h2>
+            <p style="color: #94a3b8; font-size: 1.1rem; margin-bottom: 2.5rem; line-height: 1.6;">
+                Help others discover this comprehensive Python Lists guide. Share it with your network and contribute to the developer community!
+            </p>
+            
+            <!-- SOCIAL SHARE BUTTONS -->
+            <div class="share-container" style="justify-content: center;">
+                <button class="share-btn share-facebook" onclick="shareOnFacebook()" aria-label="Share on Facebook">
+                    <i class="fab fa-facebook-f"></i> Share on Facebook
+                </button>
+                <button class="share-btn share-linkedin" onclick="shareOnLinkedIn()" aria-label="Share on LinkedIn">
+                    <i class="fab fa-linkedin-in"></i> Share on LinkedIn
+                </button>
+                <button class="share-btn share-twitter" onclick="shareOnTwitter()" aria-label="Share on X (Twitter)">
+                    <i class="fab fa-x-twitter"></i> Share on X
+                </button>
+            </div>
+            
+            <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 2rem;">
+                <i class="fas fa-heart" style="color: #ff6b6b;"></i> Thank you for spreading knowledge!
+            </p>
+        </div>
+    </section>
+    
+    <!-- Back to top button -->
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>POETIC CODES</h3>
+                <p>Exploring the art and science of programming through clean, expressive code. Tutorials, examples, and insights for developers at all levels.</p>
+                <p>Created by Glenn Junsay Pansensoy</p>
+                <p><i class="fab fa-python"></i> Focus: Python 3.10+ Features</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#characteristics">Key Characteristics</a></li>
+                    <li><a href="#methods">List Methods</a></li>
+                    <li><a href="list-comprehension.html">List Comprehensions</a></li>
+                    <li><a href="#slicing">List Slicing</a></li>
+                    <li><a href="#exercises">Practice Exercises</a></li>
+                    <li><a href="#social-sharing">Social Sharing</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Python Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="https://python.org" target="_blank">Official Python Website</a></li>
+                    <li><a href="https://docs.python.org/3.10/tutorial/" target="_blank">Python 3.10 Tutorial</a></li>
+                    <li><a href="https://pypi.org" target="_blank">Python Package Index</a></li>
+                    <li><a href="https://realpython.com" target="_blank">Real Python</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Connect With Me</h3>
+                <div class="social-icons">
+                    <a href="https://github.com/pansensoyglenn-dev" target="_blank" aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://linkedin.com/in/glenn-pansensoy-6288453a2" target="_blank" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://x.com/GlennPansensoy" target="_blank" aria-label="Twitter">
+                        <i class="fab fa-x-twitter"></i>
+                    </a>
+                    <a href="https://pansensoyglenn-dev.github.io/poetic-codes" target="_blank" aria-label="Portfolio">
+                        <i class="fas fa-code"></i>
+                    </a>
+                </div>
+                <p style="margin-top: 1.2rem; color: #94a3b8;">Email: pansensoyglenn@gmail.com</p>
+            </div>
+        </div>
+        
+        <div class="footer-legal-links">
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Service</a>
+            <a href="cookie.html">Cookie Policy</a>
+            <a href="disclaimer.html">Disclaimer</a>
+            <a href="about.html">About</a>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2026 Poetic Codes | Created by Glenn Junsay Pansensoy | All code examples are free to use under MIT License.</p>
+            <p>Domain: pansensoyglenn-dev.github.io/poetic-codes</p>
+            <p>Python 3.10+ Compatibility Focus</p>
+        </div>
+    </footer>
+    
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+    <script>
+    
+        const menuToggle = document.getElementById('menuToggle');
+        const navOverlay = document.getElementById('navOverlay');
+        const navClose = document.getElementById('navClose');
+        const body = document.body;
+        const navLinks = document.querySelectorAll('.nav-link');
+
+        function toggleMenu() {
+            const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+            
+            menuToggle.classList.toggle('active');
+            navOverlay.classList.toggle('active');
+            menuToggle.setAttribute('aria-expanded', !isExpanded);
+            navOverlay.setAttribute('aria-hidden', isExpanded);
+            
+            body.style.overflow = navOverlay.classList.contains('active') ? 'hidden' : 'auto';
+            
+            if (navOverlay.classList.contains('active')) {
+                navClose.focus();
+            }
+        }
+
+        menuToggle.addEventListener('click', toggleMenu);
+        navClose.addEventListener('click', toggleMenu);
+        
+        navLinks.forEach(link => {
+            link.addEventListener('click', toggleMenu);
+        });
+
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navOverlay.classList.contains('active')) {
+                toggleMenu();
+            }
+        });
+
+        // Close menu when clicking outside (on the overlay)
+        navOverlay.addEventListener('click', (e) => {
+            if (e.target === navOverlay) {
+                toggleMenu();
+            }
+        });
+        
+      
+        const getPageDetails = () => {
+            return {
+                url: encodeURIComponent(window.location.href),
+                title: encodeURIComponent('Python 3.10+ Lists Guide | Poetic Codes'),
+                description: encodeURIComponent('Master Python 3.10+ lists with our comprehensive guide covering all methods, examples, and best practices.')
+            };
+        };
+
+        function shareOnFacebook() {
+            const { url } = getPageDetails();
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+            window.open(facebookUrl, 'facebook-share', 'width=600,height=400');
+        }
+
+        function shareOnLinkedIn() {
+            const { url, title, description } = getPageDetails();
+            const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+            window.open(linkedInUrl, 'linkedin-share', 'width=600,height=600');
+        }
+
+        function shareOnTwitter() {
+            const { url, title } = getPageDetails();
+            const twitterText = encodeURIComponent('Master Python 3.10+ Lists! Comprehensive guide covering methods, comprehensions, slicing, and best practices.');
+            const twitterUrl = `https://twitter.com/intent/tweet?url=${url}&text=${twitterText}&hashtags=Python,Lists,Programming,LearnPython`;
+            window.open(twitterUrl, 'twitter-share', 'width=600,height=400');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const shareButtons = document.querySelectorAll('.share-btn');
+            shareButtons.forEach(btn => {
+                btn.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        btn.click();
+                    }
+                });
+            });
+        });
+        
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        if (backToTopBtn) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTopBtn.classList.add('visible');
+                } else {
+                    backToTopBtn.classList.remove('visible');
+                }
+            });
+            
+            backToTopBtn.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+        
+        document.querySelectorAll('.code-example').forEach(example => {
+            const copyButton = document.createElement('button');
+            copyButton.innerHTML = '<i class="far fa-copy"></i> Copy';
+            copyButton.className = 'copy-button';
+            
+            copyButton.addEventListener('mouseenter', () => {
+                copyButton.style.background = 'rgba(59, 130, 246, 0.2)';
+                copyButton.style.transform = 'translateY(-2px)';
+            });
+            
+            copyButton.addEventListener('mouseleave', () => {
+                copyButton.style.background = 'rgba(59, 130, 246, 0.1)';
+                copyButton.style.transform = 'translateY(0)';
+            });
+            
+            copyButton.addEventListener('click', () => {
+                const codeText = example.querySelector('code').innerText;
+                navigator.clipboard.writeText(codeText).then(() => {
+                    const originalHTML = copyButton.innerHTML;
+                    copyButton.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    copyButton.style.background = 'rgba(59, 130, 246, 0.3)';
+                    
+                    setTimeout(() => {
+                        copyButton.innerHTML = originalHTML;
+                        copyButton.style.background = 'rgba(59, 130, 246, 0.1)';
+                    }, 2000);
+                });
+            });
+            
+            example.style.position = 'relative';
+            example.appendChild(copyButton);
+        });
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                if(this.getAttribute('href') === '#') return;
+                
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                    
+                    history.pushState(null, null, targetId);
+                }
+            });
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeSocialSharing();
+        });
+        
+        function initializeSocialSharing() {
+  
+            const socialButtons = document.querySelectorAll('.social-btn');
+            const copyLinkBtn = document.getElementById('copy-link-btn');
+            const shareableLink = document.getElementById('shareable-link');
+            const aiSuggestionText = document.getElementById('ai-suggestion-text');
+            const refreshSuggestionBtn = document.getElementById('refresh-suggestion');
+            
+            const totalSharesEl = document.getElementById('total-shares');
+            const facebookSharesEl = document.getElementById('facebook-shares');
+            const linkedinSharesEl = document.getElementById('linkedin-shares');
+            const twitterSharesEl = document.getElementById('twitter-shares');
+            
+            let shareStats = JSON.parse(localStorage.getItem('pythonListsShareStats')) || {
+                facebook: 0,
+                linkedin: 0,
+                twitter: 0,
+                total: 0
+            };
+            
+            updateShareStats();
+            
+            generateAISuggestion();
+            
+            socialButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const platform = this.dataset.platform;
+                    shareToPlatform(platform);
+                });
+                
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            if (copyLinkBtn && shareableLink) {
+                copyLinkBtn.addEventListener('click', function() {
+                    navigator.clipboard.writeText(shareableLink.value).then(() => {
+                        const originalHTML = this.innerHTML;
+                        this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        this.style.background = 'linear-gradient(135deg, #10b981, #34d399)';
+                        
+                        setTimeout(() => {
+                            this.innerHTML = originalHTML;
+                            this.style.background = 'linear-gradient(135deg, #3b82f6, #8b5cf6)';
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy: ', err);
+                    
+                        shareableLink.select();
+                        document.execCommand('copy');
+                    });
+                });
+            }
+            
+            if (refreshSuggestionBtn) {
+                refreshSuggestionBtn.addEventListener('click', generateAISuggestion);
+            }
+            
+            function generateAISuggestion() {
+                const suggestions = [
+                    "Just discovered this comprehensive Python 3.10+ lists guide! Perfect for developers looking to master list comprehensions, slicing, and modern Python features. #Python #Programming",
+                    "Master Python lists with this complete guide! Covers everything from basic operations to advanced techniques in Python 3.10+. Essential reading for Python developers. #PythonLists #CodeNewbie",
+                    "Level up your Python skills! This guide to Python 3.10+ lists has practical examples, performance tips, and exercises to test your knowledge. #PythonProgramming #LearnToCode",
+                    "Python developers: Don't miss this detailed guide on lists in Python 3.10+. Includes complete method reference, list comprehensions, and real-world examples. #Developer #Coding",
+                    "Comprehensive Python lists tutorial! From creation to advanced manipulation, this guide covers everything with clear examples. Perfect for interview prep. #Tech #SoftwareDevelopment"
+                ];
+                
+                
+                let suggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+                
+                // Add emoji based on content
+                const emojis = ['🐍', '💻', '🚀', '📚', '✨'];
+                const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                if (aiSuggestionText) {
+                    aiSuggestionText.innerHTML = `<span style="color: #94a3b8;">Generating suggestion...</span>`;
+                    
+                    setTimeout(() => {
+                        aiSuggestionText.textContent = `${emoji} ${suggestion}`;
+                        
+                        aiSuggestionText.style.opacity = '0';
+                        aiSuggestionText.style.transform = 'translateY(10px)';
+                        
+                        setTimeout(() => {
+                            aiSuggestionText.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                            aiSuggestionText.style.opacity = '1';
+                            aiSuggestionText.style.transform = 'translateY(0)';
+                        }, 50);
+                    }, 500);
+                }
+            }
+            
+            function shareToPlatform(platform) {
+                const url = encodeURIComponent(window.location.href);
+                const title = encodeURIComponent(document.title);
+                const text = aiSuggestionText ? encodeURIComponent(aiSuggestionText.textContent.replace(/^[^ ]+ /, '')) : encodeURIComponent('Check out this Python 3.10+ lists guide!');
+                
+                let shareUrl = '';
+                
+                switch(platform) {
+                    case 'facebook':
+                        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+                        shareStats.facebook++;
+                        break;
+                    case 'linkedin':
+                        shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+                        shareStats.linkedin++;
+                        break;
+                    case 'twitter':
+                        const hashtags = 'Python,Programming,Coding';
+                        shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}&hashtags=${hashtags}`;
+                        shareStats.twitter++;
+                        break;
+                }
+              
+                shareStats.total = shareStats.facebook + shareStats.linkedin + shareStats.twitter;
+                
+                localStorage.setItem('pythonListsShareStats', JSON.stringify(shareStats));
+                
+                updateShareStats();
+                
+                window.open(shareUrl, '_blank', 'width=600,height=400,menubar=no,toolbar=no,resizable=yes,scrollbars=yes');
+                
+                
+                showShareConfirmation(platform);
+            }
+            
+            function updateShareStats() {
+                if (totalSharesEl) totalSharesEl.textContent = shareStats.total;
+                if (facebookSharesEl) facebookSharesEl.textContent = shareStats.facebook;
+                if (linkedinSharesEl) linkedinSharesEl.textContent = shareStats.linkedin;
+                if (twitterSharesEl) twitterSharesEl.textContent = shareStats.twitter;
+            }
+            
+            function showShareConfirmation(platform) {
+                // Create a floating notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+                    color: white;
+                    padding: 1rem 1.5rem;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                    z-index: 10000;
+                    animation: slideIn 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    max-width: 300px;
+                `;
+                
+                let platformIcon = '';
+                let message = '';
+                
+                switch(platform) {
+                    case 'facebook':
+                        platformIcon = '<i class="fab fa-facebook-f"></i>';
+                        message = 'Shared on Facebook!';
+                        break;
+                    case 'linkedin':
+                        platformIcon = '<i class="fab fa-linkedin-in"></i>';
+                        message = 'Shared on LinkedIn!';
+                        break;
+                    case 'twitter':
+                        platformIcon = '<i class="fab fa-x-twitter"></i>';
+                        message = 'Shared on X/Twitter!';
+                        break;
+                }
+                
+                notification.innerHTML = `
+                    ${platformIcon}
+                    <span>${message}</span>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'slideOut 0.3s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+            
+            
+            if (navigator.share) {
+                const shareApiBtn = document.createElement('button');
+                shareApiBtn.innerHTML = '<i class="fas fa-share-alt"></i> Share via...';
+                shareApiBtn.style.cssText = `
+                    background: linear-gradient(135deg, #10b981, #34d399);
+                    color: white;
+                    border: none;
+                    padding: 0.8rem 1.5rem;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                    font-weight: 600;
+                    margin: 0 auto;
+                    transition: transform 0.3s ease;
+                    width: 100%;
+                    max-width: 300px;
+                `;
+                
+                shareApiBtn.addEventListener('click', async () => {
+                    try {
+                        await navigator.share({
+                            title: document.title,
+                            text: aiSuggestionText ? aiSuggestionText.textContent.replace(/^[^ ]+ /, '') : 'Check out this Python 3.10+ lists guide!',
+                            url: window.location.href
+                        });
+                        
+                        shareStats.total++;
+                        localStorage.setItem('pythonListsShareStats', JSON.stringify(shareStats));
+                        updateShareStats();
+                    } catch (err) {
+                        console.log('Share cancelled or failed:', err);
+                    }
+                });
+                
+                
+                const socialButtonsContainer = document.getElementById('social-buttons');
+                if (socialButtonsContainer) {
+                    socialButtonsContainer.innerHTML = '';
+                    socialButtonsContainer.appendChild(shareApiBtn);
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add subtle animation to cards on load
+            const cards = document.querySelectorAll('.method-card, .exercise-box');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 100 * index);
+            });
+            
+            
+            const pythonBadge = document.querySelector('.python-badge');
+            if (pythonBadge) {
+                setInterval(() => {
+                    pythonBadge.style.boxShadow = '0 0 0 0 rgba(59, 130, 246, 0.7)';
+                    setTimeout(() => {
+                        pythonBadge.style.boxShadow = '0 0 0 10px rgba(59, 130, 246, 0)';
+                    }, 1000);
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
