@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Tutorial: Source Files</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            line-height: 1.65;
+            color: #c9d1d9;
+            background-color: #0d1117;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background: #161b22;
+            border-bottom: 1px solid #30363d;
+            padding: 3.5rem 0 2.5rem;
+            text-align: center;
+        }
+        
+        header h1 {
+            color: #58a6ff;
+            font-size: 2.4rem;
+            margin-bottom: 0.6rem;
+        }
+        
+        header p {
+            color: #8b949e;
+            font-size: 1.15rem;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 2.5rem 0 4rem;
+        }
+        
+        .tutorial-content {
+            font-size: 1.05rem;
+        }
+        
+        h2 {
+            color: #58a6ff;
+            font-size: 1.9rem;
+            margin: 2.5rem 0 1.2rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #21262d;
+        }
+        
+        h3 {
+            color: #79c0ff;
+            font-size: 1.45rem;
+            margin: 2rem 0 1rem;
+        }
+        
+        p {
+            margin-bottom: 1.3rem;
+            color: #c9d1d9;
+        }
+        
+        .code-block {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 1.4rem;
+            margin: 1.4rem 0;
+            overflow-x: auto;
+            font-size: 0.97rem;
+            line-height: 1.5;
+        }
+        
+        .code-keyword  { color: #ff7b72; }
+        .code-function { color: #d2a8ff; }
+        .code-string   { color: #a5d6ff; }
+        .code-comment  { color: #8b949e; font-style: italic; }
+        .code-number   { color: #ffa657; }
+        .code-class    { color: #f0883e; }
+        
+        .note-box, .warning-box {
+            padding: 1.1rem 1.3rem;
+            margin: 1.4rem 0;
+            border-radius: 6px;
+            border-left: 4px solid;
+        }
+        
+        .note-box {
+            background: rgba(88, 166, 255, 0.08);
+            border-left-color: #58a6ff;
+            color: #a5d6ff;
+        }
+        
+        .warning-box {
+            background: rgba(255, 183, 0, 0.08);
+            border-left-color: #f2c94c;
+            color: #f2c94c;
+        }
+        
+        .file-path {
+            background: #21262d;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            color: #79c0ff;
+            font-family: inherit;
+        }
+        
+        .example-label {
+            display: inline-block;
+            background: #21262d;
+            color: #8b949e;
+            padding: 0.25rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin: 1rem 0 0.6rem;
+        }
+        
+        ul, ol {
+            margin: 0 0 1.3rem 1.8rem;
+            color: #c9d1d9;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #21262d;
+            margin: 3rem 0;
+        }
+        
+        footer {
+            background: #161b22;
+            border-top: 1px solid #30363d;
+            padding: 2rem 0;
+            color: #8b949e;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            min-height: 160px;
+        }
+        
+        .footer-inner {
+            text-align: center;
+            width: 100%;
+        }
+        
+        .footer-links {
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links a {
+            color: #58a6ff;
+            text-decoration: none;
+            margin: 0 1.2rem;
+            transition: color 0.2s;
+        }
+        
+        .footer-links a:hover {
+            color: #79c0ff;
+            text-decoration: underline;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0d1117;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #30363d;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 768px) {
+            header { padding: 2.5rem 0 2rem; }
+            header h1 { font-size: 2rem; }
+            .main-content { padding: 1.8rem 0 3rem; }
+            footer { min-height: 140px; padding: 1.5rem 0; }
+            .footer-links a { display: block; margin: 0.6rem 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container">
+            <h1>Python Tutorial: Source Files</h1>
+            <p>Understanding Python source files, modules, and packages</p>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <div class="container">
+            
+            <section class="tutorial-content">
+                <h2>What are Python Source Files?</h2>
+                <p>Python source files are files containing Python code with the <span class="file-path">.py</span> extension. These files contain Python statements and definitions that can be executed directly or imported into other Python programs.</p>
+                
+                <div class="note-box">
+                    <strong>Key Point:</strong> Every Python source file is also a module. When you import a file, Python creates a module object from it.
+                </div>
+                
+                <h3>Basic Python Source File Structure</h3>
+                <p>A typical Python source file follows this structure:</p>
+                
+                <div class="example-label">Example: hello.py</div>
+                <div class="code-block">
+<pre><span class="code-comment"># hello.py - A simple Python source file</span>
+<span class="code-comment"># Module docstring (optional but recommended)</span>
+<span class="code-string">"""This module provides greeting functionality."""</span>
+
+<span class="code-comment"># Import statements</span>
+<span class="code-keyword">import</span> sys
+<span class="code-keyword">import</span> os
+
+<span class="code-comment"># Module-level variables (constants)</span>
+GREETING = <span class="code-string">"Hello, World!"</span>
+VERSION = <span class="code-string">"1.0.0"</span>
+
+<span class="code-comment"># Function definitions</span>
+<span class="code-keyword">def</span> <span class="code-function">say_hello</span>(name=<span class="code-string">"World"</span>):
+    <span class="code-string">"""Return a greeting message."""</span>
+    <span class="code-keyword">return</span> <span class="code-string">f"Hello, {name}!"</span>
+
+<span class="code-keyword">def</span> <span class="code-function">calculate_sum</span>(a, b):
+    <span class="code-string">"""Calculate the sum of two numbers."""</span>
+    <span class="code-keyword">return</span> a + b
+
+<span class="code-comment"># Class definitions</span>
+<span class="code-keyword">class</span> <span class="code-class">Greeter</span>:
+    <span class="code-string">"""A class that handles greetings."""</span>
+    
+    <span class="code-keyword">def</span> <span class="code-function">__init__</span>(<span class="code-keyword">self</span>, name):
+        <span class="code-keyword">self</span>.name = name
+    
+    <span class="code-keyword">def</span> <span class="code-function">greet</span>(<span class="code-keyword">self</span>):
+        <span class="code-keyword">return</span> <span class="code-string">f"Hello from Greeter, {self.name}!"</span>
+
+<span class="code-comment"># Main execution block (only runs if file is executed directly)</span>
+<span class="code-keyword">if</span> __name__ == <span class="code-string">"__main__"</span>:
+    print(say_hello(<span class="code-string">"Python Developer"</span>))
+    greeter = Greeter(<span class="code-string">"Alice"</span>)
+    print(greeter.greet())
+    result = calculate_sum(<span class="code-number">10</span>, <span class="code-number">20</span>)
+    print(<span class="code-string">f"10 + 20 = {result}"</span>)</pre>
+                </div>
+                
+                <h3>The __name__ Variable</h3>
+                <p>The <span class="file-path">__name__</span> variable is special in Python. It holds the name of the current module:</p>
+                <ul>
+                    <li>If the file is being run directly: <span class="file-path">__name__ == "__main__"</span></li>
+                    <li>If the file is being imported: <span class="file-path">__name__ == "module_name"</span></li>
+                </ul>
+                
+                <div class="warning-box">
+                    <strong>Important:</strong> Always use <span class="file-path">if __name__ == "__main__":</span> to prevent code from running when the module is imported.
+                </div>
+            </section>
+            
+            <div class="divider"></div>
+            
+            <section class="tutorial-content">
+                <h2>Creating Python Modules</h2>
+                <p>Modules are simply Python source files. To create a module:</p>
+                
+                <div class="example-label">Example: calculator.py</div>
+                <div class="code-block">
+<pre><span class="code-comment"># calculator.py - A simple calculator module</span>
+<span class="code-string">"""A module providing basic arithmetic operations."""</span>
+
+<span class="code-keyword">def</span> <span class="code-function">add</span>(a, b):
+    <span class="code-string">"""Return the sum of a and b."""</span>
+    <span class="code-keyword">return</span> a + b
+
+<span class="code-keyword">def</span> <span class="code-function">subtract</span>(a, b):
+    <span class="code-string">"""Return the difference of a and b."""</span>
+    <span class="code-keyword">return</span> a - b
+
+<span class="code-keyword">def</span> <span class="code-function">multiply</span>(a, b):
+    <span class="code-string">"""Return the product of a and b."""</span>
+    <span class="code-keyword">return</span> a * b
+
+<span class="code-keyword">def</span> <span class="code-function">divide</span>(a, b):
+    <span class="code-string">"""Return the quotient of a divided by b."""</span>
+    <span class="code-keyword">if</span> b == <span class="code-number">0</span>:
+        <span class="code-keyword">raise</span> ValueError(<span class="code-string">"Cannot divide by zero"</span>)
+    <span class="code-keyword">return</span> a / b
+
+<span class="code-comment"># Using the module from another file:</span>
+<span class="code-comment"># import calculator</span>
+<span class="code-comment"># result = calculator.add(5, 3)</span></pre>
+                </div>
+                
+                <h3>Importing Modules</h3>
+                <p>There are several ways to import modules:</p>
+                
+                <div class="code-block">
+<pre><span class="code-comment"># Different ways to import modules</span>
+
+<span class="code-comment"># 1. Import entire module</span>
+<span class="code-keyword">import</span> calculator
+result = calculator.add(<span class="code-number">10</span>, <span class="code-number">5</span>)
+
+<span class="code-comment"># 2. Import with alias</span>
+<span class="code-keyword">import</span> calculator <span class="code-keyword">as</span> calc
+result = calc.multiply(<span class="code-number">4</span>, <span class="code-number">6</span>)
+
+<span class="code-comment"># 3. Import specific functions</span>
+<span class="code-keyword">from</span> calculator <span class="code-keyword">import</span> add, subtract
+result = add(<span class="code-number">7</span>, <span class="code-number">3</span>)
+
+<span class="code-comment"># 4. Import all functions (not recommended)</span>
+<span class="code-keyword">from</span> calculator <span class="code-keyword">import</span> *
+result = divide(<span class="code-number">20</span>, <span class="code-number">4</span>)</pre>
+                </div>
+                
+                <div class="note-box">
+                    <strong>Best Practice:</strong> Avoid using <span class="file-path">from module import *</span> as it can lead to namespace pollution and make debugging difficult.
+                </div>
+            </section>
+            
+            <div class="divider"></div>
+            
+            <section class="tutorial-content">
+                <h2>Python Packages</h2>
+                <p>Packages are directories containing multiple Python modules. They help organize related modules into a hierarchy.</p>
+                
+                <div class="example-label">Directory Structure</div>
+                <div class="code-block">
+<pre><span class="code-comment"># Directory structure for a package:</span>
+<span class="code-comment"># mypackage/</span>
+<span class="code-comment"># ├── __init__.py</span>
+<span class="code-comment"># ├── module1.py</span>
+<span class="code-comment"># ├── module2.py</span>
+<span class="code-comment"># └── subpackage/</span>
+<span class="code-comment">#     ├── __init__.py</span>
+<span class="code-comment">#     └── module3.py</span>
+
+<span class="code-comment"># __init__.py can be empty or contain package initialization code</span>
+<span class="code-string">"""My Python package for demonstration."""</span>
+
+__version__ = <span class="code-string">"1.0.0"</span>
+__author__ = <span class="code-string">"Python Developer"</span>
+
+<span class="code-comment"># You can expose specific functions at package level</span>
+<span class="code-keyword">from</span> .module1 <span class="code-keyword">import</span> main_function
+<span class="code-keyword">from</span> .module2 <span class="code-keyword">import</span> helper_function
+
+<span class="code-comment"># Using the package:</span>
+<span class="code-comment"># import mypackage</span>
+<span class="code-comment"># from mypackage import module1</span>
+<span class="code-comment"># from mypackage.subpackage import module3</span></pre>
+                </div>
+                
+                <h3>Best Practices for Source Files</h3>
+                <ol>
+                    <li><strong>Use descriptive names:</strong> File names should indicate their purpose</li>
+                    <li><strong>Add docstrings:</strong> Document modules, functions, and classes</li>
+                    <li><strong>Follow PEP 8:</strong> Use consistent formatting and style</li>
+                    <li><strong>Keep files focused:</strong> Each file should have a single responsibility</li>
+                    <li><strong>Use absolute imports:</strong> Better for clarity and maintainability</li>
+                </ol>
+            </section>
+            
+            <div class="divider"></div>
+            
+            <section class="tutorial-content">
+                <h2>Executing Python Files</h2>
+                <p>Python source files can be executed in several ways:</p>
+                
+                <div class="code-block">
+<pre><span class="code-comment"># 1. Direct execution from command line</span>
+<span class="code-comment"># $ python script.py</span>
+<span class="code-comment"># $ python3 script.py</span>
+
+<span class="code-comment"># 2. Making a script executable (Unix/Linux/Mac)</span>
+<span class="code-comment"># Add shebang line at the top of file:</span>
+<span class="code-comment">#!/usr/bin/env python3</span>
+<span class="code-comment"># Then make executable: chmod +x script.py</span>
+<span class="code-comment"># Run directly: ./script.py</span>
+
+<span class="code-comment"># 3. Using python -m to run as module</span>
+<span class="code-comment"># $ python -m mypackage.module1</span>
+
+<span class="code-comment"># 4. Interactive execution</span>
+<span class="code-comment"># $ python -i script.py  # Runs script then enters interactive mode</span></pre>
+                </div>
+                
+                <div class="note-box">
+                    <strong>Tip:</strong> Use <span class="file-path">python -m</span> to run modules as scripts. This ensures Python adds the directory to sys.path properly.
+                </div>
+            </section>
+            
+        </div>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-inner">
+                <div class="footer-links">
+                    <a href="documentation.html">Python Documentation</a>
+                    <a href="index.html">Python Tutorial</a>
+                </div>
+                <p>© Python OOP Tutorial • Tutorial: Understanding Source Files and Modules</p>
+                <p>@Glenn Junsay Pansensoy</p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
