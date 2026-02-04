@@ -1,0 +1,2548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+
+    <title>Python Strings Tutorial: Complete Guide with Examples | Poetic Codes by Glenn Junsay Pansensoy</title>
+    <meta name="description" content="Master Python strings with our comprehensive tutorial. Learn string manipulation, 18+ methods, formatting, slicing, and best practices with practical examples. Perfect for beginners to advanced Python developers.">
+    <meta name="keywords" content="Python strings, Python string methods, string manipulation Python, Python string formatting, string slicing Python, Python tutorial, Python programming, Glenn Junsay Pansensoy, Poetic Codes, Python examples, string operations, f-strings Python, Python string functions">
+    <meta name="author" content="Glenn Junsay Pansensoy">
+  
+    <link rel="canonical" href="https://pansensoyglenn-dev.github.io/poetic-codes/python-strings-tutorial">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Python Strings Tutorial: Complete Guide with Examples | Poetic Codes">
+    <meta property="og:description" content="Master Python strings with our comprehensive tutorial. Learn string manipulation, 18+ methods, formatting, slicing, and best practices.">
+    <meta property="og:url" content="https://pansensoyglenn-dev.github.io/poetic-codes/python-strings-tutorial">
+    <meta property="og:site_name" content="Poetic Codes">
+    <meta property="article:author" content="Glenn Junsay Pansensoy">
+    <meta property="article:published_time" content="2026-02-04">
+    <meta property="article:section" content="Python Programming">
+    <meta property="article:tag" content="Python">
+    <meta property="article:tag" content="Programming">
+    <meta property="article:tag" content="Tutorial">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Python Strings Tutorial: Complete Guide with Examples">
+    <meta name="twitter:description" content="Master Python strings with our comprehensive tutorial covering all string methods, formatting, slicing, and best practices.">
+    <meta name="twitter:creator" content="@GlennPansensoy">
+    
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Python Strings Tutorial: Complete Guide with Examples",
+        "description": "Comprehensive tutorial on Python strings covering creation, manipulation, methods, formatting, and best practices with practical code examples.",
+        "author": {
+            "@type": "Person",
+            "name": "Glenn Junsay Pansensoy",
+            "url": "https://pansensoyglenn-dev.github.io/poetic-codes"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Poetic Codes",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://pansensoyglenn-dev.github.io/poetic-codes/logo.png"
+            }
+        },
+        "datePublished": "2026-02-04",
+        "dateModified": "2026-02-04",
+        "image": "https://pansensoyglenn-dev.github.io/poetic-codes/images/python-strings-tutorial.png",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://pansensoyglenn-dev.github.io/poetic-codes/python-strings-tutorial"
+        },
+        "keywords": "Python strings, string methods, string manipulation, Python programming, tutorial",
+        "articleSection": "Python Programming",
+        "inLanguage": "en",
+        "audience": {
+            "@type": "Audience",
+            "audienceType": ["Programmers", "Developers", "Students", "Beginners", "Python Developers"]
+        },
+        "educationalLevel": "Beginner to Advanced",
+        "proficiencyLevel": "Beginner, Intermediate, Advanced"
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "What are Python strings?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "In Python, strings are sequences of characters enclosed in quotes. They are immutable data types with rich built-in methods for manipulation."
+            }
+        }, {
+            "@type": "Question",
+            "name": "How many string methods does Python have?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Python provides over 45 built-in string methods. This tutorial covers 18+ essential methods including upper(), lower(), strip(), split(), join(), replace(), and find()."
+            }
+        }, {
+            "@type": "Question",
+            "name": "What is string slicing in Python?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "String slicing extracts portions of a string using index notation with syntax: string[start:end:step]. It's a powerful feature for string manipulation."
+            }
+        }, {
+            "@type": "Question",
+            "name": "What are the best practices for Python strings?",
+            "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Use f-strings for modern Python, prefer built-in methods over manual manipulation, use triple quotes for multiline strings, and always handle encoding properly."
+            }
+        }]
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://pansensoyglenn-dev.github.io/poetic-codes"
+        }, {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Python Tutorials",
+            "item": "https://pansensoyglenn-dev.github.io/poetic-codes/python-tutorials"
+        }, {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Python Strings Tutorial",
+            "item": "https://pansensoyglenn-dev.github.io/poetic-codes/python-strings-tutorial"
+        }]
+    }
+    </script>
+    
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" crossorigin>
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0e14;
+            color: #c7c9cb;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(18, 27, 39, 0.8) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(18, 27, 39, 0.6) 0%, transparent 20%);
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0c1219 0%, #111827 100%);
+            color: #e2e8f0;
+            padding: 0.8rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #1e293b;
+            min-height: 60px;
+        }
+        
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+        }
+        
+        .logo a {
+            color: transparent;
+            text-decoration: none;
+            font-size: 1.4rem;
+        }
+        
+        /* ===== INTERACTIVE HAMBURGER MENU ===== */
+        .menu-toggle {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 10001;
+            padding: 8px;
+            background: transparent;
+            border: none;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            touch-action: manipulation;
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .menu-toggle span {
+            width: 24px;
+            height: 2.5px;
+            background: #3b82f6;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            display: block;
+            position: relative;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+        
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+            transform: scale(0);
+        }
+        
+        .menu-toggle.active span:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13,17,23,0.98);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 4rem;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+            transform: translateX(100%);
+        }
+
+        .nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            width: 100%;
+            max-width: 400px;
+            padding: 1rem 1rem 1.5rem;
+            max-height: calc(100vh - 5rem);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Interactive button styles */
+        .nav-button {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.9rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border: 1.5px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.8rem;
+            cursor: pointer;
+            outline: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            touch-action: manipulation;
+            min-height: 54px;
+        }
+
+        .nav-button:hover,
+        .nav-button:active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            transform: translateY(-2px) translateX(3px);
+            border-color: #60a5fa;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .nav-button:hover::before {
+            transform: translateX(100%);
+        }
+
+        .nav-button i {
+            font-size: 1rem;
+            color: #fbbf24;
+            min-width: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover i {
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .nav-button .button-text {
+            flex-grow: 1;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .nav-button .button-badge {
+            background: #8b5cf6;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
+        }
+
+        .nav-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: #3b82f6;
+            cursor: pointer;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1.5px solid #3b82f6;
+            border-radius: 50%;
+            padding: 8px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10002;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
+            touch-action: manipulation;
+        }
+
+        .nav-close:hover,
+        .nav-close:active {
+            transform: rotate(90deg) scale(1.05);
+            color: #8b5cf6;
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.2);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .menu-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            width: 100%;
+            max-width: 400px;
+            padding: 0 1rem;
+        }
+
+        .menu-header h3 {
+            color: #3b82f6;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+
+        .menu-header p {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        /* Main content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            border: 1px solid #1e293b;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 250px;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+        
+        .hero h1 {
+            color: #e2e8f0;
+            margin-bottom: 0.8rem;
+            font-size: 1.8rem;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.3;
+            padding: 0 0.5rem;
+        }
+        
+        .hero p {
+            font-size: 1rem;
+            color: #94a3b8;
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            line-height: 1.5;
+            padding: 0 0.5rem;
+        }
+        
+        .author {
+            margin-top: 1rem;
+            color: #8b5cf6;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        /* Breadcrumb navigation */
+        /* Table of Contents */
+        .toc-container {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .toc-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 0.8rem;
+        }
+        
+        .toc-link {
+            color: #94a3b8;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+        }
+        
+        .toc-link:hover {
+            color: #60a5fa;
+            transform: translateX(5px);
+        }
+        
+        .toc-link i {
+            color: #3b82f6;
+            font-size: 0.8rem;
+        }
+        
+        /* FAQ Section */
+        .faq-item {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 1rem;
+        }
+        
+        /* Content sections - MOBILE OPTIMIZED */
+        section {
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid #1e293b;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            text-align: justify;
+        }
+        
+        section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        h2 {
+            color: #60a5fa;
+            margin-bottom: 1.2rem;
+            padding-bottom: 0.6rem;
+            border-bottom: 2px solid #1e293b;
+            font-size: 1.5rem;
+            position: relative;
+            line-height: 1.3;
+        }
+        
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, transparent);
+        }
+        
+        h3 {
+            color: #a78bfa;
+            margin: 1.2rem 0 0.8rem;
+            font-size: 1.2rem;
+            line-height: 1.3;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            font-size: 1rem;
+            text-align: justify;
+        }
+        
+        /* Code examples - MOBILE FRIENDLY */
+        .code-example {
+            background-color: #0c1219;
+            color: #e2e8f0;
+            padding: 1.2rem;
+            border-radius: 8px;
+            margin: 1.2rem 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.5);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        
+        .code-example code {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            white-space: pre;
+            min-width: min-content;
+        }
+        
+        .code-comment {
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .code-keyword {
+            color: #f472b6;
+        }
+        
+        .code-string {
+            color: #34d399;
+        }
+        
+        .code-function {
+            color: #60a5fa;
+        }
+        
+        .code-operator {
+            color: #fbbf24;
+        }
+        
+        .code-number {
+            color: #f59e0b;
+        }
+        
+        .example-output {
+            background-color: #0f172a;
+            border-left: 3px solid #3b82f6;
+            padding: 1rem 1.2rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+            border: 1px solid #1e293b;
+            font-size: 0.9rem;
+        }
+        
+        .example-output strong {
+            color: #60a5fa;
+        }
+        
+        /* Table styles - MOBILE RESPONSIVE */
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 1.2rem 0;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #e2e8f0;
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #1e293b;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #0f172a;
+        }
+        
+        tr:hover {
+            background-color: #1e293b;
+        }
+        
+        /* List styles */
+        ul {
+            padding-left: 1.2rem;
+            margin-bottom: 1.2rem;
+        }
+        
+        li {
+            margin-bottom: 0.6rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+        
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+            transition: color 0.3s;
+            word-break: break-word;
+        }
+        
+        a:hover {
+            color: #8b5cf6;
+            text-decoration: underline;
+        }
+        
+        /* Related tutorials */
+        .related-tutorials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .related-tutorial-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 1.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #cbd5e1;
+            transition: all 0.3s ease;
+            border: 1px solid #334155;
+            display: block;
+            height: 100%;
+        }
+        
+        .related-tutorial-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2);
+        }
+        
+        .related-tutorial-card h3 {
+            color: #a78bfa;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .related-tutorial-card p {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 0;
+        }
+        
+        /* ===== SOCIAL SHARE BUTTONS ===== */
+        .share-container {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            justify-content: center;
+        }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.7rem 1rem;
+            border-radius: 6px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            flex: 1;
+            min-width: 140px;
+            max-width: 200px;
+            touch-action: manipulation;
+        }
+
+        .share-btn:hover,
+        .share-btn:active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .share-btn i {
+            font-size: 1rem;
+        }
+
+        .share-facebook {
+            background: linear-gradient(135deg, #1877f2, #0d65d9);
+        }
+
+        .share-facebook:hover {
+            background: linear-gradient(135deg, #0d65d9, #084fa0);
+        }
+
+        .share-linkedin {
+            background: linear-gradient(135deg, #0077b5, #005885);
+        }
+
+        .share-linkedin:hover {
+            background: linear-gradient(135deg, #005885, #003d5c);
+        }
+
+        .share-twitter {
+            background: linear-gradient(135deg, #000000, #1a1a1a);
+        }
+
+        .share-twitter:hover {
+            background: linear-gradient(135deg, #1a1a1a, #333333);
+        }
+
+        .share-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+        }
+
+        .share-whatsapp:hover {
+            background: linear-gradient(135deg, #128C7E, #0c6b53);
+        }
+
+        .share-copy {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+        }
+
+        .share-copy:hover {
+            background: linear-gradient(135deg, #4b5563, #374151);
+        }
+
+        /* Newsletter styles - MOBILE OPTIMIZED */
+        .newsletter-input {
+            padding: 0.9rem;
+            border-radius: 6px;
+            border: 1.5px solid #334155;
+            background: #0f172a;
+            color: white;
+            font-size: 0.95rem;
+            width: 100%;
+            margin-bottom: 0.8rem;
+            -webkit-appearance: none;
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        .newsletter-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .newsletter-checkbox input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .newsletter-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 0.9rem 1.5rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            touch-action: manipulation;
+        }
+
+        .newsletter-btn:hover,
+        .newsletter-btn:active {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .newsletter-message {
+            margin-top: 1.2rem;
+            padding: 0.8rem;
+            border-radius: 6px;
+            text-align: center;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        .newsletter-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+
+        .newsletter-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        /* Modal styles - MOBILE FRIENDLY */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 1rem;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-content {
+            background: #0f172a;
+            padding: 1.5rem;
+            border-radius: 10px;
+            max-width: 100%;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid #1e293b;
+            margin-top: 2rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 0.8rem;
+            right: 0.8rem;
+            background: none;
+            border: none;
+            color: #3b82f6;
+            font-size: 1.3rem;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+            z-index: 1;
+            touch-action: manipulation;
+        }
+
+        .modal-close:hover,
+        .modal-close:active {
+            background: rgba(59, 130, 246, 0.1);
+            transform: rotate(90deg) scale(1.05);
+        }
+
+        .modal h3 {
+            color: #3b82f6;
+            margin-bottom: 0.8rem;
+            font-size: 1.3rem;
+            padding-right: 2rem;
+        }
+
+        .modal ul {
+            margin-left: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .modal li {
+            margin-bottom: 0.4rem;
+            color: #cbd5e1;
+        }
+
+        /* Footer - MOBILE OPTIMIZED */
+        footer {
+            background: linear-gradient(135deg, #0c1219 0%, #111827 100%);
+            color: #cbd5e1;
+            padding: 2rem 1rem 1rem;
+            margin-top: 3rem;
+            border-top: 1px solid #1e293b;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .footer-section h3 {
+            color: #a78bfa;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .footer-section h3::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, #8b5cf6, transparent);
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+        
+        .footer-links a:hover {
+            color: #60a5fa;
+            transform: translateX(3px);
+        }
+        
+        .social-icons {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 50%;
+            color: #60a5fa;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid #334155;
+            touch-action: manipulation;
+        }
+        
+        .social-icons a:hover,
+        .social-icons a:active {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            transform: translateY(-3px);
+            border-color: #3b82f6;
+            box-shadow: 0 3px 10px rgba(59, 130, 246, 0.3);
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid #1e293b;
+            color: #94a3b8;
+            font-size: 0.8rem;
+        }
+        
+        .copyright p {
+            margin-bottom: 0.4rem;
+            line-height: 1.4;
+        }
+        
+        /* Button states */
+        .nav-button.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-color: #60a5fa;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-button.active i {
+            color: white;
+            animation: spin 0.5s ease;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg) scale(1); }
+            to { transform: rotate(360deg) scale(1.1); }
+        }
+
+        /* Progress indicator */
+        .progress-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #1e293b;
+            z-index: 1001;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Touch-friendly adjustments */
+        button, 
+        a,
+        input[type="checkbox"],
+        input[type="radio"] {
+            touch-action: manipulation;
+        }
+
+        /* Prevent text size adjustment on orientation change */
+        html {
+            -webkit-text-size-adjust: 100%;
+        }
+
+        /* Responsive adjustments - TABLET */
+        @media (min-width: 768px) {
+            header {
+                padding: 1rem 2rem;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+            
+            .logo a {
+                font-size: 1.8rem;
+            }
+            
+            .menu-toggle span {
+                width: 28px;
+                height: 3px;
+            }
+            
+            .hero {
+                padding: 3rem 2rem;
+                margin-bottom: 2rem;
+                border-radius: 16px;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+                margin-bottom: 1rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .container {
+                padding: 2rem;
+            }
+            
+            section {
+                padding: 2rem;
+                margin-bottom: 2rem;
+                border-radius: 12px;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            h3 {
+                font-size: 1.4rem;
+                margin: 1.5rem 0 1rem;
+            }
+            
+            .code-example {
+                padding: 1.5rem;
+                font-size: 1rem;
+            }
+            
+            .code-example code {
+                font-size: 1rem;
+            }
+            
+            .nav-button {
+                padding: 1rem 1.2rem;
+                font-size: 1rem;
+            }
+            
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2.5rem;
+            }
+            
+            .share-btn {
+                padding: 0.8rem 1.2rem;
+                font-size: 0.9rem;
+                min-width: 160px;
+            }
+            
+            .toc-container {
+                padding: 2rem;
+            }
+        }
+
+        /* Responsive adjustments - DESKTOP */
+        @media (min-width: 1024px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .container {
+                padding: 2rem;
+            }
+            
+            .footer-content {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .share-container {
+                justify-content: center;
+            }
+            
+            .share-btn {
+                flex: 0 1 auto;
+                min-width: 140px;
+            }
+        }
+
+        /* Very small phones */
+        @media (max-width: 360px) {
+            header {
+                padding: 0.7rem 0.8rem;
+                min-height: 56px;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            .logo a {
+                font-size: 1.2rem;
+            }
+            
+            .menu-toggle {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .hero {
+                padding: 1.5rem 0.8rem;
+            }
+            
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .hero p {
+                font-size: 0.9rem;
+            }
+            
+            section {
+                padding: 1.2rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            h3 {
+                font-size: 1.1rem;
+            }
+            
+            .nav-button {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+                min-height: 50px;
+            }
+            
+            .nav-button i {
+                font-size: 0.9rem;
+            }
+            
+            .share-btn {
+                min-width: 120px;
+                padding: 0.6rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            
+            .social-icons a {
+                width: 36px;
+                height: 36px;
+            }
+        }
+
+        /* Landscape mode optimization */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .nav-overlay {
+                padding-top: 3rem;
+            }
+            
+            .nav-links {
+                max-height: calc(100vh - 4rem);
+            }
+            
+            .nav-button {
+                padding: 0.6rem 1rem;
+                min-height: 44px;
+            }
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0c1219;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #60a5fa, #a78bfa);
+        }
+        
+        /* Selection styling */
+        ::selection {
+            background-color: rgba(59, 130, 246, 0.5);
+            color: white;
+        }
+        
+        /* Prevent zoom on input focus in iOS */
+        @media screen and (max-width: 768px) {
+            input, 
+            textarea {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body itemscope itemtype="https://schema.org/WebPage">
+    <!-- Progress Indicator -->
+    <div class="progress-indicator">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Header -->
+    <header role="banner">
+        <div class="logo">
+            <a href="https://pansensoyglenn-dev.github.io/poetic-codes" aria-label="Poetic Codes Home">POETIC CODES</a>
+        </div>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <!-- Interactive Navigation Overlay -->
+    <div class="nav-overlay" id="navOverlay" role="navigation" aria-label="Main navigation">
+        <button class="nav-close" id="navClose" aria-label="Close navigation menu">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="menu-header">
+            <h3><i class="fas fa-code"></i> Python Strings Tutorial</h3>
+            <p>Navigate through the tutorial sections</p>
+        </div>
+        
+        <div class="nav-links" role="menu">
+            <button class="nav-button" data-section="home">
+                <i class="fas fa-home"></i>
+                <span class="button-text">Home Dashboard</span>
+                <span class="button-badge">New</span>
+            </button>
+            
+            <button class="nav-button" data-section="introduction">
+                <i class="fas fa-play-circle"></i>
+                <span class="button-text">Start Learning</span>
+            </button>
+            
+            <button class="nav-button" data-section="creation">
+                <i class="fas fa-plus-circle"></i>
+                <span class="button-text">Create Strings</span>
+            </button>
+            
+            <button class="nav-button" data-section="operations">
+                <i class="fas fa-cogs"></i>
+                <span class="button-text">String Operations</span>
+            </button>
+            
+            <button class="nav-button" data-section="methods">
+                <i class="fas fa-magic"></i>
+                <span class="button-text">String Methods</span>
+                <span class="button-badge">18+</span>
+            </button>
+            
+            <button class="nav-button" data-section="formatting">
+                <i class="fas fa-paint-brush"></i>
+                <span class="button-text">Format Strings</span>
+            </button>
+            
+            <button class="nav-button" data-section="slicing">
+                <i class="fas fa-cut"></i>
+                <span class="button-text">String Slicing</span>
+            </button>
+            
+            <button class="nav-button" data-section="advanced">
+                <i class="fas fa-rocket"></i>
+                <span class="button-text">Advanced Topics</span>
+            </button>
+            
+            <button class="nav-button" data-section="best-practices">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="button-text">Best Practices</span>
+                <span class="button-badge">Pro</span>
+            </button>
+            
+            <button class="nav-button" data-action="quiz">
+                <i class="fas fa-question-circle"></i>
+                <span class="button-text">Take Quiz</span>
+                <span class="button-badge">Test</span>
+            </button>
+            
+            <button class="nav-button" data-action="download">
+                <i class="fas fa-download"></i>
+                <span class="button-text">Download PDF</span>
+            </button>
+            
+            <button class="nav-button" data-action="share">
+                <i class="fas fa-share-alt"></i>
+                <span class="button-text">Share Tutorial</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <main class="container" role="main" itemprop="mainContentOfPage">
+        <article itemscope itemtype="https://schema.org/TechArticle">
+            <meta itemprop="datePublished" content="2026-02-04">
+            <meta itemprop="dateModified" content="2026-02-04">
+            
+            <header class="hero" itemprop="headline">
+                <h1>Python Strings: Complete Guide with Examples</h1>
+                <p itemprop="description">A comprehensive tutorial on Python strings, covering creation, manipulation, methods, formatting, and best practices with practical code examples.</p>
+                <p class="author" itemprop="author" itemscope itemtype="https://schema.org/Person">
+                    By: <span itemprop="name">Glenn Junsay Pansensoy</span>
+                </p>
+            </header>
+            
+            <!-- Table of Contents for SEO -->
+            <section class="toc-container">
+                <h2><i class="fas fa-list"></i> Table of Contents</h2>
+                <div class="toc-links">
+                    <a href="#introduction" class="toc-link">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Introduction to Python Strings</span>
+                    </a>
+                    <a href="#creation" class="toc-link">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Creating Strings in Python</span>
+                    </a>
+                    <a href="#operations" class="toc-link">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>String Operations</span>
+                    </a>
+                    <a href="#methods" class="toc-link">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Common String Methods</span>
+                    </a>
+                    <a href="#formatting" class="toc-link">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>String Formatting</span>
+                    </a>
+                    <a href="#slicing" class="toc-link">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>String Slicing and Indexing</span>
+                    </a>
+                    <a href="#advanced" class="toc-link">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Advanced Topics</span>
+                    </a>
+                    <a href="#best-practices" class="toc-link">
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Best Practices</span>
+                    </a>
+                    <a href="strings.html" class= "toc-link"><i class="fas fa-chevron-right"></i><span>More String Examples</span></a>
+                </div>
+            </section>
+            
+            <section id="faq">
+                <h2><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+                <div class="faq-item">
+                    <h3>What are Python strings and why are they important?</h3>
+                    <p>Python strings are sequences of characters used for text manipulation. They are one of Python's most fundamental data types, essential for data processing, web development, automation, and more. Strings in Python are immutable and come with over 45 built-in methods for manipulation.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>How many string methods does Python have?</h3>
+                    <p>Python provides over 45 built-in string methods. This tutorial covers the 18 most essential methods including <code>upper()</code>, <code>lower()</code>, <code>strip()</code>, <code>split()</code>, <code>join()</code>, <code>replace()</code>, and <code>find()</code>, which handle 90% of common string manipulation tasks.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>What's the best way to format strings in Python?</h3>
+                    <p>For Python 3.6+, f-strings are recommended for their readability and performance. They allow embedding expressions directly in string literals: <code>f"Hello {name}, you have {count} messages."</code>. For older Python versions, <code>format()</code> method is a good alternative.</p>
+                </div>
+            </section>
+            
+            <section id="introduction" itemprop="articleBody">
+                <h2>Introduction to Python Strings</h2>
+                <p>In Python, strings are sequences of characters enclosed in quotes. They are one of the most commonly used data types and come with a rich set of built-in methods for manipulation.</p>
+                <p>Strings in Python are immutable, meaning once created, they cannot be changed. Any operation that appears to modify a string actually creates a new one.</p>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Basic string examples</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Hello, World!"</span>)  <span class="code-comment"># Double quotes</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">'Python Programming'</span>)  <span class="code-comment"># Single quotes</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"""Multi-line
+strings can be created
+using triple quotes"""</span>)  <span class="code-comment"># Triple quotes for multi-line</span>
+                    </code>
+                </div>
+            </section>
+            
+            <section id="creation">
+                <h2>Creating Strings in Python</h2>
+                <p>Python provides several ways to create strings, each suitable for different scenarios.</p>
+                
+                <h3>String Creation Methods</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Example</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Single quotes</td>
+                                <td>'Hello'</td>
+                                <td>Simple strings without single quotes inside</td>
+                            </tr>
+                            <tr>
+                                <td>Double quotes</td>
+                                <td>"World"</td>
+                                <td>Strings with single quotes inside</td>
+                            </tr>
+                            <tr>
+                                <td>Triple quotes</td>
+                                <td>'''Multi-line string'''</td>
+                                <td>Multi-line strings or docstrings</td>
+                            </tr>
+                            <tr>
+                                <td>str() function</td>
+                                <td>str(123)</td>
+                                <td>Converting other types to strings</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Different ways to create strings</span><br>
+                        str1 = <span class="code-string">'Single quoted string'</span><br>
+                        str2 = <span class="code-string">"Double quoted string"</span><br>
+                        str3 = <span class="code-string">'''Triple quoted
+multi-line string'''</span><br>
+                        str4 = <span class="code-function">str</span>(<span class="code-number">42</span>)  <span class="code-comment"># Convert integer to string</span><br>
+                        <span class="code-comment"># String with escape sequences</span><br>
+                        str5 = <span class="code-string">"Line 1\nLine 2\tTabbed text"</span><br>
+                        <br>
+                        <span class="code-keyword">print</span>(str1)<br>
+                        <span class="code-keyword">print</span>(str3)<br>
+                        <span class="code-keyword">print</span>(str5)
+                    </code>
+                </div>
+                
+                <div class="example-output">
+                    <strong>Output:</strong><br>
+                    Single quoted string<br>
+                    Triple quoted<br>
+                    multi-line string<br>
+                    Line 1<br>
+                    Line 2	Tabbed text
+                </div>
+            </section>
+            
+            <section id="operations">
+                <h2>String Operations</h2>
+                <p>Python supports various operations on strings including concatenation, repetition, and membership testing.</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Operation</th>
+                                <th>Operator</th>
+                                <th>Example</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Concatenation</td>
+                                <td>+</td>
+                                <td>"Hello" + "World"</td>
+                                <td>"HelloWorld"</td>
+                            </tr>
+                            <tr>
+                                <td>Repetition</td>
+                                <td>*</td>
+                                <td>"Hi" * 3</td>
+                                <td>"HiHiHi"</td>
+                            </tr>
+                            <tr>
+                                <td>Membership</td>
+                                <td>in</td>
+                                <td>"H" in "Hello"</td>
+                                <td>True</td>
+                            </tr>
+                            <tr>
+                                <td>Not in</td>
+                                <td>not in</td>
+                                <td>"z" not in "Hello"</td>
+                                <td>True</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># String operations examples</span><br>
+                        str1 = <span class="code-string">"Hello"</span><br>
+                        str2 = <span class="code-string">"World"</span><br>
+                        <br>
+                        <span class="code-comment"># Concatenation</span><br>
+                        result = str1 + <span class="code-string">" "</span> + str2<br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Concatenation:"</span>, result)  <span class="code-comment"># Hello World</span><br>
+                        <br>
+                        <span class="code-comment"># Repetition</span><br>
+                        repeated = str1 * <span class="code-number">3</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Repetition:"</span>, repeated)  <span class="code-comment"># HelloHelloHello</span><br>
+                        <br>
+                        <span class="code-comment"># Membership testing</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"'e' in 'Hello':"</span>, <span class="code-string">'e'</span> <span class="code-keyword">in</span> str1)  <span class="code-comment"># True</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"'z' in 'Hello':"</span>, <span class="code-string">'z'</span> <span class="code-keyword">in</span> str1)  <span class="code-comment"># False</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"'World' in 'Hello World':"</span>, str2 <span class="code-keyword">in</span> result)  <span class="code-comment"># True</span>
+                    </code>
+                </div>
+            </section>
+            
+            <section id="methods">
+                <h2>Common String Methods</h2>
+                <p>Python provides many built-in methods for string manipulation. Here are some of the most useful ones:</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Description</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>upper()</td>
+                                <td>Converts to uppercase</td>
+                                <td>"hello".upper() → "HELLO"</td>
+                            </tr>
+                            <tr>
+                                <td>lower()</td>
+                                <td>Converts to lowercase</td>
+                                <td>"HELLO".lower() → "hello"</td>
+                            </tr>
+                            <tr>
+                                <td>strip()</td>
+                                <td>Removes whitespace</td>
+                                <td>" hello ".strip() → "hello"</td>
+                            </tr>
+                            <tr>
+                                <td>split()</td>
+                                <td>Splits into list</td>
+                                <td>"a,b,c".split(",") → ["a","b","c"]</td>
+                            </tr>
+                            <tr>
+                                <td>join()</td>
+                                <td>Joins list into string</td>
+                                <td>",".join(["a","b","c"]) → "a,b,c"</td>
+                            </tr>
+                            <tr>
+                                <td>replace()</td>
+                                <td>Replaces substring</td>
+                                <td>"hello".replace("l","x") → "hexxo"</td>
+                            </tr>
+                            <tr>
+                                <td>find()</td>
+                                <td>Finds substring index</td>
+                                <td>"hello".find("e") → 1</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># String methods in action</span><br>
+                        text = <span class="code-string">"  Python Programming  "</span><br>
+                        <br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Original:"</span>, text)<br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Stripped:"</span>, text.strip())<br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Uppercase:"</span>, text.upper())<br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Lowercase:"</span>, text.lower())<br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Title case:"</span>, text.strip().title())<br>
+                        <br>
+                        <span class="code-comment"># Split and join</span><br>
+                        words = text.strip().split(<span class="code-string">" "</span>)<br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Split:"</span>, words)<br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Joined with '-':"</span>, <span class="code-string">"-"</span>.join(words))<br>
+                        <br>
+                        <span class="code-comment"># Replace and find</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Replace 'Programming' with 'Coding':"</span>, text.replace(<span class="code-string">"Programming"</span>, <span class="code-string">"Coding"</span>))<br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Find 'Pro' index:"</span>, text.find(<span class="code-string">"Pro"</span>))
+                    </code>
+                </div>
+            </section>
+            
+            <section id="formatting">
+                <h2>String Formatting</h2>
+                <p>Python offers several ways to format strings, with f-strings being the most modern and recommended approach.</p>
+                
+                <h3>String Formatting Methods</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Python Version</th>
+                                <th>Example</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>f-strings</td>
+                                <td>3.6+</td>
+                                <td>f"Hello {name}"</td>
+                            </tr>
+                            <tr>
+                                <td>format() method</td>
+                                <td>2.6+</td>
+                                <td>"Hello {}".format(name)</td>
+                            </tr>
+                            <tr>
+                                <td>% formatting</td>
+                                <td>All</td>
+                                <td>"Hello %s" % name</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Different string formatting methods</span><br>
+                        name = <span class="code-string">"Glenn"</span><br>
+                        age = <span class="code-number">30</span><br>
+                        language = <span class="code-string">"Python"</span><br>
+                        <br>
+                        <span class="code-comment"># 1. f-strings (recommended for Python 3.6+)</span><br>
+                        message1 = <span class="code-function">f</span><span class="code-string">"Hello, {name}. You are {age} years old and learning {language}."</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"f-string:"</span>, message1)<br>
+                        <br>
+                        <span class="code-comment"># 2. format() method</span><br>
+                        message2 = <span class="code-string">"Hello, {}. You are {} years old and learning {}."</span>.format(name, age, language)<br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"format():"</span>, message2)<br>
+                        <br>
+                        <span class="code-comment"># 3. % formatting (old style)</span><br>
+                        message3 = <span class="code-string">"Hello, %s. You are %d years old and learning %s."</span> % (name, age, language)<br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"% formatting:"</span>, message3)<br>
+                        <br>
+                        <span class="code-comment"># Formatting numbers with f-strings</span><br>
+                        price = <span class="code-number">99.99</span><br>
+                        discount = <span class="code-number">0.15</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-function">f</span><span class="code-string">"Price: ${price:.2f}"</span>)<br>
+                        <span class="code-keyword">print</span>(<span class="code-function">f</span><span class="code-string">"Discount: {discount:.1%}"</span>)
+                    </code>
+                </div>
+            </section>
+            
+            <section id="slicing">
+                <h2>String Slicing and Indexing</h2>
+                <p>String slicing is a powerful feature in Python that allows you to extract portions of a string using index notation.</p>
+                
+                <h3>Basic Indexing</h3>
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># String indexing (zero-based)</span><br>
+                        text = <span class="code-string">"Python"</span><br>
+                        <span class="code-keyword">print</span>(text[<span class="code-number">0</span>])   <span class="code-comment"># Output: P (first character)</span><br>
+                        <span class="code-keyword">print</span>(text[-<span class="code-number">1</span>])  <span class="code-comment"># Output: n (last character)</span><br>
+                        <span class="code-keyword">print</span>(text[<span class="code-number">2</span>])   <span class="code-comment"># Output: t (third character)</span>
+                    </code>
+                </div>
+                
+                <h3>Slicing Syntax</h3>
+                <p>The general syntax for slicing is: <code>string[start:end:step]</code></p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Slice</th>
+                                <th>Result</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>text[1:4]</td>
+                                <td>"yth"</td>
+                                <td>Characters from index 1 to 3</td>
+                            </tr>
+                            <tr>
+                                <td>text[:3]</td>
+                                <td>"Pyt"</td>
+                                <td>From start to index 2</td>
+                            </tr>
+                            <tr>
+                                <td>text[3:]</td>
+                                <td>"hon"</td>
+                                <td>From index 3 to end</td>
+                            </tr>
+                            <tr>
+                                <td>text[::2]</td>
+                                <td>"Pto"</td>
+                                <td>Every 2nd character</td>
+                            </tr>
+                            <tr>
+                                <td>text[::-1]</td>
+                                <td>"nohtyP"</td>
+                                <td>Reverse the string</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Advanced slicing examples</span><br>
+                        sentence = <span class="code-string">"The quick brown fox jumps"</span><br>
+                        <br>
+                        <span class="code-comment"># Get first word</span><br>
+                        first_word = sentence[:<span class="code-number">3</span>]  <span class="code-comment"># "The"</span><br>
+                        <br>
+                        <span class="code-comment"># Get last word</span><br>
+                        last_word = sentence[-<span class="code-number">5</span>:]  <span class="code-comment"># "jumps"</span><br>
+                        <br>
+                        <span class="code-comment"># Reverse string</span><br>
+                        reversed_text = sentence[::-<span class="code-number">1</span>]  <span class="code-comment"># "spmuj xof nworb kciuq ehT"</span><br>
+                        <br>
+                        <span class="code-comment"># Every other character</span><br>
+                        every_other = sentence[::<span class="code-number">2</span>]  <span class="code-comment"># "Teqikbonfxjms"</span>
+                    </code>
+                </div>
+            </section>
+            
+            <section id="advanced">
+                <h2>Advanced String Topics</h2>
+                <p>Beyond basic operations, Python strings support several advanced features.</p>
+                
+                <h3>Escape Sequences</h3>
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Common escape sequences</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Line 1\nLine 2"</span>)      <span class="code-comment"># New line</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Tab:\ttext"</span>)          <span class="code-comment"># Tab</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Backslash: \\"</span>)        <span class="code-comment"># Backslash</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Double quote: \""</span>)      <span class="code-comment"># Double quote</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Single quote: \'"</span>)      <span class="code-comment"># Single quote</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Unicode: \u03B1"</span>)       <span class="code-comment"># Greek alpha</span>
+                    </code>
+                </div>
+                
+                <h3>Raw Strings</h3>
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Raw strings ignore escape sequences</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">"Normal: C:\Users\Name"</span>)  <span class="code-comment"># Causes error</span><br>
+                        <span class="code-keyword">print</span>(<span class="code-string">r"Raw: C:\Users\Name"</span>)    <span class="code-comment"># Correct</span>
+                    </code>
+                </div>
+            </section>
+            
+            <section id="best-practices">
+                <h2>String Best Practices</h2>
+                <p>Following best practices ensures your string code is efficient, readable, and maintainable.</p>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Use f-strings for modern Python</span><br>
+                        name = <span class="code-string">"Glenn"</span><br>
+                        age = <span class="code-number">30</span><br>
+                        message = <span class="code-function">f</span><span class="code-string">"Hello, {name}. You are {age} years old."</span><br>
+                        <br>
+                        <span class="code-comment"># Use join() for concatenating multiple strings</span><br>
+                        words = [<span class="code-string">'Python'</span>, <span class="code-string">'is'</span>, <span class="code-string">'awesome'</span>]<br>
+                        sentence = <span class="code-string">' '</span>.join(words)  <span class="code-comment"># Better than word1 + ' ' + word2</span><br>
+                        <br>
+                        <span class="code-comment"># Use triple quotes for long strings</span><br>
+                        long_text = <span class="code-string">"""This is a very long string
+that spans multiple lines
+and is more readable."""</span>
+                    </code>
+                </div>
+                
+                <h3>Key Best Practices:</h3>
+                <ul>
+                    <li>Use f-strings for string formatting (Python 3.6+)</li>
+                    <li>Prefer <code>join()</code> over <code>+</code> for concatenating many strings</li>
+                    <li>Use triple quotes for multi-line strings</li>
+                    <li>Use raw strings for file paths and regular expressions</li>
+                    <li>Always validate and sanitize user input strings</li>
+                    <li>Use string methods instead of manual manipulation</li>
+                </ul>
+            </section>
+            
+            <section id="resources">
+                <h2>Additional Resources</h2>
+                <p>To further your Python string knowledge, consider these resources:</p>
+                <ul>
+                    <li>Official Python Documentation: <a href="https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str" target="_blank" rel="noopener noreferrer">Text Sequence Type — str</a></li>
+                    <li>Python String Methods: <a href="https://www.w3schools.com/python/python_ref_string.asp" target="_blank" rel="noopener noreferrer">W3Schools Python String Methods</a></li>
+                    <li>Real Python String Tutorials: <a href="https://realpython.com/python-strings/" target="_blank" rel="noopener noreferrer">Python Strings: An In-Depth Tutorial</a></li>
+                    <li>Python String Formatting: <a href="https://pyformat.info/" target="_blank" rel="noopener noreferrer">PyFormat Guide</a></li>
+                </ul>
+            </section>
+        </article>
+    </main>
+    
+    <section id="related-tutorials" style="background: linear-gradient(135deg, #0c1219, #111827); padding: 2.5rem 1rem; margin-top: 1.5rem; border-radius: 12px;">
+        <h2 style="color: #60a5fa; text-align: center; margin-bottom: 1.5rem; font-size: 1.5rem;">
+            <i class="fas fa-book-open"></i> Related Python Tutorials
+        </h2>
+        <div class="related-tutorials-grid">
+            <a href="python-lists.html" class="related-tutorial-card">
+                <h3>Python Lists Tutorial</h3>
+                <p>Complete guide to Python lists with examples and methods</p>
+            </a>
+            <a href="python-dictionaries.html" class="related-tutorial-card">
+                <h3>Python Dictionaries Tutorial</h3>
+                <p>Master Python dictionaries with key-value pairs and methods</p>
+            </a>
+            <a href="python-functions.html" class="related-tutorial-card">
+                <h3>Python Functions Tutorial</h3>
+                <p>Learn functions, parameters, and lambda expressions</p>
+            </a>
+        </div>
+    </section>
+    
+    <!-- NEWSLETTER SECTION -->
+    <section id="newsletter">
+        <h2><i class="fas fa-envelope"></i> Subscribe to Our Newsletter</h2>
+        <p>Get the latest Python tutorials, tips, and exclusive content delivered to your inbox.</p>
+        
+        <form id="newsletterForm">
+            <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 0.8rem;">
+                <input type="email" class="newsletter-input" placeholder="Your email address" required>
+                <input type="text" class="newsletter-input" placeholder="Your name (optional)">
+            </div>
+            
+            <div class="newsletter-checkbox">
+                <label>
+                    <input type="checkbox" required>
+                    I agree to receive educational content and updates
+                </label>
+            </div>
+            
+            <button type="submit" class="newsletter-btn">
+                <i class="fas fa-paper-plane"></i> Subscribe Now
+            </button>
+        </form>
+        
+        <p id="newsletterMessage" class="newsletter-message"></p>
+    </section>
+    
+    <section id="social-sharing">
+        <h2><i class="fas fa-share-nodes"></i> Share This Guide</h2>
+        <p>Help others master Python strings! Share this comprehensive guide with your network and contribute to the developer community.</p>
+        
+        <!-- SOCIAL SHARE BUTTONS -->
+        <div class="share-container">
+            <button class="share-btn share-facebook" onclick="shareOnFacebook()" aria-label="Share on Facebook">
+                <i class="fab fa-facebook-f"></i> Share on Facebook
+            </button>
+            <button class="share-btn share-linkedin" onclick="shareOnLinkedIn()" aria-label="Share on LinkedIn">
+                <i class="fab fa-linkedin-in"></i> Share on LinkedIn
+            </button>
+            <button class="share-btn share-twitter" onclick="shareOnTwitter()" aria-label="Share on X (Twitter)">
+                <i class="fab fa-x-twitter"></i> Share on X
+            </button>
+            <button class="share-btn share-whatsapp" onclick="shareOnWhatsApp()" aria-label="Share on WhatsApp">
+                <i class="fab fa-whatsapp"></i> Share on WhatsApp
+            </button>
+            <button class="share-btn share-copy" onclick="copyToClipboard()" aria-label="Copy link to clipboard">
+                <i class="fas fa-link"></i> Copy Link
+            </button>
+        </div>
+        
+        <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 1.5rem;">
+            <i class="fas fa-heart" style="color: #ff6b6b;"></i> Thank you for spreading knowledge!
+        </p>
+    </section>
+    
+    <footer role="contentinfo">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>POETIC CODES</h3>
+                <p style="font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem;">Exploring the art and science of programming through clean, expressive code. Tutorials, examples, and insights for developers at all levels.</p>
+                <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Created by Glenn Junsay Pansensoy</p>
+                <p style="font-size: 0.9rem;"><i class="fab fa-python"></i> Specializing in Python Development</p>
+                <div class="social-icons">
+                    <a href="https://github.com/pansensoyglenn-dev" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://linkedin.com/in/glenn-pansensoy-6288453a2" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://x.com/@GlennPansensoy" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+                        <i class="fab fa-x-twitter"></i>
+                    </a>
+                    <a href="/cdn-cgi/l/email-protection#f585949b86909b869a8c9299909b9bb59298949c99db969a98" aria-label="pansensoyglenn@gmail.com">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Tutorial Sections</h3>
+                <ul class="footer-links">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#creation">Creating Strings</a></li>
+                    <li><a href="#operations">String Operations</a></li>
+                    <li><a href="#methods">String Methods</a></li>
+                    <li><a href="#formatting">String Formatting</a></li>
+                    <li><a href="#slicing">String Slicing</a></li>
+                    <li><a href="#best-practices">Best Practices</a></li>
+                    <li><a href="strings.html">More String Examples</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Legal Information</h3>
+                <ul class="footer-links">
+                    <li><a href="privacy.html" onclick="showModal('privacy')">Privacy Policy</a></li>
+                    <li><a href="terms.html" onclick="showModal('terms')">Terms of Service</a></li>
+                    <li><a href="disclaimer.html" onclick="showModal('disclaimer')">Disclaimer</a></li>
+                    <li><a href="cookie.html" onclick="showModal('cookies')">Cookie Policy</a></li>
+                    <li><a href="ccpa.html" onclick="showModal('ccpa')">CCPA Compliance</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact & Support</h3>
+                <ul class="footer-links">
+                    <li><i class="fas fa-envelope"></i>  pansensoyglenn@gmail.com</li>
+                    <li><i class="fas fa-globe"></i> https://pansensoyglenn-dev.github.io</li>
+                    <li><i class="fas fa-code"></i> Open Source MIT License</li>
+                    <li><i class="fas fa-bug"></i> <a href="#" onclick="reportIssue()">Report Issue</a></li>
+                    <li><i class="fas fa-star"></i> <a href="#" onclick="rateTutorial()">Rate This Tutorial</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2026 Poetic Codes | Created by Glenn Junsay Pansensoy</p>
+            <p>All code examples are free to use under MIT License | Last updated: February 2026</p>
+            <p style="font-size: 0.8rem; margin-top: 1rem; color: #64748b;">
+                This tutorial is for educational purposes only. Python is a trademark of the Python Software Foundation.
+            </p>
+        </div>
+    </footer>
+    
+    <div id="legalModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()" aria-label="Close modal">×</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+    
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const navOverlay = document.getElementById('navOverlay');
+            const navClose = document.getElementById('navClose');
+            const body = document.body;
+            const navButtons = document.querySelectorAll('.nav-button');
+            const progressBar = document.getElementById('progressBar');
+
+            if (!menuToggle || !navOverlay || !navClose) {
+                console.error('Menu elements not found!');
+                return;
+            }
+
+            function toggleMenu(e) {
+                if (e) e.preventDefault();
+                const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+                
+                menuToggle.classList.toggle('active');
+                navOverlay.classList.toggle('active');
+                menuToggle.setAttribute('aria-expanded', !isExpanded);
+                navOverlay.setAttribute('aria-hidden', isExpanded);
+                
+                body.style.overflow = navOverlay.classList.contains('active') ? 'hidden' : 'auto';
+                
+                if (navOverlay.classList.contains('active')) {
+                    navClose.focus();
+                }
+            }
+
+            // Event listeners for menu
+            menuToggle.addEventListener('click', toggleMenu);
+            navClose.addEventListener('click', toggleMenu);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navOverlay.classList.contains('active')) {
+                toggleMenu();
+            }
+        });
+
+        navOverlay.addEventListener('click', (e) => {
+            if (e.target === navOverlay) {
+                toggleMenu();
+            }
+        });
+
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', () => {
+                if (navOverlay.classList.contains('active')) {
+                    toggleMenu();
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!navOverlay.classList.contains('active')) return;
+            
+            const focusableElements = navOverlay.querySelectorAll(
+                'button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
+            const firstFocusable = focusableElements[0];
+            const lastFocusable = focusableElements[focusableElements.length - 1];
+            
+            if (e.key === 'Tab') {
+                if (e.shiftKey) {
+                    if (document.activeElement === firstFocusable) {
+                        e.preventDefault();
+                        lastFocusable.focus();
+                    }
+                } else {
+                    if (document.activeElement === lastFocusable) {
+                        e.preventDefault();
+                        firstFocusable.focus();
+                    }
+                }
+            }
+        });
+
+        navButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const section = this.dataset.section;
+                const action = this.dataset.action;
+                
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                
+                this.classList.add('active');
+                
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+                
+                if (section) {
+                    if (section === 'home') {
+                        window.location.href = 'index.html';
+                    } else {
+                        const targetElement = document.getElementById(section);
+                        if (targetElement) {
+                        
+                            setTimeout(() => {
+                                window.scrollTo({
+                                    top: targetElement.offsetTop - 80,
+                                    behavior: 'smooth'
+                                });
+                            }, 300);
+                        }
+                    }
+                }
+                
+                if (action) {
+                    handleAction(action);
+                }
+            });
+            
+            button.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    button.click();
+                }
+            });
+        });
+
+        function handleAction(action) {
+            switch(action) {
+                case 'quiz':
+                    alert('Quiz feature coming soon! This will test your Python string knowledge.');
+                    break;
+                case 'download':
+                    alert('PDF download feature coming soon! You will be able to download this tutorial as a PDF.');
+                    break;
+                case 'share':
+                    setTimeout(() => {
+                        document.getElementById('social-sharing').scrollIntoView({ behavior: 'smooth' });
+                    }, 300);
+                    break;
+            }
+        }
+        
+        window.addEventListener('scroll', () => {
+            const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (window.scrollY / windowHeight) * 100;
+            progressBar.style.width = scrolled + '%';
+        });
+
+        const sections = document.querySelectorAll('section[id]');
+        
+        function setActiveSection() {
+            const scrollPosition = window.scrollY + 150;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                const sectionId = section.getAttribute('id');
+                
+                if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                  
+                    navButtons.forEach(button => {
+                        if (button.dataset.section === sectionId) {
+                            button.classList.add('active');
+                        } else {
+                            button.classList.remove('active');
+                        }
+                    });
+                }
+            });
+        }
+
+        window.addEventListener('scroll', setActiveSection);
+        setActiveSection(); 
+        document.getElementById('newsletterForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const email = form.querySelector('input[type="email"]').value;
+            const messageEl = document.getElementById('newsletterMessage');
+            
+            if (!email || !email.includes('@')) {
+                messageEl.textContent = 'Please enter a valid email address.';
+                messageEl.className = 'newsletter-message newsletter-error';
+                messageEl.style.display = 'block';
+                return;
+            }
+            
+            messageEl.innerHTML = '<i class="fas fa-check-circle"></i> Thank you for subscribing! Check your email to confirm.';
+            messageEl.className = 'newsletter-message newsletter-success';
+            messageEl.style.display = 'block';
+            
+            form.reset();
+            
+            
+            setTimeout(() => {
+                messageEl.style.display = 'none';
+            }, 5000);
+        });
+
+        
+        const getPageDetails = () => {
+            return {
+                url: encodeURIComponent(window.location.href),
+                title: encodeURIComponent('Python Strings Tutorial: Complete Guide with Examples | Poetic Codes'),
+                description: encodeURIComponent('Master Python strings with our comprehensive guide covering all string methods, formatting, slicing, and best practices. Perfect for beginners to advanced developers.'),
+                hashtags: 'Python,Programming,Strings,Tutorial,LearnPython,Coding'
+            };
+        };
+
+        function shareOnFacebook() {
+            const { url } = getPageDetails();
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+            window.open(facebookUrl, 'facebook-share', 'width=600,height=400');
+            trackShare('facebook');
+        }
+
+        function shareOnLinkedIn() {
+            const { url } = getPageDetails();
+            const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+            window.open(linkedInUrl, 'linkedin-share', 'width=600,height=600');
+            trackShare('linkedin');
+        }
+
+        function shareOnTwitter() {
+            const { url, hashtags } = getPageDetails();
+            const twitterText = encodeURIComponent('Master Python Strings! Comprehensive guide covering all string methods, formatting, slicing, and best practices.');
+            const twitterUrl = `https://twitter.com/intent/tweet?url=${url}&text=${twitterText}&hashtags=${hashtags}`;
+            window.open(twitterUrl, 'twitter-share', 'width=600,height=400');
+            trackShare('twitter');
+        }
+
+        function shareOnWhatsApp() {
+            const { url, title } = getPageDetails();
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${title}%20${url}`;
+            window.open(whatsappUrl, 'whatsapp-share', 'width=600,height=400');
+            trackShare('whatsapp');
+        }
+
+        function copyToClipboard() {
+            const { url } = getPageDetails();
+            navigator.clipboard.writeText(decodeURIComponent(url)).then(() => {
+                alert('Link copied to clipboard! Share this Python strings tutorial with others.');
+                trackShare('clipboard');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy link. Please try again.');
+            });
+        }
+
+        function trackShare(platform) {
+            console.log(`Shared on ${platform} at ${new Date().toISOString()}`);
+            
+        }
+
+        function showModal(type) {
+            const modal = document.getElementById('legalModal');
+            const content = document.getElementById('modalContent');
+            
+            const legalContent = {
+                privacy: `<h3>Privacy Policy</h3>
+                         <p>We respect your privacy. This tutorial page:</p>
+                         <ul>
+                             <li>Does not collect personal data</li>
+                             <li>Does not use tracking cookies</li>
+                             <li>Does not share data with third parties</li>
+                             <li>Stores preferences locally in your browser</li>
+                         </ul>
+                         <p>For any privacy concerns, contact: pansensoyglenn@gmail.com</p>`,
+                
+                terms: `<h3>Terms of Service</h3>
+                        <p>By using this tutorial, you agree to:</p>
+                        <ul>
+                            <li>Use content for educational purposes</li>
+                            <li>Credit the author when sharing</li>
+                            <li>Not redistribute without permission</li>
+                            <li>Accept that code examples are provided "as-is"</li>
+                            <li>Not use automated tools to scrape content</li>
+                        </ul>`,
+                
+                disclaimer: `<h3>Disclaimer</h3>
+                             <p>This tutorial is provided for educational purposes only. The author:</p>
+                             <ul>
+                                 <li>Is not responsible for any errors or omissions</li>
+                                 <li>Does not guarantee completeness or accuracy</li>
+                                 <li>Is not liable for any damages from use of this content</li>
+                                 <li>Recommends verifying information with official documentation</li>
+                             </ul>
+                             <p>Always test code in a safe environment before production use.</p>`,
+                
+                cookies: `<h3>Cookie Policy</h3>
+                          <p>This website uses minimal cookies for essential functionality:</p>
+                          <ul>
+                              <li>Session cookies for navigation state</li>
+                              <li>Local storage for theme preferences</li>
+                              <li>No third-party tracking cookies</li>
+                              <li>No advertising cookies</li>
+                          </ul>
+                          <p>You can disable cookies in your browser settings if preferred.</p>`,
+                
+                ccpa: `<h3>CCPA Compliance</h3>
+                       <p>This website complies with the California Consumer Privacy Act (CCPA):</p>
+                       <ul>
+                           <li>Right to know what personal information is collected</li>
+                           <li>Right to delete personal information</li>
+                           <li>Right to opt-out of sale of personal information</li>
+                           <li>Right to non-discrimination for exercising CCPA rights</li>
+                       </ul>
+                       <p>Contact: pansensoyglenn@gmail.com for CCPA requests.</p>`
+            };
+            
+            content.innerHTML = legalContent[type] || '<p>Content not available.</p>';
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('legalModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        document.getElementById('legalModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('legalModal')) {
+                closeModal();
+            }
+        });
+
+        // Support functions
+        function reportIssue() {
+            const email = 'pansensoyglenn@gmail.com';
+            const subject = encodeURIComponent('Issue Report: Python Strings Tutorial');
+            const body = encodeURIComponent('Please describe the issue you encountered:\n\nPage URL: ' + window.location.href);
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+
+        function rateTutorial() {
+            alert('Thank you for your interest in rating this tutorial! Coming soon: rating system.');
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#' || targetId.includes('.html')) return;
+                
+                e.preventDefault();
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // ===== ANIMATIONS =====
+        document.querySelectorAll('section').forEach(section => {
+            section.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+                this.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.4)';
+            });
+            
+            section.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.3)';
+            });
+        });
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstButton = document.querySelector('.nav-button[data-section="introduction"]');
+            if (firstButton) {
+                firstButton.classList.add('active');
+            }
+            
+            const newsletterSection = document.getElementById('newsletter');
+            if (newsletterSection) {
+                newsletterSection.style.background = 'linear-gradient(135deg, #0f172a, #1e293b)';
+                newsletterSection.style.padding = '2.5rem 1rem';
+                newsletterSection.style.marginTop = '1.5rem';
+                newsletterSection.style.borderRadius = '12px';
+                newsletterSection.style.textAlign = 'center';
+            }
+            
+            const socialSection = document.getElementById('social-sharing');
+            if (socialSection) {
+                socialSection.style.background = '#111827';
+                socialSection.style.padding = '2.5rem 1rem';
+                socialSection.style.marginTop = '1.5rem';
+                socialSection.style.borderTop = '1px solid #1e293b';
+                socialSection.style.borderBottom = '1px solid #1e293b';
+            }
+        });
+
+        let pageStartTime = Date.now();
+        window.addEventListener('beforeunload', function() {
+            const timeSpent = Date.now() - pageStartTime;
+            console.log(`Time spent on Python Strings Tutorial: ${Math.round(timeSpent/1000)} seconds`);
+            
+        });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        
+        document.querySelectorAll('button, a').forEach(element => {
+            element.addEventListener('touchstart', function() {
+                this.classList.add('touch-active');
+            });
+            
+            element.addEventListener('touchend', function() {
+                this.classList.remove('touch-active');
+            });
+        });
+
+        
+        window.addEventListener('orientationchange', function() {
+        
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 100);
+        });
+
+        document.querySelectorAll('.nav-button, .share-btn, .newsletter-btn').forEach(element => {
+            element.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+        });
+        
+        }); 
+    </script>
+</body>
+</html>
