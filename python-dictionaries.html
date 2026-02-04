@@ -1,0 +1,3522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Learn Python dictionaries with detailed explanations and examples. Comprehensive tutorial on dictionary creation, manipulation, methods, and best practices.">
+    <meta name="keywords" content="Python, dictionaries, programming, tutorial, Glenn Junsay Pansensoy, Poetic Codes, hash maps, key-value pairs">
+    <meta name="author" content="Glenn Junsay Pansensoy">
+    <meta property="og:title" content="Python Dictionaries Tutorial | Poetic Codes">
+    <meta property="og:description" content="Comprehensive guide to Python dictionaries with examples and explanations">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pansensoyglenn-dev.github.io/poetic-codes/python-dictionaries">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Python Dictionaries Tutorial | Poetic Codes">
+    <meta name="twitter:description" content="Comprehensive guide to Python dictionaries with examples and explanations">
+    <meta name="twitter:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-dict-preview.png">
+    
+    <title>Python Dictionaries Tutorial | Poetic Codes by Glenn Junsay Pansensoy</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .newsletter-section {
+            background: linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid #334155;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .newsletter-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .newsletter-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .newsletter-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .newsletter-icon {
+            font-size: 3rem;
+            color: #3b82f6;
+            margin-bottom: 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .newsletter-section h2 {
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            border: none;
+            padding: 0;
+        }
+
+        .newsletter-section h2::after {
+            display: none;
+        }
+
+        .newsletter-section p {
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+
+        .newsletter-features {
+            list-style: none;
+            padding: 0;
+            margin: 1.5rem 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.8rem;
+        }
+
+        .newsletter-features li {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .newsletter-features li i {
+            color: #10b981;
+        }
+
+        .newsletter-form {
+            background: rgba(15, 23, 42, 0.7);
+            padding: 1.8rem;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            margin: 2rem 0;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .input-with-icon input {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.8rem;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input-with-icon input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-with-icon input::placeholder {
+            color: #64748b;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8rem;
+            text-align: left;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 0.2rem;
+            accent-color: #3b82f6;
+        }
+
+        .checkbox-group label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .privacy-link {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        .privacy-link:hover {
+            text-decoration: underline;
+        }
+
+        .subscribe-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        .subscribe-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+            background: linear-gradient(135deg, #4f8ef7, #9b6df9);
+        }
+
+        .subscribe-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .subscribe-btn .btn-icon {
+            display: flex;
+            align-items: center;
+        }
+
+        .privacy-note {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .newsletter-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #334155;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* Newsletter Success Modal */
+        .newsletter-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 10002;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .newsletter-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-newsletter-content {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 2.5rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-newsletter-icon {
+            font-size: 4rem;
+            color: #10b981;
+            margin-bottom: 1.5rem;
+            animation: bounce 1s;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-20px);}
+            60% {transform: translateY(-10px);}
+        }
+
+        .modal-newsletter-content h2 {
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            border: none;
+        }
+
+        .modal-newsletter-content h2::after {
+            display: none;
+        }
+
+        .modal-newsletter-content p {
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            margin: 1rem 0;
+            text-decoration: none;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+            background: linear-gradient(135deg, #34d399, #10b981);
+        }
+
+        .modal-newsletter-content .close-modal {
+            background: #334155;
+            color: #cbd5e1;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .modal-newsletter-content .close-modal:hover {
+            background: #475569;
+        }
+
+        /* Responsive Design for Newsletter */
+        @media (max-width: 768px) {
+            .newsletter-section {
+                padding: 1.8rem;
+                margin: 1.5rem 0;
+            }
+            
+            .newsletter-section h2 {
+                font-size: 1.5rem;
+            }
+            
+            .newsletter-features {
+                grid-template-columns: 1fr;
+                text-align: left;
+                justify-content: flex-start;
+            }
+            
+            .newsletter-form {
+                padding: 1.5rem;
+            }
+            
+            .newsletter-stats {
+                gap: 2rem;
+                flex-wrap: wrap;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .modal-newsletter-content {
+                padding: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .newsletter-section {
+                padding: 1.5rem;
+            }
+            
+            .newsletter-section h2 {
+                font-size: 1.3rem;
+            }
+            
+            .newsletter-stats {
+                gap: 1.5rem;
+            }
+            
+            .stat-item {
+                min-width: 80px;
+            }
+        }
+        
+        /* ========== END NEWSLETTER CSS ========== */
+        
+        /* All previous CSS remains exactly the same */
+        /* Return Home Button Styles */
+        .return-home-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            text-align: center;
+            margin: 1rem auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .return-home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.5);
+            color: white;
+            text-decoration: none;
+            background: linear-gradient(135deg, #4f8ef7, #9b6df9);
+        }
+        
+        .return-home-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .return-home-btn i {
+            margin-right: 0.5rem;
+        }
+        
+        /* Container for the return button in main content */
+        .return-container {
+            text-align: center;
+            margin: 1rem 0 2rem 0;
+        }
+        
+        /* Professional Compact Social Share Section */
+        .social-share-section {
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border: 1px solid #1e293b;
+            text-align: center;
+        }
+        
+        .social-share-section h2 {
+            color: #60a5fa;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .social-share-section p {
+            color: #94a3b8;
+            margin-bottom: 1.2rem;
+            font-size: 0.9rem;
+        }
+        
+        .share-buttons-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+        
+        .share-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .share-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+        
+        .share-button:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .share-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+        
+        .share-button:active {
+            transform: translateY(-1px);
+        }
+        
+        .share-button i {
+            font-size: 18px;
+            color: white;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .share-button.facebook {
+            background: linear-gradient(135deg, #1877f2, #0c5bc9);
+        }
+        
+        .share-button.linkedin {
+            background: linear-gradient(135deg, #0077b5, #005885);
+        }
+        
+        .share-button.twitter {
+            background: linear-gradient(135deg, #1da1f2, #0d8bd9);
+        }
+        
+        .share-button.ai-generate {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            width: 52px;
+            height: 52px;
+        }
+        
+        .share-button.ai-generate i {
+            font-size: 20px;
+        }
+        
+        .share-label {
+            display: block;
+            color: #94a3b8;
+            font-size: 0.75rem;
+            margin-top: 4px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .share-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+        }
+        
+        /* Professional AI Modal */
+        .ai-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .ai-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 1.5rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #334155;
+        }
+        
+        .modal-header h2 {
+            color: #e2e8f0;
+            font-size: 1.3rem;
+            margin: 0;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            border: none;
+            padding: 0;
+        }
+        
+        .modal-header h2::after {
+            display: none;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+            line-height: 1;
+            padding: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        
+        .close-modal:hover {
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .platform-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 1.2rem;
+        }
+        
+        .platform-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: #94a3b8;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .platform-btn:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background: #1e293b;
+        }
+        
+        .platform-btn.active {
+            border-color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+        
+        .ai-content-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            min-height: 120px;
+        }
+        
+        .ai-generated-text {
+            color: #cbd5e1;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.95rem;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .loading-spinner.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 2px solid #334155;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 0.8rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #334155;
+            color: #cbd5e1;
+        }
+        
+        .btn-secondary:hover {
+            background: #475569;
+        }
+        
+        /* Compact Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 6px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+            z-index: 10001;
+            opacity: 0;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            max-width: 300px;
+            text-align: center;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        
+        .toast i {
+            margin-right: 6px;
+        }
+        
+        /* Mobile Responsive for Compact Share Section */
+        @media (max-width: 768px) {
+            .social-share-section {
+                padding: 1.2rem;
+                margin: 1.5rem 0;
+            }
+            
+            .share-buttons-container {
+                gap: 10px;
+            }
+            
+            .share-button {
+                width: 44px;
+                height: 44px;
+            }
+            
+            .share-button i {
+                font-size: 16px;
+            }
+            
+            .share-button.ai-generate {
+                width: 48px;
+                height: 48px;
+            }
+            
+            .share-button.ai-generate i {
+                font-size: 18px;
+            }
+            
+            .share-label {
+                font-size: 0.7rem;
+            }
+            
+            .modal-content {
+                padding: 1.2rem;
+                width: 95%;
+            }
+            
+            .platform-selector {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .share-buttons-container {
+                gap: 8px;
+            }
+            
+            .share-button {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .share-button i {
+                font-size: 15px;
+            }
+            
+            .share-button.ai-generate {
+                width: 44px;
+                height: 44px;
+            }
+            
+            .share-button.ai-generate i {
+                font-size: 17px;
+            }
+            
+            .share-label {
+                font-size: 0.65rem;
+            }
+        }
+        
+        /* All other CSS remains exactly the same */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0e14;
+            color: #c7c9cb;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(18, 27, 39, 0.8) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(18, 27, 39, 0.6) 0%, transparent 20%);
+            overflow-x: hidden;
+            transition: overflow 0.3s ease;
+        }
+        
+        body.menu-open {
+            overflow: hidden !important;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* Header styles */
+        header {
+            background: linear-gradient(135deg, #0c1219 0%, #111827 100%);
+            color: #e2e8f0;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #1e293b;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+        }
+        
+        .logo a {
+            color: transparent;
+            text-decoration: none;
+        }
+        
+        /* Hamburger menu */
+        .menu-toggle {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 1001;
+            padding: 8px;
+            background: transparent;
+            border: none;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-toggle span {
+            width: 28px;
+            height: 3px;
+            background: #3b82f6;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            display: block;
+            position: relative;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: translateY(10px) rotate(45deg);
+        }
+        
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+            transform: scale(0);
+        }
+        
+        .menu-toggle.active span:nth-child(3) {
+            transform: translateY(-10px) rotate(-45deg);
+        }
+
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13,17,23,0.98);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 5rem;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+            transform: translateY(-20px);
+        }
+
+        .nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.4rem;
+            width: 100%;
+            max-width: 350px;
+            padding: 0.5rem 0.8rem 1rem;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .nav-links a {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            background: #3b82f6;
+            border: 1.5px solid #60a5fa;
+            box-shadow: 0 1px 4px rgba(59, 130, 246, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.6rem;
+        }
+
+        .nav-links a:hover {
+            background: #60a5fa;
+            transform: translateX(3px);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+            border-color: #8b5cf6;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: #8b5cf6;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a:hover::before {
+            transform: translateX(0);
+        }
+
+        .nav-links a i {
+            font-size: 0.9rem;
+            color: #fbbf24;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .nav-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.8rem;
+            color: #3b82f6;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 8px;
+            z-index: 1002;
+            transition: all 0.3s ease;
+        }
+
+        .nav-close:hover {
+            transform: rotate(90deg);
+            color: #8b5cf6;
+        }
+        
+        /* Main content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #1e293b;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+        
+        .hero h1 {
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.3;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto 1rem;
+            position: relative;
+            z-index: 1;
+            line-height: 1.5;
+        }
+        
+        .author {
+            margin-top: 1rem;
+            color: #8b5cf6;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        
+        /* Content sections */
+        section {
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border: 1px solid #1e293b;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+        
+        h2 {
+            color: #60a5fa;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #1e293b;
+            font-size: 1.6rem;
+            position: relative;
+            line-height: 1.3;
+        }
+        
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, transparent);
+        }
+        
+        h3 {
+            color: #a78bfa;
+            margin: 1.5rem 0 1rem;
+            font-size: 1.3rem;
+            line-height: 1.3;
+        }
+        
+        p {
+            margin-bottom: 1.2rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        
+        /* Code examples */
+        .code-example {
+            background-color: #0c1219;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+            -webkit-overflow-scrolling: touch;
+            font-size: 0.95rem;
+        }
+        
+        .code-example code {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            display: block;
+            min-width: min-content;
+        }
+        
+        .code-comment {
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .code-keyword {
+            color: #f472b6;
+        }
+        
+        .code-string {
+            color: #34d399;
+        }
+        
+        .code-function {
+            color: #60a5fa;
+        }
+        
+        .code-operator {
+            color: #fbbf24;
+        }
+        
+        .code-number {
+            color: #f59e0b;
+        }
+        
+        .code-dict {
+            color: #8b5cf6;
+        }
+        
+        .example-output {
+            background-color: #0f172a;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+            border: 1px solid #1e293b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            overflow-x: auto;
+        }
+        
+        .example-output strong {
+            color: #60a5fa;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Table styles - Responsive tables */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #1e293b;
+            min-width: 600px; /* Minimum width for table on mobile */
+        }
+        
+        th {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #e2e8f0;
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #1e293b;
+            color: #cbd5e1;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #0f172a;
+        }
+        
+        tr:hover {
+            background-color: #1e293b;
+        }
+        
+        /* List styles */
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        li {
+            margin-bottom: 0.8rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+        }
+        
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+            transition: color 0.3s;
+            word-break: break-word;
+        }
+        
+        a:hover {
+            color: #8b5cf6;
+            text-decoration: underline;
+        }
+        
+        /* Info boxes */
+        .info-box, .warning-box {
+            background-color: #0f172a;
+            border-left: 4px solid #10b981;
+            padding: 1.2rem 1.5rem;
+            margin: 1.2rem 0;
+            border-radius: 0 8px 8px 0;
+            border: 1px solid #1e293b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .warning-box {
+            border-left-color: #f59e0b;
+        }
+        
+        .info-box strong, .warning-box strong {
+            color: #60a5fa;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, #0c1219 0%, #111827 100%);
+            color: #cbd5e1;
+            padding: 2.5rem 1.5rem 1.5rem;
+            margin-top: 3rem;
+            border-top: 1px solid #1e293b;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-section h3 {
+            color: #a78bfa;
+            margin-bottom: 1.2rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+        
+        .footer-section h3::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, #8b5cf6, transparent);
+        }
+        
+        .footer-section p {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.6rem;
+        }
+        
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            font-size: 0.95rem;
+        }
+        
+        .footer-links a:hover {
+            color: #60a5fa;
+            transform: translateX(5px);
+        }
+        
+        .social-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 50%;
+            color: #60a5fa;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid #334155;
+            flex-shrink: 0;
+        }
+        
+        .social-icons a:hover {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            transform: translateY(-3px);
+            border-color: #3b82f6;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1e293b;
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        .copyright p {
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .hero {
+                padding: 2rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 1.6rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+                border-radius: 12px;
+            }
+            
+            h2 {
+                font-size: 1.4rem;
+                margin-bottom: 1.2rem;
+            }
+            
+            h3 {
+                font-size: 1.2rem;
+                margin: 1.2rem 0 0.8rem;
+            }
+            
+            .code-example {
+                padding: 1.2rem;
+                margin: 1.2rem 0;
+                font-size: 0.9rem;
+                border-radius: 10px;
+            }
+            
+            .code-example code {
+                font-size: 0.9rem;
+            }
+            
+            .example-output, .info-box, .warning-box {
+                padding: 1rem 1.2rem;
+                font-size: 0.9rem;
+            }
+            
+            table {
+                min-width: 700px; /* Slightly larger min-width for readability on mobile */
+            }
+            
+            .footer-content {
+                gap: 1.5rem;
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-section {
+                margin-bottom: 1rem;
+            }
+            
+            .return-home-btn {
+                padding: 0.7rem 1.3rem;
+                font-size: 0.95rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header {
+                padding: 0.8rem 1rem;
+            }
+            
+            .logo {
+                font-size: 1.3rem;
+            }
+            
+            .hero h1 {
+                font-size: 1.4rem;
+            }
+            
+            .hero p {
+                font-size: 0.95rem;
+            }
+            
+            .author {
+                font-size: 0.9rem;
+            }
+            
+            section {
+                padding: 1.2rem;
+                border-radius: 10px;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            h3 {
+                font-size: 1.1rem;
+            }
+            
+            .code-example {
+                padding: 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .code-example code {
+                font-size: 0.85rem;
+            }
+            
+            .nav-links a {
+                padding: 16px 20px;
+                font-size: 1rem;
+            }
+            
+            .social-icons a {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .copyright {
+                font-size: 0.8rem;
+            }
+            
+            .return-home-btn {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+                margin: 0.5rem auto;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .hero h1 {
+                font-size: 1.3rem;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            h2 {
+                font-size: 1.2rem;
+            }
+            
+            .code-example {
+                padding: 0.9rem;
+                font-size: 0.8rem;
+            }
+            
+            .return-home-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0c1219;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #60a5fa, #a78bfa);
+        }
+        
+        /* Selection styling */
+        ::selection {
+            background-color: rgba(59, 130, 246, 0.5);
+            color: white;
+        }
+        
+        /* Back to top button */
+        .back-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <a href="https://pansensoyglenn-dev.github.io/poetic-codes">POETIC CODES</a>
+        </div>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <!-- Navigation Overlay -->
+    <div class="nav-overlay" id="navOverlay" aria-hidden="true">
+        <button class="nav-close" id="navClose" aria-label="Close navigation menu">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="#introduction" class="nav-link">Introduction</a>
+            <a href="#creation" class="nav-link">Creating Dictionaries</a>
+            <a href="#accessing" class="nav-link">Accessing Elements</a>
+            <a href="#methods" class="nav-link">Dictionary Methods</a>
+            <a href="#operations" class="nav-link">Dictionary Operations</a>
+            <a href="#comprehensions" class="nav-link">Dictionary Comprehensions</a>
+            <a href="#advanced" class="nav-link">Advanced Topics</a>
+            <a href="#performance" class="nav-link">Performance</a>
+            <a href="#exercises" class="nav-link">Exercises</a>
+            <a href="#newsletter" class="nav-link"><i class="fas fa-envelope"></i> Newsletter</a>
+            <a href="#resources" class="nav-link">Resources</a>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <main class="container">
+        <section class="hero">
+            <h1>Python Dictionaries: Complete Guide with Examples</h1>
+            <p style="text-align: justify;">A comprehensive tutorial on Python dictionaries, covering creation, manipulation, methods, comprehensions, and best practices with practical code examples.</p>
+            <p class="author">By Glenn Junsay Pansensoy</p>
+        </section>
+        
+        <!-- Added Return Home button after hero section -->
+        <div class="return-container">
+            <a href="index.html" class="return-home-btn">
+                <i class="fas fa-arrow-left"></i> Return Home
+            </a>
+        </div>
+        
+        <!-- ========== NEWSLETTER SECTION ========== -->
+        <section class="newsletter-section" id="newsletter">
+            <div class="newsletter-container">
+                <div class="newsletter-content">
+                    <div class="newsletter-icon">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </div>
+                    <h2>Stay Updated with Poetic Codes</h2>
+                    <p>Subscribe to our newsletter and receive:</p>
+                    <ul class="newsletter-features">
+                        <li><i class="fas fa-check-circle"></i> Weekly Python tutorials & tips</li>
+                        <li><i class="fas fa-check-circle"></i> Exclusive code examples</li>
+                        <li><i class="fas fa-check-circle"></i> Latest programming insights</li>
+                        <li><i class="fas fa-check-circle"></i> Early access to new content</li>
+                    </ul>
+                    
+                    <form id="newsletterForm" class="newsletter-form">
+                        <div class="form-group">
+                            <div class="input-with-icon">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="subscriberName" placeholder="Your Name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="input-with-icon">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="subscriberEmail" placeholder="Your Email Address" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="agreeTerms" required>
+                            <label for="agreeTerms">
+                                I agree to receive newsletters and accept the 
+                                <a href="privacy-policy.html" class="privacy-link">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="subscribe-btn" id="subscribeBtn">
+                            <span class="btn-text">Subscribe Now</span>
+                            <span class="btn-icon"><i class="fas fa-paper-plane"></i></span>
+                        </button>
+                        
+                        <p class="privacy-note">
+                            <i class="fas fa-shield-alt"></i> We respect your privacy. Unsubscribe at any time.
+                        </p>
+                    </form>
+                    
+                    <div class="newsletter-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="subscriberCount">1,245</span>
+                            <span class="stat-label">Subscribers</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">Weekly</span>
+                            <span class="stat-label">Updates</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Free</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="introduction">
+            <h2>Introduction to Python Dictionaries</h2>
+            <p>In Python, dictionaries are unordered collections of key-value pairs. They are also known as associative arrays or hash maps in other programming languages.</p>
+            <p>Dictionaries are mutable, unordered, and indexed by keys (which must be immutable types like strings, numbers, or tuples). They are extremely efficient for lookups and are one of Python's most powerful data structures.</p>
+            
+            <div class="info-box">
+                <strong>Key Characteristics:</strong>
+                <ul>
+                    <li>Unordered collection of key-value pairs</li>
+                    <li>Keys must be unique and immutable (strings, numbers, tuples)</li>
+                    <li>Values can be of any data type</li>
+                    <li>Mutable - can be changed after creation</li>
+                    <li>Extremely fast for lookups (O(1) average time complexity)</li>
+                </ul>
+            </div>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Basic dictionary example</span><br>
+                    person = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"name"</span>: <span class="code-string">"Alice"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"age"</span>: <span class="code-number">30</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"city"</span>: <span class="code-string">"New York"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"is_student"</span>: <span class="code-keyword">False</span><br>
+                    }<br>
+                    <br>
+                    <span class="code-keyword">print</span>(person)<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Type:"</span>, <span class="code-function">type</span>(person))<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Length:"</span>, <span class="code-function">len</span>(person))
+                </code>
+            </div>
+            
+            <div class="example-output">
+                <strong>Output:</strong><br>
+                {'name': 'Alice', 'age': 30, 'city': 'New York', 'is_student': False}<br>
+                Type: &lt;class 'dict'&gt;<br>
+                Length: 4
+            </div>
+            
+            <!-- Compact Professional Social Share Section -->
+            <div class="social-share-section">
+                <h2>Share This Tutorial</h2>
+                <p>Found this helpful? Share with your network</p>
+                
+                <div class="share-buttons-container">
+                    <div class="share-item">
+                        <button class="share-button ai-generate" onclick="openAIModal()" title="Generate AI-powered share message">
+                            <i class="fas fa-sparkles"></i>
+                        </button>
+                        <span class="share-label">AI Share</span>
+                    </div>
+                    
+                    <div class="share-item">
+                        <button class="share-button facebook" onclick="shareOnFacebook()" title="Share on Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </button>
+                        <span class="share-label">Facebook</span>
+                    </div>
+                    
+                    <div class="share-item">
+                        <button class="share-button linkedin" onclick="shareOnLinkedIn()" title="Share on LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </button>
+                        <span class="share-label">LinkedIn</span>
+                    </div>
+                    
+                    <div class="share-item">
+                        <button class="share-button twitter" onclick="shareOnTwitter()" title="Share on X">
+                            <i class="fab fa-x-twitter"></i>
+                        </button>
+                        <span class="share-label">Twitter</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="creation">
+            <h2>Creating Dictionaries in Python</h2>
+            <p>Python provides several ways to create dictionaries, each suitable for different scenarios.</p>
+            
+            <h3>Dictionary Creation Methods</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Example</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Curly braces {}</td>
+                            <td>{'a': 1, 'b': 2}</td>
+                            <td>Most common way, with key-value pairs</td>
+                        </tr>
+                        <tr>
+                            <td>dict() constructor</td>
+                            <td>dict(a=1, b=2)</td>
+                            <td>Using keyword arguments (keys as identifiers)</td>
+                        </tr>
+                        <tr>
+                            <td>From list of tuples</td>
+                            <td>dict([('a',1),('b',2)])</td>
+                            <td>Convert list of (key, value) tuples</td>
+                        </tr>
+                        <tr>
+                            <td>Dictionary comprehension</td>
+                            <td>{x: x*2 for x in range(5)}</td>
+                            <td>Create dynamically from iterable</td>
+                        </tr>
+                        <tr>
+                            <td>fromkeys() method</td>
+                            <td>dict.fromkeys(['a','b'], 0)</td>
+                            <td>All keys with same initial value</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Different ways to create dictionaries</span><br>
+                    <span class="code-comment"># 1. Using curly braces</span><br>
+                    dict1 = {<span class="code-string">"name"</span>: <span class="code-string">"John"</span>, <span class="code-string">"age"</span>: <span class="code-number">25</span>}<br>
+                    <br>
+                    <span class="code-comment"># 2. Using dict() constructor</span><br>
+                    dict2 = <span class="code-function">dict</span>(name=<span class="code-string">"Jane"</span>, age=<span class="code-number">30</span>, city=<span class="code-string">"Boston"</span>)<br>
+                    <br>
+                    <span class="code-comment"># 3. From list of tuples</span><br>
+                    dict3 = <span class="code-function">dict</span>([(<span class="code-string">'a'</span>, <span class="code-number">1</span>), (<span class="code-string">'b'</span>, <span class="code-number">2</span>), (<span class="code-string">'c'</span>, <span class="code-number">3</span>)])<br>
+                    <br>
+                    <span class="code-comment"># 4. Empty dictionary</span><br>
+                    empty_dict = {}<br>
+                    empty_dict2 = <span class="code-function">dict</span>()<br>
+                    <br>
+                    <span class="code-comment"># 5. Nested dictionary</span><br>
+                    nested_dict = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"user1"</span>: {<span class="code-string">"name"</span>: <span class="code-string">"Alice"</span>, <span class="code-string">"score"</span>: <span class="code-number">95</span>},<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"user2"</span>: {<span class="code-string">"name"</span>: <span class="code-string">"Bob"</span>, <span class="code-string">"score"</span>: <span class="code-number">87</span>}<br>
+                    }<br>
+                    <br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"dict1:"</span>, dict1)<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"dict2:"</span>, dict2)<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"dict3:"</span>, dict3)<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"nested_dict:"</span>, nested_dict)
+                </code>
+            </div>
+        </section>
+
+        <section id="accessing">
+            <h2>Accessing and Modifying Dictionary Elements</h2>
+            <p>Learn how to retrieve, update, add, and delete elements from dictionaries efficiently.</p>
+            
+            <h3>Accessing Values</h3>
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Accessing dictionary elements</span><br>
+                    student = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"name"</span>: <span class="code-string">"John Doe"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"age"</span>: <span class="code-number">21</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"major"</span>: <span class="code-string">"Computer Science"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"courses"</span>: [<span class="code-string">"Python"</span>, <span class="code-string">"Algorithms"</span>, <span class="code-string">"Database Systems"</span>]<br>
+                    }<br>
+                    <br>
+                    <span class="code-comment"># Method 1: Square bracket notation (raises KeyError if key doesn't exist)</span><br>
+                    name = student[<span class="code-string">"name"</span>]<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Name:"</span>, name)<br>
+                    <br>
+                    <span class="code-comment"># Method 2: get() method (safer, returns None or default value)</span><br>
+                    gpa = student.<span class="code-function">get</span>(<span class="code-string">"gpa"</span>)  <span class="code-comment"># Returns None</span><br>
+                    gpa_safe = student.<span class="code-function">get</span>(<span class="code-string">"gpa"</span>, <span class="code-string">"Not available"</span>)  <span class="code-comment"># Returns default</span><br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"GPA:"</span>, gpa_safe)<br>
+                    <br>
+                    <span class="code-comment"># Method 3: Access nested dictionaries</span><br>
+                    student[<span class="code-string">"grades"</span>] = {<span class="code-string">"Python"</span>: <span class="code-number">95</span>, <span class="code-string">"Algorithms"</span>: <span class="code-number">88</span>}<br>
+                    python_grade = student[<span class="code-string">"grades"</span>][<span class="code-string">"Python"</span>]<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Python Grade:"</span>, python_grade)
+                </code>
+            </div>
+            
+            <h3>Modifying Dictionaries</h3>
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Adding and updating dictionary elements</span><br>
+                    inventory = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"apples"</span>: <span class="code-number">50</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"bananas"</span>: <span class="code-number">30</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"oranges"</span>: <span class="code-number">25</span><br>
+                    }<br>
+                    <br>
+                    <span class="code-comment"># Adding new key-value pair</span><br>
+                    inventory[<span class="code-string">"grapes"</span>] = <span class="code-number">40</span><br>
+                    <br>
+                    <span class="code-comment"># Updating existing value</span><br>
+                    inventory[<span class="code-string">"apples"</span>] = <span class="code-number">60</span><br>
+                    <br>
+                    <span class="code-comment"># Using update() method for multiple changes</span><br>
+                    inventory.<span class="code-function">update</span>({<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"bananas"</span>: <span class="code-number">35</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"mangoes"</span>: <span class="code-number">20</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"watermelons"</span>: <span class="code-number">15</span><br>
+                    })<br>
+                    <br>
+                    <span class="code-comment"># Deleting elements</span><br>
+                    <span class="code-keyword">del</span> inventory[<span class="code-string">"oranges"</span>]  <span class="code-comment"># Raises KeyError if key doesn't exist</span><br>
+                    <br>
+                    <span class="code-comment"># Safe deletion with pop()</span><br>
+                    removed_item = inventory.<span class="code-function">pop</span>(<span class="code-string">"bananas"</span>, <span class="code-number">0</span>)  <span class="code-comment"># Returns 0 if key not found</span><br>
+                    <br>
+                    <span class="code-comment"># Remove last inserted item (Python 3.7+)</span><br>
+                    last_item = inventory.<span class="code-function">popitem</span>()<br>
+                    <br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Updated Inventory:"</span>, inventory)<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Removed item:"</span>, removed_item)<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Last removed:"</span>, last_item)
+                </code>
+            </div>
+            
+            <div class="info-box">
+                <strong>Best Practice:</strong>
+                <p>Always use the <code>get()</code> method when accessing values if you're unsure whether a key exists. This prevents <code>KeyError</code> exceptions and makes your code more robust.</p>
+            </div>
+        </section>
+
+        <section id="methods">
+            <h2>Essential Dictionary Methods</h2>
+            <p>Python dictionaries come with powerful built-in methods for common operations.</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Description</th>
+                            <th>Example</th>
+                            <th>Return Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>keys()</code></td>
+                            <td>Returns a view of all keys</td>
+                            <td><code>dict.keys()</code></td>
+                            <td>dict_keys object</td>
+                        </tr>
+                        <tr>
+                            <td><code>values()</code></td>
+                            <td>Returns a view of all values</td>
+                            <td><code>dict.values()</code></td>
+                            <td>dict_values object</td>
+                        </tr>
+                        <tr>
+                            <td><code>items()</code></td>
+                            <td>Returns a view of (key, value) pairs</td>
+                            <td><code>dict.items()</code></td>
+                            <td>dict_items object</td>
+                        </tr>
+                        <tr>
+                            <td><code>get(key, default)</code></td>
+                            <td>Safely get value with optional default</td>
+                            <td><code>dict.get("x", 0)</code></td>
+                            <td>Value or default</td>
+                        </tr>
+                        <tr>
+                            <td><code>pop(key, default)</code></td>
+                            <td>Remove key and return its value</td>
+                            <td><code>dict.pop("x")</code></td>
+                            <td>Removed value</td>
+                        </tr>
+                        <tr>
+                            <td><code>popitem()</code></td>
+                            <td>Remove and return last (key, value) pair</td>
+                            <td><code>dict.popitem()</code></td>
+                            <td>(key, value) tuple</td>
+                        </tr>
+                        <tr>
+                            <td><code>update()</code></td>
+                            <td>Update with another dict or iterable</td>
+                            <td><code>dict.update(other)</code></td>
+                            <td>None (modifies in-place)</td>
+                        </tr>
+                        <tr>
+                            <td><code>setdefault(key, default)</code></td>
+                            <td>Get value, set to default if key missing</td>
+                            <td><code>dict.setdefault("x", 0)</code></td>
+                            <td>Value</td>
+                        </tr>
+                        <tr>
+                            <td><code>clear()</code></td>
+                            <td>Remove all items</td>
+                            <td><code>dict.clear()</code></td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>copy()</code></td>
+                            <td>Return a shallow copy</td>
+                            <td><code>dict.copy()</code></td>
+                            <td>New dictionary</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Practical examples of dictionary methods</span><br>
+                    employee = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"id"</span>: <span class="code-number">101</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"name"</span>: <span class="code-string">"Alice Johnson"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"department"</span>: <span class="code-string">"Engineering"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"salary"</span>: <span class="code-number">85000</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"skills"</span>: [<span class="code-string">"Python"</span>, <span class="code-string">"Django"</span>, <span class="code-string">"AWS"</span>]<br>
+                    }<br>
+                    <br>
+                    <span class="code-comment"># 1. keys() - Get all keys</span><br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Keys:"</span>, <span class="code-function">list</span>(employee.<span class="code-function">keys</span>()))<br>
+                    <br>
+                    <span class="code-comment"># 2. values() - Get all values</span><br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Values:"</span>, <span class="code-function">list</span>(employee.<span class="code-function">values</span>()))<br>
+                    <br>
+                    <span class="code-comment"># 3. items() - Iterate through key-value pairs</span><br>
+                    <span class="code-keyword">for</span> key, value <span class="code-keyword">in</span> employee.<span class="code-function">items</span>():<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">print</span>(<span class="code-string">f"<span class="code-dict">{key}</span>: <span class="code-dict">{value}</span>"</span>)<br>
+                    <br>
+                    <span class="code-comment"># 4. setdefault() - Get or set with default</span><br>
+                    projects = employee.<span class="code-function">setdefault</span>(<span class="code-string">"projects"</span>, [])<br>
+                    projects.<span class="code-function">append</span>(<span class="code-string">"Inventory System"</span>)<br>
+                    <br>
+                    <span class="code-comment"># 5. copy() - Create a shallow copy</span><br>
+                    employee_copy = employee.<span class="code-function">copy</span>()<br>
+                    employee_copy[<span class="code-string">"name"</span>] = <span class="code-string">"Bob Smith"</span><br>
+                    <br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"\nOriginal:"</span>, employee[<span class="code-string">"name"</span>])<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Copy:"</span>, employee_copy[<span class="code-string">"name"</span>])
+                </code>
+            </div>
+        </section>
+
+        <section id="operations">
+            <h2>Dictionary Operations and Iteration</h2>
+            
+            <h3>Checking Key Existence</h3>
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Different ways to check if a key exists</span><br>
+                    config = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"host"</span>: <span class="code-string">"localhost"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"port"</span>: <span class="code-number">8080</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"debug"</span>: <span class="code-keyword">True</span><br>
+                    }<br>
+                    <br>
+                    <span class="code-comment"># Method 1: 'in' operator (recommended)</span><br>
+                    <span class="code-keyword">if</span> <span class="code-string">"host"</span> <span class="code-keyword">in</span> config:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">print</span>(<span class="code-string">"Host found:"</span>, config[<span class="code-string">"host"</span>])<br>
+                    <br>
+                    <span class="code-comment"># Method 2: Using get()</span><br>
+                    timeout = config.<span class="code-function">get</span>(<span class="code-string">"timeout"</span>)<br>
+                    <span class="code-keyword">if</span> timeout <span class="code-keyword">is not</span> <span class="code-keyword">None</span>:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">print</span>(<span class="code-string">"Timeout:"</span>, timeout)<br>
+                    <br>
+                    <span class="code-comment"># Method 3: Using keys()</span><br>
+                    <span class="code-keyword">if</span> <span class="code-string">"port"</span> <span class="code-keyword">in</span> config.<span class="code-function">keys</span>():<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">print</span>(<span class="code-string">"Port found:"</span>, config[<span class="code-string">"port"</span>])<br>
+                    <br>
+                    <span class="code-comment"># Check if value exists</span><br>
+                    <span class="code-keyword">if</span> <span class="code-keyword">True</span> <span class="code-keyword">in</span> config.<span class="code-function">values</span>():<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">print</span>(<span class="code-string">"Debug mode is enabled"</span>)
+                </code>
+            </div>
+            
+            <h3>Dictionary Merging Techniques</h3>
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Different ways to merge dictionaries (Python 3.5+)</span><br>
+                    defaults = {<span class="code-string">"color"</span>: <span class="code-string">"red"</span>, <span class="code-string">"size"</span>: <span class="code-string">"medium"</span>, <span class="code-string">"price"</span>: <span class="code-number">100</span>}<br>
+                    user_prefs = {<span class="code-string">"color"</span>: <span class="code-string">"blue"</span>, <span class="code-string">"discount"</span>: <span class="code-number">20</span>}<br>
+                    <br>
+                    <span class="code-comment"># Method 1: update() (modifies original)</span><br>
+                    merged1 = defaults.<span class="code-function">copy</span>()<br>
+                    merged1.<span class="code-function">update</span>(user_prefs)<br>
+                    <br>
+                    <span class="code-comment"># Method 2: Dictionary unpacking (Python 3.5+)</span><br>
+                    merged2 = {**defaults, **user_prefs}<br>
+                    <br>
+                    <span class="code-comment"># Method 3: | operator (Python 3.9+)</span><br>
+                    merged3 = defaults | user_prefs<br>
+                    <br>
+                    <span class="code-comment"># Method 4: Dictionary comprehension</span><br>
+                    merged4 = {key: user_prefs.<span class="code-function">get</span>(key, defaults[key]) <span class="code-keyword">for</span> key <span class="code-keyword">in</span> <span class="code-function">set</span>(defaults) | <span class="code-function">set</span>(user_prefs)}<br>
+                    <br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Merged (update):"</span>, merged1)<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Merged (unpacking):"</span>, merged2)
+                </code>
+            </div>
+        </section>
+
+        <section id="comprehensions">
+            <h2>Dictionary Comprehensions</h2>
+            <p>Dictionary comprehensions provide a concise way to create dictionaries from iterables.</p>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Basic dictionary comprehension</span><br>
+                    <span class="code-comment"># Syntax: {key_expression: value_expression for item in iterable}</span><br>
+                    <br>
+                    <span class="code-comment"># 1. Create squares dictionary</span><br>
+                    squares = {x: x**2 <span class="code-keyword">for</span> x <span class="code-keyword">in</span> <span class="code-function">range</span>(<span class="code-number">1</span>, <span class="code-number">6</span>)}<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Squares:"</span>, squares)  <span class="code-comment"># {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}</span><br>
+                    <br>
+                    <span class="code-comment"># 2. Transform list to dictionary</span><br>
+                    fruits = [<span class="code-string">"apple"</span>, <span class="code-string">"banana"</span>, <span class="code-string">"cherry"</span>]<br>
+                    fruit_lengths = {fruit: <span class="code-function">len</span>(fruit) <span class="code-keyword">for</span> fruit <span class="code-keyword">in</span> fruits}<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Fruit lengths:"</span>, fruit_lengths)<br>
+                    <br>
+                    <span class="code-comment"># 3. With conditional filtering</span><br>
+                    numbers = {x: x**3 <span class="code-keyword">for</span> x <span class="code-keyword">in</span> <span class="code-function">range</span>(<span class="code-number">10</span>) <span class="code-keyword">if</span> x % <span class="code-number">2</span> == <span class="code-number">0</span>}<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Even cubes:"</span>, numbers)<br>
+                    <br>
+                    <span class="code-comment"># 4. Transform existing dictionary</span><br>
+                    prices = {<span class="code-string">"apple"</span>: <span class="code-number">1.2</span>, <span class="code-string">"banana"</span>: <span class="code-number">0.8</span>, <span class="code-string">"orange"</span>: <span class="code-number">1.5</span>}<br>
+                    discounted_prices = {item: price * <span class="code-number">0.9</span> <span class="code-keyword">for</span> item, price <span class="code-keyword">in</span> prices.<span class="code-function">items</span>()}<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Discounted prices:"</span>, discounted_prices)<br>
+                    <br>
+                    <span class="code-comment"># 5. Switch keys and values (if values are hashable)</span><br>
+                    original = {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>, <span class="code-string">"c"</span>: <span class="code-number">3</span>}<br>
+                    swapped = {value: key <span class="code-keyword">for</span> key, value <span class="code-keyword">in</span> original.<span class="code-function">items</span>()}<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Swapped:"</span>, swapped)<br>
+                    <br>
+                    <span class="code-comment"># 6. Nested dictionary comprehension</span><br>
+                    matrix = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;i: {j: i*j <span class="code-keyword">for</span> j <span class="code-keyword">in</span> <span class="code-function">range</span>(<span class="code-number">1</span>, <span class="code-number">4</span>)}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-function">range</span>(<span class="code-number">1</span>, <span class="code-number">4</span>)<br>
+                    }<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Multiplication table:"</span>, matrix)
+                </code>
+            </div>
+            
+            <div class="warning-box">
+                <strong>Important:</strong>
+                <p>Dictionary comprehensions are great for simple transformations, but for complex logic, consider using regular loops for better readability.</p>
+            </div>
+        </section>
+
+        <section id="advanced">
+            <h2>Advanced Dictionary Techniques</h2>
+            
+            <h3>DefaultDict from Collections Module</h3>
+            <div class="code-example">
+                <code>
+                    <span class="code-keyword">from</span> collections <span class="code-keyword">import</span> defaultdict<br>
+                    <br>
+                    <span class="code-comment"># 1. Grouping items by category</span><br>
+                    students = [<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;(<span class="code-string">"Math"</span>, <span class="code-string">"Alice"</span>),<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;(<span class="code-string">"Science"</span>, <span class="code-string">"Bob"</span>),<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;(<span class="code-string">"Math"</span>, <span class="code-string">"Charlie"</span>),<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;(<span class="code-string">"Art"</span>, <span class="code-string">"David"</span>),<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;(<span class="code-string">"Science"</span>, <span class="code-string">"Eve"</span>)<br>
+                    ]<br>
+                    <br>
+                    <span class="code-comment"># Without defaultdict</span><br>
+                    grouped = {}<br>
+                    <span class="code-keyword">for</span> subject, student <span class="code-keyword">in</span> students:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> subject <span class="code-keyword">not</span> <span class="code-keyword">in</span> grouped:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;grouped[subject] = []<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;grouped[subject].<span class="code-function">append</span>(student)<br>
+                    <br>
+                    <span class="code-comment"># With defaultdict (cleaner)</span><br>
+                    grouped_default = defaultdict(<span class="code-function">list</span>)<br>
+                    <span class="code-keyword">for</span> subject, student <span class="code-keyword">in</span> students:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;grouped_default[subject].<span class="code-function">append</span>(student)<br>
+                    <br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Grouped (regular):"</span>, grouped)<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Grouped (defaultdict):"</span>, <span class="code-function">dict</span>(grouped_default))<br>
+                    <br>
+                    <span class="code-comment"># 2. Counting with defaultdict</span><br>
+                    words = [<span class="code-string">"apple"</span>, <span class="code-string">"banana"</span>, <span class="code-string">"apple"</span>, <span class="code-string">"orange"</span>, <span class="code-string">"banana"</span>, <span class="code-string">"apple"</span>]<br>
+                    word_count = defaultdict(<span class="code-keyword">int</span>)<br>
+                    <span class="code-keyword">for</span> word <span class="code-keyword">in</span> words:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;word_count[word] += <span class="code-number">1</span><br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Word count:"</span>, <span class="code-function">dict</span>(word_count))
+                </code>
+            </div>
+            
+            <h3>OrderedDict for Maintaining Insertion Order</h3>
+            <div class="code-example">
+                <code>
+                    <span class="code-keyword">from</span> collections <span class="code-keyword">import</span> OrderedDict<br>
+                    <br>
+                    <span class="code-comment"># Creating an ordered dictionary</span><br>
+                    tasks = OrderedDict()<br>
+                    tasks[<span class="code-string">"wake_up"</span>] = <span class="code-string">"7:00 AM"</span><br>
+                    tasks[<span class="code-string">"breakfast"</span>] = <span class="code-string">"8:00 AM"</span><br>
+                    tasks[<span class="code-string">"work"</span>] = <span class="code-string">"9:00 AM"</span><br>
+                    tasks[<span class="code-string">"lunch"</span>] = <span class="code-string">"1:00 PM"</span><br>
+                    <br>
+                    <span class="code-comment"># Moving an item to the end</span><br>
+                    tasks.<span class="code-function">move_to_end</span>(<span class="code-string">"wake_up"</span>)<br>
+                    <br>
+                    <span class="code-comment"># Inserting at specific position</span><br>
+                    tasks[<span class="code-string">"exercise"</span>] = <span class="code-string">"6:00 AM"</span><br>
+                    <br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Ordered tasks:"</span>)<br>
+                    <span class="code-keyword">for</span> task, time <span class="code-keyword">in</span> tasks.<span class="code-function">items</span>():<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">print</span>(<span class="code-string">f"<span class="code-dict">{task}</span>: <span class="code-dict">{time}</span>"</span>)
+                </code>
+            </div>
+            
+            <h3>Practical Real-World Examples</h3>
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># 1. Configuration Management</span><br>
+                    <span class="code-keyword">class</span> Config:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">__init__</span>(<span class="code-keyword">self</span>):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.settings = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"database"</span>: {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"host"</span>: <span class="code-string">"localhost"</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"port"</span>: <span class="code-number">5432</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"name"</span>: <span class="code-string">"myapp_db"</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;},<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"api"</span>: {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"timeout"</span>: <span class="code-number">30</span>,<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"retries"</span>: <span class="code-number">3</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">get</span>(<span class="code-keyword">self</span>, key, default=<span class="code-keyword">None</span>):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># Nested get using recursion</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;keys = key.<span class="code-function">split</span>(<span class="code-string">"."</span>)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value = <span class="code-keyword">self</span>.settings<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> k <span class="code-keyword">in</span> keys:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;value = value.<span class="code-function">get</span>(k)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> value <span class="code-keyword">is</span> <span class="code-keyword">None</span>:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> default<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> value<br>
+                    <br>
+                    config = Config()<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Database host:"</span>, config.<span class="code-function">get</span>(<span class="code-string">"database.host"</span>))<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"API timeout:"</span>, config.<span class="code-function">get</span>(<span class="code-string">"api.timeout"</span>))<br>
+                    <br>
+                    <span class="code-comment"># 2. Cache Implementation</span><br>
+                    <span class="code-keyword">class</span> SimpleCache:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">__init__</span>(<span class="code-keyword">self</span>, max_size=<span class="code-number">100</span>):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.cache = {}<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.max_size = max_size<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.access_order = []<br>
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">get</span>(<span class="code-keyword">self</span>, key):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> key <span class="code-keyword">in</span> <span class="code-keyword">self</span>.cache:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># Update access order</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.access_order.<span class="code-function">remove</span>(key)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.access_order.<span class="code-function">append</span>(key)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-keyword">self</span>.cache[key]<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-keyword">None</span><br>
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">set</span>(<span class="code-keyword">self</span>, key, value):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> <span class="code-function">len</span>(<span class="code-keyword">self</span>.cache) >= <span class="code-keyword">self</span>.max_size:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># Remove least recently used</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;oldest = <span class="code-keyword">self</span>.access_order.<span class="code-function">pop</span>(<span class="code-number">0</span>)<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">del</span> <span class="code-keyword">self</span>.cache[oldest]<br>
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.cache[key] = value<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.access_order.<span class="code-function">append</span>(key)<br>
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">clear</span>(<span class="code-keyword">self</span>):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.cache.<span class="code-function">clear</span>()<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.access_order.<span class="code-function">clear</span>()<br>
+                    <br>
+                    cache = SimpleCache(max_size=<span class="code-number">3</span>)<br>
+                    cache.<span class="code-function">set</span>(<span class="code-string">"user_1"</span>, {<span class="code-string">"name"</span>: <span class="code-string">"Alice"</span>})<br>
+                    cache.<span class="code-function">set</span>(<span class="code-string">"user_2"</span>, {<span class="code-string">"name"</span>: <span class="code-string">"Bob"</span>})<br>
+                    cache.<span class="code-function">set</span>(<span class="code-string">"user_3"</span>, {<span class="code-string">"name"</span>: <span class="code-string">"Charlie"</span>})<br>
+                    cache.<span class="code-function">set</span>(<span class="code-string">"user_4"</span>, {<span class="code-string">"name"</span>: <span class="code-string">"David"</span>})  <span class="code-comment"># Removes user_1</span><br>
+                    <br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Cache contents:"</span>, cache.cache)<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Get user_2:"</span>, cache.<span class="code-function">get</span>(<span class="code-string">"user_2"</span>))
+                </code>
+            </div>
+        </section>
+
+        <section id="performance">
+            <h2>Performance Considerations and Best Practices</h2>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Operation</th>
+                            <th>Average Time Complexity</th>
+                            <th>Worst Case</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Get Item</td>
+                            <td>O(1)</td>
+                            <td>O(n)</td>
+                            <td>Extremely fast for lookups</td>
+                        </tr>
+                        <tr>
+                            <td>Set Item</td>
+                            <td>O(1)</td>
+                            <td>O(n)</td>
+                            <td>Fast insertion</td>
+                        </tr>
+                        <tr>
+                            <td>Delete Item</td>
+                            <td>O(1)</td>
+                            <td>O(n)</td>
+                            <td>Fast deletion</td>
+                        </tr>
+                        <tr>
+                            <td>Iteration</td>
+                            <td>O(n)</td>
+                            <td>O(n)</td>
+                            <td>Linear time for all items</td>
+                        </tr>
+                        <tr>
+                            <td>Copy</td>
+                            <td>O(n)</td>
+                            <td>O(n)</td>
+                            <td>Deep copy is O(n*m)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="info-box">
+                <strong>Optimization Tips:</strong>
+                <ol>
+                    <li><strong>Use appropriate key types:</strong> Strings and integers make the best dictionary keys due to their fast hash computation.</li>
+                    <li><strong>Avoid using mutable types as keys:</strong> Lists and dictionaries cannot be used as keys.</li>
+                    <li><strong>Prefer <code>in</code> operator for membership testing:</strong> <code>if key in dict:</code> is faster than <code>if dict.get(key):</code> for checking existence.</li>
+                    <li><strong>Use <code>defaultdict</code> for counting/grouping:</strong> Avoids the need for checking key existence manually.</li>
+                    <li><strong>Consider memory usage:</strong> Dictionaries have overhead per item (approx. 72 bytes per entry).</li>
+                </ol>
+            </div>
+            
+            <h3>Common Pitfalls and Solutions</h3>
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Common mistakes and how to avoid them</span><br>
+                    <br>
+                    <span class="code-comment"># 1. Modifying dictionary while iterating</span><br>
+                    scores = {<span class="code-string">"Alice"</span>: <span class="code-number">85</span>, <span class="code-string">"Bob"</span>: <span class="code-number">92</span>, <span class="code-string">"Charlie"</span>: <span class="code-number">78</span>}<br>
+                    <br>
+                    <span class="code-comment"># WRONG: RuntimeError - dictionary changed size during iteration</span><br>
+                    <span class="code-comment"># for name in scores:</span><br>
+                    <span class="code-comment">#     if scores[name] < 80:</span><br>
+                    <span class="code-comment">#         del scores[name]</span><br>
+                    <br>
+                    <span class="code-comment"># RIGHT: Create list of keys to delete</span><br>
+                    to_delete = [name <span class="code-keyword">for</span> name, score <span class="code-keyword">in</span> scores.<span class="code-function">items</span>() <span class="code-keyword">if</span> score < <span class="code-number">80</span>]<br>
+                    <span class="code-keyword">for</span> name <span class="code-keyword">in</span> to_delete:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">del</span> scores[name]<br>
+                    <br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Filtered scores:"</span>, scores)<br>
+                    <br>
+                    <span class="code-comment"># 2. Shallow vs Deep copy</span><br>
+                    original = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"list"</span>: [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>],<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"nested"</span>: {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>}<br>
+                    }<br>
+                    <br>
+                    <span class="code-comment"># Shallow copy (references remain)</span><br>
+                    shallow_copy = original.<span class="code-function">copy</span>()<br>
+                    shallow_copy[<span class="code-string">"list"</span>].<span class="code-function">append</span>(<span class="code-number">4</span>)<br>
+                    <br>
+                    <span class="code-comment"># Deep copy (complete copy)</span><br>
+                    <span class="code-keyword">import</span> copy<br>
+                    deep_copy = copy.deepcopy(original)<br>
+                    deep_copy[<span class="code-string">"list"</span>].<span class="code-function">append</span>(<span class="code-number">5</span>)<br>
+                    <br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Original list:"</span>, original[<span class="code-string">"list"</span>])  <span class="code-comment"># [1, 2, 3, 4]</span><br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Deep copy list:"</span>, deep_copy[<span class="code-string">"list"</span>])  <span class="code-comment"># [1, 2, 3, 5]</span>
+                </code>
+            </div>
+        </section>
+
+        <section id="exercises">
+            <h2>Practice Exercises</h2>
+            <p>Test your understanding with these practical exercises.</p>
+            
+            <div class="info-box">
+                <strong>Exercise 1: Student Gradebook</strong>
+                <p>Create a dictionary to store student grades and implement functions to:</p>
+                <ol>
+                    <li>Add a student with their grades</li>
+                    <li>Calculate the average grade for a student</li>
+                    <li>Find the student with the highest average</li>
+                    <li>Get all students with grades above a certain threshold</li>
+                </ol>
+            </div>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Starter code for Exercise 1</span><br>
+                    <span class="code-keyword">class</span> Gradebook:<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">__init__</span>(<span class="code-keyword">self</span>):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.grades = {}<br>
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">add_student</span>(<span class="code-keyword">self</span>, name, subject_grades):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># TODO: Implement this method</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">pass</span><br>
+                    <br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">get_average</span>(<span class="code-keyword">self</span>, name):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># TODO: Implement this method</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">pass</span><br>
+                    <br>
+                    <span class="code-comment"># Test your implementation</span><br>
+                    gradebook = Gradebook()<br>
+                    gradebook.<span class="code-function">add_student</span>(<span class="code-string">"Alice"</span>, {<span class="code-string">"Math"</span>: <span class="code-number">85</span>, <span class="code-string">"Science"</span>: <span class="code-number">92</span>, <span class="code-string">"English"</span>: <span class="code-number">88</span>})<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Alice's average:"</span>, gradebook.<span class="code-function">get_average</span>(<span class="code-string">"Alice"</span>))
+                </code>
+            </div>
+            
+            <div class="warning-box">
+                <strong>Exercise 2: Word Frequency Counter</strong>
+                <p>Write a function that takes a text string and returns a dictionary with word frequencies.</p>
+                <p><strong>Challenge:</strong> Make it case-insensitive and ignore punctuation.</p>
+            </div>
+            
+            <div class="code-example">
+                <code>
+                    <span class="code-comment"># Starter code for Exercise 2</span><br>
+                    <span class="code-keyword">def</span> <span class="code-function">word_frequency</span>(text):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># TODO: Implement this function</span><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">pass</span><br>
+                    <br>
+                    sample_text = <span class="code-string">"Hello world! Hello Python. Python is awesome. World says hello back."</span><br>
+                    frequencies = <span class="code-function">word_frequency</span>(sample_text)<br>
+                    <span class="code-keyword">print</span>(<span class="code-string">"Word frequencies:"</span>, frequencies)
+                </code>
+            </div>
+        </section>
+        
+        <!-- Resources Section with another share section -->
+        <section id="resources">
+            <h2>Additional Resources</h2>
+            <p>To further your Python dictionary knowledge, consider these resources:</p>
+            <ul>
+                <li>Official Python Documentation: <a href="https://docs.python.org/3/tutorial/datastructures.html#dictionaries" target="_blank">Python Dictionaries</a></li>
+                <li>Python Dictionary Methods: <a href="https://www.w3schools.com/python/python_ref_dictionary.asp" target="_blank">W3Schools Python Dictionary Methods</a></li>
+                <li>Real Python Dictionary Tutorials: <a href="https://realpython.com/python-dicts/" target="_blank">Dictionaries in Python</a></li>
+                <li>Collections Module: <a href="https://docs.python.org/3/library/collections.html" target="_blank">Collections Module Documentation</a></li>
+                <li>Practice Problems: <a href="https://www.hackerrank.com/domains/python?filters%5Bsubdomains%5D%5B%5D=dicts-and-sets" target="_blank">HackerRank Dictionary Challenges</a></li>
+            </ul>
+            
+            <div class="info-box">
+                <strong>Best Practices:</strong>
+                <ol>
+                    <li>Use <code>get()</code> method when you're not sure if a key exists</li>
+                    <li>Use dictionary comprehensions for concise dictionary creation</li>
+                    <li>Consider <code>defaultdict</code> for counting or grouping operations</li>
+                    <li>Use meaningful, descriptive keys for better code readability</li>
+                    <li>Remember that dictionary keys must be immutable</li>
+                </ol>
+            </div>
+            
+            <!-- Compact Share Section at the end -->
+            <div class="social-share-section">
+                <h2>Share This Guide</h2>
+                <p>Help others discover this comprehensive Python resource</p>
+                
+                <div class="share-buttons-container">
+                    <div class="share-item">
+                        <button class="share-button ai-generate" onclick="openAIModal()" title="Generate AI-powered share message">
+                            <i class="fas fa-sparkles"></i>
+                        </button>
+                        <span class="share-label">AI Generator</span>
+                    </div>
+                    
+                    <div class="share-item">
+                        <button class="share-button facebook" onclick="shareOnFacebook()" title="Share on Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </button>
+                        <span class="share-label">Facebook</span>
+                    </div>
+                    
+                    <div class="share-item">
+                        <button class="share-button linkedin" onclick="shareOnLinkedIn()" title="Share on LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </button>
+                        <span class="share-label">LinkedIn</span>
+                    </div>
+                    
+                    <div class="share-item">
+                        <button class="share-button twitter" onclick="shareOnTwitter()" title="Share on X">
+                            <i class="fab fa-x-twitter"></i>
+                        </button>
+                        <span class="share-label">Twitter</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Added Return Home button at the end of the page -->
+            <div class="return-container" style="margin-top: 2rem;">
+                <a href="index.html" class="return-home-btn">
+                    <i class="fas fa-home"></i> Return to Homepage
+                </a>
+            </div>
+        </section>
+    </main>
+    
+    <button class="back-to-top" id="backToTop">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- AI Modal -->
+    <div class="ai-modal" id="aiModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-wand-magic-sparkles"></i> AI Share Generator</h2>
+                <button class="close-modal" onclick="closeAIModal()">&times;</button>
+            </div>
+            
+            <div class="platform-selector">
+                <button class="platform-btn active" data-platform="facebook" onclick="selectPlatform('facebook')">
+                    <i class="fab fa-facebook-f"></i> Facebook
+                </button>
+                <button class="platform-btn" data-platform="linkedin" onclick="selectPlatform('linkedin')">
+                    <i class="fab fa-linkedin-in"></i> LinkedIn
+                </button>
+                <button class="platform-btn" data-platform="twitter" onclick="selectPlatform('twitter')">
+                    <i class="fab fa-x-twitter"></i> X (Twitter)
+                </button>
+            </div>
+            
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <p style="color: #94a3b8;">AI is crafting your perfect share message...</p>
+            </div>
+            
+            <div class="ai-content-box" id="aiContentBox">
+                <div class="ai-generated-text" id="generatedText">
+                    Click "Generate" to create an AI-optimized share message for your selected platform.
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="generateAIContent()">
+                    <i class="fas fa-wand-magic-sparkles"></i> Generate
+                </button>
+                <button class="btn btn-primary" onclick="copyToClipboard()">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <button class="btn btn-primary" onclick="shareGenerated()">
+                    <i class="fas fa-share"></i> Share Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    
+    <div class="newsletter-modal" id="newsletterModal">
+        <div class="modal-newsletter-content">
+            <div class="modal-newsletter-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            
+            <h2>Welcome to Poetic Codes!</h2>
+            
+            <p>Thank you for subscribing, <span id="userName"></span>! Your newsletter journey starts now.</p>
+            <p>Here's your welcome gift - a beautifully formatted HTML newsletter with all the Python dictionary examples from this tutorial.</p>
+            
+            <a href="#" class="download-btn" id="downloadNewsletterBtn">
+                <i class="fas fa-download"></i> Download Newsletter (HTML)
+            </a>
+            
+            <p class="privacy-note" style="margin-top: 1.5rem;">
+                <i class="fas fa-envelope"></i> Your first newsletter will arrive within 24 hours.
+            </p>
+            
+            <button class="close-modal" onclick="closeNewsletterModal()">
+                Continue Reading Tutorial
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Copied to clipboard!</span>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>POETIC CODES</h3>
+                <p style="text-align: justify;">Exploring the art and science of programming through clean, expressive code. Tutorials, examples, and insights for developers at all levels.</p>
+                <p>Created by Glenn Junsay Pansensoy</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#creation">Creating Dictionaries</a></li>
+                    <li><a href="#accessing">Accessing Elements</a></li>
+                    <li><a href="#methods">Dictionary Methods</a></li>
+                    <li><a href="#comprehensions">Dictionary Comprehensions</a></li>
+                    <li><a href="#newsletter">Newsletter</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Legal & Information</h3>
+                <ul class="footer-links">
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="cookie.html">Cookie Policy</a></li>
+                    <li><a href="terms.html">Terms of Service</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="disclaimer.html">Disclaimers</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Connect With Me</h3>
+                <div class="social-icons">
+                    <a href="https://github.com/pansensoyglenn-dev" target="_blank" aria-label="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/glenn-pansensoy-6288453a2" target="_blank" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://x.com/GlennPansensoy" target="_blank" aria-label="X (formerly Twitter)">
+                        <i class="fab fa-x-twitter"></i>
+                    </a>
+                    <a href="https://pansensoyglenn-dev.github.io/poetic-codes" target="_blank" aria-label="Portfolio">
+                        <i class="fas fa-code"></i>
+                    </a>
+                </div>
+                <p style="margin-top: 1.2rem; color: #94a3b8;">Email: pansensoyglenn@gmail.com</p>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2026 Poetic Codes | Created by Glenn Junsay Pansensoy | All code examples are free to use under MIT License.</p>
+            <p>Domain: pansensoyglenn-dev.github.io/poetic-codes</p>
+        </div>
+    </footer>
+    
+    <script>
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initMenu();
+            initBackToTop();
+            initAIModal();
+            initNewsletter();
+        });
+    
+        function initMenu() {
+            const menuToggle = document.getElementById('menuToggle');
+            const navOverlay = document.getElementById('navOverlay');
+            const navClose = document.getElementById('navClose');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const body = document.body;
+
+            function toggleMenu() {
+                const isExpanded = menuToggle.getAttribute('aria-expanded') === 'true';
+                const isActive = navOverlay.classList.contains('active');
+                
+                // Toggle menu state
+                menuToggle.classList.toggle('active');
+                navOverlay.classList.toggle('active');
+                menuToggle.setAttribute('aria-expanded', !isExpanded);
+                navOverlay.setAttribute('aria-hidden', isExpanded);
+                
+          
+                if (!isActive) {
+                    body.classList.add('menu-open');
+                } else {
+                    body.classList.remove('menu-open');
+                }
+                
+                if (!isActive) {
+                    setTimeout(() => navClose.focus(), 300);
+                }
+            }
+
+            menuToggle.addEventListener('click', toggleMenu);
+            navClose.addEventListener('click', toggleMenu);
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', toggleMenu);
+            });
+
+            // Close menu with Escape key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && navOverlay.classList.contains('active')) {
+                    toggleMenu();
+                }
+            });
+
+            navOverlay.addEventListener('click', (e) => {
+                if (e.target === navOverlay) {
+                    toggleMenu();
+                }
+            });
+        }
+        
+        function initBackToTop() {
+            const backToTopBtn = document.getElementById('backToTop');
+            
+            if (backToTopBtn) {
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 300) {
+                        backToTopBtn.classList.add('visible');
+                    } else {
+                        backToTopBtn.classList.remove('visible');
+                    }
+                });
+                
+                backToTopBtn.addEventListener('click', () => {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+        }
+        
+        const pageConfig = {
+            title: "Python Dictionaries Tutorial | Poetic Codes",
+            url: window.location.href,
+            description: "Comprehensive guide to Python dictionaries with examples and explanations by Glenn Junsay Pansensoy"
+        };
+
+        let selectedPlatform = 'facebook';
+        let generatedContent = '';
+        
+        function initAIModal() {
+            selectPlatform('facebook');
+        }
+        
+        async function generateAIContent() {
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const aiContentBox = document.getElementById('aiContentBox');
+            const generatedText = document.getElementById('generatedText');
+            
+            if (!loadingSpinner || !aiContentBox || !generatedText) {
+                showToast('Error: Required elements not found', 'error');
+                return;
+            }
+            
+            loadingSpinner.classList.add('active');
+            aiContentBox.style.display = 'none';
+            
+            try {
+                // Simulate API call with fallback content
+                await new Promise(resolve => setTimeout(resolve, 800));
+                generatedContent = getFallbackContent(selectedPlatform);
+                
+                generatedText.textContent = generatedContent;
+                showToast('AI content generated successfully!');
+                
+            } catch (error) {
+                console.error('Error generating content:', error);
+                generatedContent = getFallbackContent(selectedPlatform);
+                generatedText.textContent = generatedContent;
+                showToast('Using optimized template content', 'info');
+            } finally {
+                loadingSpinner.classList.remove('active');
+                aiContentBox.style.display = 'block';
+            }
+        }
+
+        function getFallbackContent(platform) {
+            const fallbacks = {
+                facebook: `🐍 Learn Python Dictionaries! 
+
+Just published a comprehensive guide covering everything you need to know about Python dictionaries - from basics to advanced concepts.
+
+Perfect for beginners and experienced developers alike! 
+
+👉 Check it out: ${pageConfig.url}
+
+#Python #Programming #LearnToCode #PoeticCodes #GlennPansensoy`,
+                
+                linkedin: `📚 New Tutorial Alert: Python Dictionaries Complete Guide
+
+I've created an in-depth tutorial covering Python dictionaries with practical examples and best practices. Great resource for developers looking to strengthen their Python fundamentals.
+
+Key topics covered:
+• Dictionary creation and manipulation
+• Advanced methods and techniques  
+• Real-world use cases
+• Best practices
+
+Link: ${pageConfig.url}
+
+#Python #Programming #TechEducation #SoftwareDevelopment #LearnToCode #DataStructures`,
+                
+                twitter: `🐍 New Python tutorial: Complete Guide to Dictionaries!
+
+📖 Comprehensive examples
+💡 Best practices
+🔧 Practical use cases
+
+Perfect for all skill levels! Check it out:
+
+${pageConfig.url}
+
+#Python #Programming #100DaysOfCode #DevCommunity #Coding`
+            };
+
+            return fallbacks[platform];
+        }
+
+        
+        function selectPlatform(platform) {
+            selectedPlatform = platform;
+            
+            document.querySelectorAll('.platform-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const selectedBtn = document.querySelector(`[data-platform="${platform}"]`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('active');
+            }
+            
+            const generatedText = document.getElementById('generatedText');
+            if (generatedText) {
+                generatedText.textContent = `Click "Generate" to create an AI-optimized share message for ${platform}.`;
+            }
+            generatedContent = '';
+        }
+
+        
+        function openAIModal() {
+            const modal = document.getElementById('aiModal');
+            if (modal) {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                document.body.classList.add('modal-open');
+            }
+        }
+
+        function closeAIModal() {
+            const modal = document.getElementById('aiModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+                document.body.classList.remove('modal-open');
+            }
+        }
+
+        async function copyToClipboard() {
+            if (!generatedContent) {
+                showToast('Please generate content first!', 'warning');
+                return;
+            }
+            
+            try {
+                await navigator.clipboard.writeText(generatedContent);
+                showToast('Copied to clipboard!');
+            } catch (error) {
+                console.error('Copy failed:', error);
+                
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = generatedContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Copied to clipboard!');
+            }
+        }
+
+        
+        function shareOnFacebook() {
+            const url = encodeURIComponent(pageConfig.url);
+            const text = encodeURIComponent(pageConfig.title);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareOnLinkedIn() {
+            const url = encodeURIComponent(pageConfig.url);
+            const title = encodeURIComponent(pageConfig.title);
+            const summary = encodeURIComponent(pageConfig.description);
+            window.open(`https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}&summary=${summary}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareOnTwitter() {
+            const url = encodeURIComponent(pageConfig.url);
+            const text = encodeURIComponent(pageConfig.title);
+            const hashtags = encodeURIComponent('Python,Programming,Coding');
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}&hashtags=${hashtags}`, '_blank', 'width=600,height=400');
+        }
+
+        function shareGenerated() {
+            if (!generatedContent) {
+                showToast('Please generate content first!', 'warning');
+                return;
+            }
+            
+            const url = encodeURIComponent(pageConfig.url);
+            const text = encodeURIComponent(generatedContent);
+            
+            const shareUrls = {
+                facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`,
+                linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+                twitter: `https://twitter.com/intent/tweet?text=${text}&url=${url}`
+            };
+            
+            if (shareUrls[selectedPlatform]) {
+                window.open(shareUrls[selectedPlatform], '_blank', 'width=600,height=400');
+                closeAIModal();
+            }
+        }
+
+        
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            if (!toast || !toastMessage) return;
+            
+            toastMessage.textContent = message;
+            
+            if (type === 'error') {
+                toast.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+            } else if (type === 'warning') {
+                toast.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+            } else {
+                toast.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            }
+            
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function initNewsletter() {
+            const newsletterForm = document.getElementById('newsletterForm');
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    subscribeToNewsletter();
+                });
+                
+              
+                const inputs = newsletterForm.querySelectorAll('input[required]');
+                inputs.forEach(input => {
+                    input.addEventListener('input', function() {
+                        validateForm();
+                    });
+                });
+                
+                loadInitialSubscriberCount();
+            }
+        }
+
+        function validateForm() {
+            const newsletterForm = document.getElementById('newsletterForm');
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            
+            if (!newsletterForm || !subscribeBtn) return;
+            
+            const nameInput = document.getElementById('subscriberName');
+            const emailInput = document.getElementById('subscriberEmail');
+            const agreeCheckbox = document.getElementById('agreeTerms');
+            
+            const isValid = nameInput.value.trim() !== '' && 
+                            emailInput.value.trim() !== '' && 
+                            emailInput.checkValidity() && 
+                            agreeCheckbox.checked;
+            
+            subscribeBtn.disabled = !isValid;
+            return isValid;
+        }
+
+        async function subscribeToNewsletter() {
+            const nameInput = document.getElementById('subscriberName');
+            const emailInput = document.getElementById('subscriberEmail');
+            const subscribeBtn = document.getElementById('subscribeBtn');
+            
+            if (!nameInput || !emailInput || !subscribeBtn) return;
+            
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            
+            if (!validateForm()) {
+                showToast('Please fill in all required fields correctly', 'warning');
+                return;
+            }
+            
+            const originalText = subscribeBtn.querySelector('.btn-text').textContent;
+            const originalIcon = subscribeBtn.querySelector('.btn-icon').innerHTML;
+            
+            // Show loading state
+            subscribeBtn.disabled = true;
+            subscribeBtn.querySelector('.btn-text').textContent = 'Subscribing...';
+            subscribeBtn.querySelector('.btn-icon').innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            try {
+              
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                const subscriber = {
+                    name: name,
+                    email: email,
+                    subscribedAt: new Date().toISOString(),
+                    subscriptionId: 'PC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9)
+                };
+                
+                let subscribers = JSON.parse(localStorage.getItem('poeticCodesSubscribers') || '[]');
+                subscribers.push(subscriber);
+                localStorage.setItem('poeticCodesSubscribers', JSON.stringify(subscribers));
+                
+                updateSubscriberCount(subscribers.length);
+                
+                showNewsletterModal(subscriber);
+                
+                document.getElementById('newsletterForm').reset();
+                
+            } catch (error) {
+                console.error('Subscription error:', error);
+                showToast('Subscription failed. Please try again.', 'error');
+            } finally {
+                
+                subscribeBtn.disabled = false;
+                subscribeBtn.querySelector('.btn-text').textContent = originalText;
+                subscribeBtn.querySelector('.btn-icon').innerHTML = originalIcon;
+                validateForm(); 
+            }
+        }
+
+        function updateSubscriberCount(count) {
+            const countElement = document.getElementById('subscriberCount');
+            if (countElement) {
+                // Animate count
+                animateCount(countElement, count);
+            }
+        }
+
+        function animateCount(element, target) {
+            let current = parseInt(element.textContent.replace(/,/g, '')) || 0;
+            const increment = target > current ? 1 : -1;
+            const duration = 1000; // ms
+            const stepTime = Math.abs(Math.floor(duration / (target - current)));
+            
+            const timer = setInterval(() => {
+                current += increment;
+                element.textContent = current.toLocaleString();
+                
+                if (current === target) {
+                    clearInterval(timer);
+                }
+            }, stepTime);
+        }
+
+        function showNewsletterModal(subscriber) {
+            const modal = document.getElementById('newsletterModal');
+            const userName = document.getElementById('userName');
+            const downloadBtn = document.getElementById('downloadNewsletterBtn');
+            
+            if (!modal || !userName || !downloadBtn) return;
+            
+            
+            userName.textContent = subscriber.name;
+            
+            
+            downloadBtn.onclick = function(e) {
+                e.preventDefault();
+                downloadNewsletterHTML(subscriber);
+            };
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            document.body.classList.add('newsletter-modal-open');
+        }
+
+        function closeNewsletterModal() {
+            const modal = document.getElementById('newsletterModal');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+                document.body.classList.remove('newsletter-modal-open');
+            }
+        }
+
+        function downloadNewsletterHTML(subscriber) {
+            
+            const newsletterHTML = createNewsletterHTML(subscriber);
+            
+            const blob = new Blob([newsletterHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Poetic-Codes-Newsletter-${subscriber.subscriptionId}.html`;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Cleanup
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showToast('Newsletter downloaded successfully!', 'success');
+            }, 100);
+        }
+
+        function createNewsletterHTML(subscriber) {
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            return `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poetic Codes Newsletter - Python Dictionaries</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        
+        .newsletter-container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-top: 5px solid #3b82f6;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .header h1 {
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .header p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+        
+        .greeting {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .content-section {
+            margin-bottom: 40px;
+        }
+        
+        .content-section h2 {
+            color: #1e40af;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+        
+        .code-block {
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Cascadia Code', 'Fira Code', monospace;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+        
+        .code-comment { color: #94a3b8; font-style: italic; }
+        .code-keyword { color: #f472b6; }
+        .code-string { color: #34d399; }
+        .code-function { color: #60a5fa; }
+        .code-number { color: #f59e0b; }
+        
+        .tip-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+        
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .resource-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s ease;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .resource-card h3 {
+            color: #1e40af;
+            margin-top: 0;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        
+        .social-links {
+            margin: 20px 0;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .subscription-info {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="newsletter-container">
+        <div class="header">
+            <h1><i class="fas fa-code"></i> Poetic Codes Newsletter</h1>
+            <p>Python Dictionaries Masterclass - Issue #001</p>
+            <p><strong>${currentDate}</strong></p>
+        </div>
+        
+        <div class="greeting">
+            <h2>Welcome, ${subscriber.name}! 👋</h2>
+            <p>Thank you for subscribing to Poetic Codes. This is your first newsletter, packed with valuable Python insights.</p>
+            <p><strong>Subscription ID:</strong> ${subscriber.subscriptionId}</p>
+        </div>
+        
+        <div class="content-section">
+            <h2><i class="fas fa-star"></i> Python Dictionaries: Key Concepts</h2>
+            
+            <p>Here's a quick recap of what we covered in the tutorial:</p>
+            
+            <div class="code-block">
+<pre><span class="code-comment"># Dictionary Creation Examples</span>
+<span class="code-keyword">person</span> = {
+    <span class="code-string">"name"</span>: <span class="code-string">"Alice"</span>,
+    <span class="code-string">"age"</span>: <span class="code-number">30</span>,
+    <span class="code-string">"skills"</span>: [<span class="code-string">"Python"</span>, <span class="code-string">"JavaScript"</span>, <span class="code-string">"SQL"</span>]
+}
+
+<span class="code-comment"># Accessing values</span>
+name = person[<span class="code-string">"name"</span>]  <span class="code-comment"># "Alice"</span>
+age = person.<span class="code-function">get</span>(<span class="code-string">"age"</span>)  <span class="code-comment"># 30</span>
+
+<span class="code-comment"># Adding/Updating</span>
+person[<span class="code-string">"city"</span>] = <span class="code-string">"New York"</span>
+person.<span class="code-function">update</span>({<span class="code-string">"is_student"</span>: <span class="code-keyword">False</span>})</pre>
+            </div>
+            
+            <div class="tip-box">
+                <h3><i class="fas fa-lightbulb"></i> Pro Tip</h3>
+                <p>Always use the <code>.get()</code> method when accessing dictionary values if you're not sure whether a key exists. This prevents KeyError exceptions!</p>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2><i class="fas fa-bolt"></i> Dictionary Comprehension Examples</h2>
+            
+            <div class="code-block">
+<pre><span class="code-comment"># Create a dictionary of squares</span>
+squares = {x: x*x <span class="code-keyword">for</span> x <span class="code-keyword">in</span> <span class="code-function">range</span>(<span class="code-number">1</span>, <span class="code-number">6</span>)}
+<span class="code-comment"># {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}</span>
+
+<span class="code-comment"># Filter dictionary items</span>
+scores = {<span class="code-string">"Alice"</span>: <span class="code-number">85</span>, <span class="code-string">"Bob"</span>: <span class="code-number">92</span>, <span class="code-string">"Charlie"</span>: <span class="code-number">78</span>}
+high_scores = {name: score <span class="code-keyword">for</span> name, score <span class="code-keyword">in</span> scores.<span class="code-function">items</span>() 
+               <span class="code-keyword">if</span> score > <span class="code-number">80</span>}
+<span class="code-comment"># {"Alice": 85, "Bob": 92}</span></pre>
+            </div>
+        </div>
+        
+        <div class="content-section">
+            <h2><i class="fas fa-book"></i> Recommended Resources</h2>
+            
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <h3><i class="fas fa-book-open"></i> Official Docs</h3>
+                    <p>Python Dictionary Documentation - The most comprehensive reference</p>
+                </div>
+                
+                <div class="resource-card">
+                    <h3><i class="fas fa-video"></i> Video Tutorials</h3>
+                    <p>Corey Schafer's Python Dictionary Tutorial on YouTube</p>
+                </div>
+                
+                <div class="resource-card">
+                    <h3><i class="fas fa-laptop-code"></i> Practice Problems</h3>
+                    <p>HackerRank Dictionary Challenges for hands-on practice</p>
+                </div>
+                
+                <div class="resource-card">
+                    <h3><i class="fas fa-project-diagram"></i> Real Projects</h3>
+                    <p>Build a contact management system using dictionaries</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="subscription-info">
+            <p><strong>Your Subscription Details:</strong></p>
+            <p>Name: ${subscriber.name}</p>
+            <p>Email: ${subscriber.email}</p>
+            <p>Subscribed on: ${new Date(subscriber.subscribedAt).toLocaleDateString()}</p>
+        </div>
+        
+        <div class="footer">
+            <div class="social-links">
+                <a href="https://pansensoyglenn-dev.github.io/poetic-codes"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://www.linkedin.com/in/glenn-pansensoy-6288453a2"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                <a href="https://x.com/@GlennPansensoy"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="https://pansensoyglenn-dev.github.io/poetic-codes"><i class="fas fa-globe"></i> Website</a>
+            </div>
+            
+            <p>This newsletter is part of your Poetic Codes subscription.</p>
+            <p>To unsubscribe, reply to this email with "UNSUBSCRIBE" in the subject line.</p>
+            <p>&copy; 2024 Poetic Codes by Glenn Junsay Pansensoy. All rights reserved.</p>
+            <p>You received this email because you subscribed at poetic-codes.com</p>
+        </div>
+    </div>
+</body>
+</html>`;
+        }
+
+        
+        function loadInitialSubscriberCount() {
+            const subscribers = JSON.parse(localStorage.getItem('poeticCodesSubscribers') || '[]');
+            updateSubscriberCount(subscribers.length);
+        }
+
+        function scrollToNewsletter() {
+            const newsletterSection = document.querySelector('.newsletter-section');
+            if (newsletterSection) {
+                newsletterSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAIModal();
+                closeNewsletterModal();
+            }
+        });
+
+        const newsletterModal = document.getElementById('newsletterModal');
+        if (newsletterModal) {
+            newsletterModal.addEventListener('click', function(e) {
+                if (e.target === newsletterModal) {
+                    closeNewsletterModal();
+                }
+            });
+        }
+
+        const aiModal = document.getElementById('aiModal');
+        if (aiModal) {
+            aiModal.addEventListener('click', (e) => {
+                if (e.target.id === 'aiModal') {
+                    closeAIModal();
+                }
+            });
+        }
+        
+        // Add CSS for modal open state
+        const style = document.createElement('style');
+        style.textContent = `
+            body.modal-open, body.newsletter-modal-open {
+                overflow: hidden !important;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
