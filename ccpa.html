@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | CCPA Compliance</title>
+    <style>
+        :root {
+            --obsidian: #0b0e14;
+            --midnight-blue: #161b22;
+            --electric-blue: #58a6ff;
+            --text-main: #adbac7;
+            --text-bright: #ffffff;
+            --border-color: #444c56;
+            --success: #2ea043;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 850px;
+            background-color: var(--midnight-blue);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h1, h2, h3 { color: var(--text-bright); }
+        h1 { border-bottom: 1px solid var(--border-color); padding-bottom: 15px; font-size: 1.8rem; }
+        
+        a { color: var(--electric-blue); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .last-updated { font-size: 0.85rem; color: #768390; margin-bottom: 30px; }
+
+        .table-container { overflow-x: auto; margin: 25px 0; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+            background: rgba(0,0,0,0.2);
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+        th { background-color: rgba(88, 166, 255, 0.1); color: var(--electric-blue); }
+
+        /* Opt-Out Section */
+        .opt-out-card {
+            background: #1c2128;
+            border: 1px solid var(--electric-blue);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .switch-container { display: flex; align-items: center; gap: 15px; }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #373e47; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px;
+            left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        /* Buttons & Inputs */
+        .request-form {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        input[type="email"], select {
+            background: var(--obsidian);
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            width: 100%;
+        }
+        .btn-submit {
+            background-color: var(--electric-blue);
+            color: var(--obsidian);
+            font-weight: bold;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-submit:hover { opacity: 0.9; }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.4rem; }
+            .opt-out-card { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>California Privacy Notice</h1>
+        <p class="last-updated">Last Modified: February 4, 2026</p>
+    </header>
+
+    <section>
+        <h2>Do Not Sell or Share My Info</h2>
+        <div class="opt-out-card">
+            <div>
+                <strong style="color: var(--text-bright);">Global Opt-Out Preference</strong>
+                <p style="margin: 5px 0 0 0; font-size: 0.9rem;">Limit the use of my sensitive personal information.</p>
+            </div>
+            <div class="switch-container">
+                <span id="statusLabel">Sharing Active</span>
+                <label class="switch">
+                    <input type="checkbox" id="ccpaToggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Information We Collect</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Collected</th>
+                        <th>Retention</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Direct Identifiers (Name, Email)</td>
+                        <td>Yes</td>
+                        <td>7 Years</td>
+                    </tr>
+                    <tr>
+                        <td>Sensitive PI (Account Credentials)</td>
+                        <td>Yes</td>
+                        <td>Account Life</td>
+                    </tr>
+                    <tr>
+                        <td>Biometric or Geolocation</td>
+                        <td>No</td>
+                        <td>N/A</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section>
+        <h2>Submit a Privacy Request</h2>
+        <p>Use the form below to request access, correction, or deletion of your data.</p>
+        <form class="request-form" id="privacyForm">
+            <input type="email" id="userEmail" placeholder="Your Email Address" required>
+            <select id="requestType">
+                <option value="access">Right to Know / Access</option>
+                <option value="delete">Right to Delete</option>
+                <option value="correct">Right to Correct Information</option>
+            </select>
+            <button type="submit" class="btn-submit">Submit Request</button>
+        </form>
+    </section>
+
+    <footer style="margin-top: 50px; font-size: 0.8rem; text-align: center; color: #768390;">
+        &copy; 2026 Glenn Junsay Pansensoy. All Rights Reserved.
+    </footer>
+</div>
+
+<script>
+    const toggle = document.getElementById('ccpaToggle');
+    const statusLabel = document.getElementById('statusLabel');
+    const form = document.getElementById('privacyForm');
+
+  
+    toggle.addEventListener('change', function() {
+        const isOptedOut = this.checked;
+        localStorage.setItem('ccpa_opt_out', isOptedOut);
+        statusLabel.innerText = isOptedOut ? "Opt-Out Active" : "Sharing Active";
+        statusLabel.style.color = isOptedOut ? "var(--success)" : "var(--text-main)";
+        
+        if(isOptedOut) {
+            console.log("CCPA: Data sharing scripts disabled.");
+            
+        }
+    });
+
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const email = document.getElementById('userEmail').value;
+        const type = document.getElementById('requestType').value;
+        
+        alert(`Request Received!\nType: ${type}\nEmail: ${email}\n\nWe will verify your identity via email within 10 days.`);
+        form.reset();
+    });
+
+    // Detect Global Privacy Control (GPC)
+    if (navigator.globalPrivacyControl) {
+        toggle.checked = true;
+        statusLabel.innerText = "GPC Opt-Out Active";
+        localStorage.setItem('ccpa_opt_out', 'true');
+    }
+</script>
+
+</body>
+</html>
