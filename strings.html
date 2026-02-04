@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Python String Method Specifications</title>
+    <style>
+        :root {
+            --obsidian: #0f1115;
+            --midnight: #1a1e2a;
+            --accent-blue: #38bdf8;
+            --code-green: #4ade80;
+            --text-main: #94a3b8;
+            --border: #2d3748;
+        }
+        body { 
+            font-family: 'Inter', -apple-system, monospace; 
+            background-color: var(--obsidian); 
+            color: var(--text-main); 
+            margin: 0; 
+            padding: 40px; 
+            line-height: 1.6;
+        }
+        .container { max-width: 1100px; margin: auto; }
+        h1 { 
+            color: #f8fafc; 
+            font-size: 1.8rem; 
+            border-left: 4px solid var(--accent-blue); 
+            padding-left: 15px; 
+            margin-bottom: 40px;
+        }
+        .method-item { 
+            background: var(--midnight); 
+            border: 1px solid var(--border); 
+            border-radius: 8px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+        }
+        .header-row { display: flex; align-items: baseline; gap: 15px; margin-bottom: 10px; }
+        .index { color: var(--accent-blue); font-weight: bold; font-family: 'Fira Code', monospace; }
+        .method-name { color: #f8fafc; font-weight: 700; font-size: 1.1rem; }
+        .description { color: #94a3b8; font-size: 0.95rem; margin-bottom: 12px; }
+        code-block { 
+            display: block; 
+            background: #000; 
+            padding: 12px; 
+            border-radius: 6px; 
+            color: var(--code-green); 
+            font-family: 'Fira Code', 'Consolas', monospace;
+            border: 1px solid #222;
+        }
+        .keyword { color: var(--accent-blue); }
+        .comment { color: #64748b; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>40  Python  String Methods</h2>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 1:</span> <span class="method-name">upper()</span></div>
+        <p class="description">Transposes all cased characters to their uppercase equivalents.</p>
+        <code-block>val = <span class="keyword">"python"</span>.upper() <span class="comment"># Output: "PYTHON"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 2:</span> <span class="method-name">lower()</span></div>
+        <p class="description">Normalizes all characters to lowercase.</p>
+        <code-block>val = <span class="keyword">"DATA"</span>.lower() <span class="comment"># Output: "data"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 3:</span> <span class="method-name">casefold()</span></div>
+        <p class="description">Implements aggressive case-folding for caseless string comparison across different languages.</p>
+        <code-block>val = <span class="keyword">"Fluß"</span>.casefold() <span class="comment"># Output: "fluss"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 4:</span> <span class="method-name">capitalize()</span></div>
+        <p class="description">Converts the first character to uppercase and all subsequent to lowercase.</p>
+        <code-block>val = <span class="keyword">"hello WORLD"</span>.capitalize() <span class="comment"># Output: "Hello world"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 5:</span> <span class="method-name">title()</span></div>
+        <p class="description">Applies title-casing where every word starts with an uppercase character.</p>
+        <code-block>val = <span class="keyword">"entry point"</span>.title() <span class="comment"># Output: "Entry Point"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 6:</span> <span class="method-name">swapcase()</span></div>
+        <p class="description">Inverts the casing of all characters in the string.</p>
+        <code-block>val = <span class="keyword">"PyThOn"</span>.swapcase() <span class="comment"># Output: "pYtHoN"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 7:</span> <span class="method-name">find()</span></div>
+        <p class="description">Returns the lowest index of a substring; returns -1 on failure.</p>
+        <code-block>val = <span class="keyword">"system"</span>.find(<span class="keyword">"y"</span>) <span class="comment"># Output: 1</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 8:</span> <span class="method-name">rfind()</span></div>
+        <p class="description">Returns the highest index of a substring; returns -1 on failure.</p>
+        <code-block>val = <span class="keyword">"banana"</span>.rfind(<span class="keyword">"a"</span>) <span class="comment"># Output: 5</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 9:</span> <span class="method-name">index()</span></div>
+        <p class="description">Identical to find(), but raises a <code>ValueError</code> if the substring is not present.</p>
+        <code-block>val = <span class="keyword">"root"</span>.index(<span class="keyword">"o"</span>) <span class="comment"># Output: 1</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 10:</span> <span class="method-name">rindex()</span></div>
+        <p class="description">Returns the highest index of a substring; raises <code>ValueError</code> on failure.</p>
+        <code-block>val = <span class="keyword">"root"</span>.rindex(<span class="keyword">"o"</span>) <span class="comment"># Output: 2</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 11:</span> <span class="method-name">count()</span></div>
+        <p class="description">Returns the number of non-overlapping occurrences of a substring.</p>
+        <code-block>val = <span class="keyword">"tests"</span>.count(<span class="keyword">"t"</span>) <span class="comment"># Output: 2</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 12:</span> <span class="method-name">startswith()</span></div>
+        <p class="description">Returns True if the string starts with the specified prefix.</p>
+        <code-block>val = <span class="keyword">"v1_b"</span>.startswith(<span class="keyword">"v1"</span>) <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 13:</span> <span class="method-name">endswith()</span></div>
+        <p class="description">Returns True if the string ends with the specified suffix.</p>
+        <code-block>val = <span class="keyword">"d.csv"</span>.endswith(<span class="keyword">".csv"</span>) <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 14:</span> <span class="method-name">isalnum()</span></div>
+        <p class="description">Checks if all characters are alphanumeric (letters or numbers).</p>
+        <code-block>val = <span class="keyword">"user123"</span>.isalnum() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 15:</span> <span class="method-name">isalpha()</span></div>
+        <p class="description">Checks if all characters in the string are alphabetic.</p>
+        <code-block>val = <span class="keyword">"Python"</span>.isalpha() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 16:</span> <span class="method-name">isascii()</span></div>
+        <p class="description">Returns True if the string is empty or all characters are ASCII.</p>
+        <code-block>val = <span class="keyword">"apple"</span>.isascii() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 17:</span> <span class="method-name">isdecimal()</span></div>
+        <p class="description">Checks if all characters are decimals (0-9).</p>
+        <code-block>val = <span class="keyword">"100"</span>.isdecimal() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 18:</span> <span class="method-name">isdigit()</span></div>
+        <p class="description">Checks if all characters are digits (includes superscripts).</p>
+        <code-block>val = <span class="keyword">"²"</span>.isdigit() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 19:</span> <span class="method-name">isnumeric()</span></div>
+        <p class="description">Checks if all characters are numeric (includes fractions).</p>
+        <code-block>val = <span class="keyword">"½"</span>.isnumeric() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 20:</span> <span class="method-name">isidentifier()</span></div>
+        <p class="description">Determines if the string is a valid identifier (variable name) in Python.</p>
+        <code-block>val = <span class="keyword">"my_var"</span>.isidentifier() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 21:</span> <span class="method-name">islower()</span></div>
+        <p class="description">Checks if all cased characters are lowercase.</p>
+        <code-block>val = <span class="keyword">"low"</span>.islower() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 22:</span> <span class="method-name">isupper()</span></div>
+        <p class="description">Checks if all cased characters are uppercase.</p>
+        <code-block>val = <span class="keyword">"HIGH"</span>.isupper() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 23:</span> <span class="method-name">istitle()</span></div>
+        <p class="description">Returns True if the string is in title-case.</p>
+        <code-block>val = <span class="keyword">"Hello World"</span>.istitle() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 24:</span> <span class="method-name">isprintable()</span></div>
+        <p class="description">Checks if characters are printable (e.g., no escape codes).</p>
+        <code-block>val = <span class="keyword">"data"</span>.isprintable() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 25:</span> <span class="method-name">isspace()</span></div>
+        <p class="description">Checks if the string contains only whitespace.</p>
+        <code-block>val = <span class="keyword">"  \t  "</span>.isspace() <span class="comment"># Output: True</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 26:</span> <span class="method-name">center()</span></div>
+        <p class="description">Centers the string in a field of specific width using a padding character.</p>
+        <code-block>val = <span class="keyword">"X"</span>.center(5, <span class="keyword">"-"</span>) <span class="comment"># Output: "--X--"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 27:</span> <span class="method-name">ljust()</span></div>
+        <p class="description">Left-justifies the string with padding.</p>
+        <code-block>val = <span class="keyword">"txt"</span>.ljust(5, <span class="keyword">"*"</span>) <span class="comment"># Output: "txt**"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 28:</span> <span class="method-name">rjust()</span></div>
+        <p class="description">Right-justifies the string with padding.</p>
+        <code-block>val = <span class="keyword">"txt"</span>.rjust(5, <span class="keyword">"*"</span>) <span class="comment"># Output: "**txt"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 29:</span> <span class="method-name">zfill()</span></div>
+        <p class="description">Pads a numeric string with leading zeros.</p>
+        <code-block>val = <span class="keyword">"42"</span>.zfill(5) <span class="comment"># Output: "00042"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 30:</span> <span class="method-name">expandtabs()</span></div>
+        <p class="description">Sets the tab size of the string to the specified number of spaces.</p>
+        <code-block>val = <span class="keyword">"A\tB"</span>.expandtabs(2) <span class="comment"># Output: "A B"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 31:</span> <span class="method-name">split()</span></div>
+        <p class="description">Splits string into a list based on a separator.</p>
+        <code-block>val = <span class="keyword">"a,b,c"</span>.split(<span class="keyword">","</span>) <span class="comment"># Output: ["a", "b", "c"]</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 32:</span> <span class="method-name">rsplit()</span></div>
+        <p class="description">Splits string into a list starting from the right side.</p>
+        <code-block>val = <span class="keyword">"a,b,c"</span>.rsplit(<span class="keyword">","</span>, 1) <span class="comment"># Output: ["a,b", "c"]</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 33:</span> <span class="method-name">splitlines()</span></div>
+        <p class="description">Splits the string at line breaks into a list.</p>
+        <code-block>val = <span class="keyword">"l1\nl2"</span>.splitlines() <span class="comment"># Output: ["l1", "l2"]</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 34:</span> <span class="index">join()</span></div>
+        <p class="description">Concatenates an iterable's elements into a single string using a joiner.</p>
+        <code-block>val = <span class="keyword">"-"</span>.join([<span class="keyword">"a"</span>, <span class="keyword">"b"</span>]) <span class="comment"># Output: "a-b"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 35:</span> <span class="method-name">partition()</span></div>
+        <p class="description">Splits the string into a 3-tuple (before, sep, after) at first match.</p>
+        <code-block>val = <span class="keyword">"a-b-c"</span>.partition(<span class="keyword">"-"</span>) <span class="comment"># Output: ("a", "-", "b-c")</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 36:</span> <span class="method-name">rpartition()</span></div>
+        <p class="description">Splits the string into a 3-tuple at the last match.</p>
+        <code-block>val = <span class="keyword">"a-b-c"</span>.rpartition(<span class="keyword">"-"</span>) <span class="comment"># Output: ("a-b", "-", "c")</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 37:</span> <span class="method-name">strip()</span></div>
+        <p class="description">Removes leading and trailing whitespace/chars.</p>
+        <code-block>val = <span class="keyword">"  x  "</span>.strip() <span class="comment"># Output: "x"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 38:</span> <span class="method-name">lstrip()</span></div>
+        <p class="description">Removes leading whitespace/chars.</p>
+        <code-block>val = <span class="keyword">"  x  "</span>.lstrip() <span class="comment"># Output: "x  "</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 39:</span> <span class="method-name">rstrip()</span></div>
+        <p class="description">Removes trailing whitespace/chars.</p>
+        <code-block>val = <span class="keyword">"  x  "</span>.rstrip() <span class="comment"># Output: "  x"</span></code-block>
+    </div>
+
+    <div class="method-item">
+        <div class="header-row"><span class="index">Number 40:</span> <span class="method-name">replace()</span></div>
+        <p class="description">Substitutes all occurrences of a substring with another.</p>
+        <code-block>val = <span class="keyword">"old"</span>.replace(<span class="keyword">"old"</span>, <span class="keyword">"new"</span>) <span class="comment"># Output: "new"</span></code-block>
+    </div>
+
+</div>
+
+</body>
+</html>
