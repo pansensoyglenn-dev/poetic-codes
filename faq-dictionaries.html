@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Dictionary FAQ</title>
+    <style>
+        :root {
+            --obsidian: #0b0e14;
+            --midnight-blue: #191e29;
+            --accent-blue: #3b82f6;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: #2d3748;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        h1 {
+            color: var(--accent-blue);
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .faq-container {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .faq-item {
+            background-color: var(--midnight-blue);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            padding: 18px 25px;
+            text-align: left;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            outline: none;
+        }
+
+        .faq-question:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 20px;
+            color: var(--accent-blue);
+        }
+
+        .faq-item.active .faq-question::after {
+            content: '−';
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .faq-answer-content {
+            padding: 20px 25px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            border-top: 1px solid var(--border);
+        }
+
+        code {
+            background-color: #000;
+            color: #ec4899;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Python Dictionaries FAQ</h1>
+
+    <div class="faq-container">
+        <div class="faq-item">
+            <button class="faq-question">What is a Python Dictionary?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    A dictionary is a built-in data type that stores data in <strong>key-value pairs</strong>. They are ordered (as of Python 3.7+), mutable, and do not allow duplicate keys.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do you create an empty dictionary?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    You can use curly braces <code>my_dict = {}</code> or the constructor <code>my_dict = dict()</code>.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do I access a value using a key?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Use square brackets: <code>my_dict["key"]</code>. Alternatively, use <code>my_dict.get("key")</code> to avoid a KeyError if the key doesn't exist.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">Can a dictionary have duplicate keys?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    No. If you assign a value to an existing key, the old value will be <strong>overwritten</strong>.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">What types can be used as dictionary keys?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Keys must be <strong>immutable</strong> (hashable) types, such as strings, numbers, or tuples. Lists and other dictionaries cannot be keys.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do I add or update an item?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Simply assign a value to a key: <code>my_dict["new_key"] = "new_value"</code>. You can also use <code>my_dict.update({"key": "value"})</code>.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do I remove an item by key?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Use <code>del my_dict["key"]</code> or <code>my_dict.pop("key")</code>. The latter returns the value of the removed item.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do I check if a key exists?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Use the <code>in</code> keyword: <code>if "key" in my_dict:</code>.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do I iterate through a dictionary?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Use <code>for key, val in my_dict.items():</code> to get both, or <code>.keys()</code> and <code>.values()</code> for specific components.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">What is a Dictionary Comprehension?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    A concise way to create dictionaries: <code>{k: v for k, v in iterable}</code>. It's similar to list comprehensions but for key-value pairs.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do I merge two dictionaries?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    In Python 3.9+, you can use the union operator: <code>dict1 | dict2</code>. In older versions, use <code>dict1.update(dict2)</code>.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">What happens if I access a non-existent key?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Python raises a <code>KeyError</code>. Using <code>.get()</code> instead returns <code>None</code> (or a default value you provide).
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do I clear all items from a dictionary?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Use the <code>my_dict.clear()</code> method to remove all elements, leaving an empty dictionary.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do I get the number of items?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Use the built-in <code>len(my_dict)</code> function.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">What is a DefaultDict?</button>
+            <div class="faq-answer">
+                <div class="faq-answer-content">
+                    Found in the <code>collections</code> module, a <code>defaultdict</code> provides a default value for a non-existent key instead of throwing a KeyError.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const faqItem = button.parentElement;
+                
+                // Toggle active class
+                faqItem.classList.toggle('active');
+
+                // Toggle answer visibility
+                const answer = faqItem.querySelector('.faq-answer');
+                if (faqItem.classList.contains('active')) {
+                    answer.style.maxHeight = answer.scrollHeight + "px";
+                } else {
+                    answer.style.maxHeight = 0;
+                }
+
+                // Close other items (Optional)
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    if (item !== faqItem) {
+                        item.classList.remove('active');
+                        item.querySelector('.faq-answer').style.maxHeight = 0;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
