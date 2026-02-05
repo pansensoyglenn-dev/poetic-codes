@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Web Development</title>
+    <style>
+        :root {
+            --obsidian: #0d1117; /* Deepest black-blue */
+            --midnight: #161b22; /* Classic dark panel */
+            --midnight-hover: #21262d;
+            --accent-blue: #58a6ff;
+            --accent-gold: #f2c94c;
+            --text-muted: #8b949e;
+            --text-main: #c9d1d9;
+            --border: #30363d;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            padding: 50px 20px;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            color: var(--accent-blue);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .faq-grid {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .faq-card {
+            background-color: var(--midnight);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .faq-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .faq-trigger {
+            width: 100%;
+            padding: 22px;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            text-align: left;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-trigger span {
+            padding-right: 15px;
+        }
+
+        .icon {
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-card.active .icon {
+            transform: rotate(45deg);
+            color: var(--accent-gold);
+        }
+
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0, 1, 0, 1);
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-card.active .faq-content {
+            max-height: 1000px;
+            transition: max-height 0.4s ease-in;
+            border-top: 1px solid var(--border);
+        }
+
+        .content-inner {
+            padding: 22px;
+            color: var(--text-muted);
+        }
+
+        code {
+            background: #000;
+            color: var(--accent-gold);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+        }
+
+        strong {
+            color: var(--text-main);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Python Web Development</h1>
+        <p class="subtitle">Frequently Asked Questions & Architecture Patterns</p>
+    </div>
+
+    <div class="faq-grid" id="faqAccordion">
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>What is the difference between Django and Flask?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    <strong>Django</strong> is a "batteries-included" framework, providing an ORM, auth, and admin panel out of the box. <strong>Flask</strong> is a micro-framework, giving you the bare essentials and letting you choose your own tools.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>When should I use FastAPI instead of Flask?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    Use <strong>FastAPI</strong> if you need high performance, native <code>async/await</code> support, and automatic OpenAPI (Swagger) documentation. It's ideal for modern REST or GraphQL APIs.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>What is WSGI vs. ASGI?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    <strong>WSGI</strong> (Web Server Gateway Interface) is for synchronous Python apps. <strong>ASGI</strong> (Asynchronous Server Gateway Interface) is the successor, supporting WebSockets and asynchronous requests.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>How do you handle Database Migrations?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    Django uses its built-in <code>makemigrations</code> system. For Flask or FastAPI, <strong>Alembic</strong> (used with SQLAlchemy) is the industry standard for tracking schema changes.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>What is an ORM?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    An <strong>Object-Relational Mapper</strong> allows you to interact with a database using Python classes instead of writing raw SQL. Examples include <code>SQLAlchemy</code> and <code>Django ORM</code>.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>How do you manage environment variables?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    Never hardcode secrets! Use a <code>.env</code> file and libraries like <code>python-dotenv</code> or <code>pydantic-settings</code> to load configurations securely.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>What is Jinja2?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    <strong>Jinja2</strong> is a popular templating engine for Python. It allows you to inject Python-like logic (loops, conditionals) directly into your HTML files.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>Why use Gunicorn or Uvicorn?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    Python's built-in servers (like <code>app.run()</code>) aren't production-ready. <strong>Gunicorn</strong> (WSGI) and <strong>Uvicorn</strong> (ASGI) are robust servers designed to handle multiple concurrent workers.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>What is the purpose of a Virtual Environment?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    It isolates project dependencies. Tools like <code>venv</code>, <code>Pipenv</code>, or <code>Poetry</code> ensure that <i>Project A</i> doesn't break because of an update in <i>Project B</i>.
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>How do you implement Authentication?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    Common methods include <strong>Session-based auth</strong> (common in Django) and <strong>JWT (JSON Web Tokens)</strong> (preferred for stateless APIs and SPAs).
+                </div>
+            </div>
+        </div>
+
+        <div class="faq-card">
+            <button class="faq-trigger">
+                <span>What are Celery and Redis used for?</span>
+                <div class="icon">+</div>
+            </button>
+            <div class="faq-content">
+                <div class="content-inner">
+                    They handle <strong>Background Tasks</strong>. If a user uploads a large file or triggers an email, you use Celery to process it "off-thread" so the website stays responsive.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.querySelectorAll('.faq-trigger').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const parent = trigger.parentElement;
+                
+                // Toggle active class
+                parent.classList.toggle('active');
+
+                // Collapse others
+                document.querySelectorAll('.faq-card').forEach(card => {
+                    if (card !== parent) {
+                        card.classList.remove('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
