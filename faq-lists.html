@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Lists FAQ</title>
+    <style>
+        :root {
+            --obsidian: #0b0e14;
+            --midnight: #161b22;
+            --accent: #58a6ff;
+            --text-main: #adbac7;
+            --text-bright: #ffffff;
+            --border: #30363d;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        h1 {
+            color: var(--accent);
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .faq-container {
+            width: 100%;
+            max-width: 700px;
+        }
+
+        .faq-item {
+            background-color: var(--midnight);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: var(--accent);
+        }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            outline: none;
+            padding: 18px 20px;
+            text-align: left;
+            cursor: pointer;
+            color: var(--text-bright);
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 20px;
+            color: var(--accent);
+        }
+
+        .faq-item.active .faq-question::after {
+            content: '−';
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            background-color: #1c2128;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px; /* Adjust as needed */
+            padding: 0 20px 18px 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        code {
+            background-color: #2d333b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ff7b72;
+            font-family: 'Courier New', Courier, monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Python Lists: FAQ</h1>
+
+    <div class="faq-container">
+        <div class="faq-item">
+            <button class="faq-question">What is a Python List?</button>
+            <div class="faq-answer">
+                <p>A list is a built-in data type that stores an ordered collection of items. Lists are <b>mutable</b> (changeable) and can contain different data types simultaneously.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do you create an empty list?</button>
+            <div class="faq-answer">
+                <p>You can create an empty list using square brackets <code>my_list = []</code> or the constructor <code>my_list = list()</code>.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">What is the difference between append() and extend()?</button>
+            <div class="faq-answer">
+                <p><code>append()</code> adds a single element to the end of the list. <code>extend()</code> takes an iterable (like another list) and adds each of its elements to the list individually.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do you access the last element?</button>
+            <div class="faq-answer">
+                <p>Python supports negative indexing. You can access the last element using <code>my_list[-1]</code>.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do you remove an item by value?</button>
+            <div class="faq-answer">
+                <p>Use the <code>remove()</code> method, e.g., <code>my_list.remove('value')</code>. Note: This only removes the first occurrence of that value.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">What does pop() do?</button>
+            <div class="faq-answer">
+                <p><code>pop()</code> removes and returns an item at a given index (default is the last item). It is useful when you need to use the value after removing it.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do you slice a list?</button>
+            <div class="faq-answer">
+                <p>Slicing uses the syntax <code>list[start:stop:step]</code>. For example, <code>my_list[0:3]</code> returns the first three elements.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How can you sort a list?</button>
+            <div class="faq-answer">
+                <p>You can use <code>my_list.sort()</code> to sort the list in place, or <code>sorted(my_list)</code> to return a new sorted list without modifying the original.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">Are Python lists arrays?</button>
+            <div class="faq-answer">
+                <p>Not exactly. While they act like dynamic arrays, Python lists are more flexible as they can hold mixed types and handle resizing automatically, unlike standard C-style arrays.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">What is a List Comprehension?</button>
+            <div class="faq-answer">
+                <p>It's a concise way to create lists. Syntax: <code>[expression for item in iterable if condition]</code>. It is usually faster and more readable than a standard loop.</p>
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <button class="faq-question">How do you find the length of a list?</button>
+            <div class="faq-answer">
+                <p>Use the built-in <code>len()</code> function, for example: <code>len(my_list)</code>.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const faqItems = document.querySelectorAll('.faq-item');
+
+        faqItems.forEach(item => {
+            const question = item.querySelector('.faq-question');
+            question.addEventListener('click', () => {
+                // Close other open items (optional)
+                faqItems.forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+                // Toggle current item
+                item.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>
