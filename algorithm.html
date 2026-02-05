@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Algorithms</title>
+    <style>
+        :root {
+            --obsidian: #0b0e14;
+            --midnight: #1a1f29;
+            --border-glow: #238636; /* Success green for algorithms */
+            --accent-blue: #58a6ff;
+            --text-main: #c9d1d9;
+            --text-dim: #8b949e;
+            --code-bg: #000000;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--text-main);
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 15px;
+            margin: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--accent-blue);
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+        }
+
+        .status-bar {
+            font-size: 0.8rem;
+            color: var(--border-glow);
+            margin-bottom: 30px;
+        }
+
+        .faq-container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .algo-box {
+            background: var(--midnight);
+            border: 1px solid #30363d;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        .algo-box:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 10px rgba(88, 166, 255, 0.1);
+        }
+
+        .algo-btn {
+            width: 100%;
+            padding: 20px;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            text-align: left;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .algo-btn::before {
+            content: ">";
+            color: var(--accent-blue);
+            margin-right: 15px;
+        }
+
+        .algo-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: #12161d;
+        }
+
+        .algo-box.open .algo-content {
+            max-height: 500px;
+            border-top: 1px solid #30363d;
+        }
+
+        .inner-text {
+            padding: 20px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--text-dim);
+        }
+
+        code {
+            background: var(--code-bg);
+            color: #ff7b72;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .complexity {
+            color: var(--border-glow);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Algorithm_Engine</h1>
+        <div class="status-bar">SYSTEM STATUS: OPTIMIZED // O(log n)</div>
+    </div>
+
+    <div class="faq-container">
+        <div class="algo-box">
+            <button class="algo-btn">What is Big O Notation?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    Big O notation describes the <strong>upper bound</strong> of an algorithm's execution time or space requirements as the input size grows. It focuses on the worst-case scenario.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">Linear Search vs. Binary Search?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    Linear search checks every element <span class="complexity">O(n)</span>. Binary search repeatedly divides the search interval in half <span class="complexity">O(log n)</span>, but requires the list to be <strong>sorted</strong> first.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">How does Bubble Sort work?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    It repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order. Complexity: <span class="complexity">O(n²)</span>. Not recommended for large datasets.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">What is Quick Sort?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    A "Divide and Conquer" algorithm. It picks a 'pivot' element and partitions the array around it. Average complexity: <span class="complexity">O(n log n)</span>.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">What is Recursion?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    A technique where a function calls itself to solve smaller instances of the same problem. Always ensure you have a <strong>base case</strong> to prevent a <code>RecursionError</code>.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">Difference between BFS and DFS?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    <strong>BFS (Breadth-First)</strong> uses a <code>Queue</code> to explore neighbors first. <strong>DFS (Depth-First)</strong> uses a <code>Stack</code> (or recursion) to go as deep as possible before backtracking.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">What is Dynamic Programming (DP)?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    An optimization technique that solves complex problems by breaking them into overlapping subproblems and storing the results (<strong>Memoization</strong>) to avoid redundant calculations.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">How do you implement a Hash Table in Python?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    In Python, the built-in <code>dict</code> (dictionary) type is an implementation of a hash table, providing <span class="complexity">O(1)</span> average time complexity for lookups.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">What is a Greedy Algorithm?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    An algorithm that makes the locally optimal choice at each stage with the hope of finding a global optimum. Common example: Dijkstra's Shortest Path.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">What is Space Complexity?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    It measures the total amount of memory that an algorithm uses relative to the input size. For example, creating a new list the same size as the input is <span class="complexity">O(n)</span> space.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">What is the Timsort algorithm?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    The default sorting algorithm used in Python (<code>list.sort()</code>). It is a hybrid of Merge Sort and Insertion Sort designed to perform well on real-world data.
+                </div>
+            </div>
+        </div>
+
+        <div class="algo-box">
+            <button class="algo-btn">What is a Two-Pointer technique?</button>
+            <div class="algo-content">
+                <div class="inner-text">
+                    A strategy often used on sorted arrays where two indices (pointers) move toward each other or at different speeds to solve a problem in <span class="complexity">O(n)</span> time.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.algo-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const box = button.parentElement;
+                const isOpen = box.classList.contains('open');
+                
+                // Close all boxes
+                document.querySelectorAll('.algo-box').forEach(el => el.classList.remove('open'));
+                
+                // If it wasn't open, open it
+                if (!isOpen) {
+                    box.classList.add('open');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
