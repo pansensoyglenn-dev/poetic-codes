@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Data Structures</title>
+    <style>
+        :root {
+            --obsidian: #090c10;
+            --midnight: #161b22;
+            --panel: #21262d;
+            --accent-violet: #bc8cff;
+            --accent-cyan: #39c5bb;
+            --text-primary: #ecf2f8;
+            --text-secondary: #8b949e;
+            --border-color: #30363d;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            margin: 0;
+            padding: 50px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            text-align: center;
+            max-width: 600px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--accent-violet);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .desc {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .structure-grid {
+            width: 100%;
+            max-width: 850px;
+            display: grid;
+            gap: 15px;
+        }
+
+        .node {
+            background: var(--midnight);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .node:hover {
+            border-color: var(--accent-cyan);
+            background: #1c2128;
+        }
+
+        .node-btn {
+            width: 100%;
+            padding: 20px 25px;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .node-btn span {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .node-btn .tag {
+            font-size: 0.7rem;
+            background: rgba(188, 140, 255, 0.1);
+            color: var(--accent-violet);
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .node-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            color: var(--text-secondary);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .node.active .node-content {
+            max-height: 400px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .inner-padding {
+            padding: 20px 25px;
+            line-height: 1.6;
+        }
+
+        code {
+            color: var(--accent-cyan);
+            background: rgba(57, 197, 187, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .chevron {
+            transition: transform 0.3s ease;
+            color: var(--text-secondary);
+        }
+
+        .node.active .chevron {
+            transform: rotate(180deg);
+            color: var(--accent-cyan);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Data Structure Schematics</h1>
+        <p class="desc">Core and advanced Python containers for efficient data management.</p>
+    </div>
+
+    <div class="structure-grid">
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Basic</div> What is a Tuple?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    A <b>Tuple</b> is an ordered, immutable collection. Unlike lists, once a tuple is created, you cannot modify its elements. They are defined using parentheses: <code>(1, 2, 3)</code>.
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Uniqueness</div> How do Sets work?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    <b>Sets</b> are unordered collections of <i>unique</i> elements. They are highly efficient for membership testing and removing duplicates from a sequence. Use curly braces: <code>{1, 2, 3}</code>.
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Mapping</div> What is a Dictionary?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    A <b>Dictionary (dict)</b> stores data in key-value pairs. Keys must be hashable (immutable) and unique. Since Python 3.7, dictionaries maintain the insertion order of items.
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Advanced</div> What is a namedtuple?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    Located in the <code>collections</code> module, <code>namedtuple</code> assigns names to each position in a tuple, allowing you to access elements by field name as well as index.
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Performance</div> List vs. Deque?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    A <code>list</code> is optimized for fast fixed-length operations. A <code>deque</code> (double-ended queue) is optimized for fast appends and pops from <i>both</i> ends with <code>O(1)</code> complexity.
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Logic</div> What is a Counter?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    <code>collections.Counter</code> is a dictionary subclass for counting hashable objects. It’s perfect for finding the frequency of elements in a list or characters in a string.
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Memory</div> What are Bytearrays?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    A <code>bytearray</code> is a mutable sequence of integers in the range 0 &le; x < 256. It is essentially a mutable version of a <code>bytes</code> object, useful for binary data manipulation.
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Mapping</div> defaultdict vs. dict?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    A <code>defaultdict</code> never raises a <code>KeyError</code>. It provides a default value for a key that does not exist based on a factory function (like <code>int</code> or <code>list</code>).
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Storage</div> When to use an Array?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    The <code>array.array</code> type is more memory-efficient than a list when storing large amounts of basic values (like integers or floats) because it stores them as packed C-style values.
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Order</div> What is an OrderedDict?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    While standard dicts now preserve order, <code>OrderedDict</code> includes specific methods like <code>move_to_end()</code> and is more robust for reordering operations.
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Advanced</div> What is a Heap (heapq)?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    The <code>heapq</code> module implements a min-heap on top of a standard list. It ensures the smallest element is always at <code>heap[0]</code>, useful for priority queues.
+                </div>
+            </div>
+        </div>
+
+        <div class="node">
+            <button class="node-btn">
+                <span><div class="tag">Logic</div> What is a ChainMap?</span>
+                <div class="chevron">▼</div>
+            </button>
+            <div class="node-content">
+                <div class="inner-padding">
+                    <code>collections.ChainMap</code> groups multiple dictionaries into a single view. When looking up a key, it searches each dictionary in the chain until it finds a match.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.node-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const node = btn.parentElement;
+                const isActive = node.classList.contains('active');
+                
+                document.querySelectorAll('.node').forEach(n => n.classList.remove('active'));
+                
+                if (!isActive) {
+                    node.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
