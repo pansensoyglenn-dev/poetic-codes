@@ -1,0 +1,3571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Master Python 3.10+ dictionaries with our comprehensive tutorial. Learn dictionary methods, comprehensions, advanced techniques, and best practices with practical examples.">
+    <meta name="keywords" content="Python dictionaries tutorial, Python 3.10 dictionaries, dict methods Python, dictionary comprehensions, Python data structures, Python programming tutorial, Python examples, learn Python, Glenn Junsay Pansensoy">
+    <meta name="author" content="Glenn Junsay Pansensoy">
+    <link rel="canonical" href="https://pansensoyglenn-dev.github.io/poetic-codes/python-dictionaries.html">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://pansensoyglenn-dev.github.io/poetic-codes/python-dictionaries.html">
+    <meta property="og:title" content="Complete Python 3.10+ Dictionaries Tutorial: Master Dict Methods & Comprehensions">
+    <meta property="og:description" content="Master Python 3.10+ dictionaries with our comprehensive tutorial. Learn dictionary methods, comprehensions, advanced techniques, and best practices with practical examples.">
+    <meta property="og:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-dictionaries.html-og.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name" content="Poetic Codes">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:published_time" content="2024-11-15T00:00:00+00:00">
+    <meta property="article:modified_time" content="2024-11-15T00:00:00+00:00">
+    <meta property="article:author" content="Glenn Junsay Pansensoy">
+    <meta property="article:section" content="Programming">
+    <meta property="article:tag" content="Python">
+    <meta property="article:tag" content="Programming">
+    <meta property="article:tag" content="Tutorial">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@poetic_codes">
+    <meta name="twitter:creator" content="@glennpansensoy">
+    <meta name="twitter:title" content="Complete Python 3.10+ Dictionaries Tutorial: Master Dict Methods & Comprehensions">
+    <meta name="twitter:description" content="Master Python 3.10+ dictionaries with our comprehensive tutorial. Learn dictionary methods, comprehensions, advanced techniques, and best practices with practical examples.">
+    <meta name="twitter:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-dictionaries.html-twitter.jpg">
+    <meta name="twitter:image:alt" content="Python Dictionaries Tutorial Infographic">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Complete Python 3.10+ Dictionaries Tutorial: Master Dictionary Methods, Comprehensions & Operations",
+      "description": "Comprehensive guide to Python 3.10+ dictionaries covering creation, manipulation, methods, comprehensions, merging, and best practices with practical code examples.",
+      "image": "https://pansensoyglenn-dev.github.io/poetic-codes/images/python-dictionaries.html-og.jpg",
+      "author": {
+        "@type": "Person",
+        "name": "Glenn Junsay Pansensoy",
+        "url": "https://pansensoyglenn-dev.github.io/poetic-codes/about"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Poetic Codes",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://pansensoyglenn-dev.github.io/poetic-codes/logo.png"
+        }
+      },
+      "datePublished": "2024-11-15T00:00:00+00:00",
+      "dateModified": "2024-11-15T00:00:00+00:00",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://pansensoyglenn-dev.github.io/poetic-codes/python-dictionaries.html"
+      },
+      "articleSection": "Python Programming",
+      "keywords": "Python, dictionaries, data structures, programming, tutorial",
+      "inLanguage": "en-US",
+      "timeRequired": "PT40M",
+      "difficulty": "Beginner",
+      "proficiencyLevel": "Beginner",
+      "educationalLevel": "Beginner",
+      "hasPart": [
+        {
+          "@type": "WebPageElement",
+          "name": "Introduction to Python Dictionaries",
+          "description": "Learn what Python dictionaries are and their basic characteristics"
+        },
+        {
+          "@type": "WebPageElement",
+          "name": "Dictionary Methods Reference",
+          "description": "Complete reference of all Python dictionary methods with examples"
+        },
+        {
+          "@type": "WebPageElement",
+          "name": "Dictionary Comprehensions",
+          "description": "Master dictionary comprehensions for efficient Python coding"
+        }
+      ]
+    }
+    </script>
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    <meta name="rating" content="General">
+    <meta name="language" content="English">
+    <meta name="coverage" content="Worldwide">
+    <meta name="distribution" content="Global">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    
+    <title>Complete Python 3.10+ Dictionaries Tutorial: Master Dictionary Methods, Comprehensions & Operations | Poetic Codes</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #0a0e14;
+            color: #c7c9cb;
+            line-height: 1.8;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(18, 27, 39, 0.8) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(18, 27, 39, 0.6) 0%, transparent 20%);
+            text-align: justify;
+        }
+        
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: #3b82f6;
+            color: white;
+            padding: 8px;
+            z-index: 10000;
+            text-decoration: none;
+        }
+        
+        .skip-link:focus {
+            top: 0;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #0c1219 0%, #111827 100%);
+            color: #e2e8f0;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid #1e293b;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            white-space: nowrap;
+        }
+        
+        .logo a {
+            color: transparent;
+            text-decoration: none;
+        }
+        
+        /* Fixed Hamburger Menu */
+        .menu-toggle {
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 1001;
+            padding: 8px;
+            background: transparent;
+            border: none;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+            pointer-events: auto;
+            position: relative;
+        }
+
+        .menu-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .menu-toggle span {
+            width: 28px;
+            height: 3px;
+            background: #3b82f6;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            display: block;
+            position: relative;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+        
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+            transform: scale(0);
+        }
+        
+        .menu-toggle.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13,17,23,0.98);
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding-top: 5rem;
+            z-index: 1100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        .nav-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 400px;
+            padding: 1.5rem 1.5rem 2rem;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .nav-links a {
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.8rem;
+        }
+
+        .nav-links a:hover {
+            background: rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-links a:hover::before {
+            transform: translateX(0);
+        }
+
+        .nav-links a i {
+            font-size: 1rem;
+            color: #fbbf24;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        .nav-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 1.8rem;
+            color: #3b82f6;
+            cursor: pointer;
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid #3b82f6;
+            border-radius: 50%;
+            padding: 8px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1101;
+            transition: all 0.3s ease;
+        }
+
+        .nav-close:hover {
+            transform: rotate(90deg);
+            color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+            border-color: #8b5cf6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            width: 100%;
+        }
+        
+        .hero {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            margin-bottom: 2rem;
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #1e293b;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            z-index: 0;
+        }
+        
+        .hero h1 {
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+            font-size: 2.2rem;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            z-index: 1;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+        
+           .meta-info {
+           display: flex;
+          justify-content: space-between; 
+          align-items: center;
+          gap: 1.5rem;
+          margin-top: 1.8rem;
+          color: #8b5cf6;
+          font-size: 0.95rem;
+          max-width: 720px;             
+          margin-left: auto;
+          margin-right: auto;
+         flex-wrap: wrap;
+}
+
+        .meta-item {
+        display: flex;
+        align-items: center;
+       gap: 0.6rem;
+       white-space: nowrap;
+}
+        .meta-item i {
+            color: #3776AB;
+        }
+        
+        .author {
+            margin-top: 1rem;
+            color: #8b5cf6;
+            font-style: italic;
+            position: relative;
+            z-index: 1;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+        
+        .toc {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 1px solid #1e293b;
+        }
+        
+        .toc h2 {
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+        }
+        
+        .toc ol {
+            padding-left: 1.5rem;
+            margin: 0;
+        }
+        
+        .toc li {
+            margin-bottom: 0.5rem;
+            color: #cbd5e1;
+        }
+        
+        .toc a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .toc a:hover {
+            color: #60a5fa;
+            text-decoration: underline;
+        }
+        
+        .toc .toc-sub {
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        section {
+            background: linear-gradient(145deg, #111827, #0c1219);
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            border: 1px solid #1e293b;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            width: 100%;
+            overflow: hidden;
+        }
+        
+        section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+        }
+        
+        h2 {
+            color: #60a5fa;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px solid #1e293b;
+            font-size: 1.8rem;
+            position: relative;
+            line-height: 1.3;
+        }
+        
+        h2::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, transparent);
+        }
+        
+        h3 {
+            color: #a78bfa;
+            margin: 2rem 0 1rem;
+            font-size: 1.4rem;
+            line-height: 1.3;
+        }
+        
+        h4 {
+            color: #cbd5e1;
+            margin: 1.5rem 0 0.5rem;
+            font-size: 1.2rem;
+        }
+        
+        p {
+            margin-bottom: 1.5rem;
+            color: #e2e8f0;
+            line-height: 1.7;
+            font-size: 1.05rem;
+            text-align: justify;
+        }
+        
+        .code-example {
+            background-color: #0c1219;
+            color: #e2e8f0;
+            padding: 1.8rem;
+            border-radius: 12px;
+            margin: 1.8rem 0;
+            overflow-x: auto;
+            font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+            -webkit-overflow-scrolling: touch;
+            font-size: 1rem;
+            position: relative;
+        }
+        
+        .code-example::before {
+            content: 'Python';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #3b82f6;
+            color: white;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            border-bottom-left-radius: 8px;
+        }
+        
+        .code-example code {
+            font-size: 1rem;
+            line-height: 1.6;
+            display: block;
+            min-width: min-content;
+        }
+        
+        .code-comment {
+            color: #64748b;
+            font-style: italic;
+        }
+        
+        .code-keyword {
+            color: #f472b6;
+            font-weight: bold;
+        }
+        
+        .code-string {
+            color: #34d399;
+        }
+        
+        .code-function {
+            color: #60a5fa;
+        }
+        
+        .code-operator {
+            color: #fbbf24;
+        }
+        
+        .code-number {
+            color: #f59e0b;
+        }
+        
+        .code-dict {
+            color: #8b5cf6;
+        }
+        
+        .code-builtin {
+            color: #22d3ee;
+        }
+        
+        .example-output {
+            background-color: #0f172a;
+            border-left: 4px solid #3b82f6;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            border: 1px solid #1e293b;
+            font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+            font-size: 1rem;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+        
+        .example-output strong {
+            color: #60a5fa;
+            display: block;
+            margin-bottom: 0.8rem;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin: 2rem 0;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            border: 1px solid #1e293b;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: #e2e8f0;
+            padding: 16px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 1rem;
+            white-space: nowrap;
+            border-bottom: 2px solid #334155;
+        }
+        
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #1e293b;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            vertical-align: top;
+        }
+        
+        tr:nth-child(even) {
+            background-color: rgba(15, 23, 42, 0.3);
+        }
+        
+        tr:hover {
+            background-color: #1e293b;
+        }
+        
+        ul, ol {
+            padding-left: 2rem;
+            margin-bottom: 1.8rem;
+        }
+        
+        li {
+            margin-bottom: 1rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+            font-size: 1.05rem;
+            text-align: justify;
+        }
+        
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+            transition: color 0.3s;
+            word-break: break-word;
+        }
+        
+        a:hover {
+            color: #8b5cf6;
+            text-decoration: underline;
+        }
+        
+        .info-box, .warning-box, .tip-box, .exercise-box {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+            border-left: 4px solid #3b82f6;
+            padding: 1.5rem;
+            margin: 1.8rem 0;
+            border-radius: 0 8px 8px 0;
+            border: 1px solid #1e293b;
+            font-size: 1rem;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        
+        .warning-box {
+            border-left-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(251, 191, 36, 0.05));
+        }
+        
+        .tip-box {
+            border-left-color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(52, 211, 153, 0.05));
+        }
+        
+        .exercise-box {
+            border-left-color: #8b5cf6;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(124, 58, 237, 0.05));
+        }
+        
+        .info-box strong, .warning-box strong, .tip-box strong, .exercise-box strong {
+            color: #60a5fa;
+            display: block;
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+        
+        .warning-box strong {
+            color: #f59e0b;
+        }
+        
+        .tip-box strong {
+            color: #10b981;
+        }
+        
+        .exercise-box strong {
+            color: #8b5cf6;
+        }
+        
+        /* Enhanced Social Sharing */
+        .share-container {
+            margin: 2.5rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.9rem 1.8rem;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .share-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .share-btn i {
+            font-size: 1.2rem;
+        }
+
+        .share-facebook {
+            background: linear-gradient(135deg, #1877f2, #0d65d9);
+        }
+
+        .share-facebook:hover {
+            background: linear-gradient(135deg, #0d65d9, #084fa0);
+        }
+
+        .share-linkedin {
+            background: linear-gradient(135deg, #0077b5, #005885);
+        }
+
+        .share-linkedin:hover {
+            background: linear-gradient(135deg, #005885, #003d5c);
+        }
+
+        .share-twitter {
+            background: linear-gradient(135deg, #1DA1F2, #0d8bd9);
+        }
+
+        .share-twitter:hover {
+            background: linear-gradient(135deg, #0d8bd9, #0a70b8);
+        }
+        
+        .share-reddit {
+            background: linear-gradient(135deg, #ff4500, #cc3700);
+        }
+
+        .share-reddit:hover {
+            background: linear-gradient(135deg, #cc3700, #992900);
+        }
+        
+        .share-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+        }
+
+        .share-whatsapp:hover {
+            background: linear-gradient(135deg, #128C7E, #075E54);
+        }
+        
+        .share-email {
+            background: linear-gradient(135deg, #EA4335, #D14836);
+        }
+
+        .share-email:hover {
+            background: linear-gradient(135deg, #D14836, #A83226);
+        }
+        
+        /* Enhanced Newsletter Section */
+        .newsletter-section {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            padding: 3.5rem 2.5rem;
+            margin: 3rem 0;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid #1e293b;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .newsletter-section::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+        
+        .newsletter-section h2 {
+            color: #60a5fa;
+            margin-bottom: 1rem;
+            font-size: 2rem;
+            text-align: center;
+        }
+        
+        .newsletter-section p {
+            color: #94a3b8;
+            margin-bottom: 2.5rem;
+            font-size: 1.15rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+        
+        .newsletter-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-input {
+            width: 100%;
+            padding: 1.2rem;
+            margin-bottom: 1.2rem;
+            border-radius: 10px;
+            border: 2px solid #334155;
+            background: #0f172a;
+            color: white;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+        
+        .newsletter-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+        
+        .newsletter-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 1.2rem 2.5rem;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            position: relative;
+        }
+        
+        .newsletter-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .newsletter-btn:disabled {
+            background: linear-gradient(135deg, #6b7280, #9ca3af);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .newsletter-message {
+            margin-top: 1.5rem;
+            padding: 1.2rem;
+            border-radius: 8px;
+            display: none;
+            font-size: 1rem;
+        }
+        
+        .newsletter-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        
+        .newsletter-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Professional Footer */
+        footer {
+            background: linear-gradient(135deg, #0c1219 0%, #111827 100%);
+            color: #cbd5e1;
+            padding: 3rem 1.5rem 1.5rem;
+            margin-top: 4rem;
+            border-top: 1px solid #1e293b;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+        }
+        
+        .footer-section h3 {
+            color: #a78bfa;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            position: relative;
+            padding-bottom: 0.8rem;
+            line-height: 1.3;
+        }
+        
+        .footer-section h3::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(90deg, #8b5cf6, transparent);
+        }
+        
+        .footer-section p {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1.2rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.3s;
+            display: inline-block;
+            font-size: 1rem;
+        }
+        
+        .footer-links a:hover {
+            color: #60a5fa;
+            transform: translateX(5px);
+        }
+        
+        .social-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-icons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: 50%;
+            color: #60a5fa;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 1px solid #334155;
+            flex-shrink: 0;
+        }
+        
+        .social-icons a:hover {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            transform: translateY(-3px);
+            border-color: #3b82f6;
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .legal-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #1e293b;
+        }
+        
+        .legal-links a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.3s;
+        }
+        
+        .legal-links a:hover {
+            color: #60a5fa;
+        }
+        
+        .legal-compliance {
+            background: rgba(30, 41, 59, 0.3);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            border: 1px solid #334155;
+        }
+        
+        .legal-compliance h4 {
+            color: #a78bfa;
+            margin-bottom: 1rem;
+        }
+        
+        .legal-compliance p {
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            color: #94a3b8;
+        }
+        
+        .copyright {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #1e293b;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .copyright p {
+            margin-bottom: 0.8rem;
+        }
+        
+        .python-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-left: 1rem;
+            vertical-align: middle;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0;
+        }
+        
+        .method-item {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #1e293b;
+            transition: all 0.3s ease;
+        }
+        
+        .method-item:hover {
+            border-color: #3b82f6;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+        }
+        
+        .method-item h4 {
+            color: #60a5fa;
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+        
+        .method-syntax {
+            background-color: #0c1219;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: 'Cascadia Code', 'Fira Code', 'Courier New', monospace;
+            color: #f59e0b;
+            font-size: 0.95rem;
+            border: 1px solid #1e293b;
+            overflow-x: auto;
+        }
+        
+        .progress-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #1e293b;
+            z-index: 1001;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        }
+        
+        .interactive-demo {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border: 1px solid #334155;
+        }
+        
+        .demo-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .demo-btn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .demo-output {
+            background: #0c1219;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-family: 'Cascadia Code', monospace;
+            min-height: 100px;
+            border: 1px solid #1e293b;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        
+        .real-world-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .use-case {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid #1e293b;
+        }
+        
+        .use-case h4 {
+            color: #60a5fa;
+            margin-bottom: 0.8rem;
+        }
+        
+        .performance-comparison {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(251, 191, 36, 0.05));
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid #f59e0b;
+            margin: 2rem 0;
+        }
+        
+        .performance-comparison h3 {
+            color: #f59e0b;
+        }
+        
+        .copy-code-btn {
+            position: absolute;
+            top: 10px;
+            right: 60px;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid #3b82f6;
+            color: #60a5fa;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+        
+        .copy-code-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+        }
+        
+        @media (min-width: 1024px) {
+            .toc-floating {
+                position: fixed;
+                top: 120px;
+                right: 30px;
+                width: 300px;
+                max-height: calc(100vh - 150px);
+                overflow-y: auto;
+                background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9));
+                backdrop-filter: blur(10px);
+                padding: 1.5rem;
+                border-radius: 12px;
+                border: 1px solid #334155;
+                z-index: 100;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .hero {
+                padding: 2rem 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            section {
+                padding: 1.8rem;
+                margin-bottom: 1.8rem;
+                border-radius: 12px;
+            }
+            
+            h2 {
+                font-size: 1.6rem;
+                margin-bottom: 1.2rem;
+            }
+            
+            h3 {
+                font-size: 1.3rem;
+                margin: 1.5rem 0 1rem;
+            }
+            
+            .code-example {
+                padding: 1.5rem;
+                margin: 1.5rem 0;
+                font-size: 0.95rem;
+                border-radius: 10px;
+            }
+            
+            .code-example code {
+                font-size: 0.95rem;
+            }
+            
+            .example-output, .info-box, .warning-box, .tip-box {
+                padding: 1.2rem 1.5rem;
+                font-size: 0.95rem;
+            }
+            
+            table {
+                min-width: 700px;
+            }
+            
+            .method-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .real-world-cases {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                gap: 2rem;
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-section {
+                margin-bottom: 1.5rem;
+            }
+            
+            .legal-links {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+            
+            .share-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .share-btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto;
+            }
+            
+            .nav-links {
+                max-width: 320px;
+                padding: 1rem;
+            }
+            
+            .nav-links a {
+                padding: 0.8rem 1rem;
+                font-size: 0.95rem;
+            }
+            
+            .newsletter-section {
+                padding: 2.5rem 1.5rem;
+            }
+            
+            .newsletter-section h2 {
+                font-size: 1.6rem;
+            }
+            
+            .demo-controls {
+                flex-direction: column;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            header {
+                padding: 0.8rem 1rem;
+            }
+            
+            .logo {
+                font-size: 1.3rem;
+            }
+            
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .meta-info {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: center;
+            }
+            
+            .author {
+                font-size: 0.9rem;
+            }
+            
+            section {
+                padding: 1.5rem;
+                border-radius: 10px;
+            }
+            
+            h2 {
+                font-size: 1.4rem;
+            }
+            
+            h3 {
+                font-size: 1.2rem;
+            }
+            
+            .code-example {
+                padding: 1.2rem;
+                font-size: 0.9rem;
+            }
+            
+            .code-example code {
+                font-size: 0.9rem;
+            }
+            
+            .social-icons a {
+                width: 38px;
+                height: 38px;
+            }
+            
+            .copyright {
+                font-size: 0.85rem;
+            }
+            
+            .python-badge {
+                font-size: 0.8rem;
+                padding: 0.4rem 1rem;
+                margin-left: 0.5rem;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .hero h1 {
+                font-size: 1.3rem;
+            }
+            
+            .logo {
+                font-size: 1.2rem;
+            }
+            
+            h2 {
+                font-size: 1.2rem;
+            }
+            
+            .code-example {
+                padding: 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .nav-links {
+                max-width: 280px;
+            }
+        }
+        
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0c1219;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #60a5fa, #a78bfa);
+        }
+        
+        ::selection {
+            background-color: rgba(59, 130, 246, 0.5);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <div class="progress-indicator">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <header>
+        <div class="logo">
+            <a href="https://pansensoyglenn-dev.github.io/poetic-codes" aria-label="Poetic Codes Home">POETIC CODES</a>
+        </div>
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle navigation menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <div class="nav-overlay" id="navOverlay">
+        <button class="nav-close" id="navClose" aria-label="Close navigation menu">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="nav-links">
+            <a href="index.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
+            <a href="#introduction" class="nav-link">Introduction</a>
+            <a href="#characteristics" class="nav-link">Key Characteristics</a>
+            <a href="#creation" class="nav-link">Creating Dictionaries</a>
+            <a href="#methods" class="nav-link">Dictionary Methods</a>
+            <a href="#comprehensions" class="nav-link">Dictionary Comprehensions</a>
+            <a href="#operations" class="nav-link">Dictionary Operations</a>
+            <a href="#advanced" class="nav-link">Advanced Topics</a>
+            <a href="#performance" class="nav-link">Performance Guide</a>
+            <a href="#exercises" class="nav-link">Practice Exercises</a>
+            <a href="#resources" class="nav-link">Resources</a>
+            <a href="#social-sharing" class="nav-link">Social Sharing</a>
+            <a href="#newsletter" class="nav-link">Newsletter</a>
+        </div>
+    </div>
+    
+    <main class="container" id="main-content">
+        <article>
+            <section class="hero">
+                <h1>Complete Python 3.10+ Dictionaries Tutorial: Master Dictionary Methods, Comprehensions & Operations <span class="python-badge" aria-label="Python 3.10+">Python 3.10+</span></h1>
+                <p class="hero-subtitle">A comprehensive, beginner-to-advanced guide to Python dictionaries with practical examples, performance tips, and real-world use cases.It is a versatile tool amd equally a powerful mechanism that allows developers to store multiple data and retrieve them easily without any fuss.</p>
+                <div class="meta-info">
+                    <div class="meta-item"><i class="fas fa-user"></i> Glenn Junsay Pansensoy</div>
+                    <div class="meta-item"><i class="fas fa-calendar"></i> February 4, 2026</div>
+                    <div class="meta-item"><i class="fas fa-clock"></i> 30 min read</div>
+                    <div class="meta-item"><i class="fas fa-tags"></i> Python, Data Structures, Tutorial</div>
+                </div>
+            </section>
+
+            <div class="toc" id="table-of-contents">
+                <h2><i class="fas fa-list"></i> Table of Contents</h2>
+                <ol>
+                    <li><a href="#introduction">Introduction to Python Dictionaries</a></li>
+                    <li><a href="#characteristics">Key Characteristics</a></li>
+                    <li><a href="#creation">Creating Dictionaries</a></li>
+                    <li><a href="#methods">Complete Dictionary Methods</a></li>
+                    <li><a href="#comprehensions">Dictionary Comprehensions</a></li>
+                    <li><a href="#operations">Dictionary Operations</a></li>
+                    <li><a href="#advanced">Advanced Topics</a></li>
+                    <li><a href="#performance">Performance & Best Practices</a></li>
+                    <li><a href="#exercises">Practice Exercises</a></li>
+                    <li><a href="#resources">Additional Resources</a></li>
+                </ol>
+            </div>
+
+            <section id="introduction">
+                <h2>1. Introduction to Python Dictionaries</h2>
+                <p>Python dictionaries are one of the most powerful and versatile data structures in Python. A dictionary is an <strong>unordered, mutable collection</strong> of key-value pairs that provides fast lookups by key.</p>
+                
+                <p>Dictionaries are fundamental to Python programming and provide an efficient way to organize, store, and retrieve data. They are especially useful in <strong>Python 3.10+</strong> with improved pattern matching capabilities and better error messages.</p>
+                
+                <div class="tip-box">
+                    <strong><i class="fas fa-lightbulb"></i> Python 3.10+ Feature:</strong> Python 3.10 introduced improved error messages and structural pattern matching, which can be particularly useful when working with dictionaries. The new <code>match</code> statement provides cleaner syntax for complex conditional logic with dictionaries.
+                </div>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Basic dictionary examples in Python 3.10+</span><br>
+                        <span class="code-keyword">person</span> = {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"name"</span>: <span class="code-string">"John"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"age"</span>: <span class="code-number">30</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"city"</span>: <span class="code-string">"New York"</span><br>
+                        }<br>
+                        <br>
+                        <span class="code-keyword">config</span> = {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"debug"</span>: <span class="code-keyword">True</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"version"</span>: <span class="code-number">3.10</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"features"</span>: [<span class="code-string">"pattern matching"</span>, <span class="code-string">"better errors"</span>]<br>
+                        }<br>
+                        <br>
+                        <span class="code-comment"># Accessing dictionary elements</span><br>
+                        <span class="code-keyword">name</span> = person[<span class="code-string">"name"</span>]  <span class="code-comment"># "John"</span><br>
+                        <span class="code-keyword">age</span> = person.<span class="code-function">get</span>(<span class="code-string">"age"</span>)  <span class="code-comment"># 30</span><br>
+                        <br>
+                        <span class="code-comment"># Python 3.10+ structural pattern matching with dictionaries</span><br>
+                        <span class="code-keyword">def</span> <span class="code-function">process_user</span>(user):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">match</span> user:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">case</span> {<span class="code-string">"name"</span>: name, <span class="code-string">"age"</span>: age}:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">f"User {name} is {age} years old"</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">case</span> {<span class="code-string">"name"</span>: name}:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">f"User {name}"</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">case</span> _:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">"Unknown user"</span>
+                    </code>
+                </div>
+                
+                <h3>Interactive Demo: See Dictionaries in Action</h3>
+                <div class="interactive-demo">
+                    <div class="demo-controls">
+                        <button class="demo-btn" id="demoBasic">Basic Dictionary Operations</button>
+                        <button class="demo-btn" id="demoMethods">Dictionary Methods</button>
+                        <button class="demo-btn" id="demoComprehension">Dictionary Comprehension</button>
+                        <button class="demo-btn" id="demoMerging">Dictionary Merging</button>
+                    </div>
+                    <div class="demo-output" id="demoOutput">
+                        Click a button above to see Python dictionary operations in action...
+                    </div>
+                </div>
+                
+                <h3>Why Dictionaries are Essential in Python</h3>
+                <p>Dictionaries serve as the backbone for many Python programs because they:</p>
+                <ul>
+                    <li><strong>Store key-value pairs</strong> for efficient data organization</li>
+                    <li>Provide <strong>O(1) average time complexity</strong> for lookups</li>
+                    <li>Support <strong>flexible key types</strong> (strings, numbers, tuples)</li>
+                    <li>Enable <strong>JSON-like data structures</strong> for APIs and web development</li>
+                    <li>Work <strong>seamlessly</strong> with other Python data structures</li>
+                    <li>Form the <strong>basis</strong> for classes and objects</li>
+                </ul>
+                
+                <div class="info-box">
+                    <strong><i class="fas fa-info-circle"></i> Real-World Application:</strong> Dictionaries are used everywhere in Python development—from configuration files and API responses to database records and caching systems. They're essential for web development (Django, Flask), data science (pandas DataFrames), and system programming.
+                </div>
+            </section>
+
+            <section id="characteristics">
+                <h2>2. Key Characteristics of Python Dictionaries</h2>
+                
+                <p>Understanding the fundamental characteristics of dictionaries is essential for using them effectively in Python programming:</p>
+                
+                <h3>2.1 Mutable Nature</h3>
+                <p>Dictionaries are mutable, meaning you can modify them after creation by adding, removing, or changing key-value pairs.</p>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Demonstrating mutability</span><br>
+                        <span class="code-keyword">config</span> = {<span class="code-string">"debug"</span>: <span class="code-keyword">False</span>, <span class="code-string">"timeout"</span>: <span class="code-number">30</span>}<br>
+                        <br>
+                        <span class="code-comment"># Modify existing key</span><br>
+                        config[<span class="code-string">"debug"</span>] = <span class="code-keyword">True</span><br>
+                        <br>
+                        <span class="code-comment"># Add new key-value pair</span><br>
+                        config[<span class="code-string">"retries"</span>] = <span class="code-number">3</span><br>
+                        <br>
+                        <span class="code-comment"># Remove key</span><br>
+                        <span class="code-keyword">del</span> config[<span class="code-string">"timeout"</span>]<br>
+                        <br>
+                        <span class="code-builtin">print</span>(config)  <span class="code-comment"># {'debug': True, 'retries': 3}</span>
+                    </code>
+                </div>
+                
+                <h3>2.2 Unordered Collections (Python 3.7+)</h3>
+                <div class="info-box">
+                    <strong><i class="fas fa-info-circle"></i> Important Note:</strong> Starting from Python 3.7, dictionaries maintain insertion order as part of the language specification. This means items are stored in the order they were added, making dictionaries predictable for iteration.
+                </div>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Dictionary order preservation (Python 3.7+)</span><br>
+                        <span class="code-keyword">ordered_dict</span> = {}<br>
+                        ordered_dict[<span class="code-string">"first"</span>] = <span class="code-number">1</span><br>
+                        ordered_dict[<span class="code-string">"second"</span>] = <span class="code-number">2</span><br>
+                        ordered_dict[<span class="code-string">"third"</span>] = <span class="code-number">3</span><br>
+                        <br>
+                        <span class="code-comment"># Iteration preserves insertion order</span><br>
+                        <span class="code-keyword">for</span> key, value <span class="code-keyword">in</span> ordered_dict.<span class="code-function">items</span>():<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-builtin">print</span>(key, value)<br>
+                        <span class="code-comment"># Output: first 1, second 2, third 3 (in insertion order)</span>
+                    </code>
+                </div>
+                
+                <h3>2.3 Key Requirements and Hashability</h3>
+                <p>Dictionary keys must be hashable (immutable) objects. Common hashable types include:</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Hashable?</th>
+                                <th>Example</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Strings</td>
+                                <td>✅ Yes</td>
+                                <td><code>"name", "id", "email"</code></td>
+                                <td>Most common key type</td>
+                            </tr>
+                            <tr>
+                                <td>Integers</td>
+                                <td>✅ Yes</td>
+                                <td><code>1, 100, -5</code></td>
+                                <td>Numerical IDs, indices</td>
+                            </tr>
+                            <tr>
+                                <td>Floats</td>
+                                <td>✅ Yes (with caution)</td>
+                                <td><code>3.14, 2.0</code></td>
+                                <td>Scientific data, coordinates</td>
+                            </tr>
+                            <tr>
+                                <td>Tuples</td>
+                                <td>✅ Yes (if elements are hashable)</td>
+                                <td><code>(1, 2), ("x", "y")</code></td>
+                                <td>Composite keys, coordinates</td>
+                            </tr>
+                            <tr>
+                                <td>Frozensets</td>
+                                <td>✅ Yes</td>
+                                <td><code>frozenset([1, 2, 3])</code></td>
+                                <td>Set-based keys</td>
+                            </tr>
+                            <tr>
+                                <td>Lists</td>
+                                <td>❌ No</td>
+                                <td><code>[1, 2, 3]</code></td>
+                                <td>Cannot be used as keys</td>
+                            </tr>
+                            <tr>
+                                <td>Dictionaries</td>
+                                <td>❌ No</td>
+                                <td><code>{"a": 1}</code></td>
+                                <td>Cannot be used as keys</td>
+                            </tr>
+                            <tr>
+                                <td>Sets</td>
+                                <td>❌ No</td>
+                                <td><code>{1, 2, 3}</code></td>
+                                <td>Cannot be used as keys</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="warning-box">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Important:</strong> While floats can be used as dictionary keys, it's generally not recommended due to precision issues. The same float value might have different representations, causing lookup failures.
+                </div>
+                
+                <h3>2.4 Dynamic Sizing</h3>
+                <p>Python dictionaries automatically resize as needed, providing efficient memory usage and performance characteristics:</p>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Dynamic resizing demonstration</span><br>
+                        <span class="code-keyword">import</span> sys<br>
+                        <br>
+                        <span class="code-keyword">def</span> <span class="code-function">show_dict_growth</span>():<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;d = {}<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">10</span>):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d[i] = i * <span class="code-number">10</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-builtin">print</span>(<span class="code-string">f"Size: {len(d)}, Memory: {sys.getsizeof(d)} bytes"</span>)<br>
+                        <br>
+                        show_dict_growth()<br>
+                        <span class="code-comment"># Output shows increasing memory allocation in steps</span>
+                    </code>
+                </div>
+            </section>
+
+            <section id="creation">
+                <h2>3. Creating Dictionaries</h2>
+                
+                <p>Python provides multiple ways to create dictionaries, each with its own use cases and advantages:</p>
+                
+                <h3>3.1 Basic Dictionary Creation Methods</h3>
+                
+                <div class="method-grid">
+                    <div class="method-item">
+                        <h4>1. Curly Brace Syntax</h4>
+                        <p>The most common and readable way to create dictionaries.</p>
+                        <div class="method-syntax">{key1: value1, key2: value2}</div>
+                        <div class="code-example">
+                            <code>
+                                <span class="code-comment"># Empty dictionary</span><br>
+                                empty_dict = {}<br>
+                                <br>
+                                <span class="code-comment"># Dictionary with initial values</span><br>
+                                person = {<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"name"</span>: <span class="code-string">"Alice"</span>,<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"age"</span>: <span class="code-number">30</span>,<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"city"</span>: <span class="code-string">"London"</span><br>
+                                }
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>2. dict() Constructor</h4>
+                        <p>Useful for creating dictionaries from sequences or keyword arguments.</p>
+                        <div class="method-syntax">dict(**kwargs)<br>dict(mapping, **kwargs)<br>dict(iterable, **kwargs)</div>
+                        <div class="code-example">
+                            <code>
+                                <span class="code-comment"># From keyword arguments</span><br>
+                                d1 = dict(name=<span class="code-string">"Bob"</span>, age=<span class="code-number">25</span>, city=<span class="code-string">"Paris"</span>)<br>
+                                <br>
+                                <span class="code-comment"># From list of tuples</span><br>
+                                d2 = dict([(<span class="code-string">'a'</span>, <span class="code-number">1</span>), (<span class="code-string">'b'</span>, <span class="code-number">2</span>)])<br>
+                                <br>
+                                <span class="code-comment"># From two lists using zip</span><br>
+                                keys = [<span class="code-string">'x'</span>, <span class="code-string">'y'</span>, <span class="code-string">'z'</span>]<br>
+                                values = [<span class="code-number">10</span>, <span class="code-number">20</span>, <span class="code-number">30</span>]<br>
+                                d3 = dict(<span class="code-builtin">zip</span>(keys, values))
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>3. Dictionary Comprehensions</h4>
+                        <p>Create dictionaries dynamically using comprehension syntax (more details in Section 5).</p>
+                        <div class="method-syntax">{key_expr: value_expr for item in iterable}</div>
+                        <div class="code-example">
+                            <code>
+                                <span class="code-comment"># Squares dictionary</span><br>
+                                squares = {x: x**<span class="code-number">2</span> <span class="code-keyword">for</span> x <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">1</span>, <span class="code-number">6</span>)}<br>
+                                <span class="code-comment"># {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}</span><br>
+                                <br>
+                                <span class="code-comment"># With conditional</span><br>
+                                even_squares = {x: x**<span class="code-number">2</span> <span class="code-keyword">for</span> x <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">10</span>) <span class="code-keyword">if</span> x % <span class="code-number">2</span> == <span class="code-number">0</span>}
+                            </code>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>3.2 Specialized Dictionary Creation</h3>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># From existing dictionary (copy)</span><br>
+                        original = {<span class="code-string">'a'</span>: <span class="code-number">1</span>, <span class="code-string">'b'</span>: <span class="code-number">2</span>}<br>
+                        copy_dict = dict(original)  <span class="code-comment"># Shallow copy</span><br>
+                        <br>
+                        <span class="code-comment"># Using fromkeys() for default values</span><br>
+                        default_keys = [<span class="code-string">'name'</span>, <span class="code-string">'email'</span>, <span class="code-string">'phone'</span>]<br>
+                        default_dict = dict.fromkeys(default_keys, <span class="code-string">'N/A'</span>)<br>
+                        <span class="code-comment"># {'name': 'N/A', 'email': 'N/A', 'phone': 'N/A'}</span><br>
+                        <br>
+                        <span class="code-comment"># Nested dictionary creation</span><br>
+                        nested = {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"user1"</span>: {<span class="code-string">"name"</span>: <span class="code-string">"Alice"</span>, <span class="code-string">"score"</span>: <span class="code-number">95</span>},<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"user2"</span>: {<span class="code-string">"name"</span>: <span class="code-string">"Bob"</span>, <span class="code-string">"score"</span>: <span class="code-number">88</span>}<br>
+                        }
+                    </code>
+                </div>
+                
+                <h3>3.3 Type-Specific Dictionaries</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Import</th>
+                                <th>Syntax</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>DefaultDict</td>
+                                <td><code>from collections import defaultdict</code></td>
+                                <td><code>defaultdict(default_factory)</code></td>
+                                <td>Provides default values for missing keys</td>
+                            </tr>
+                            <tr>
+                                <td>OrderedDict</td>
+                                <td><code>from collections import OrderedDict</code></td>
+                                <td><code>OrderedDict()</code></td>
+                                <td>Guaranteed order (pre-Python 3.7) or special ordering</td>
+                            </tr>
+                            <tr>
+                                <td>ChainMap</td>
+                                <td><code>from collections import ChainMap</code></td>
+                                <td><code>ChainMap(*dicts)</code></td>
+                                <td>Multiple dictionaries as single mapping</td>
+                            </tr>
+                            <tr>
+                                <td>Counter</td>
+                                <td><code>from collections import Counter</code></td>
+                                <td><code>Counter(iterable)</code></td>
+                                <td>Count hashable objects</td>
+                            </tr>
+                            <tr>
+                                <td>UserDict</td>
+                                <td><code>from collections import UserDict</code></td>
+                                <td><code>UserDict([initialdata])</code></td>
+                                <td>Wrapper for creating custom dict-like classes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-keyword">from</span> collections <span class="code-keyword">import</span> defaultdict, Counter, OrderedDict<br>
+                        <br>
+                        <span class="code-comment"># defaultdict example</span><br>
+                        word_counts = defaultdict(int)<br>
+                        <span class="code-keyword">for</span> word <span class="code-keyword">in</span> [<span class="code-string">"apple"</span>, <span class="code-string">"banana"</span>, <span class="code-string">"apple"</span>, <span class="code-string">"cherry"</span>]:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;word_counts[word] += <span class="code-number">1</span><br>
+                        <span class="code-comment"># defaultdict(&lt;class 'int'>, {'apple': 2, 'banana': 1, 'cherry': 1})</span><br>
+                        <br>
+                        <span class="code-comment"># Counter example</span><br>
+                        counts = Counter([<span class="code-string">"apple"</span>, <span class="code-string">"banana"</span>, <span class="code-string">"apple"</span>, <span class="code-string">"cherry"</span>])<br>
+                        <span class="code-comment"># Counter({'apple': 2, 'banana': 1, 'cherry': 1})</span><br>
+                        <br>
+                        <span class="code-comment"># OrderedDict with custom order</span><br>
+                        ordered = OrderedDict()<br>
+                        ordered[<span class="code-string">'z'</span>] = <span class="code-number">1</span><br>
+                        ordered[<span class="code-string">'a'</span>] = <span class="code-number">2</span><br>
+                        ordered[<span class="code-string">'c'</span>] = <span class="code-number">3</span><br>
+                        <span class="code-comment"># Keys will be in insertion order: z, a, c</span>
+                    </code>
+                </div>
+            </section>
+
+            <section id="methods">
+                <h2>4. Complete Dictionary Methods Reference</h2>
+                
+                <p>Python dictionaries come with a rich set of built-in methods. Mastering these methods is essential for efficient dictionary manipulation.</p>
+                
+                <div class="method-grid">
+                    <div class="method-item">
+                        <h4>clear()</h4>
+                        <p>Remove all items from the dictionary.</p>
+                        <div class="method-syntax">dict.clear()</div>
+                        <div class="code-example">
+                            <code>
+                                d = {<span class="code-string">'a'</span>: <span class="code-number">1</span>, <span class="code-string">'b'</span>: <span class="code-number">2</span>}<br>
+                                d.clear()<br>
+                                <span class="code-builtin">print</span>(d)  <span class="code-comment"># {}</span><br>
+                                <span class="code-builtin">print</span>(<span class="code-builtin">len</span>(d))  <span class="code-comment"># 0</span>
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>copy()</h4>
+                        <p>Return a shallow copy of the dictionary.</p>
+                        <div class="method-syntax">dict.copy()</div>
+                        <div class="code-example">
+                            <code>
+                                original = {<span class="code-string">'a'</span>: <span class="code-number">1</span>, <span class="code-string">'b'</span>: [<span class="code-number">1</span>, <span class="code-number">2</span>, <span class="code-number">3</span>]}<br>
+                                copied = original.copy()<br>
+                                <br>
+                                <span class="code-comment"># Modify the copy</span><br>
+                                copied[<span class="code-string">'a'</span>] = <span class="code-number">100</span><br>
+                                copied[<span class="code-string">'b'</span>].append(<span class="code-number">4</span>)<br>
+                                <br>
+                                <span class="code-builtin">print</span>(original)  <span class="code-comment"># {'a': 1, 'b': [1, 2, 3, 4]} (nested list affected!)</span><br>
+                                <span class="code-builtin">print</span>(copied)    <span class="code-comment"># {'a': 100, 'b': [1, 2, 3, 4]}</span>
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>get(key[, default])</h4>
+                        <p>Return the value for key if key is in the dictionary, else default.</p>
+                        <div class="method-syntax">dict.get(key, default=None)</div>
+                        <div class="code-example">
+                            <code>
+                                d = {<span class="code-string">'name'</span>: <span class="code-string">'Alice'</span>, <span class="code-string">'age'</span>: <span class="code-number">30</span>}<br>
+                                <br>
+                                <span class="code-comment"># Safe access</span><br>
+                                name = d.get(<span class="code-string">'name'</span>)  <span class="code-comment"># 'Alice'</span><br>
+                                city = d.get(<span class="code-string">'city'</span>)  <span class="code-comment"># None</span><br>
+                                city = d.get(<span class="code-string">'city'</span>, <span class="code-string">'Unknown'</span>)  <span class="code-comment"># 'Unknown'</span><br>
+                                <br>
+                                <span class="code-comment"># vs direct access that raises KeyError</span><br>
+                                <span class="code-comment"># city = d['city']  # KeyError: 'city'</span>
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>items()</h4>
+                        <p>Return a new view of the dictionary's items (key, value pairs).</p>
+                        <div class="method-syntax">dict.items()</div>
+                        <div class="code-example">
+                            <code>
+                                d = {<span class="code-string">'a'</span>: <span class="code-number">1</span>, <span class="code-string">'b'</span>: <span class="code-number">2</span>, <span class="code-string">'c'</span>: <span class="code-number">3</span>}<br>
+                                <br>
+                                <span class="code-comment"># Iterate over items</span><br>
+                                <span class="code-keyword">for</span> key, value <span class="code-keyword">in</span> d.items():<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-builtin">print</span>(<span class="code-string">f"{key}: {value}"</span>)<br>
+                                <br>
+                                <span class="code-comment"># Convert to list</span><br>
+                                items_list = <span class="code-builtin">list</span>(d.items())<br>
+                                <span class="code-comment"># [('a', 1), ('b', 2), ('c', 3)]</span>
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>keys()</h4>
+                        <p>Return a new view of the dictionary's keys.</p>
+                        <div class="method-syntax">dict.keys()</div>
+                        <div class="code-example">
+                            <code>
+                                d = {<span class="code-string">'x'</span>: <span class="code-number">10</span>, <span class="code-string">'y'</span>: <span class="code-number">20</span>, <span class="code-string">'z'</span>: <span class="code-number">30</span>}<br>
+                                <br>
+                                <span class="code-comment"># View object (dynamic)</span><br>
+                                keys_view = d.keys()<br>
+                                <span class="code-builtin">print</span>(keys_view)  <span class="code-comment"># dict_keys(['x', 'y', 'z'])</span><br>
+                                <br>
+                                <span class="code-comment"># Check membership</span><br>
+                                <span class="code-builtin">print</span>(<span class="code-string">'x'</span> <span class="code-keyword">in</span> keys_view)  <span class="code-comment"># True</span><br>
+                                <span class="code-builtin">print</span>(<span class="code-string">'w'</span> <span class="code-keyword">in</span> keys_view)  <span class="code-comment"># False</span>
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>values()</h4>
+                        <p>Return a new view of the dictionary's values.</p>
+                        <div class="method-syntax">dict.values()</div>
+                        <div class="code-example">
+                            <code>
+                                d = {<span class="code-string">'apple'</span>: <span class="code-number">3</span>, <span class="code-string">'banana'</span>: <span class="code-number">5</span>, <span class="code-string">'cherry'</span>: <span class="code-number">2</span>}<br>
+                                <br>
+                                <span class="code-comment"># Sum all values</span><br>
+                                total = <span class="code-builtin">sum</span>(d.values())  <span class="code-comment"># 10</span><br>
+                                <br>
+                                <span class="code-comment"># Check if value exists</span><br>
+                                <span class="code-builtin">print</span>(<span class="code-number">3</span> <span class="code-keyword">in</span> d.values())  <span class="code-comment"># True</span><br>
+                                <span class="code-builtin">print</span>(<span class="code-number">7</span> <span class="code-keyword">in</span> d.values())  <span class="code-comment"># False</span>
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>pop(key[, default])</h4>
+                        <p>Remove specified key and return the corresponding value.</p>
+                        <div class="method-syntax">dict.pop(key[, default])</div>
+                        <div class="code-example">
+                            <code>
+                                d = {<span class="code-string">'a'</span>: <span class="code-number">1</span>, <span class="code-string">'b'</span>: <span class="code-number">2</span>, <span class="code-string">'c'</span>: <span class="code-number">3</span>}<br>
+                                <br>
+                                <span class="code-comment"># Remove and get value</span><br>
+                                value = d.pop(<span class="code-string">'b'</span>)<br>
+                                <span class="code-builtin">print</span>(value)  <span class="code-comment"># 2</span><br>
+                                <span class="code-builtin">print</span>(d)      <span class="code-comment"># {'a': 1, 'c': 3}</span><br>
+                                <br>
+                                <span class="code-comment"># With default (no KeyError)</span><br>
+                                value = d.pop(<span class="code-string">'d'</span>, <span class="code-number">0</span>)  <span class="code-comment"># Returns 0, doesn't raise KeyError</span>
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>popitem()</h4>
+                        <p>Remove and return a (key, value) pair as a 2-tuple.</p>
+                        <div class="method-syntax">dict.popitem()</div>
+                        <div class="code-example">
+                            <code>
+                                d = {<span class="code-string">'first'</span>: <span class="code-number">1</span>, <span class="code-string">'second'</span>: <span class="code-number">2</span>, <span class="code-string">'third'</span>: <span class="code-number">3</span>}<br>
+                                <br>
+                                <span class="code-comment"># LIFO order (Python 3.7+)</span><br>
+                                <span class="code-keyword">while</span> d:<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;key, value = d.popitem()<br>
+                                &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-builtin">print</span>(<span class="code-string">f"Removed {key}: {value}"</span>)<br>
+                                <span class="code-comment"># Removes in reverse insertion order</span>
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>setdefault(key[, default])</h4>
+                        <p>Return value of key if exists, else insert key with default and return default.</p>
+                        <div class="method-syntax">dict.setdefault(key, default=None)</div>
+                        <div class="code-example">
+                            <code>
+                                d = {<span class="code-string">'name'</span>: <span class="code-string">'Alice'</span>}<br>
+                                <br>
+                                <span class="code-comment"># Key exists - returns value</span><br>
+                                name = d.setdefault(<span class="code-string">'name'</span>, <span class="code-string">'Unknown'</span>)<br>
+                                <span class="code-builtin">print</span>(name)  <span class="code-comment"># 'Alice'</span><br>
+                                <br>
+                                <span class="code-comment"># Key doesn't exist - sets and returns default</span><br>
+                                age = d.setdefault(<span class="code-string">'age'</span>, <span class="code-number">30</span>)<br>
+                                <span class="code-builtin">print</span>(age)   <span class="code-comment"># 30</span><br>
+                                <span class="code-builtin">print</span>(d)      <span class="code-comment"># {'name': 'Alice', 'age': 30}</span>
+                            </code>
+                        </div>
+                    </div>
+                    
+                    <div class="method-item">
+                        <h4>update([other])</h4>
+                        <p>Update dictionary with key/value pairs from other, overwriting existing keys.</p>
+                        <div class="method-syntax">dict.update([other])</div>
+                        <div class="code-example">
+                            <code>
+                                d = {<span class="code-string">'a'</span>: <span class="code-number">1</span>, <span class="code-string">'b'</span>: <span class="code-number">2</span>}<br>
+                                <br>
+                                <span class="code-comment"># Update with another dictionary</span><br>
+                                d.update({<span class="code-string">'b'</span>: <span class="code-number">20</span>, <span class="code-string">'c'</span>: <span class="code-number">3</span>})<br>
+                                <span class="code-builtin">print</span>(d)  <span class="code-comment"># {'a': 1, 'b': 20, 'c': 3}</span><br>
+                                <br>
+                                <span class="code-comment"># Update with keyword arguments</span><br>
+                                d.update(d=<span class="code-number">4</span>, e=<span class="code-number">5</span>)<br>
+                                <span class="code-builtin">print</span>(d)  <span class="code-comment"># {'a': 1, 'b': 20, 'c': 3, 'd': 4, 'e': 5}</span><br>
+                                <br>
+                                <span class="code-comment"># Update with iterable of key-value pairs</span><br>
+                                d.update([(<span class="code-string">'f'</span>, <span class="code-number">6</span>), (<span class="code-string">'g'</span>, <span class="code-number">7</span>)])
+                            </code>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>4.1 Method Comparison Table</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Method</th>
+                                <th>Returns</th>
+                                <th>Modifies Dict?</th>
+                                <th>Raises KeyError?</th>
+                                <th>Time Complexity</th>
+                                <th>Use Case</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>get(key, default)</code></td>
+                                <td>Value or default</td>
+                                <td>No</td>
+                                <td>No</td>
+                                <td>O(1)</td>
+                                <td>Safe value retrieval</td>
+                            </tr>
+                            <tr>
+                                <td><code>setdefault(key, default)</code></td>
+                                <td>Value or default</td>
+                                <td>Yes (if key missing)</td>
+                                <td>No</td>
+                                <td>O(1)</td>
+                                <td>Initialize missing keys</td>
+                            </tr>
+                            <tr>
+                                <td><code>pop(key, default)</code></td>
+                                <td>Value or default</td>
+                                <td>Yes</td>
+                                <td>Only without default</td>
+                                <td>O(1)</td>
+                                <td>Remove and get value</td>
+                            </tr>
+                            <tr>
+                                <td><code>popitem()</code></td>
+                                <td>(key, value) tuple</td>
+                                <td>Yes</td>
+                                <td>Yes (if empty)</td>
+                                <td>O(1)</td>
+                                <td>LIFO removal</td>
+                            </tr>
+                            <tr>
+                                <td><code>update(other)</code></td>
+                                <td>None</td>
+                                <td>Yes</td>
+                                <td>No</td>
+                                <td>O(k) for k items</td>
+                                <td>Merge dictionaries</td>
+                            </tr>
+                            <tr>
+                                <td><code>clear()</code></td>
+                                <td>None</td>
+                                <td>Yes</td>
+                                <td>No</td>
+                                <td>O(1)</td>
+                                <td>Remove all items</td>
+                            </tr>
+                            <tr>
+                                <td><code>copy()</code></td>
+                                <td>Shallow copy</td>
+                                <td>No</td>
+                                <td>No</td>
+                                <td>O(n)</td>
+                                <td>Create duplicate</td>
+                            </tr>
+                            <tr>
+                                <td><code>items()</code></td>
+                                <td>View object</td>
+                                <td>No</td>
+                                <td>No</td>
+                                <td>O(1)</td>
+                                <td>Iterate key-value pairs</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="comprehensions">
+                <h2>5. Dictionary Comprehensions</h2>
+                
+                <p>Dictionary comprehensions provide a concise way to create dictionaries from iterables. They're similar to list comprehensions but produce dictionaries instead.</p>
+                
+                <h3>5.1 Basic Dictionary Comprehension Syntax</h3>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Basic syntax: {key_expression: value_expression for item in iterable}</span><br>
+                        <br>
+                        <span class="code-comment"># Create dictionary with squares</span><br>
+                        squares = {x: x**<span class="code-number">2</span> <span class="code-keyword">for</span> x <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">1</span>, <span class="code-number">6</span>)}<br>
+                        <span class="code-builtin">print</span>(squares)  <span class="code-comment"># {1: 1, 2: 4, 3: 9, 4: 16, 5: 25}</span><br>
+                        <br>
+                        <span class="code-comment"># Create dictionary from list of words</span><br>
+                        words = [<span class="code-string">"apple"</span>, <span class="code-string">"banana"</span>, <span class="code-string">"cherry"</span>]<br>
+                        word_lengths = {word: <span class="code-builtin">len</span>(word) <span class="code-keyword">for</span> word <span class="code-keyword">in</span> words}<br>
+                        <span class="code-builtin">print</span>(word_lengths)  <span class="code-comment"># {'apple': 5, 'banana': 6, 'cherry': 6}</span><br>
+                        <br>
+                        <span class="code-comment"># Using enumerate for index-based keys</span><br>
+                        items = [<span class="code-string">"first"</span>, <span class="code-string">"second"</span>, <span class="code-string">"third"</span>]<br>
+                        indexed = {i: item <span class="code-keyword">for</span> i, item <span class="code-keyword">in</span> <span class="code-builtin">enumerate</span>(items)}<br>
+                        <span class="code-builtin">print</span>(indexed)  <span class="code-comment"># {0: 'first', 1: 'second', 2: 'third'}</span>
+                    </code>
+                </div>
+                
+                <h3>5.2 Conditional Dictionary Comprehensions</h3>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Only include even numbers</span><br>
+                        even_squares = {x: x**<span class="code-number">2</span> <span class="code-keyword">for</span> x <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">10</span>) <span class="code-keyword">if</span> x % <span class="code-number">2</span> == <span class="code-number">0</span>}<br>
+                        <span class="code-builtin">print</span>(even_squares)  <span class="code-comment"># {0: 0, 2: 4, 4: 16, 6: 36, 8: 64}</span><br>
+                        <br>
+                        <span class="code-comment"># Filter by value length</span><br>
+                        fruits = {<span class="code-string">"apple"</span>: <span class="code-string">"red"</span>, <span class="code-string">"banana"</span>: <span class="code-string">"yellow"</span>, <span class="code-string">"grape"</span>: <span class="code-string">"purple"</span>}<br>
+                        long_colors = {fruit: color <span class="code-keyword">for</span> fruit, color <span class="code-keyword">in</span> fruits.items() <span class="code-keyword">if</span> <span class="code-builtin">len</span>(color) > <span class="code-number">5</span>}<br>
+                        <span class="code-builtin">print</span>(long_colors)  <span class="code-comment"># {'banana': 'yellow', 'grape': 'purple'}</span><br>
+                        <br>
+                        <span class="code-comment"># Multiple conditions</span><br>
+                        numbers = {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>, <span class="code-string">"c"</span>: <span class="code-number">3</span>, <span class="code-string">"d"</span>: <span class="code-number">4</span>, <span class="code-string">"e"</span>: <span class="code-number">5</span>}<br>
+                        filtered = {k: v <span class="code-keyword">for</span> k, v <span class="code-keyword">in</span> numbers.items() <span class="code-keyword">if</span> v > <span class="code-number">2</span> <span class="code-keyword">and</span> v < <span class="code-number">5</span>}<br>
+                        <span class="code-builtin">print</span>(filtered)  <span class="code-comment"># {'c': 3, 'd': 4}</span>
+                    </code>
+                </div>
+                
+                <h3>5.3 Transforming Existing Dictionaries</h3>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Transform keys to uppercase</span><br>
+                        original = {<span class="code-string">"name"</span>: <span class="code-string">"Alice"</span>, <span class="code-string">"age"</span>: <span class="code-number">30</span>, <span class="code-string">"city"</span>: <span class="code-string">"London"</span>}<br>
+                        uppercase_keys = {k.upper(): v <span class="code-keyword">for</span> k, v <span class="code-keyword">in</span> original.items()}<br>
+                        <span class="code-builtin">print</span>(uppercase_keys)  <span class="code-comment"># {'NAME': 'Alice', 'AGE': 30, 'CITY': 'London'}</span><br>
+                        <br>
+                        <span class="code-comment"># Apply transformation to values</span><br>
+                        prices = {<span class="code-string">"apple"</span>: <span class="code-number">1.2</span>, <span class="code-string">"banana"</span>: <span class="code-number">0.8</span>, <span class="code-string">"cherry"</span>: <span class="code-number">2.5</span>}<br>
+                        discounted = {item: price * <span class="code-number">0.9</span> <span class="code-keyword">for</span> item, price <span class="code-keyword">in</span> prices.items()}<br>
+                        <span class="code-builtin">print</span>(discounted)  <span class="code-comment"># {'apple': 1.08, 'banana': 0.72, 'cherry': 2.25}</span><br>
+                        <br>
+                        <span class="code-comment"># Swap keys and values (if values are hashable)</span><br>
+                        original = {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>, <span class="code-string">"c"</span>: <span class="code-number">3</span>}<br>
+                        swapped = {v: k <span class="code-keyword">for</span> k, v <span class="code-keyword">in</span> original.items()}<br>
+                        <span class="code-builtin">print</span>(swapped)  <span class="code-comment"># {1: 'a', 2: 'b', 3: 'c'}</span>
+                    </code>
+                </div>
+                
+                <h3>5.4 Nested Dictionary Comprehensions</h3>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Create a multiplication table</span><br>
+                        multiplication_table = {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;i: {j: i*j <span class="code-keyword">for</span> j <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">1</span>, <span class="code-number">6</span>)}<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-builtin">range</span>(<span class="code-number">1</span>, <span class="code-number">6</span>)<br>
+                        }<br>
+                        <br>
+                        <span class="code-comment"># Access values</span><br>
+                        <span class="code-builtin">print</span>(multiplication_table[<span class="code-number">3</span>][<span class="code-number">4</span>])  <span class="code-comment"># 12</span><br>
+                        <br>
+                        <span class="code-comment"># Flatten nested structure</span><br>
+                        nested = {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"group1"</span>: {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>},<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"group2"</span>: {<span class="code-string">"c"</span>: <span class="code-number">3</span>, <span class="code-string">"d"</span>: <span class="code-number">4</span>}<br>
+                        }<br>
+                        <br>
+                        flattened = {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">f"{outer_key}_{inner_key}"</span>: value<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> outer_key, inner_dict <span class="code-keyword">in</span> nested.items()<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> inner_key, value <span class="code-keyword">in</span> inner_dict.items()<br>
+                        }<br>
+                        <span class="code-builtin">print</span>(flattened)  <span class="code-comment"># {'group1_a': 1, 'group1_b': 2, 'group2_c': 3, 'group2_d': 4}</span>
+                    </code>
+                </div>
+                
+                <div class="tip-box">
+                    <strong><i class="fas fa-lightbulb"></i> Performance Tip:</strong> Dictionary comprehensions are generally faster than equivalent for-loops for creating dictionaries, especially in Python 3.6+. They're optimized at the C level and avoid the overhead of repeated method calls.
+                </div>
+            </section>
+
+            <section id="operations">
+                <h2>6. Dictionary Operations</h2>
+                
+                <p>Beyond basic methods, dictionaries support various operations for manipulation, comparison, and iteration.</p>
+                
+                <h3>6.1 Access and Modification Operations</h3>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Access operations</span><br>
+                        person = {<span class="code-string">"name"</span>: <span class="code-string">"Alice"</span>, <span class="code-string">"age"</span>: <span class="code-number">30</span>}<br>
+                        <br>
+                        <span class="code-comment"># Direct access</span><br>
+                        name = person[<span class="code-string">"name"</span>]  <span class="code-comment"># 'Alice'</span><br>
+                        <br>
+                        <span class="code-comment"># Safe access with get()</span><br>
+                        city = person.get(<span class="code-string">"city"</span>, <span class="code-string">"Unknown"</span>)  <span class="code-comment"># 'Unknown'</span><br>
+                        <br>
+                        <span class="code-comment"># Check key existence</span><br>
+                        has_age = <span class="code-string">"age"</span> <span class="code-keyword">in</span> person  <span class="code-comment"># True</span><br>
+                        has_city = <span class="code-string">"city"</span> <span class="code-keyword">in</span> person  <span class="code-comment"># False</span><br>
+                        <br>
+                        <span class="code-comment"># Modification operations</span><br>
+                        <span class="code-comment"># Add or update</span><br>
+                        person[<span class="code-string">"city"</span>] = <span class="code-string">"London"</span><br>
+                        person[<span class="code-string">"age"</span>] = <span class="code-number">31</span><br>
+                        <br>
+                        <span class="code-comment"># Delete operations</span><br>
+                        <span class="code-keyword">del</span> person[<span class="code-string">"city"</span>]  <span class="code-comment"># Remove specific key</span><br>
+                        removed_age = person.pop(<span class="code-string">"age"</span>)  <span class="code-comment"># Remove and return</span><br>
+                        <br>
+                        <span class="code-comment"># Clear all items</span><br>
+                        person.clear()
+                    </code>
+                </div>
+                
+                <h3>6.2 Dictionary Views</h3>
+                
+                <div class="info-box">
+                    <strong><i class="fas fa-info-circle"></i> Understanding Views:</strong> Dictionary views (<code>keys()</code>, <code>values()</code>, <code>items()</code>) provide dynamic windows into the dictionary. They reflect changes made to the dictionary after the view is created.
+                </div>
+                
+                <div class="code-example">
+                    <code>
+                        d = {<span class="code-string">'a'</span>: <span class="code-number">1</span>, <span class="code-string">'b'</span>: <span class="code-number">2</span>, <span class="code-string">'c'</span>: <span class="code-number">3</span>}<br>
+                        <br>
+                        <span class="code-comment"># Create views</span><br>
+                        keys_view = d.keys()<br>
+                        values_view = d.values()<br>
+                        items_view = d.items()<br>
+                        <br>
+                        <span class="code-builtin">print</span>(<span class="code-builtin">list</span>(keys_view))   <span class="code-comment"># ['a', 'b', 'c']</span><br>
+                        <span class="code-builtin">print</span>(<span class="code-builtin">list</span>(values_view)) <span class="code-comment"># [1, 2, 3]</span><br>
+                        <span class="code-builtin">print</span>(<span class="code-builtin">list</span>(items_view))  <span class="code-comment"># [('a', 1), ('b', 2), ('c', 3)]</span><br>
+                        <br>
+                        <span class="code-comment"># Views are dynamic</span><br>
+                        d[<span class="code-string">'d'</span>] = <span class="code-number">4</span><br>
+                        <span class="code-builtin">print</span>(<span class="code-builtin">list</span>(keys_view))   <span class="code-comment"># ['a', 'b', 'c', 'd'] (updated!)</span><br>
+                        <br>
+                        <span class="code-comment"># Set operations on keys view</span><br>
+                        other_keys = {<span class="code-string">'b'</span>, <span class="code-string">'c'</span>, <span class="code-string">'e'</span>}<br>
+                        intersection = keys_view & other_keys  <span class="code-comment"># {'b', 'c'}</span><br>
+                        union = keys_view | other_keys        <span class="code-comment"># {'a', 'b', 'c', 'd', 'e'}</span>
+                    </code>
+                </div>
+                
+                <h3>6.3 Dictionary Merging (Python 3.5+)</h3>
+                
+                <div class="code-example">
+                    <code>
+                        dict1 = {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>}<br>
+                        dict2 = {<span class="code-string">"b"</span>: <span class="code-number">20</span>, <span class="code-string">"c"</span>: <span class="code-number">3</span>}<br>
+                        dict3 = {<span class="code-string">"c"</span>: <span class="code-number">30</span>, <span class="code-string">"d"</span>: <span class="code-number">4</span>}<br>
+                        <br>
+                        <span class="code-comment"># Method 1: update() (in-place)</span><br>
+                        merged1 = dict1.copy()<br>
+                        merged1.update(dict2)<br>
+                        merged1.update(dict3)<br>
+                        <span class="code-builtin">print</span>(merged1)  <span class="code-comment"># {'a': 1, 'b': 20, 'c': 30, 'd': 4}</span><br>
+                        <br>
+                        <span class="code-comment"># Method 2: ** unpacking (Python 3.5+)</span><br>
+                        merged2 = {**dict1, **dict2, **dict3}<br>
+                        <span class="code-builtin">print</span>(merged2)  <span class="code-comment"># {'a': 1, 'b': 20, 'c': 30, 'd': 4}</span><br>
+                        <br>
+                        <span class="code-comment"># Method 3: | operator (Python 3.9+)</span><br>
+                        merged3 = dict1 | dict2 | dict3<br>
+                        <span class="code-builtin">print</span>(merged3)  <span class="code-comment"># {'a': 1, 'b': 20, 'c': 30, 'd': 4}</span><br>
+                        <br>
+                        <span class="code-comment"># Note: later dictionaries override earlier ones</span>
+                    </code>
+                </div>
+                
+                <h3>6.4 Comparison and Equality</h3>
+                
+                <div class="code-example">
+                    <code>
+                        dict1 = {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>}<br>
+                        dict2 = {<span class="code-string">"b"</span>: <span class="code-number">2</span>, <span class="code-string">"a"</span>: <span class="code-number">1</span>}<br>
+                        dict3 = {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">3</span>}<br>
+                        <br>
+                        <span class="code-comment"># Equality comparison (order doesn't matter)</span><br>
+                        <span class="code-builtin">print</span>(dict1 == dict2)  <span class="code-comment"># True (same key-value pairs)</span><br>
+                        <span class="code-builtin">print</span>(dict1 == dict3)  <span class="code-comment"># False (different values)</span><br>
+                        <br>
+                        <span class="code-comment"># Identity comparison</span><br>
+                        dict4 = dict1<br>
+                        <span class="code-builtin">print</span>(dict1 <span class="code-keyword">is</span> dict4)  <span class="code-comment"># True (same object)</span><br>
+                        <span class="code-builtin">print</span>(dict1 <span class="code-keyword">is</span> dict2)  <span class="code-comment"># False (different objects)</span><br>
+                        <br>
+                        <span class="code-comment"># Check subset relationship</span><br>
+                        big = {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>, <span class="code-string">"c"</span>: <span class="code-number">3</span>}<br>
+                        small = {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>}<br>
+                        <br>
+                        <span class="code-comment"># Check if all items in small are in big</span><br>
+                        all_in = all(item <span class="code-keyword">in</span> big.items() <span class="code-keyword">for</span> item <span class="code-keyword">in</span> small.items())<br>
+                        <span class="code-builtin">print</span>(all_in)  <span class="code-comment"># True</span>
+                    </code>
+                </div>
+            </section>
+
+            <section id="advanced">
+                <h2>7. Advanced Dictionary Topics</h2>
+                
+                <h3>7.1 Nested Dictionaries</h3>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Creating nested dictionaries</span><br>
+                        company = {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"name"</span>: <span class="code-string">"TechCorp"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"employees"</span>: {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"e001"</span>: {<span class="code-string">"name"</span>: <span class="code-string">"Alice"</span>, <span class="code-string">"role"</span>: <span class="code-string">"Developer"</span>},<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"e002"</span>: {<span class="code-string">"name"</span>: <span class="code-string">"Bob"</span>, <span class="code-string">"role"</span>: <span class="code-string">"Manager"</span>}<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;},<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"departments"</span>: {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"engineering"</span>: [<span class="code-string">"e001"</span>],<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"management"</span>: [<span class="code-string">"e002"</span>]<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                        }<br>
+                        <br>
+                        <span class="code-comment"># Accessing nested values</span><br>
+                        alice_role = company[<span class="code-string">"employees"</span>][<span class="code-string">"e001"</span>][<span class="code-string">"role"</span>]<br>
+                        <span class="code-builtin">print</span>(alice_role)  <span class="code-comment"># 'Developer'</span><br>
+                        <br>
+                        <span class="code-comment"># Safe access with get() for nested dicts</span><br>
+                        <span class="code-keyword">def</span> <span class="code-function">get_nested</span>(d, *keys, default=<span class="code-keyword">None</span>):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> key <span class="code-keyword">in</span> keys:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">try</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;d = d[key]<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">except</span> (KeyError, TypeError):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> default<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> d<br>
+                        <br>
+                        role = get_nested(company, <span class="code-string">"employees"</span>, <span class="code-string">"e001"</span>, <span class="code-string">"role"</span>)<br>
+                        <span class="code-builtin">print</span>(role)  <span class="code-comment"># 'Developer'</span>
+                    </code>
+                </div>
+                
+                <h3>7.2 Dictionary as Switch Statement</h3>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-comment"># Using dictionary as switch/case alternative</span><br>
+                        <span class="code-keyword">def</span> <span class="code-function">handle_add</span>(x, y):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> x + y<br>
+                        <br>
+                        <span class="code-keyword">def</span> <span class="code-function">handle_subtract</span>(x, y):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> x - y<br>
+                        <br>
+                        <span class="code-keyword">def</span> <span class="code-function">handle_multiply</span>(x, y):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> x * y<br>
+                        <br>
+                        <span class="code-keyword">def</span> <span class="code-function">handle_divide</span>(x, y):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> x / y <span class="code-keyword">if</span> y != <span class="code-number">0</span> <span class="code-keyword">else</span> <span class="code-string">"Cannot divide by zero"</span><br>
+                        <br>
+                        <span class="code-comment"># Dictionary mapping operations to functions</span><br>
+                        operations = {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"add"</span>: handle_add,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"subtract"</span>: handle_subtract,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"multiply"</span>: handle_multiply,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"divide"</span>: handle_divide<br>
+                        }<br>
+                        <br>
+                        <span class="code-comment"># Usage</span><br>
+                        <span class="code-keyword">def</span> <span class="code-function">calculator</span>(operation, x, y):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;handler = operations.get(operation)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> handler:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> handler(x, y)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">else</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> <span class="code-string">"Invalid operation"</span><br>
+                        <br>
+                        <span class="code-builtin">print</span>(calculator(<span class="code-string">"add"</span>, <span class="code-number">5</span>, <span class="code-number">3</span>))      <span class="code-comment"># 8</span><br>
+                        <span class="code-builtin">print</span>(calculator(<span class="code-string">"multiply"</span>, <span class="code-number">4</span>, <span class="code-number">2</span>))  <span class="code-comment"># 8</span><br>
+                        <span class="code-builtin">print</span>(calculator(<span class="code-string">"power"</span>, <span class="code-number">2</span>, <span class="code-number">3</span>))    <span class="code-comment"># "Invalid operation"</span>
+                    </code>
+                </div>
+                
+                <h3>7.3 Dictionary Serialization (JSON)</h3>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-keyword">import</span> json<br>
+                        <br>
+                        <span class="code-comment"># Dictionary to JSON</span><br>
+                        data = {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"name"</span>: <span class="code-string">"Alice"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"age"</span>: <span class="code-number">30</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"skills"</span>: [<span class="code-string">"Python"</span>, <span class="code-string">"JavaScript"</span>, <span class="code-string">"SQL"</span>],<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"address"</span>: {<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"street"</span>: <span class="code-string">"123 Main St"</span>,<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"city"</span>: <span class="code-string">"London"</span><br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                        }<br>
+                        <br>
+                        <span class="code-comment"># Convert to JSON string</span><br>
+                        json_string = json.dumps(data, indent=<span class="code-number">2</span>)<br>
+                        <span class="code-builtin">print</span>(json_string)<br>
+                        <br>
+                        <span class="code-comment"># Save to file</span><br>
+                        <span class="code-keyword">with</span> <span class="code-builtin">open</span>(<span class="code-string">"data.json"</span>, <span class="code-string">"w"</span>) <span class="code-keyword">as</span> f:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;json.dump(data, f, indent=<span class="code-number">2</span>)<br>
+                        <br>
+                        <span class="code-comment"># Load from JSON string</span><br>
+                        loaded_data = json.loads(json_string)<br>
+                        <span class="code-builtin">print</span>(loaded_data[<span class="code-string">"name"</span>])  <span class="code-comment"># 'Alice'</span>
+                    </code>
+                </div>
+            </section>
+
+            <section id="performance">
+                <h2>8. Performance Guide & Best Practices</h2>
+                
+                <h3>8.1 Time Complexity Analysis</h3>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Operation</th>
+                                <th>Average Case</th>
+                                <th>Worst Case</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Get item</td>
+                                <td>O(1)</td>
+                                <td>O(n)</td>
+                                <td>Constant time lookup</td>
+                            </tr>
+                            <tr>
+                                <td>Set item</td>
+                                <td>O(1)</td>
+                                <td>O(n)</td>
+                                <td>Constant time insertion/update</td>
+                            </tr>
+                            <tr>
+                                <td>Delete item</td>
+                                <td>O(1)</td>
+                                <td>O(n)</td>
+                                <td>Constant time deletion</td>
+                            </tr>
+                            <tr>
+                                <td>Check membership</td>
+                                <td>O(1)</td>
+                                <td>O(n)</td>
+                                <td>Constant time key existence check</td>
+                            </tr>
+                            <tr>
+                                <td>Iteration</td>
+                                <td>O(n)</td>
+                                <td>O(n)</td>
+                                <td>Linear time to iterate all items</td>
+                            </tr>
+                            <tr>
+                                <td>Copy</td>
+                                <td>O(n)</td>
+                                <td>O(n)</td>
+                                <td>Linear time to copy all items</td>
+                            </tr>
+                            <tr>
+                                <td>Merge (update)</td>
+                                <td>O(k)</td>
+                                <td>O(k)</td>
+                                <td>Linear in size of other dict</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="info-box">
+                    <strong><i class="fas fa-info-circle"></i> Note:</strong> The worst-case O(n) scenarios occur during hash collisions, but Python's dictionary implementation is highly optimized to make these extremely rare in practice.
+                </div>
+                
+                <h3>8.2 Memory Efficiency</h3>
+                
+                <div class="code-example">
+                    <code>
+                        <span class="code-keyword">import</span> sys<br>
+                        <br>
+                        <span class="code-comment"># Memory usage comparison</span><br>
+                        empty_dict = {}<br>
+                        small_dict = {<span class="code-string">"a"</span>: <span class="code-number">1</span>}<br>
+                        medium_dict = {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>, <span class="code-string">"c"</span>: <span class="code-number">3</span>}<br>
+                        <br>
+                        <span class="code-builtin">print</span>(<span class="code-string">f"Empty dict: {sys.getsizeof(empty_dict)} bytes"</span>)<br>
+                        <span class="code-builtin">print</span>(<span class="code-string">f"Small dict: {sys.getsizeof(small_dict)} bytes"</span>)<br>
+                        <span class="code-builtin">print</span>(<span class="code-string">f"Medium dict: {sys.getsizeof(medium_dict)} bytes"</span>)<br>
+                        <br>
+                        <span class="code-comment"># Memory optimization: Use __slots__ for class instances</span><br>
+                        <span class="code-keyword">class</span> <span class="code-function">OptimizedPerson</span>:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;__slots__ = (<span class="code-string">'name'</span>, <span class="code-string">'age'</span>)<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">def</span> <span class="code-function">__init__</span>(<span class="code-keyword">self</span>, name, age):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.name = name<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">self</span>.age = age<br>
+                        <br>
+                        <span class="code-comment"># Uses less memory than regular class with __dict__</span>
+                    </code>
+                </div>
+                
+                <h3>8.3 Best Practices</h3>
+                
+                <div class="tip-box">
+                    <strong><i class="fas fa-check-circle"></i> Best Practice 1:</strong> Use <code>get()</code> method for safe dictionary access instead of direct key access with try-except blocks.
+                </div>
+                
+                <div class="tip-box">
+                    <strong><i class="fas fa-check-circle"></i> Best Practice 2:</strong> Prefer dictionary comprehensions over loops for creating dictionaries from iterables—they're more readable and often faster.
+                </div>
+                
+                <div class="tip-box">
+                    <strong><i class="fas fa-check-circle"></i> Best Practice 3:</strong> Use <code>defaultdict</code> from collections when you need default values for missing keys, especially in accumulation patterns.
+                </div>
+                
+                <div class="tip-box">
+                    <strong><i class="fas fa-check-circle"></i> Best Practice 4:</strong> For configuration or constant data, consider using <code>types.MappingProxyType</code> to create read-only dictionaries.
+                </div>
+                
+                <div class="warning-box">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Anti-Pattern:</strong> Avoid using dictionaries as lists. If you need ordered, integer-indexed collections, use lists instead. Dictionaries with sequential integer keys are inefficient compared to lists.
+                </div>
+                
+                <h3>8.4 Real-World Performance Comparison</h3>
+                
+                <div class="performance-comparison">
+                    <h3>Performance Benchmark: List vs Dictionary Lookup</h3>
+                    
+                    <div class="code-example">
+                        <code>
+                            <span class="code-keyword">import</span> timeit<br>
+                            <br>
+                            <span class="code-comment"># Setup</span><br>
+                            size = <span class="code-number">10000</span><br>
+                            my_list = <span class="code-builtin">list</span>(<span class="code-builtin">range</span>(size))<br>
+                            my_dict = {i: i <span class="code-keyword">for</span> i <span class="code-keyword">in</span> <span class="code-builtin">range</span>(size)}<br>
+                            <br>
+                            <span class="code-comment"># List lookup (linear search)</span><br>
+                            list_time = timeit.timeit(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"9999 in my_list"</span>,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;globals=globals(),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;number=<span class="code-number">1000</span><br>
+                            )<br>
+                            <br>
+                            <span class="code-comment"># Dictionary lookup (hash-based)</span><br>
+                            dict_time = timeit.timeit(<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"9999 in my_dict"</span>,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;globals=globals(),<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;number=<span class="code-number">1000</span><br>
+                            )<br>
+                            <br>
+                            <span class="code-builtin">print</span>(<span class="code-string">f"List lookup time: {list_time:.6f} seconds"</span>)<br>
+                            <span class="code-builtin">print</span>(<span class="code-string">f"Dict lookup time: {dict_time:.6f} seconds"</span>)<br>
+                            <span class="code-builtin">print</span>(<span class="code-string">f"Dictionary is {list_time/dict_time:.1f}x faster"</span>)
+                        </code>
+                    </div>
+                    
+                    <p><strong>Expected Result:</strong> Dictionary lookups will be significantly faster (O(1) vs O(n)), especially for large collections.</p>
+                </div>
+            </section>
+
+            <section id="exercises">
+                <h2>9. Practice Exercises</h2>
+                
+                <p>Test your understanding with these practical exercises. Solutions are provided but try to solve them yourself first!</p>
+                
+                <div class="exercise-box">
+                    <strong><i class="fas fa-pencil-alt"></i> Exercise 1: Word Frequency Counter</strong>
+                    <p>Write a function that takes a string and returns a dictionary with word frequencies.</p>
+                    <div class="code-example">
+                        <code>
+                            <span class="code-keyword">def</span> <span class="code-function">word_frequency</span>(text):<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># Your code here</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;pass<br>
+                            <br>
+                            <span class="code-comment"># Test</span><br>
+                            text = <span class="code-string">"hello world hello python world python python"</span><br>
+                            <span class="code-builtin">print</span>(word_frequency(text))<br>
+                            <span class="code-comment"># Expected: {'hello': 2, 'world': 2, 'python': 3}</span>
+                        </code>
+                    </div>
+                </div>
+                
+                <div class="exercise-box">
+                    <strong><i class="fas fa-pencil-alt"></i> Exercise 2: Dictionary Inverter</strong>
+                    <p>Create a function that inverts a dictionary (swaps keys and values). Handle duplicate values by storing lists of keys.</p>
+                    <div class="code-example">
+                        <code>
+                            <span class="code-keyword">def</span> <span class="code-function">invert_dict</span>(d):<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># Your code here</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;pass<br>
+                            <br>
+                            <span class="code-comment"># Test</span><br>
+                            original = {<span class="code-string">"a"</span>: <span class="code-number">1</span>, <span class="code-string">"b"</span>: <span class="code-number">2</span>, <span class="code-string">"c"</span>: <span class="code-number">1</span>}<br>
+                            <span class="code-builtin">print</span>(invert_dict(original))<br>
+                            <span class="code-comment"># Expected: {1: ['a', 'c'], 2: ['b']}</span>
+                        </code>
+                    </div>
+                </div>
+                
+                <div class="exercise-box">
+                    <strong><i class="fas fa-pencil-alt"></i> Exercise 3: Nested Dictionary Flattener</strong>
+                    <p>Write a function that flattens a nested dictionary, concatenating keys with dots.</p>
+                    <div class="code-example">
+                        <code>
+                            <span class="code-keyword">def</span> <span class="code-function">flatten_dict</span>(d, parent_key=<span class="code-string">''</span>):<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-comment"># Your code here</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;pass<br>
+                            <br>
+                            <span class="code-comment"># Test</span><br>
+                            nested = {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"a"</span>: <span class="code-number">1</span>,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"b"</span>: {<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"c"</span>: <span class="code-number">2</span>,<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"d"</span>: {<span class="code-string">"e"</span>: <span class="code-number">3</span>}<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+                            }<br>
+                            <span class="code-builtin">print</span>(flatten_dict(nested))<br>
+                            <span class="code-comment"># Expected: {'a': 1, 'b.c': 2, 'b.d.e': 3}</span>
+                        </code>
+                    </div>
+                </div>
+                
+                <h3>Exercise Solutions</h3>
+                
+                <details>
+                    <summary>Click to view solutions</summary>
+                    <div class="code-example">
+                        <code>
+                            <span class="code-comment"># Solution 1: Word Frequency Counter</span><br>
+                            <span class="code-keyword">def</span> <span class="code-function">word_frequency</span>(text):<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;words = text.split()<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;freq = {}<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> word <span class="code-keyword">in</span> words:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;freq[word] = freq.get(word, <span class="code-number">0</span>) + <span class="code-number">1</span><br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> freq<br>
+                            <br>
+                            <span class="code-comment"># Solution 2: Dictionary Inverter</span><br>
+                            <span class="code-keyword">def</span> <span class="code-function">invert_dict</span>(d):<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;inverted = {}<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> key, value <span class="code-keyword">in</span> d.items():<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> value <span class="code-keyword">not</span> <span class="code-keyword">in</span> inverted:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inverted[value] = [key]<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">else</span>:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;inverted[value].append(key)<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> inverted<br>
+                            <br>
+                            <span class="code-comment"># Solution 3: Nested Dictionary Flattener</span><br>
+                            <span class="code-keyword">def</span> <span class="code-function">flatten_dict</span>(d, parent_key=<span class="code-string">''</span>):<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;items = []<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">for</span> k, v <span class="code-keyword">in</span> d.items():<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;new_key = <span class="code-string">f"{parent_key}.{k}"</span> <span class="code-keyword">if</span> parent_key <span class="code-keyword">else</span> k<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">if</span> <span class="code-builtin">isinstance</span>(v, dict):<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;items.extend(flatten_dict(v, new_key).items())<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">else</span>:<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;items.append((new_key, v))<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> dict(items)
+                        </code>
+                    </div>
+                </details>
+            </section>
+
+            <section id="resources">
+                <h2>10. Additional Resources</h2>
+                
+                <h3>10.1 Official Python Documentation</h3>
+                <ul>
+                    <li><a href="https://docs.python.org/3/library/stdtypes.html#mapping-types-dict" target="_blank">Python Documentation: Mapping Types</a></li>
+                    <li><a href="https://docs.python.org/3/tutorial/datastructures.html#dictionaries" target="_blank">Python Tutorial: Dictionaries</a></li>
+                    <li><a href="https://docs.python.org/3/library/collections.html" target="_blank">Collections Module</a></li>
+                </ul>
+                
+                <h3>10.2 Recommended Books</h3>
+                <ul>
+                    <li><strong>Fluent Python</strong> by Luciano Ramalho - Excellent coverage of Python data structures</li>
+                    <li><strong>Python Cookbook</strong> by David Beazley and Brian K. Jones - Practical dictionary recipes</li>
+                    <li><strong>Effective Python</strong> by Brett Slatkin - Best practices for Python programming</li>
+                </ul>
+                
+                <h3>10.3 Online Courses</h3>
+                <ul>
+                    <li><a href="https://realpython.com/tutorials/dicts/" target="_blank">Real Python Dictionary Tutorials</a></li>
+                    <li><a href="https://www.datacamp.com/courses/python-data-science-toolbox-part-1" target="_blank">DataCamp: Python Data Science Toolbox</a></li>
+                    <li><a href="https://www.coursera.org/learn/python-data" target="_blank">Coursera: Python Data Structures</a></li>
+                </ul>
+                
+                <h3>10.4 Tools and Libraries</h3>
+                <ul>
+                    <li><strong>pandas</strong>: Data analysis library built on top of dictionaries/DataFrames</li>
+                    <li><strong>attrs/dataclasses</strong>: Modern alternatives to dictionaries for structured data</li>
+                    <li><strong>pydantic</strong>: Data validation using Python type annotations</li>
+                    <li><strong>orjson/ujson</strong>: Faster JSON serialization libraries</li>
+                </ul>
+            </section>
+
+            <section id="social-sharing">
+                <h2>Share This Tutorial</h2>
+                <p>If you found this tutorial helpful, please share it with others who might benefit from it!</p>
+                
+                <div class="share-container">
+                    <button class="share-btn share-facebook" id="shareFacebook">
+                        <i class="fab fa-facebook-f"></i> Facebook
+                    </button>
+                    <button class="share-btn share-twitter" id="shareTwitter">
+                        <i class="fab fa-twitter"></i> Twitter
+                    </button>
+                    <button class="share-btn share-linkedin" id="shareLinkedIn">
+                        <i class="fab fa-linkedin-in"></i> LinkedIn
+                    </button>
+                    <button class="share-btn share-reddit" id="shareReddit">
+                        <i class="fab fa-reddit-alien"></i> Reddit
+                    </button>
+                    <button class="share-btn share-whatsapp" id="shareWhatsApp">
+                        <i class="fab fa-whatsapp"></i> WhatsApp
+                    </button>
+                    <button class="share-btn share-email" id="shareEmail">
+                        <i class="fas fa-envelope"></i> Email
+                    </button>
+                </div>
+            </section>
+
+            <section id="newsletter" class="newsletter-section">
+                <h2>Stay Updated with Poetic Codes</h2>
+                <p>Subscribe to our newsletter to receive notifications about new tutorials, Python tips, and coding best practices. No spam, unsubscribe anytime.</p>
+                
+                <form class="newsletter-form" id="newsletterForm">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email address" required aria-label="Email address" id="newsletterEmail">
+                    <button type="submit" class="newsletter-btn" id="newsletterBtn">
+                        <span id="btnText">Subscribe Now</span>
+                        <span id="btnLoading" class="loading-spinner" style="display: none;"></span>
+                    </button>
+                </form>
+                
+                <div class="newsletter-message" id="newsletterMessage"></div>
+            </section>
+        </article>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About Poetic Codes</h3>
+                <p>Poetic Codes is dedicated to creating comprehensive, beginner-friendly programming tutorials with a focus on practical examples and real-world applications.</p>
+                <p>Our mission is to make programming accessible and enjoyable for everyone, from complete beginners to experienced developers looking to expand their skills.</p>
+                <div class="social-icons">
+                    <a href="https://pansensoyglenn-dev.github.io/poetic-codes" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="https://x.com/@GlennPansensoy" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="www.linkedin.com/in/glenn-pansensoy-6288453a2" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="www.youtube.com/@GlennPansensoy" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    <a href="https://medium.com/@glennpansensoy" aria-label="Medium"><i class="fab fa-medium"></i></a>
+                    <a href="https://dev.to/glennpansensoy" aria-label="Dev.to"><i class="fab fa-dev"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Python Tutorials</h3>
+                <ul class="footer-links">
+                    <li><a href="python-lists.html">Python Lists</a></li>
+                    <li><a href="python-dictionaries.html">Python Dictionaries</a></li>
+                    <li><a href="python-functions.html">Python Functions</a></li>
+                    <li><a href="python-oop.html">Python OOP</a></li>
+                    <li><a href="python-data-structures.html">Python Data Structures</a></li>
+                    <li><a href="python-algorithms.html">Python Algorithms</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul class="footer-links">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#methods">Dictionary Methods</a></li>
+                    <li><a href="#comprehensions">Dictionary Comprehensions</a></li>
+                    <li><a href="#exercises">Practice Exercises</a></li>
+                    <li><a href="#resources">Resources</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact & Support</h3>
+                <p>Have questions or suggestions? We'd love to hear from you!</p>
+                <ul class="footer-links">
+                    <li><a href="contact.html">Contact Us</a></li>
+                    <li><a href="contact.html">Submit Tutorial Idea</a></li>
+                    <li><a href="contact.html.html">Report an Issue</a></li>
+                    <li><a href="faq-dictionaries.html">FAQ</a></li>
+                    <li><a href="forum.html">Community Forum</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="legal-compliance">
+            <h4>Legal & Compliance Information</h4>
+            <p><strong>CCPA/CPRA Compliance:</strong> California residents have the right to know what personal information is collected, access their data, request deletion, and opt-out of data sales. Contact us for CCPA requests.</p>
+            <p><strong>GDPR Compliance:</strong> For EU residents, we comply with GDPR regulations. You have the right to access, correct, delete, and restrict processing of your personal data.</p>
+            <p><strong>Accessibility:</strong> We are committed to making our content accessible to everyone. If you encounter accessibility issues, please contact us for assistance.</p>
+        </div>
+        
+        <div class="legal-links">
+            <a href="privacy.html">Privacy Policy</a>
+            <a href="terms.html">Terms of Service</a>
+            <a href="cookies.html">Cookie Policy</a>
+            <a href="disclaimer.html">Disclaimer</a>
+            <a href="accessibility.html">Accessibility Statement</a>
+            <a href="ccpa.html">CCPA Rights</a>
+            <a href="about.html">About</a>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2026 Poetic Codes. All rights reserved.</p>
+            <p>Created by Glenn Junsay Pansensoy | Python Dictionaries Tutorial v2.0</p>
+            <p>This content is available under the Creative Commons Attribution 4.0 International License.</p>
+            <p>Python® is a registered trademark of the Python Software Foundation. This tutorial is not affiliated with or endorsed by the Python Software Foundation.</p>
+        </div>
+    </footer>
+
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        class Navigation {
+            constructor() {
+                this.menuToggle = document.getElementById('menuToggle');
+                this.navOverlay = document.getElementById('navOverlay');
+                this.navClose = document.getElementById('navClose');
+                this.navLinks = document.querySelectorAll('.nav-link');
+                this.isOpen = false;
+                
+                this.init();
+            }
+            
+            init() {
+                this.menuToggle.addEventListener('click', () => this.openMenu());
+                this.navClose.addEventListener('click', () => this.closeMenu());
+                
+                this.navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        if (link.getAttribute('href').startsWith('#')) {
+                            e.preventDefault();
+                            const targetId = link.getAttribute('href');
+                            const targetElement = document.querySelector(targetId);
+                            if (targetElement) {
+                                this.closeMenu();
+                                setTimeout(() => {
+                                    targetElement.scrollIntoView({ 
+                                        behavior: 'smooth', 
+                                        block: 'start' 
+                                    });
+                                }, 300);
+                            }
+                        } else {
+                            this.closeMenu();
+                        }
+                    });
+                });
+                
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && this.isOpen) {
+                        this.closeMenu();
+                    }
+                });
+                
+                this.navOverlay.addEventListener('click', (e) => {
+                    if (e.target === this.navOverlay) {
+                        this.closeMenu();
+                    }
+                });
+            }
+            
+            openMenu() {
+                this.navOverlay.classList.add('active');
+                this.menuToggle.classList.add('active');
+                this.menuToggle.setAttribute('aria-expanded', 'true');
+                document.body.style.overflow = 'hidden';
+                this.isOpen = true;
+            }
+            
+            closeMenu() {
+                this.navOverlay.classList.remove('active');
+                this.menuToggle.classList.remove('active');
+                this.menuToggle.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+                this.isOpen = false;
+            }
+        }
+
+        class NewsletterBackend {
+            constructor() {
+                this.form = document.getElementById('newsletterForm');
+                this.message = document.getElementById('newsletterMessage');
+                this.btn = document.getElementById('newsletterBtn');
+                this.btnText = document.getElementById('btnText');
+                this.btnLoading = document.getElementById('btnLoading');
+                this.emailInput = document.getElementById('newsletterEmail');
+                
+                
+                this.backendUrls = {
+                    formspree: 'https://formspree.io/f/xdknlzjq',
+                    emailFallback: 'mailto: pansensoyglenn@gmail.com'
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                if (this.form) {
+                    this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+                    this.checkSubscriptionStatus();
+                }
+            }
+            
+            async handleSubmit(e) {
+                e.preventDefault();
+                
+                const email = this.emailInput.value.trim();
+                
+                if (!this.validateEmail(email)) {
+                    this.showMessage('Please enter a valid email address.', 'error');
+                    this.emailInput.focus();
+                    return;
+                }
+                
+                this.setLoading(true);
+                
+                try {
+                    const result = await this.submitToFormspree(email);
+                    
+                    if (result.success) {
+                        this.showMessage(result.message, 'success');
+                        this.saveSubscription(email);
+                        this.emailInput.value = '';
+                        this.form.reset();
+                    } else {
+                        this.showMessage(result.message || 'Subscription failed. Please try again.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Newsletter error:', error);
+                    this.showMessage('Network error. Please check your connection and try again.', 'error');
+                } finally {
+                    this.setLoading(false);
+                }
+            }
+            
+            validateEmail(email) {
+                const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return re.test(email);
+            }
+            
+            async submitToFormspree(email) {
+                const formData = new FormData();
+                formData.append('email', email);
+                formData.append('_subject', 'New Newsletter Subscription - Python Dictionaries Tutorial');
+                formData.append('_replyto', email);
+                formData.append('source', 'Python Dictionaries Tutorial');
+                formData.append('page', window.location.href);
+                formData.append('timestamp', new Date().toISOString());
+                
+                const response = await fetch(this.backendUrls.formspree, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    return {
+                        success: true,
+                        message: 'Thank you! You have been subscribed to our newsletter.'
+                    };
+                } else {
+                    throw new Error('Formspree submission failed');
+                }
+            }
+            
+            showMessage(text, type) {
+                this.message.textContent = text;
+                this.message.className = `newsletter-message newsletter-${type}`;
+                this.message.style.display = 'block';
+                
+              
+                this.message.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                
+                
+                setTimeout(() => {
+                    this.message.style.display = 'none';
+                }, 7000);
+            }
+            
+            setLoading(isLoading) {
+                if (isLoading) {
+                    this.btn.disabled = true;
+                    this.btnText.style.display = 'none';
+                    this.btnLoading.style.display = 'inline-block';
+                } else {
+                    this.btn.disabled = false;
+                    this.btnText.style.display = 'inline';
+                    this.btnLoading.style.display = 'none';
+                }
+            }
+            
+            saveSubscription(email) {
+                try {
+                    const subscriptions = JSON.parse(localStorage.getItem('newsletter_subscriptions') || '[]');
+                    
+                    const isAlreadySubscribed = subscriptions.some(sub => sub.email === email);
+                    
+                    if (!isAlreadySubscribed) {
+                        subscriptions.push({
+                            email: email,
+                            date: new Date().toISOString(),
+                            page: window.location.href,
+                            tutorial: 'Python Dictionaries'
+                        });
+                        
+                        localStorage.setItem('newsletter_subscriptions', JSON.stringify(subscriptions));
+                        localStorage.setItem('last_subscribed_email', email);
+                        localStorage.setItem('last_subscribed_date', new Date().toISOString());
+                        
+                        if (typeof gtag !== 'undefined') {
+                            gtag('event', 'newsletter_subscription', {
+                                'event_category': 'engagement',
+                                'event_label': 'Python Dictionaries Tutorial'
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error saving subscription:', error);
+                }
+            }
+            
+            checkSubscriptionStatus() {
+                try {
+                    const lastEmail = localStorage.getItem('last_subscribed_email');
+                    if (lastEmail) {
+                        this.emailInput.placeholder = "You're subscribed! Enter new email if different.";
+                        this.emailInput.value = lastEmail;
+                    }
+                } catch (error) {
+                    console.error('Error checking subscription status:', error);
+                }
+            }
+        }
+
+        class SocialSharing {
+            constructor() {
+                this.shareData = {
+                    title: 'Complete Python 3.10+ Dictionaries Tutorial: Master Dictionary Methods & Comprehensions',
+                    url: window.location.href,
+                    description: 'Master Python 3.10+ dictionaries with our comprehensive tutorial. Learn dictionary methods, comprehensions, advanced techniques, and best practices with practical examples.',
+                    hashtags: 'Python,Programming,Tutorial,DataStructures,Dictionaries'
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                
+                const facebookBtn = document.getElementById('shareFacebook');
+                if (facebookBtn) {
+                    facebookBtn.addEventListener('click', () => this.shareFacebook());
+                }
+                
+                const twitterBtn = document.getElementById('shareTwitter');
+                if (twitterBtn) {
+                    twitterBtn.addEventListener('click', () => this.shareTwitter());
+                }
+                
+                const linkedinBtn = document.getElementById('shareLinkedIn');
+                if (linkedinBtn) {
+                    linkedinBtn.addEventListener('click', () => this.shareLinkedIn());
+                }
+                
+                const redditBtn = document.getElementById('shareReddit');
+                if (redditBtn) {
+                    redditBtn.addEventListener('click', () => this.shareReddit());
+                }
+                
+                const whatsappBtn = document.getElementById('shareWhatsApp');
+                if (whatsappBtn) {
+                    whatsappBtn.addEventListener('click', () => this.shareWhatsApp());
+                }
+                
+                // Email Sharing
+                const emailBtn = document.getElementById('shareEmail');
+                if (emailBtn) {
+                    emailBtn.addEventListener('click', () => this.shareEmail());
+                }
+            }
+            
+            shareFacebook() {
+                const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(this.shareData.url)}`;
+                window.open(url, '_blank', 'width=600,height=400');
+            }
+            
+            shareTwitter() {
+                const text = encodeURIComponent(`Check out this Python dictionaries tutorial: ${this.shareData.title}`);
+                const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(this.shareData.url)}&text=${text}&hashtags=${this.shareData.hashtags}`;
+                window.open(url, '_blank', 'width=600,height=400');
+            }
+            
+            shareLinkedIn() {
+                const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(this.shareData.url)}`;
+                window.open(url, '_blank', 'width=600,height=400');
+            }
+            
+            shareReddit() {
+                const url = `https://www.reddit.com/submit?url=${encodeURIComponent(this.shareData.url)}&title=${encodeURIComponent(this.shareData.title)}`;
+                window.open(url, '_blank', 'width=600,height=600');
+            }
+            
+            shareWhatsApp() {
+                const text = encodeURIComponent(`${this.shareData.title} - ${this.shareData.url}`);
+                const url = `https://wa.me/?text=${text}`;
+                window.open(url, '_blank', 'width=600,height=600');
+            }
+            
+            shareEmail() {
+                const subject = encodeURIComponent(this.shareData.title);
+                const body = encodeURIComponent(`Check out this Python tutorial:\n\n${this.shareData.title}\n${this.shareData.url}\n\n${this.shareData.description}`);
+                const url = `mailto:?subject=${subject}&body=${body}`;
+                window.location.href = url;
+            }
+        }
+
+        class InteractiveDemo {
+            constructor() {
+                this.demoOutput = document.getElementById('demoOutput');
+                this.demoButtons = {
+                    basic: document.getElementById('demoBasic'),
+                    methods: document.getElementById('demoMethods'),
+                    comprehension: document.getElementById('demoComprehension'),
+                    merging: document.getElementById('demoMerging')
+                };
+                
+                this.demoExamples = {
+                    basic: `# Basic Dictionary Operations
+person = {"name": "John", "age": 30, "city": "New York"}
+
+print("Original dictionary:", person)
+print("Length:", len(person))
+print("Name:", person["name"])
+print("Age:", person.get("age"))
+print("Has 'city' key:", "city" in person)
+print("Keys:", list(person.keys()))
+print("Values:", list(person.values()))
+print("Items:", list(person.items()))
+
+# Modifying dictionary
+person["age"] = 31
+print("\\nAfter updating age:", person)
+
+person["country"] = "USA"
+print("After adding country:", person)
+
+del person["city"]
+print("After deleting city:", person)
+
+# Iterating
+print("\\nIterating through dictionary:")
+for key, value in person.items():
+    print(f"{key}: {value")}`,
+
+                    methods: `# Dictionary Methods Examples
+student = {"name": "Alice", "age": 25, "major": "Computer Science"}
+
+print("Original:", student)
+
+# get() - safe key access
+age = student.get("age")
+print("Age using get():", age)
+non_existent = student.get("grade", "Not Available")
+print("Grade using get() with default:", non_existent)
+
+# setdefault() - set if not exists
+course = student.setdefault("course", "Python Programming")
+print("Course after setdefault():", course)
+print("Dictionary after setdefault():", student)
+
+# update() - merge dictionaries
+student.update({"grade": "A", "graduation_year": 2024})
+print("\\nAfter update():", student)
+
+# pop() - remove and return value
+major = student.pop("major")
+print("Popped major:", major)
+print("After pop():", student)
+
+# popitem() - remove last item
+last_item = student.popitem()
+print("\\nPopped item:", last_item)
+print("After popitem():", student)
+
+# clear() - remove all items
+student_copy = student.copy()
+student_copy.clear()
+print("\\nAfter clear():", student_copy)`,
+
+                    comprehension: `# Dictionary Comprehensions
+# Basic comprehension
+squares = {x: x**2 for x in range(1, 6)}
+print("Squares 1-5:", squares)
+
+# With condition
+even_squares = {x: x**2 for x in range(10) if x % 2 == 0}
+print("\\nEven squares:", even_squares)
+
+# Transforming existing dictionary
+prices = {"apple": 1.2, "banana": 0.8, "cherry": 2.5}
+discounted = {item: price * 0.9 for item, price in prices.items()}
+print("\\nDiscounted prices:", discounted)
+
+# Creating from two lists
+keys = ["a", "b", "c"]
+values = [1, 2, 3]
+combined = {k: v for k, v in zip(keys, values)}
+print("\\nCombined from lists:", combined)
+
+# Nested comprehension
+matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+flattened = {f"cell_{i}_{j}": matrix[i][j] 
+             for i in range(3) for j in range(3)}
+print("\\nFlattened matrix as dict:", flattened)`,
+
+                    merging: `# Dictionary Merging (Python 3.5+)
+dict1 = {"a": 1, "b": 2}
+dict2 = {"c": 3, "d": 4}
+dict3 = {"e": 5, "f": 6}
+
+# Method 1: Using update()
+merged1 = {}
+merged1.update(dict1)
+merged1.update(dict2)
+merged1.update(dict3)
+print("Merged using update():", merged1)
+
+# Method 2: Using ** unpacking (Python 3.5+)
+merged2 = {**dict1, **dict2, **dict3}
+print("\\nMerged using ** unpacking:", merged2)
+
+# Method 3: Using | operator (Python 3.9+)
+merged3 = dict1 | dict2 | dict3
+print("\\nMerged using | operator:", merged3)
+
+# Method 4: Dictionary union with conflict resolution
+config_default = {"debug": False, "timeout": 30, "retries": 3}
+config_user = {"debug": True, "timeout": 60}
+config_final = {**config_default, **config_user}
+print("\\nConfig with user overrides:", config_final)
+
+# Method 5: Deep merging nested dictionaries
+from collections import ChainMap
+defaults = {"colors": {"text": "black", "background": "white"}}
+user_prefs = {"colors": {"text": "blue"}}
+combined = dict(ChainMap(user_prefs, defaults))
+print("\\nDeep merged (ChainMap):", combined)`
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                Object.keys(this.demoButtons).forEach(key => {
+                    if (this.demoButtons[key]) {
+                        this.demoButtons[key].addEventListener('click', () => {
+                            this.showExample(key);
+                        });
+                    }
+                });
+                
+            
+                if (this.demoButtons.basic && this.demoOutput) {
+                    this.showExample('basic');
+                }
+            }
+            
+            showExample(key) {
+                if (this.demoOutput && this.demoExamples[key]) {
+                    this.demoOutput.textContent = this.demoExamples[key];
+                    
+                    Object.values(this.demoButtons).forEach(btn => {
+                        if (btn) btn.style.opacity = '0.7';
+                    });
+                    this.demoButtons[key].style.opacity = '1';
+                }
+            }
+        }
+
+        class CodeCopy {
+            constructor() {
+                this.init();
+            }
+            
+            init() {
+                const codeExamples = document.querySelectorAll('.code-example');
+                codeExamples.forEach(example => {
+                    const copyButton = this.createCopyButton();
+                    copyButton.addEventListener('click', () => this.copyCode(example, copyButton));
+                    example.appendChild(copyButton);
+                });
+            }
+            
+            createCopyButton() {
+                const button = document.createElement('button');
+                button.innerHTML = '<i class="far fa-copy"></i> Copy';
+                button.className = 'copy-code-btn';
+                button.setAttribute('aria-label', 'Copy code to clipboard');
+                button.setAttribute('title', 'Copy code to clipboard');
+                return button;
+            }
+            
+            copyCode(example, button) {
+                const codeElement = example.querySelector('code');
+                const codeText = codeElement.textContent;
+                
+                navigator.clipboard.writeText(codeText).then(() => {
+                    this.showCopySuccess(button);
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    this.showCopyError(button);
+                });
+            }
+            
+            showCopySuccess(button) {
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                button.style.background = 'rgba(16, 185, 129, 0.2)';
+                button.style.borderColor = '#10b981';
+                button.style.color = '#10b981';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.style.background = 'rgba(59, 130, 246, 0.2)';
+                    button.style.borderColor = '#3b82f6';
+                    button.style.color = '#60a5fa';
+                }, 2000);
+            }
+            
+            showCopyError(button) {
+                button.innerHTML = '<i class="fas fa-times"></i> Failed';
+                button.style.background = 'rgba(239, 68, 68, 0.2)';
+                button.style.borderColor = '#ef4444';
+                button.style.color = '#ef4444';
+                
+                setTimeout(() => {
+                    button.innerHTML = '<i class="far fa-copy"></i> Copy';
+                    button.style.background = 'rgba(59, 130, 246, 0.2)';
+                    button.style.borderColor = '#3b82f6';
+                    button.style.color = '#60a5fa';
+                }, 2000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            new Navigation();
+            new NewsletterBackend();
+            new SocialSharing();
+            new InteractiveDemo();
+            new CodeCopy();
+            
+            const progressBar = document.getElementById('progressBar');
+            window.addEventListener('scroll', () => {
+                const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+                const scrolled = (window.scrollY / windowHeight) * 100;
+                if (progressBar) {
+                    progressBar.style.width = scrolled + '%';
+                }
+            });
+            
+            // Back to top button
+            const backToTop = document.getElementById('backToTop');
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.remove('visible');
+                }
+            });
+            
+            if (backToTop) {
+                backToTop.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+            
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    if (this.getAttribute('href') === '#') return;
+                    
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+            
+            // Analytics
+            let startTime = Date.now();
+            let maxScroll = 0;
+            
+            window.addEventListener('beforeunload', () => {
+                const timeSpent = Math.round((Date.now() - startTime) / 1000);
+                const scrollPercentage = Math.round((maxScroll / (document.documentElement.scrollHeight - window.innerHeight)) * 100);
+                
+                try {
+                    const analytics = JSON.parse(localStorage.getItem('tutorial_analytics') || '{}');
+                    analytics['python_dictionaries_tutorial'] = {
+                        time_spent_seconds: timeSpent,
+                        scroll_percentage: scrollPercentage,
+                        last_visited: new Date().toISOString(),
+                        completion_rate: Math.min(100, Math.round(scrollPercentage))
+                    };
+                    localStorage.setItem('tutorial_analytics', JSON.stringify(analytics));
+                } catch (e) {
+                    console.error('Error saving analytics:', e);
+                }
+            });
+            
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                if (currentScroll > maxScroll) {
+                    maxScroll = currentScroll;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
