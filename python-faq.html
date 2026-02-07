@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Python Professional FAQ</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-alt: #161b22;
+      --text: #c9d1d9;
+      --text-light: #8b949e;
+      --accent: #58a6ff;
+      --accent-dim: #388bfd;
+      --green: #3fb950;
+      --purple: #b083f0;
+      --orange: #ffa657;
+      --red: #f85149;
+      --border: #30363d;
+      --qcolor: #ff7b72;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.7;
+      padding: 20px 30px;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+
+    h1, h2 {
+      color: var(--accent);
+      margin: 1.6em 0 0.7em;
+    }
+
+    h1 {
+      text-align: center;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.6em;
+      margin-bottom: 1.2em;
+    }
+
+    .faq-item {
+      margin: 2.2em 0;
+      padding: 1.4em 1.8em;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .question {
+      font-weight: bold;
+      color: var(--qcolor);
+      margin-bottom: 0.8em;
+      font-size: 1.15rem;
+    }
+
+    .answer {
+      color: var(--text);
+    }
+
+    code, pre {
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.25em 0.45em;
+      color: var(--orange);
+    }
+
+    pre {
+      padding: 1.1rem;
+      overflow-x: auto;
+      margin: 1em 0;
+      background: #0d1117;
+    }
+
+    .comment { color: #6e7681; font-style: italic; }
+
+    .keyword  { color: #ff7b72; font-weight: bold; }
+    .string   { color: #a5d6ff; }
+    .number   { color: #ffa657; }
+    .function { color: #d2a8ff; }
+
+    .tip {
+      background: rgba(63, 185, 80, 0.15);
+      border-left: 4px solid var(--green);
+      padding: 1rem 1.4rem;
+      margin: 1.4em 0;
+      border-radius: 4px;
+      font-size: 0.98rem;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 5rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-light);
+      font-size: 0.92rem;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 16px; }
+      .faq-item { padding: 1.2em 1.4em; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Python Professional FAQ (2026 Edition)</h1>
+
+<p style="text-align:center; color:var(--text-light); margin-bottom: 3rem;">
+  Frequently Asked Questions for mid/senior Python developers, interviews & real-world practice • Midnight Obsidian theme
+</p>
+
+<div class="tip">
+  <strong>Focus areas in 2025–2026 interviews:</strong> modern packaging (pyproject.toml + uv/pdm), type hints (typing + mypy), async/await, performance (list vs deque vs array), memory management, concurrency pitfalls, decorators/context managers, pytest fixtures/mocking.
+</div>
+
+<div class="faq-item">
+  <div class="question">Q: What is the difference between <code>is</code> and <code>==</code>?</div>
+  <div class="answer">
+    <code>==</code> checks for value equality.<br>
+    <code>is</code> checks for identity (same object in memory).<br><br>
+    Common trap: small integers & some strings are interned, so <code>a = 256; b = 256; a is b → True</code>, but don't rely on it.<br>
+    <strong>Rule:</strong> Use <code>==</code> for values, <code>is</code> for <code>None</code>, <code>True</code>/<code>False</code>, or when you really need identity.
+  </div>
+</div>
+
+<div class="faq-item">
+  <div class="question">Q: Why are mutable default arguments dangerous? How to fix?</div>
+  <div class="answer">
+    Default arguments are evaluated <strong>once</strong> at function definition time.<br>
+    If mutable (list, dict, set), it is shared across calls → unexpected side effects.
+<pre><code><span class="keyword">def</span> <span class="function">bad</span>(items=[]):
+    items.append(1)
+    <span class="keyword">return</span> items
+
+print(bad())  <span class="comment"># [1]</span>
+print(bad())  <span class="comment"># [1,1] ← surprise!</span>
+
+<span class="comment"># Fix: use None + check</span>
+<span class="keyword">def</span> <span class="function">good</span>(items=None):
+    <span class="keyword">if</span> items <span class="keyword">is</span> None:
+        items = []
+    items.append(1)
+    <span class="keyword">return</span> items
+</code></pre>
+  </div>
+</div>
+
+<div class="faq-item">
+  <div class="question">Q: Explain <code>*args</code> and <code>**kwargs</code> – when to use each?</div>
+  <div class="answer">
+    <code>*args</code> → collects positional arguments into a tuple.<br>
+    <code>**kwargs</code> → collects keyword arguments into a dict.<br><br>
+    Use cases:
+    <ul>
+      <li>Forwarding arguments to super() or wrapped functions</li>
+      <li>Flexible APIs (e.g. logging, decorators)</li>
+      <li>Adapter / proxy patterns</li>
+    </ul>
+<pre><code><span class="keyword">def</span> <span class="function">log</span>(msg, *args, level=<span class="string">"INFO"</span>, **kwargs):
+    print(f"[{level}] {msg}", args, kwargs)
+</code></pre>
+  </div>
+</div>
+
+<div class="faq-item">
+  <div class="question">Q: What is a closure in Python? Give a practical example.</div>
+  <div class="answer">
+    A closure is a function that remembers variables from its enclosing scope even after that scope is gone.<br><br>
+    Classic example – counter:
+<pre><code><span class="keyword">def</span> <span class="function">make_counter</span>():
+    count = 0
+    <span class="keyword">def</span> <span class="function">increment</span>():
+        <span class="keyword">nonlocal</span> count
+        count += 1
+        <span class="keyword">return</span> count
+    <span class="keyword">return</span> increment
+
+c1 = make_counter()
+print(c1())  <span class="comment"># 1</span>
+print(c1())  <span class="comment"># 2</span>
+
+c2 = make_counter()
+print(c2())  <span class="comment"># 1  (independent)</span>
+</code></pre>
+  </div>
+</div>
+
+<div class="faq-item">
+  <div class="question">Q: <code>@staticmethod</code> vs <code>@classmethod</code> vs regular method – when to use?</div>
+  <div class="answer">
+    <ul>
+      <li>Regular method: takes <code>self</code>, operates on instance</li>
+      <li><code>@classmethod</code>: takes <code>cls</code>, operates on class (alternative constructors, inheritance friendly)</li>
+      <li><code>@staticmethod</code>: no <code>self</code> or <code>cls</code>, utility function logically belongs to class namespace</li>
+    </ul>
+<pre><code><span class="keyword">class</span> <span class="function">Date</span>:
+    <span class="keyword">def</span> <span class="function">__init__</span>(<span class="built-in">self</span>, year, month, day):
+        <span class="built-in">self</span>.year = year
+
+    @classmethod
+    <span class="keyword">def</span> <span class="function">from_string</span>(<span class="built-in">cls</span>, s):
+        y, m, d = <span class="built-in">map</span>(<span class="built-in">int</span>, s.split('-'))
+        <span class="keyword">return</span> <span class="built-in">cls</span>(y, m, d)
+
+    @staticmethod
+    <span class="keyword">def</span> <span class="function">is_leap_year</span>(year):
+        <span class="keyword">return</span> year % 4 == 0 <span class="keyword">and</span> (year % 100 != 0 <span class="keyword">or</span> year % 400 == 0)
+</code></pre>
+  </div>
+</div>
+
+<div class="faq-item">
+  <div class="question">Q: How does Python's GIL affect threading? When to use threading vs multiprocessing?</div>
+  <div class="answer">
+    GIL (Global Interpreter Lock) → only one thread executes Python bytecode at a time.<br>
+    → CPU-bound tasks: threading gives no speedup (use <code>multiprocessing</code>)<br>
+    → I/O-bound tasks: threading is fine (network, disk, waiting)<br><br>
+    Modern alternatives: <code>asyncio</code> (single-threaded concurrency), <code>concurrent.futures</code>, process pools.
+  </div>
+</div>
+
+<div class="faq-item">
+  <div class="question">Q: Explain context managers and the <code>with</code> statement. How to write your own?</div>
+  <div class="answer">
+    Context managers handle resource acquisition/release (files, locks, db connections).<br><br>
+    Two ways:
+    <ol>
+      <li>Class with <code>__enter__</code> / <code>__exit__</code></li>
+      <li>Generator + <code>@contextmanager</code></li>
+    </ol>
+<pre><code><span class="keyword">from</span> contextlib <span class="keyword">import</span> contextmanager
+
+@contextmanager
+<span class="keyword">def</span> <span class="function">timer</span>(label):
+    <span class="keyword">import</span> time
+    start = time.time()
+    <span class="keyword">try</span>:
+        <span class="keyword">yield</span>
+    <span class="keyword">finally</span>:
+        print(f"{label}: {time.time() - start:.3f}s")
+</code></pre>
+  </div>
+</div>
+
+<div class="faq-item">
+  <div class="question">Q: What are descriptors? Give a simple example (property-like behavior).</div>
+  <div class="answer">
+    Descriptors are objects that define <code>__get__</code>, <code>__set__</code>, <code>__delete__</code>.<br>
+    They power <code>@property</code>, class variables with validation, etc.
+<pre><code><span class="keyword">class</span> <span class="function">Positive</span>:
+    <span class="keyword">def</span> <span class="function">__set_name__</span>(<span class="built-in">self</span>, owner, name):
+        <span class="built-in">self</span>.name = name
+
+    <span class="keyword">def</span> <span class="function">__get__</span>(<span class="built-in">self</span>, obj, owner=None):
+        <span class="keyword">return</span> obj.__dict__.get(<span class="built-in">self</span>.name, 0)
+
+    <span class="keyword">def</span> <span class="function">__set__</span>(<span class="built-in">self</span>, obj, value):
+        <span class="keyword">if</span> <span class="keyword">not</span> <span class="built-in">isinstance</span>(value, (int, float)) <span class="keyword">or</span> value &lt; 0:
+            <span class="keyword">raise</span> ValueError("Must be non-negative number")
+        obj.__dict__[<span class="built-in">self</span>.name] = value
+
+<span class="keyword">class</span> <span class="function">Product</span>:
+    price = Positive()
+</code></pre>
+  </div>
+</div>
+
+<div class="tip">
+  <strong>More advanced topics to master (2026 trend):</strong><br>
+  • Type hints + mypy / pyright<br>
+  • Structural pattern matching (<code>match</code> / <code>case</code>)<br>
+  • <code>dataclasses</code> vs <code>attrs</code> vs Pydantic<br>
+  • Async generators, <code>asyncio.gather</code> vs <code>asyncio.as_completed</code><br>
+  • Memory profiling (<code>tracemalloc</code>, <code>objgraph</code>)<br>
+  • Packaging: <code>pyproject.toml</code> + <code>uv</code> / <code>pdm</code> / <code>hatch</code>
+</div>
+
+<footer>
+   Python Professional FAQ • Updated for 2026 interviews • Keep grinding! 🐍⚡
+</footer>
+
+</body>
+</html>
