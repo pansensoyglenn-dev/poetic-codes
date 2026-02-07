@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Roadmap 2026</title>
+    <style>
+        :root {
+            --obsidian: #0D1117;
+            --midnight-blue: #161B22;
+            --accent-blue: #58A6FF;
+            --purple-ai: #A371F7;
+            --cloud-orange: #F7A072;
+            --success-green: #238636;
+            --text-main: #C9D1D9;
+            --text-dim: #8B949E;
+            --border-color: #30363D;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--accent-blue);
+            padding-left: 20px;
+            margin-bottom: 50px;
+        }
+
+        .btn-home {
+            background: var(--midnight-blue);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .btn-home:hover {
+            border-color: var(--accent-blue);
+            background: #1c2128;
+        }
+
+        h1 {
+            color: #FFFFFF;
+            font-size: 2.8rem;
+            margin: 0;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--accent-blue);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .tier {
+            background-color: var(--midnight-blue);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tier::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 4px; height: 100%;
+            background: var(--accent-blue);
+            opacity: 0.3;
+        }
+
+        .tier.ai::after { background: var(--purple-ai); }
+        .tier.cloud::after { background: var(--cloud-orange); }
+
+        .tier-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h2 { margin: 0; color: #F0F6FC; font-size: 1.4rem; }
+
+        .tier-label {
+            font-size: 0.7rem;
+            background: rgba(88, 166, 255, 0.1);
+            color: var(--accent-blue);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--accent-blue);
+        }
+
+        .tier.ai .tier-label { color: var(--purple-ai); border-color: var(--purple-ai); background: rgba(163, 113, 247, 0.1); }
+        .tier.cloud .tier-label { color: var(--cloud-orange); border-color: var(--cloud-orange); background: rgba(247, 160, 114, 0.1); }
+
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 0.95rem; }
+        li:last-child { border-bottom: none; }
+
+        .project-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(35, 134, 54, 0.05);
+            border: 1px dashed var(--success-green);
+            border-radius: 8px;
+        }
+
+        .project-box h4 { margin: 0 0 5px 0; color: var(--success-green); font-size: 0.85rem; text-transform: uppercase; }
+
+        .tool-tag {
+            display: inline-block;
+            background: #21262D;
+            border: 1px solid var(--border-color);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin: 4px 2px;
+            color: var(--text-dim);
+        }
+
+        .full-width { grid-column: 1 / -1; }
+
+        footer {
+            margin-top: 60px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            header { flex-direction: column; text-align: center; border: none; padding: 0; }
+            .btn-home { margin-top: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div>
+            <p class="subtitle">Curriculum Overview 2026</p>
+            <h1>Learning Python</h1>
+        </div>
+        <a href="index.html" class="btn-home">← Return Home</a>
+    </header>
+
+    <div class="grid">
+        <div class="tier">
+            <div class="tier-header">
+                <h2>01. Syntax Architecture</h2>
+                <span class="tier-label">Foundations</span>
+            </div>
+            <ul>
+                <li><strong>Memory Management:</strong> Understanding variables and references.</li>
+                <li><strong>Collections:</strong> Mastery of Lists, Dicts, and Set Theory.</li>
+                <li><strong>Logic Flow:</strong> Nested conditionals and loop optimizations.</li>
+                <li><strong>Type Hinting:</strong> Static analysis with <code>mypy</code>.</li>
+            </ul>
+            <div class="project-box">
+                <h4>Build Milestone</h4>
+                Automated Finance Tracker (CLI) with local storage.
+            </div>
+        </div>
+
+        <div class="tier ai">
+            <div class="tier-header">
+                <h2>02. Machine Learning</h2>
+                <span class="tier-label">Intelligence</span>
+            </div>
+            [attachment_0](attachment)
+            <ul>
+                <li><strong>Data Science:</strong> NumPy arrays and Pandas DataFrames.</li>
+                <li><strong>Modeling:</strong> Scikit-learn for regression and classification.</li>
+                <li><strong>Deep Learning:</strong> Neural networks with PyTorch or TensorFlow.</li>
+                <li><strong>Generative AI:</strong> Fine-tuning LLMs with HuggingFace.</li>
+            </ul>
+            <div class="project-box">
+                <h4>Build Milestone</h4>
+                Predictive Analytics Engine for stock market trends.
+            </div>
+        </div>
+
+        <div class="tier">
+            <div class="tier-header">
+                <h2>03. Backend Systems</h2>
+                <span class="tier-label">Advanced</span>
+            </div>
+            <ul>
+                <li><strong>FastAPI/Django:</strong> Dependency Injection and Middlewares.</li>
+                <li><strong>Databases:</strong> SQL Alchemy (Relational) & Redis (Caching).</li>
+                <li><strong>Asynchronous:</strong> <code>async/await</code> and event loops.</li>
+                <li><strong>Security:</strong> OAuth2, JWT, and Hashing.</li>
+            </ul>
+            <div class="project-box">
+                <h4>Build Milestone</h4>
+                High-concurrency Task Queue using Redis and Celery.
+            </div>
+        </div>
+
+        <div class="tier cloud">
+            <div class="tier-header">
+                <h2>04. Cloud Development</h2>
+                <span class="tier-label">Infrastructure</span>
+            </div>
+            [attachment_1](attachment)
+            <ul>
+                <li><strong>Providers:</strong> Mastering AWS Boto3 and Azure SDKs.</li>
+                <li><strong>Serverless:</strong> Event-driven functions (Lambda/Azure Functions).</li>
+                <li><strong>IaC:</strong> Defining infrastructure via Pulumi or Terraform.</li>
+                <li><strong>Storage:</strong> S3 Bucket management and Cloud SQL integration.</li>
+            </ul>
+            <div class="project-box">
+                <h4>Build Milestone</h4>
+                Scalable serverless API deployed across multiple regions.
+            </div>
+        </div>
+
+        <div class="tier">
+            <div class="tier-header">
+                <h2>05. DevOps & Scale</h2>
+                <span class="tier-label">Professional</span>
+            </div>
+            <ul>
+                <li><strong>Docker:</strong> Containerizing multi-service Python apps.</li>
+                <li><strong>CI/CD:</strong> GitHub Actions for automated testing/linting.</li>
+                <li><strong>Testing:</strong> PyTest fixtures and Mocking strategies.</li>
+                <li><strong>Profiling:</strong> Memory profiling and speed optimization.</li>
+            </ul>
+            <div class="project-box">
+                <h4>Build Milestone</h4>
+                Fully containerized Microservice with 90% test coverage.
+            </div>
+        </div>
+
+        <div class="tier full-width">
+            <div class="tier-header">
+                <h2>Professional Ecosystem Tools</h2>
+                <span class="tier-label">Standards</span>
+            </div>
+            <p style="color: var(--text-dim);">Master these tools to operate in a modern engineering team:</p>
+            <div>
+                <span class="tool-tag">Git/GitHub</span>
+                <span class="tool-tag">PyTorch</span>
+                <span class="tool-tag">Terraform</span>
+                <span class="tool-tag">Docker</span>
+                <span class="tool-tag">PostgreSQL</span>
+                <span class="tool-tag">AWS Lambda</span>
+                <span class="tool-tag">Pandas</span>
+                <span class="tool-tag">Ruff (Linter)</span>
+                <span class="tool-tag">Redis</span>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Designed for Python Developers | Glenn Junsay Pansensoy | 2026
+    </footer>
+</div>
+
+</body>
+</html>
