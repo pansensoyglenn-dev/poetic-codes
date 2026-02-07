@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Python Project Templates</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-alt: #161b22;
+      --text: #c9d1d9;
+      --text-light: #8b949e;
+      --accent: #58a6ff;
+      --accent-dim: #388bfd;
+      --green: #3fb950;
+      --purple: #b083f0;
+      --orange: #ffa657;
+      --red: #f85149;
+      --border: #30363d;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      padding: 20px 30px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 {
+      color: var(--accent);
+      margin: 1.4em 0 0.6em;
+    }
+
+    h1 {
+      text-align: center;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5em;
+      margin-bottom: 1em;
+    }
+
+    code, pre {
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    code {
+      padding: 0.2em 0.4em;
+      color: var(--orange);
+    }
+
+    pre {
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1em 0;
+    }
+
+    .comment { color: #6e7681; font-style: italic; }
+    .string   { color: #a5d6ff; }
+    .keyword  { color: #ff7b72; font-weight: bold; }
+    .built-in { color: #79c0ff; }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+      color: var(--accent-dim);
+    }
+
+    .tip, .warning {
+      padding: 0.9rem 1.3rem;
+      margin: 1.4em 0;
+      border-radius: 6px;
+    }
+
+    .tip {
+      background: rgba(63, 185, 80, 0.18);
+      border-left: 4px solid var(--green);
+    }
+
+    .warning {
+      background: rgba(248, 81, 73, 0.15);
+      border-left: 4px solid var(--red);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5em 0;
+    }
+
+    th, td {
+      padding: 0.8em 1em;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      background: var(--bg-alt);
+      color: var(--accent);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 5rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 16px; }
+      pre { font-size: 0.92rem; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Python Project Templates Starter Guide</h1>
+
+<p style="text-align:center; color:var(--text-light);">
+  Folder structures & starter files for different project types • 2026 edition • obsidian dark theme
+</p>
+
+<div class="tip">
+  <strong>Why use templates?</strong><br>
+  Good structure from day 1 saves time, makes collaboration easier, helps testing/linting/docs/CI later.
+</div>
+
+<h2>1. Minimal Console Script / Small Tool</h2>
+
+<p>Best for: scripts, automation tools, learning projects, CLI utilities</p>
+
+<pre><code>my-cool-tool/
+├── my_cool_tool.py       # main script (or __main__.py if package)
+├── requirements.txt      # or pyproject.toml + uv/pdm/poetry
+├── README.md
+├── .gitignore
+└── LICENSE               # (optional: MIT / Apache-2.0)
+</code></pre>
+
+<p>Modern variant with <code>pyproject.toml</code> (recommended 2025+):</p>
+
+<pre><code>my-cool-tool/
+├── src/
+│   └── mycooltool/
+│       ├── __init__.py
+│       └── __main__.py     # entry point: python -m mycooltool
+├── pyproject.toml
+├── README.md
+├── .gitignore
+└── LICENSE
+</code></pre>
+
+<div class="tip">
+  <strong>Quick start (2025–2026 style with uv):</strong><br>
+  <code>uv init my-cool-tool --bare</code><br>
+  <code>cd my-cool-tool</code><br>
+  <code>uv add typer rich</code>   <!-- for nice CLI -->
+</div>
+
+<h2>2. Small Package (publishable on PyPI)</h2>
+
+<p>Best for: reusable modules, tiny libraries</p>
+
+<pre><code>awesome-utils/
+├── src/
+│   └── awesome_utils/
+│       ├── __init__.py
+│       ├── core.py
+│       └── utils.py
+├── tests/
+│   ├── __init__.py
+│   └── test_utils.py
+├── pyproject.toml          # [build-system], [project], [tool.ruff], etc.
+├── README.md
+├── LICENSE
+├── .gitignore
+└── .github/workflows/      # (optional: ci.yml)
+</code></pre>
+
+<div class="tip">
+  Popular modern tools in <code>pyproject.toml</code>:<br>
+  • build backend: <code>hatchling</code> or <code>setuptools</code><br>
+  • lint/format: <code>ruff</code><br>
+  • test: <code>pytest</code><br>
+  • deps manager: <code>uv</code>, <code>pdm</code>, <code>poetry</code>
+</div>
+
+<h2>3. Beginner-Friendly GUI Project (Tkinter)</h2>
+
+<p>Good for: to-do apps, calculators, simple tools with interface</p>
+
+<pre><code>todo-app/
+├── main.py                 # Tkinter main file
+├── widgets.py              # custom widgets / frames (optional)
+├── style.py                # ttk styles / themes
+├── data/                   # json / pickle files
+├── requirements.txt
+├── README.md
+└── .gitignore
+</code></pre>
+
+<h2>4. Data Analysis / Jupyter Project</h2>
+
+<p>Best for: exploration, reports, small ML experiments</p>
+
+<pre><code>customer-churn-analysis/
+├── notebooks/
+│   ├── 01-exploration.ipynb
+│   └── 02-modeling.ipynb
+├── src/
+│   └── utils/
+│       ├── __init__.py
+│       └── data.py
+├── data/                   # .csv, .parquet (add to .gitignore if large)
+│   └── raw/
+├── requirements.txt
+├── README.md
+└── .gitignore
+</code></pre>
+
+<div class="warning">
+  <strong>Never commit large data files</strong> — use <code>.gitignore</code> + <code>data/raw/.gitkeep</code>
+</div>
+
+<h2>5. FastAPI / Web App Starter (2025 style)</h2>
+
+<pre><code>fastapi-todo/
+├── app/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── api/
+│   │   └── routes.py
+│   ├── models/
+│   └── schemas/
+├── tests/
+├── alembic/                # (if using SQLAlchemy + migrations)
+├── pyproject.toml
+├── README.md
+├── .env.example
+└── .gitignore
+</code></pre>
+
+<h2>Quick Comparison Table</h2>
+
+<table>
+  <tr>
+    <th>Type</th>
+    <th>Best For</th>
+    <th>Key Folder</th>
+    <th>Modern Dep Manager</th>
+    <th>Difficulty</th>
+  </tr>
+  <tr>
+    <td>Minimal script</td>
+    <td>Quick tools, automation</td>
+    <td>flat or <code>src/</code></td>
+    <td>uv / pdm</td>
+    <td>★☆☆</td>
+  </tr>
+  <tr>
+    <td>Small package</td>
+    <td>Reusable code, PyPI</td>
+    <td><code>src/</code> + <code>tests/</code></td>
+    <td>uv / poetry</td>
+    <td>★★☆</td>
+  </tr>
+  <tr>
+    <td>GUI (Tkinter)</td>
+    <td>Desktop apps</td>
+    <td>flat + <code>data/</code></td>
+    <td>uv</td>
+    <td>★★☆</td>
+  </tr>
+  <tr>
+    <td>Data / Jupyter</td>
+    <td>Analysis, ML prototypes</td>
+    <td><code>notebooks/</code> + <code>src/</code></td>
+    <td>uv / conda</td>
+    <td>★★★</td>
+  </tr>
+  <tr>
+    <td>FastAPI web</td>
+    <td>APIs, small web services</td>
+    <td><code>app/</code> modular</td>
+    <td>uv / pdm</td>
+    <td>★★★</td>
+  </tr>
+</table>
+
+<div class="tip">
+  <strong>Want zero-effort good structure?</strong><br>
+  Try one of these (install via pip / uv):<br>
+  • <code>uvx cookiecutter gh:tonysyu/cookiecutter-pypackage-minimal</code><br>
+  • <code>cookiecutter gh:drivendata/cookiecutter-data-science</code> (great for data)<br>
+  • <code>cookiecutter gh:py-cookiecutter/cookiecutter-fastapi-mongo</code> (API example)<br>
+  Or just <code>uv init --bare</code> and build from there.
+</div>
+
+<footer>
+  Keep building awesome things • Structure early = GLenn Junsay Pansensoy • Happy coding! 🐍✨
+</footer>
+
+</body>
+</html>
