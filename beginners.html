@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Python Beginners Guide</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-alt: #161b22;
+      --text: #c9d1d9;
+      --text-light: #8b949e;
+      --accent: #58a6ff;
+      --accent-dim: #388bfd;
+      --green: #3fb950;
+      --purple: #b083f0;
+      --orange: #ffa657;
+      --red: #f85149;
+      --border: #30363d;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      padding: 20px 30px;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 {
+      color: var(--accent);
+      margin: 1.4em 0 0.6em;
+    }
+
+    h1 {
+      text-align: center;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5em;
+      margin-bottom: 1em;
+    }
+
+    code, pre {
+      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    code {
+      padding: 0.2em 0.4em;
+      color: var(--orange);
+    }
+
+    pre {
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 1em 0;
+    }
+
+    .comment {
+      color: #6e7681;
+      font-style: italic;
+    }
+
+    .string   { color: #a5d6ff; }
+    .keyword  { color: #ff7b72; font-weight: bold; }
+    .number   { color: #ffa657; }
+    .function { color: #d2a8ff; }
+    .built-in { color: #79c0ff; }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+      color: var(--accent-dim);
+    }
+
+    .highlight {
+      background: rgba(88, 166, 255, 0.12);
+      padding: 0.1em 0.3em;
+      border-radius: 4px;
+    }
+
+    .tip {
+      background: rgba(63, 185, 80, 0.15);
+      border-left: 4px solid var(--green);
+      padding: 0.8rem 1.2rem;
+      margin: 1.2em 0;
+      border-radius: 4px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 16px; }
+      pre { font-size: 0.92rem; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>Python for Absolute Beginners</h1>
+
+<p style="text-align:center; color:var(--text-light);">
+  A quick, practical guide • 2025 edition • dark obsidian style
+</p>
+
+<div class="tip">
+  <strong>Quick start:</strong> You only need Python installed → <a href="https://www.python.org/downloads/" target="_blank">python.org</a><br>
+  Recommended editor (free): <strong>VS Code</strong> + Python extension
+</div>
+
+<h2>1. Your First Program</h2>
+
+<pre><code><span class="comment"># hello.py</span>
+print(<span class="string">"Hello, Python world!"</span>)
+print(<span class="string">"I'm learning Python in 2026 🎉"</span>)
+</code></pre>
+
+<p>How to run it:</p>
+<ol>
+  <li>Save as <code>hello.py</code></li>
+  <li>Open terminal / command prompt</li>
+  <li>Go to the folder: <code>cd path/to/folder</code></li>
+  <li>Run: <code>python hello.py</code>   <span style="color:var(--text-light);">(or <code>python3 hello.py</code> on some systems)</span></li>
+</ol>
+
+<h2>2. Variables & Data Types</h2>
+
+<pre><code>name = <span class="string">"Glenn"</span>              <span class="comment"># string (str)</span>
+age = 25                       <span class="comment"># integer (int)</span>
+height = 1.75                  <span class="comment"># float</span>
+is_learning = <span class="keyword">True</span>            <span class="comment"># boolean (bool)</span>
+
+print(name, age, height, is_learning)
+</code></pre>
+
+<h2>3. Basic Math</h2>
+
+<pre><code>a = 10
+b = 3
+
+print(a + b)    <span class="comment"># 13</span>
+print(a - b)    <span class="comment"># 7</span>
+print(a * b)    <span class="comment"># 30</span>
+print(a / b)    <span class="comment"># 3.333...</span>
+print(a // b)   <span class="comment"># 3   (integer division)</span>
+print(a % b)    <span class="comment"># 1   (remainder)</span>
+print(a ** 2)   <span class="comment"># 100 (power)</span>
+</code></pre>
+
+<h2>4. Getting Input from User</h2>
+
+<pre><code>name = input(<span class="string">"What is your name? "</span>)
+age = int(input(<span class="string">"How old are you? "</span>))
+
+print(<span class="string">f"Hello {name}! Next year you'll be {age + 1} 🎂"</span>)
+</code></pre>
+
+<h2>5. If / Else Conditions</h2>
+
+<pre><code>age = int(input(<span class="string">"Your age: "</span>))
+
+<span class="keyword">if</span> age >= 18:
+    print(<span class="string">"You can vote!"</span>)
+<span class="keyword">elif</span> age >= 13:
+    print(<span class="string">"You're a teenager 😎"</span>)
+<span class="keyword">else</span>:
+    print(<span class="string">"You're still young!"</span>)
+</code></pre>
+
+<h2>6. Lists (like arrays)</h2>
+
+<pre><code>fruits = [<span class="string">"apple"</span>, <span class="string">"banana"</span>, <span class="string">"mango"</span>, <span class="string">"kiwi"</span>]
+
+print(fruits[0])      <span class="comment"># apple</span>
+print(fruits[-1])     <span class="comment"># kiwi (last item)</span>
+
+fruits.append(<span class="string">"orange"</span>)
+fruits.pop(1)         <span class="comment"># removes banana</span>
+
+<span class="keyword">for</span> fruit <span class="keyword">in</span> fruits:
+    print(fruit)
+</code></pre>
+
+<h2>7. For & While Loops</h2>
+
+<pre><code><span class="comment"># For loop (most common)</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> range(5):
+    print(i)          <span class="comment"># 0 1 2 3 4</span>
+
+<span class="comment"># While loop</span>
+count = 0
+<span class="keyword">while</span> count < 3:
+    print(<span class="string">"Hello"</span>)
+    count += 1
+</code></pre>
+
+<h2>8. Simple Function</h2>
+
+<pre><code><span class="keyword">def</span> <span class="function">greet</span>(name, age=20):
+    <span class="keyword">return</span> <span class="string">f"Hi {name}! You are {age} years old."</span>
+
+print(greet(<span class="string">"Alex"</span>))
+print(greet(<span class="string">"Mia"</span>, 17))
+</code></pre>
+
+<div class="tip">
+  <strong>Next steps after basics:</strong><br>
+  → strings & formatting<br>
+  → dictionaries & sets<br>
+  → list comprehensions<br>
+  → files (read/write)<br>
+  → modules & <code>import</code><br>
+  → try / except (error handling)<br>
+  → libraries: random, math, datetime
+</div>
+
+<footer>
+  Glenn Junsay  Pansensoy• Keep coding! • 2026
+</footer>
+
+</body>
+</html>
