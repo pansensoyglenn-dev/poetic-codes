@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Python Hub| Professional Tutorial Portal</title>
+    <style>
+        :root {
+            --midnight-blue: #0a192f;
+            --obsidian-dark: #020c1b;
+            --obsidian-light: #1a2639;
+            --electric-blue: #64ffda;
+            --deep-blue: #112240;
+            --steel-blue: #2d3748;
+            --light-blue: #ccd6f6;
+            --gray-blue: #8892b0;
+            --glow-blue: #00bfff;
+            --success-green: #00ff88;
+            --error-red: #ff4d4d;
+            --warning-orange: #ffa500;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--obsidian-dark) 0%, var(--midnight-blue) 100%);
+            color: var(--light-blue);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.2rem;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(10, 25, 47, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-text {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--electric-blue), var(--glow-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .logo-text span {
+            color: var(--light-blue);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--gray-blue);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success-green);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (min-width: 768px) {
+            .logo-text { font-size: 1.6rem; }
+            .status-indicator { font-size: 0.85rem; }
+        }
+
+        /* Main Content */
+        .main { 
+            padding: 2rem 0; 
+            min-height: calc(100vh - 180px);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--light-blue), var(--electric-blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: var(--gray-blue);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .page-title { font-size: 2.8rem; }
+            .page-subtitle { font-size: 1.1rem; }
+        }
+
+        /* Progress Stats */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .stats-container { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .stat-card {
+            background: var(--obsidian-light);
+            border-radius: 12px;
+            padding: 1rem;
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--electric-blue);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--gray-blue);
+            margin-top: 0.3rem;
+        }
+
+        /* Grid System */
+        .sitemap-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .sitemap-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (min-width: 1024px) {
+            .sitemap-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .sitemap-card {
+            background: var(--obsidian-light);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sitemap-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--electric-blue), var(--glow-blue));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .sitemap-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(100, 255, 218, 0.3);
+        }
+
+        .sitemap-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            color: var(--electric-blue);
+            font-weight: 700;
+        }
+
+        .difficulty-badge {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .difficulty-beginner {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success-green);
+        }
+
+        .difficulty-intermediate {
+            background: rgba(255, 165, 0, 0.2);
+            color: var(--warning-orange);
+        }
+
+        .difficulty-advanced {
+            background: rgba(255, 77, 77, 0.2);
+            color: var(--error-red);
+        }
+
+        .lesson-list {
+            flex: 1;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-item {
+            background: rgba(17, 34, 64, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            transition: background 0.2s ease;
+        }
+
+        .lesson-item:hover {
+            background: rgba(17, 34, 64, 0.8);
+        }
+
+        @media (min-width: 480px) {
+            .lesson-item { 
+                flex-direction: row; 
+                align-items: center;
+                justify-content: space-between;
+            }
+        }
+
+        .lesson-content {
+            flex: 1;
+        }
+
+        .lesson-title {
+            color: var(--light-blue);
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .lesson-desc {
+            color: var(--gray-blue);
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .lesson-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: var(--gray-blue);
+            margin-top: 0.3rem;
+        }
+
+        .lesson-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .ask-button {
+            background: linear-gradient(135deg, var(--electric-blue), var(--glow-blue));
+            color: var(--obsidian-dark);
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .ask-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(100, 255, 218, 0.3);
+        }
+
+        .ask-button:active {
+            transform: scale(0.98);
+        }
+
+        @media (min-width: 480px) {
+            .ask-button { width: auto; }
+        }
+
+        .quiz-btn {
+            background: transparent;
+            color: var(--electric-blue);
+            border: 2px solid var(--electric-blue);
+            padding: 0.8rem;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: 600;
+            margin-top: auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-btn:hover {
+            background: var(--electric-blue);
+            color: var(--obsidian-dark);
+        }
+
+        /* AI Panel */
+        .ai-panel {
+            background: var(--obsidian-light);
+            border-radius: 12px;
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            margin-top: 2rem;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: rgba(100, 255, 218, 0.1);
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            color: var(--electric-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-content {
+            padding: 1.5rem;
+        }
+
+        .response-area {
+            background: rgba(17, 34, 64, 0.5);
+            border-radius: 8px;
+            padding: 1.2rem;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+
+        .response-area::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .response-area::-webkit-scrollbar-track {
+            background: rgba(17, 34, 64, 0.3);
+            border-radius: 4px;
+        }
+
+        .response-area::-webkit-scrollbar-thumb {
+            background: var(--electric-blue);
+            border-radius: 4px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        @media (min-width: 600px) {
+            .input-group { flex-direction: row; }
+        }
+
+        .custom-input {
+            flex: 1;
+            background: rgba(17, 34, 64, 0.5);
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            border-radius: 6px;
+            padding: 0.9rem;
+            color: var(--light-blue);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .custom-input:focus {
+            border-color: var(--electric-blue);
+        }
+
+        .custom-input::placeholder {
+            color: var(--gray-blue);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(2, 12, 27, 0.95);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--obsidian-light);
+            border-radius: 12px;
+            padding: 2rem;
+            width: 95%;
+            max-width: 600px;
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            color: var(--gray-blue);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--electric-blue);
+        }
+
+        .quiz-question {
+            font-size: 1.1rem;
+            color: var(--light-blue);
+            margin: 1.5rem 0;
+            line-height: 1.6;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin: 1.5rem 0;
+        }
+
+        .quiz-option {
+            background: rgba(17, 34, 64, 0.5);
+            border: 2px solid rgba(100, 255, 218, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .quiz-option:hover {
+            background: rgba(17, 34, 64, 0.8);
+            border-color: var(--electric-blue);
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: var(--success-green);
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255, 77, 77, 0.2);
+            border-color: var(--error-red);
+        }
+
+        .quiz-result {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .quiz-score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--electric-blue);
+            margin: 1rem 0;
+        }
+
+        .quiz-feedback {
+            font-size: 1.1rem;
+            color: var(--gray-blue);
+            margin-bottom: 2rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(10, 25, 47, 0.95);
+            border-top: 1px solid rgba(100, 255, 218, 0.1);
+            padding: 2rem 0;
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        .footer-text {
+            color: var(--gray-blue);
+            font-size: 0.85rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-link {
+            color: var(--electric-blue);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--glow-blue);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(100, 255, 218, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--electric-blue);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Quiz Modal -->
+    <div class="modal-overlay" id="quiz-modal">
+        <div class="modal-content">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <div id="quiz-container">
+                <h3 id="quiz-title" style="color: var(--electric-blue);">Section Quiz</h3>
+                <p id="quiz-progress" style="font-size: 0.85rem; margin-bottom: 1rem; color: var(--gray-blue);">Question 1 of 5</p>
+                <div class="quiz-question" id="question-text">Question will appear here</div>
+                <div class="quiz-options" id="options-container"></div>
+                <button id="next-question" class="ask-button" style="margin-top: 1rem; display: none;">Next Question</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-content">
+            <div class="logo">
+                <div class="logo-text">Python--Hub</div>
+            </div>
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span>Virtual Assistant Online</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <h1 class="page-title">Python Learning Path</h1>
+            <p class="page-subtitle">Master Python step by step. Interactive lessons with Virtual Assistance!</p>
+
+            <!-- Progress Stats -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <span class="stat-number" id="lessons-completed">0</span>
+                    <span class="stat-label">Lessons Completed</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="quizzes-taken">0</span>
+                    <span class="stat-label">Quizzes Taken</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="questions-asked">0</span>
+                    <span class="stat-label">Questions Asked</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">24</span>
+                    <span class="stat-label">Total Lessons</span>
+                </div>
+            </div>
+
+            <!-- Learning Modules Grid -->
+            <div class="sitemap-grid">
+                <!-- Module 1: Foundations -->
+                <div class="sitemap-card">
+                    <div class="card-header">
+                        <h2 class="card-title">01. Foundations</h2>
+                        <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    </div>
+                    <div class="lesson-list">
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Introduction to Python</h4>
+                                <p class="lesson-desc">What is Python and why learn it?</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 10 min</span>
+                                    <span>📚 Reading</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Introduction to Python">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Setting Up Python</h4>
+                                <p class="lesson-desc">Install Python and your first IDE</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 15 min</span>
+                                    <span>🔧 Setup</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Setting Up Python Environment">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Variables & Data Types</h4>
+                                <p class="lesson-desc">Strings, integers, floats, and booleans</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Variables and Data Types">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Basic Operations</h4>
+                                <p class="lesson-desc">Arithmetic, comparison, and logical operators</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 15 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Basic Operations">Ask</button>
+                        </div>
+                    </div>
+                    <button class="quiz-btn" onclick="startQuiz('foundations')">Start Foundations Quiz</button>
+                </div>
+
+                <!-- Module 2: Control Flow -->
+                <div class="sitemap-card">
+                    <div class="card-header">
+                        <h2 class="card-title">02. Control Flow</h2>
+                        <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                    </div>
+                    <div class="lesson-list">
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">If/Else Statements</h4>
+                                <p class="lesson-desc">Make decisions in your code</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python If/Else Statements">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Loops: For & While</h4>
+                                <p class="lesson-desc">Repeat code efficiently</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python For and While Loops">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Loop Control</h4>
+                                <p class="lesson-desc">Break, continue, and pass statements</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 15 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Loop Control Statements">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Nested Structures</h4>
+                                <p class="lesson-desc">Combining loops and conditionals</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Nested Loops and Conditionals">Ask</button>
+                        </div>
+                    </div>
+                    <button class="quiz-btn" onclick="startQuiz('control-flow')">Start Control Flow Quiz</button>
+                </div>
+
+                <!-- Module 3: Data Structures -->
+                <div class="sitemap-card">
+                    <div class="card-header">
+                        <h2 class="card-title">03. Data Structures</h2>
+                        <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    </div>
+                    <div class="lesson-list">
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Lists</h4>
+                                <p class="lesson-desc">Ordered, mutable collections</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Lists">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Tuples & Sets</h4>
+                                <p class="lesson-desc">Immutable sequences and unique collections</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Tuples and Sets">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Dictionaries</h4>
+                                <p class="lesson-desc">Key-value pairs and mappings</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Dictionaries">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">List Comprehensions</h4>
+                                <p class="lesson-desc">Create lists efficiently</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python List Comprehensions">Ask</button>
+                        </div>
+                    </div>
+                    <button class="quiz-btn" onclick="startQuiz('data-structures')">Start Data Structures Quiz</button>
+                </div>
+
+                <!-- Module 4: Functions -->
+                <div class="sitemap-card">
+                    <div class="card-header">
+                        <h2 class="card-title">04. Functions</h2>
+                        <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    </div>
+                    <div class="lesson-list">
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Defining Functions</h4>
+                                <p class="lesson-desc">Create reusable code blocks</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Function Definitions">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Parameters & Arguments</h4>
+                                <p class="lesson-desc">Default, positional, and keyword args</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Function Parameters and Arguments">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Lambda Functions</h4>
+                                <p class="lesson-desc">Anonymous single-expression functions</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 15 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Lambda Functions">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Scope & Closures</h4>
+                                <p class="lesson-desc">Variable visibility and nested functions</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Scope and Closures">Ask</button>
+                        </div>
+                    </div>
+                    <button class="quiz-btn" onclick="startQuiz('functions')">Start Functions Quiz</button>
+                </div>
+
+                <!-- Module 5: OOP -->
+                <div class="sitemap-card">
+                    <div class="card-header">
+                        <h2 class="card-title">05. Object-Oriented</h2>
+                        <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                    </div>
+                    <div class="lesson-list">
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Classes & Objects</h4>
+                                <p class="lesson-desc">Define custom data types</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 30 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Classes and Objects">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Inheritance</h4>
+                                <p class="lesson-desc">Extend and reuse classes</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Inheritance">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Encapsulation</h4>
+                                <p class="lesson-desc">Private attributes and methods</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Encapsulation">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Polymorphism</h4>
+                                <p class="lesson-desc">Method overriding and duck typing</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Polymorphism">Ask</button>
+                        </div>
+                    </div>
+                    <button class="quiz-btn" onclick="startQuiz('oop')">Start OOP Quiz</button>
+                </div>
+
+                <!-- Module 6: File Handling -->
+                <div class="sitemap-card">
+                    <div class="card-header">
+                        <h2 class="card-title">06. File Handling</h2>
+                        <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                    </div>
+                    <div class="lesson-list">
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Reading Files</h4>
+                                <p class="lesson-desc">Open and read text files</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Reading Files">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Writing Files</h4>
+                                <p class="lesson-desc">Create and modify files</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Writing Files">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">CSV & JSON</h4>
+                                <p class="lesson-desc">Work with structured data formats</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 25 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python CSV and JSON">Ask</button>
+                        </div>
+                        <div class="lesson-item">
+                            <div class="lesson-content">
+                                <h4 class="lesson-title">Exception Handling</h4>
+                                <p class="lesson-desc">Handle file errors gracefully</p>
+                                <div class="lesson-meta">
+                                    <span>⏱️ 20 min</span>
+                                    <span>💻 Coding</span>
+                                </div>
+                            </div>
+                            <button class="ask-button" data-topic="Python Exception Handling with Files">Ask</button>
+                        </div>
+                    </div>
+                    <button class="quiz-btn" onclick="startQuiz('file-handling')">Start File Handling Quiz</button>
+                </div>
+            </div>
+
+            <!-- AI Assistant Panel -->
+            <div class="ai-panel" id="assistant-section">
+                <div class="panel-header">
+                    <h3 class="panel-title">🤖 Virtual Learning Assistant</h3>
+                </div>
+                <div class="panel-content">
+                    <div id="response-area" class="response-area">
+                        👋 <strong>Welcome to Python Mastery!</strong><br><br>
+                        I'm your virtual assistant, ready to help you learn Python. Here's how to get started:<br><br>
+                        • Click <strong>"Ask"</strong> on any lesson to get a detailed explanation<br>
+                        • Type your own questions in the box below<br>
+                        • Take quizzes to test your knowledge<br><br>
+                        Select a lesson above or ask me anything about Python! 🐍
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="custom-question" class="custom-input" placeholder="Ask me anything about Python...">
+                        <button id="submit-question" class="ask-button">Send 📤</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="about.html" class="footer-link">About</a>
+                <a href="documentation.html" class="footer-link">Documentation</a>
+                <a href="about.html" class="footer-link">Community</a>
+                <a href="contact.html" class="footer-link">Support</a>
+            </div>
+            <p class="footer-text" style="margin-top: 1rem;">© 2026 Glenn Junsay Pansensoy | Python Mastery Learning Platform</p>
+        </div>
+    </footer>
+
+    <script>
+        // Quiz Database
+        const quizData = {
+            'foundations': [
+                {
+                    question: "What is Python primarily known for?",
+                    options: [
+                        "Being difficult to learn",
+                        "Readable and beginner-friendly syntax",
+                        "Only working on Windows",
+                        "Being the fastest programming language"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "Which of these is a valid variable name in Python?",
+                    options: ["2variable", "variable_name", "variable-name", "var name"],
+                    correct: 1
+                },
+                {
+                    question: "What data type is the value '42' (with quotes)?",
+                    options: ["Integer", "Float", "String", "Boolean"],
+                    correct: 2
+                },
+                {
+                    question: "Which operator is used for exponentiation in Python?",
+                    options: ["^", "**", "exp()", "pow"],
+                    correct: 1
+                },
+                {
+                    question: "What will be the output of: print(type(3.14))?",
+                    options: ["<class 'int'>", "<class 'float'>", "<class 'decimal'>", "<class 'number'>"],
+                    correct: 1
+                }
+            ],
+            'control-flow': [
+                {
+                    question: "What does the 'elif' keyword stand for?",
+                    options: ["Else loop if", "Else if", "Elif function", "End loop if"],
+                    correct: 1
+                },
+                {
+                    question: "Which loop is guaranteed to execute at least once?",
+                    options: ["for loop", "while loop", "Neither guarantees execution", "Both guarantee execution"],
+                    correct: 2
+                },
+                {
+                    question: "What does the 'break' statement do?",
+                    options: [
+                        "Skips the current iteration",
+                        "Exits the loop entirely",
+                        "Pauses the loop",
+                        "Restarts the loop"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "What will this code print? for i in range(3): print(i)",
+                    options: ["1 2 3", "0 1 2", "0 1 2 3", "1 2"],
+                    correct: 1
+                },
+                {
+                    question: "What does 'continue' do in a loop?",
+                    options: [
+                        "Exits the loop",
+                        "Skips to the next iteration",
+                        "Breaks the loop",
+                        "Does nothing"
+                    ],
+                    correct: 1
+                }
+            ],
+            'data-structures': [
+                {
+                    question: "Which data structure is ordered and mutable?",
+                    options: ["Tuple", "Set", "List", "String"],
+                    correct: 2
+                },
+                {
+                    question: "How do you access the value with key 'name' in a dictionary?",
+                    options: ["dict.name", "dict['name']", "dict(name)", "dict->name"],
+                    correct: 1
+                },
+                {
+                    question: "What makes a set different from a list?",
+                    options: [
+                        "Sets are ordered",
+                        "Sets allow duplicates",
+                        "Sets only store unique values",
+                        "Sets are immutable"
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "Which syntax creates a list comprehension?",
+                    options: [
+                        "{x for x in range(5)}",
+                        "[x for x in range(5)]",
+                        "(x for x in range(5))",
+                        "list(x for x in range(5))"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "What is the result of: len([1, 2, 3, 4, 5])?",
+                    options: ["4", "5", "6", "Error"],
+                    correct: 1
+                }
+            ],
+            'functions': [
+                {
+                    question: "What keyword is used to define a function?",
+                    options: ["function", "def", "func", "define"],
+                    correct: 1
+                },
+                {
+                    question: "What does a function return if no return statement is specified?",
+                    options: ["0", "Empty string", "None", "Error"],
+                    correct: 2
+                },
+                {
+                    question: "Which is the correct syntax for a lambda function?",
+                    options: [
+                        "lambda x: x + 1",
+                        "def lambda(x): return x + 1",
+                        "lambda(x) { return x + 1 }",
+                        "x => x + 1"
+                    ],
+                    correct: 0
+                },
+                {
+                    question: "What is variable scope?",
+                    options: [
+                        "The size of a variable",
+                        "Where a variable can be accessed",
+                        "The type of a variable",
+                        "The speed of a variable"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "What are *args used for in function parameters?",
+                    options: [
+                        "Keyword arguments",
+                        "Variable number of positional arguments",
+                        "Optional arguments",
+                        "Default arguments"
+                    ],
+                    correct: 1
+                }
+            ],
+            'oop': [
+                {
+                    question: "What is a class in Python?",
+                    options: [
+                        "A type of variable",
+                        "A blueprint for creating objects",
+                        "A function",
+                        "A loop structure"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "What is the purpose of the __init__ method?",
+                    options: [
+                        "To delete an object",
+                        "To initialize object attributes",
+                        "To print an object",
+                        "To compare objects"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "What does inheritance allow you to do?",
+                    options: [
+                        "Create multiple objects",
+                        "Reuse code from parent classes",
+                        "Delete classes",
+                        "Import modules"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "What does polymorphism mean in OOP?",
+                    options: [
+                        "Having multiple classes",
+                        "Different classes can be used interchangeably",
+                        "Classes inherit from multiple parents",
+                        "Objects can change type"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "How do you make an attribute private in Python?",
+                    options: [
+                        "Start with single underscore _",
+                        "Start with double underscore __",
+                        "Use the private keyword",
+                        "Put it in a private block"
+                    ],
+                    correct: 1
+                }
+            ],
+            'file-handling': [
+                {
+                    question: "Which mode opens a file for reading?",
+                    options: ["'w'", "'r'", "'a'", "'x'"],
+                    correct: 1
+                },
+                {
+                    question: "What does 'with open()' ensure?",
+                    options: [
+                        "File is created",
+                        "File is automatically closed",
+                        "File is deleted",
+                        "File is copied"
+                    ],
+                    correct: 1
+                },
+                {
+                    question: "Which module is used to work with JSON in Python?",
+                    options: ["csv", "json", "file", "data"],
+                    correct: 1
+                },
+                {
+                    question: "What does 'a' mode do when opening a file?",
+                    options: [
+                        "Reads the file",
+                        "Overwrites the file",
+                        "Appends to the file",
+                        "Deletes the file"
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "Which exception is raised when a file is not found?",
+                    options: ["IOError", "FileError", "FileNotFoundError", "PathError"],
+                    correct: 2
+                }
+            ]
+        };
+
+        // Learning Content Database
+        const learningContent = {
+            "Introduction to Python": `
+                <strong>🐍 Welcome to Python!</strong><br><br>
+                Python is a high-level, interpreted programming language known for its simplicity and readability.<br><br>
+                <strong>Why Learn Python?</strong><br>
+                • Easy to learn and read<br>
+                • Versatile (web, data science, AI, automation)<br>
+                • Huge community and libraries<br>
+                • High demand in job market<br><br>
+                <strong>Example:</strong><br>
+                <code>print("Hello, World!")</code><br><br>
+                Python emphasizes code readability and allows you to express concepts in fewer lines than languages like Java or C++.
+            `,
+            "Setting Up Python Environment": `
+                <strong>🔧 Setting Up Python</strong><br><br>
+                <strong>Step 1: Download Python</strong><br>
+                Visit python.org and download the latest version for your OS.<br><br>
+                <strong>Step 2: Install an IDE</strong><br>
+                Popular choices:<br>
+                • VS Code (Recommended for beginners)<br>
+                • PyCharm<br>
+                • Jupyter Notebook<br><br>
+                <strong>Step 3: Verify Installation</strong><br>
+                Open terminal/command prompt and type:<br>
+                <code>python --version</code><br><br>
+                You're ready to start coding! 🚀
+            `,
+            "Python Variables and Data Types": `
+                <strong>📦 Variables & Data Types</strong><br><br>
+                Variables are containers for storing data. In Python, you don't need to declare their type!<br><br>
+                <strong>Basic Data Types:</strong><br>
+                • <strong>int</strong>: Whole numbers → <code>age = 25</code><br>
+                • <strong>float</strong>: Decimals → <code>price = 19.99</code><br>
+                • <strong>str</strong>: Text → <code>name = "Alice"</code><br>
+                • <strong>bool</strong>: True/False → <code>is_active = True</code><br><br>
+                <strong>Example:</strong><br>
+                <code>
+                name = "Python"<br>
+                version = 3.12<br>
+                is_cool = True<br>
+                print(f"{name} {version} is cool: {is_cool}")
+                </code>
+            `,
+            "Python Basic Operations": `
+                <strong>➗ Basic Operations</strong><br><br>
+                <strong>Arithmetic:</strong><br>
+                • Addition: <code>5 + 3 = 8</code><br>
+                • Subtraction: <code>10 - 4 = 6</code><br>
+                • Multiplication: <code>6 * 7 = 42</code><br>
+                • Division: <code>15 / 3 = 5.0</code><br>
+                • Floor Division: <code>15 // 4 = 3</code><br>
+                • Modulus: <code>17 % 5 = 2</code><br>
+                • Exponent: <code>2 ** 3 = 8</code><br><br>
+                <strong>Comparison:</strong><br>
+                <code>==, !=, >, <, >=, <=</code><br><br>
+                <strong>Logical:</strong><br>
+                <code>and, or, not</code>
+            `
+        };
+
+        // State Management
+        let stats = {
+            lessonsCompleted: 0,
+            quizzesTaken: 0,
+            questionsAsked: 0
+        };
+
+        let currentQuiz = null;
+        let currentQuestionIndex = 0;
+        let quizScore = 0;
+        let selectedAnswer = null;
+
+        // DOM Elements
+        const responseArea = document.getElementById('response-area');
+        const customQuestion = document.getElementById('custom-question');
+        const submitButton = document.getElementById('submit-question');
+        const quizModal = document.getElementById('quiz-modal');
+        const closeModal = document.getElementById('close-modal');
+
+        // Event Listeners
+        document.querySelectorAll('.ask-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const topic = this.getAttribute('data-topic');
+                showLearningContent(topic);
+                stats.questionsAsked++;
+                updateStats();
+            });
+        });
+
+        submitButton.addEventListener('click', handleCustomQuestion);
+        customQuestion.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleCustomQuestion();
+        });
+
+        closeModal.addEventListener('click', closeQuizModal);
+        quizModal.addEventListener('click', function(e) {
+            if (e.target === quizModal) closeQuizModal();
+        });
+
+        // Functions
+        function showLearningContent(topic) {
+            const content = learningContent[topic];
+            if (content) {
+                responseArea.innerHTML = content;
+            } else {
+                responseArea.innerHTML = `
+                    <strong>📚 ${topic}</strong><br><br>
+                    This is a comprehensive lesson on ${topic}. Here are the key concepts you'll learn:<br><br>
+                    • Core principles and syntax<br>
+                    • Practical examples<br>
+                    • Common use cases<br>
+                    • Best practices<br><br>
+                    Ask me specific questions to dive deeper into any aspect!
+                `;
+            }
+            responseArea.scrollTop = 0;
+            document.getElementById('assistant-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function handleCustomQuestion() {
+            const question = customQuestion.value.trim();
+            if (!question) return;
+
+            responseArea.innerHTML = `<div class="loading"></div> Thinking...`;
+            
+            setTimeout(() => {
+                responseArea.innerHTML = `
+                    <strong>💡 Great question!</strong><br><br>
+                    You asked: "<em>${question}</em>"<br><br>
+                    Here's what I can tell you:<br><br>
+                    This is where I would provide a detailed, virtual-generated response based on your question. 
+                    Since this is a demo, I'm showing this placeholder response.<br><br>
+                    In a full implementation, this would connect to an actual virtual service to provide 
+                    personalized learning assistance!<br><br>
+                    Keep asking questions - that's how you learn! 🚀
+                `;
+                customQuestion.value = '';
+                stats.questionsAsked++;
+                updateStats();
+            }, 1000);
+        }
+
+        function startQuiz(section) {
+            if (!quizData[section]) {
+                alert('Quiz coming soon!');
+                return;
+            }
+
+            currentQuiz = quizData[section];
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            selectedAnswer = null;
+
+            showQuestion();
+            quizModal.classList.add('active');
+            stats.quizzesTaken++;
+            updateStats();
+        }
+
+        function showQuestion() {
+            const question = currentQuiz[currentQuestionIndex];
+            const nextBtn = document.getElementById('next-question');
+
+            document.getElementById('quiz-title').textContent = 'Python Quiz';
+            document.getElementById('quiz-progress').textContent = 
+                `Question ${currentQuestionIndex + 1} of ${currentQuiz.length}`;
+            document.getElementById('question-text').textContent = question.question;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'quiz-option';
+                optionDiv.textContent = option;
+                optionDiv.onclick = () => selectAnswer(index, optionDiv);
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            nextBtn.style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        function selectAnswer(index, element) {
+            if (selectedAnswer !== null) return;
+
+            selectedAnswer = index;
+            const question = currentQuiz[currentQuestionIndex];
+            const options = document.querySelectorAll('.quiz-option');
+            const nextBtn = document.getElementById('next-question');
+
+            options.forEach(opt => opt.style.pointerEvents = 'none');
+
+            if (index === question.correct) {
+                element.classList.add('correct');
+                quizScore++;
+            } else {
+                element.classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+            }
+
+            nextBtn.style.display = 'block';
+            nextBtn.onclick = nextQuestion;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuiz.length) {
+                showQuestion();
+            } else {
+                showQuizResults();
+            }
+        }
+
+        function showQuizResults() {
+            const percentage = Math.round((quizScore / currentQuiz.length) * 100);
+            let feedback = '';
+
+            if (percentage >= 80) {
+                feedback = '🎉 Excellent work! You really know your stuff!';
+            } else if (percentage >= 60) {
+                feedback = '👍 Good job! Keep practicing to master this topic.';
+            } else {
+                feedback = '📚 Keep studying! Review the lessons and try again.';
+            }
+
+            document.getElementById('quiz-container').innerHTML = `
+                <div class="quiz-result">
+                    <h3 style="color: var(--electric-blue);">Quiz Complete!</h3>
+                    <div class="quiz-score">${quizScore}/${currentQuiz.length}</div>
+                    <div class="quiz-score" style="font-size: 2rem;">${percentage}%</div>
+                    <div class="quiz-feedback">${feedback}</div>
+                    <button class="ask-button" onclick="closeQuizModal()">Close</button>
+                </div>
+            `;
+        }
+
+        function closeQuizModal() {
+            quizModal.classList.remove('active');
+        }
+
+        function updateStats() {
+            document.getElementById('lessons-completed').textContent = stats.lessonsCompleted;
+            document.getElementById('quizzes-taken').textContent = stats.quizzesTaken;
+            document.getElementById('questions-asked').textContent = stats.questionsAsked;
+        }
+
+        // Initialize
+        updateStats();
+    </script>
+</body>
+</html>
