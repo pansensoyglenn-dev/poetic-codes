@@ -1,0 +1,2778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Python Functions | Poetic Codes - Complete Guide with Examples</title>
+    <meta name="description" content="Master Python functions with our comprehensive guide. Learn function fundamentals, decorators, lambda expressions, scope, closures, and best practices with interactive examples.">
+    <meta name="keywords" content="Python functions, Python programming, Python tutorials, lambda functions, Python decorators, function scope, Python best practices">
+    <meta name="author" content="Glenn Junsay Pansensoy">
+    
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta property="og:title" content="Master Python Functions - Complete Guide | Poetic Codes">
+    <meta property="og:description" content="Comprehensive Python functions tutorial with interactive examples and AI-powered social sharing.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://pansensoyglenn-dev.github.io/poetic-codes/python-functions.html">
+    <meta property="og:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-functions.html-og.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Python Functions Mastery">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:site_name" content="Poetic Codes">
+    <meta property="article:published_time" content="2026-01-15T00:00:00+00:00">
+    <meta property="article:modified_time" content="2026-01-20T00:00:00+00:00">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Master Python Functions - Complete Guide | Poetic Codes">
+    <meta name="twitter:description" content="Comprehensive Python functions tutorial with interactive examples and AI-powered social sharing.">
+    <meta name="twitter:image" content="https://pansensoyglenn-dev.github.io/poetic-codes/images/python-functions.html-twitter.jpg">
+    <meta name="twitter:creator" content="@poeticcodes">
+    <meta name="twitter:site" content="@poeticcodes">
+    <link rel="canonical" href="https://pansensoyglenn-dev.github.io/poetic-codes/python-functions.html">
+    <meta name="theme-color" content="#0b0e14">
+    <meta name="msapplication-TileColor" content="#0b0e14">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --obsidian: #0b0e14;
+            --midnight-blue: #10172a;
+            --electric-blue: #38bdf8;
+            --neon-green: #50fa7b;
+            --slate-gray: #94a3b8;
+            --text-light: #f1f5f9;
+            --accent: #1e293b;
+            --purple-accent: #bd93f9;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--text-light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* NEW: Progress Indicator */
+        .progress-container {
+            position: fixed;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: transparent;
+            z-index: 999;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-green), var(--electric-blue));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* NEW: Breadcrumb Navigation */
+        .breadcrumb {
+            background: rgba(30, 41, 59, 0.7);
+            padding: 1rem 5%;
+            border-bottom: 1px solid var(--accent);
+        }
+
+        .breadcrumb ol {
+            display: flex;
+            list-style: none;
+            gap: 0.5rem;
+            color: var(--slate-gray);
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a {
+            color: var(--electric-blue);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .breadcrumb a:hover {
+            color: var(--neon-green);
+        }
+
+        .breadcrumb li:not(:last-child)::after {
+            content: "›";
+            margin-left: 0.5rem;
+            color: var(--slate-gray);
+        }
+
+        /* Header Navigation with Hamburger on Top Right */
+        header {
+            background-color: rgba(16, 23, 42, 0.95);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--accent);
+            backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: var(--electric-blue);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1001;
+        }
+
+        .logo i {
+            color: var(--neon-green);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-light);
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 500;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon-green);
+            transition: var(--transition);
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Hamburger positioned top right */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 5px;
+            position: absolute;
+            right: 5%;
+            top: 1.5rem;
+            z-index: 1002;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background-color: var(--electric-blue);
+            transition: var(--transition);
+            border-radius: 2px;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(8px, 8px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(6px, -6px);
+        }
+
+        /* Mobile Menu - Now with interactive buttons */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            nav {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                background: var(--midnight-blue);
+                width: 85%;
+                max-width: 350px;
+                height: 100vh;
+                transition: var(--transition);
+                border-left: 1px solid var(--accent);
+                overflow-y: auto;
+                box-shadow: -5px 0 20px rgba(0,0,0,0.3);
+                z-index: 1000;
+                padding-top: 80px;
+            }
+
+            nav.active {
+                right: 0;
+            }
+
+            nav ul {
+                flex-direction: column;
+                padding: 1rem 2rem;
+                gap: 0;
+            }
+
+            nav ul li {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            /* Interactive menu buttons */
+            nav a {
+                display: block;
+                padding: 1rem 1.5rem;
+                background: var(--accent);
+                border-radius: 12px;
+                border: 1px solid rgba(56, 189, 248, 0.2);
+                transition: var(--transition);
+                text-align: left;
+                position: relative;
+                overflow: hidden;
+            }
+
+            nav a::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(56, 189, 248, 0.2), transparent);
+                transition: var(--transition);
+            }
+
+            nav a:hover::before {
+                left: 100%;
+            }
+
+            nav a:hover {
+                background: var(--midnight-blue);
+                border-color: var(--electric-blue);
+                transform: translateX(5px);
+                box-shadow: 0 5px 15px rgba(56, 189, 248, 0.2);
+            }
+
+            nav a::after {
+                display: none;
+            }
+
+            nav a i {
+                margin-right: 10px;
+                color: var(--neon-green);
+            }
+
+            .nav-container {
+                width: 100%;
+            }
+        }
+
+        /* NEW: Table of Contents Sidebar */
+        .toc-container {
+            position: fixed;
+            left: 20px;
+            top: 150px;
+            width: 280px;
+            background: rgba(30, 41, 59, 0.95);
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            padding: 1.5rem;
+            display: none;
+            z-index: 999;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        @media (min-width: 1200px) {
+            .toc-container {
+                display: block;
+            }
+        }
+
+        .toc-header {
+            color: var(--electric-blue);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toc-list {
+            list-style: none;
+        }
+
+        .toc-list li {
+            margin-bottom: 0.8rem;
+            position: relative;
+            padding-left: 1.2rem;
+        }
+
+        .toc-list li::before {
+            content: "▸";
+            color: var(--neon-green);
+            position: absolute;
+            left: 0;
+            font-size: 0.8rem;
+        }
+
+        .toc-list a {
+            color: var(--slate-gray);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .toc-list a:hover {
+            color: var(--electric-blue);
+            padding-left: 5px;
+        }
+
+        .toc-list .toc-sub {
+            list-style: none;
+            margin-top: 0.5rem;
+            margin-left: 1rem;
+            padding-left: 0;
+        }
+
+        .toc-list .toc-sub li::before {
+            content: "•";
+            color: var(--purple-accent);
+        }
+
+        /* Explanation styles */
+        .code-explanation {
+            background: rgba(30, 41, 59, 0.7);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--neon-green);
+        }
+        
+        .code-explanation h4 {
+            color: var(--electric-blue);
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .code-explanation p {
+            color: var(--slate-gray);
+            line-height: 1.7;
+        }
+        
+        .explanation-points {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        .explanation-points li {
+            color: var(--slate-gray);
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+        
+        .explanation-points li:before {
+            content: "▸";
+            color: var(--neon-green);
+            position: absolute;
+            left: -1rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--midnight-blue);
+            padding: 2.5rem;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--electric-blue);
+            position: relative;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            color: var(--neon-green);
+        }
+
+        .modal h3 {
+            color: var(--electric-blue);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .modal-input {
+            padding: 1rem;
+            background: var(--obsidian);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--electric-blue);
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, var(--neon-green), #2ecc71);
+            color: var(--obsidian);
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            margin-top: 1rem;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(80, 250, 123, 0.3);
+        }
+
+        .modal-message {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 8px;
+            background: rgba(80, 250, 123, 0.1);
+            border: 1px solid var(--neon-green);
+        }
+
+        /* Legal Modal */
+        .legal-modal-content {
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .legal-section-modal {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--accent);
+        }
+
+        .legal-section-modal h4 {
+            color: var(--electric-blue);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legal-section-modal p {
+            color: var(--slate-gray);
+            line-height: 1.8;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--midnight-blue), var(--obsidian));
+            padding: 6rem 5% 4rem;
+            text-align: center;
+            border-bottom: 1px solid var(--accent);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, var(--electric-blue), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--slate-gray);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            animation: fadeIn 1.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            max-width: 600px;
+            margin: 3rem auto 0;
+        }
+
+        .stat-card {
+            background: var(--accent);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--electric-blue);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            color: var(--neon-green);
+            font-weight: 800;
+        }
+
+        .stat-label {
+            color: var(--slate-gray);
+            margin-top: 0.5rem;
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 4rem 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .content-section h2 {
+            font-size: 2.5rem;
+            color: var(--electric-blue);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .content-section h3 {
+            font-size: 1.8rem;
+            color: var(--neon-green);
+            margin: 2.5rem 0 1.5rem;
+        }
+
+        .content-section p {
+            color: var(--slate-gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        /* Code Blocks with Run Button */
+        .code-wrapper {
+            position: relative;
+            margin: 2rem 0;
+        }
+
+        .code-header {
+            background: var(--accent);
+            padding: 0.75rem 1rem;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-bottom: none;
+        }
+
+        .code-title {
+            color: var(--electric-blue);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        pre {
+            background-color: var(--midnight-blue);
+            padding: 1.5rem;
+            border-radius: 0 0 8px 8px;
+            overflow-x: auto;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-top: none;
+            position: relative;
+        }
+
+        code {
+            color: var(--neon-green);
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .run-btn, .copy-btn {
+            background: var(--electric-blue);
+            color: var(--obsidian);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .run-btn:hover, .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(56, 189, 248, 0.3);
+        }
+
+        .run-btn {
+            background: var(--neon-green);
+        }
+
+        .run-btn:hover {
+            box-shadow: 0 5px 15px rgba(80, 250, 123, 0.3);
+        }
+
+        .output-box {
+            background: var(--obsidian);
+            border: 1px solid rgba(80, 250, 123, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .output-box.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .output-label {
+            color: var(--neon-green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .output-content {
+            color: var(--text-light);
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            background: var(--midnight-blue);
+            padding: 1rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--neon-green);
+        }
+
+        /* Feature Grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: var(--accent);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--electric-blue);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            color: var(--electric-blue);
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .feature-card p {
+            color: var(--slate-gray);
+        }
+
+        /* Interactive Demo */
+        .interactive-demo {
+            background: var(--accent);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            margin: 2rem 0;
+        }
+
+        .demo-controls {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .demo-input, .demo-select {
+            padding: 1rem;
+            background: var(--obsidian);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .demo-input:focus, .demo-select:focus {
+            outline: none;
+            border-color: var(--electric-blue);
+        }
+
+        .demo-btn {
+            background: var(--neon-green);
+            color: var(--obsidian);
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(80, 250, 123, 0.3);
+        }
+
+        .demo-output {
+            background: var(--obsidian);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--neon-green);
+            min-height: 60px;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Newsletter Section */
+        .newsletter-section {
+            background: linear-gradient(135deg, var(--midnight-blue), var(--accent));
+            padding: 4rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(56, 189, 248, 0.2);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .newsletter-section h2 {
+            color: var(--electric-blue);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .newsletter-section p {
+            color: var(--slate-gray);
+            margin-bottom: 2rem;
+        }
+
+        .newsletter-form {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .newsletter-input {
+            padding: 1rem;
+            background: var(--obsidian);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            border-color: var(--electric-blue);
+        }
+
+        .newsletter-btn {
+            background: var(--neon-green);
+            color: var(--obsidian);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .newsletter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(80, 250, 123, 0.3);
+        }
+
+        /* Social Sharing Section */
+        .social-sharing {
+            background: var(--accent);
+            padding: 3rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(56, 189, 248, 0.2);
+        }
+
+        .social-sharing h3 {
+            color: var(--electric-blue);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .social-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: white;
+        }
+
+        .social-btn.twitter {
+            background: #1DA1F2;
+        }
+
+        .social-btn.linkedin {
+            background: #0A66C2;
+        }
+
+        .social-btn.facebook {
+            background: #1877F2;
+        }
+
+        .social-btn.email {
+            background: var(--purple-accent);
+        }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* NEW: Professional Footer */
+        footer {
+            background-color: var(--midnight-blue);
+            padding: 4rem 5% 2rem;
+            border-top: 2px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent 60%, rgba(56, 189, 248, 0.05) 100%);
+            pointer-events: none;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto 3rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-section h3 {
+            color: var(--electric-blue);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+
+        .footer-section h3::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--neon-green);
+        }
+
+        .footer-section p, .footer-section a {
+            color: var(--slate-gray);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.8rem;
+            transition: var(--transition);
+            line-height: 1.6;
+        }
+
+        .footer-section a:hover {
+            color: var(--neon-green);
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--accent);
+            color: var(--slate-gray);
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 1.5rem 0;
+        }
+
+        .footer-links a {
+            color: var(--slate-gray);
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .footer-links a::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--electric-blue);
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        .footer-links a:hover {
+            color: var(--electric-blue);
+        }
+
+        .copyright {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* NEW: FAQ Section */
+        .faq-section {
+            background: var(--midnight-blue);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 3rem 0;
+            border: 1px solid var(--accent);
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+            padding-bottom: 1.5rem;
+        }
+
+        .faq-question {
+            color: var(--electric-blue);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+
+        .faq-question i {
+            transition: var(--transition);
+        }
+
+        .faq-answer {
+            color: var(--slate-gray);
+            max-height: 0;
+            overflow: hidden;
+            transition: var(--transition);
+            line-height: 1.7;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            margin-top: 1rem;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        /* NEW: Quiz Section */
+        .quiz-section {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), rgba(80, 250, 123, 0.1));
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+            border: 1px solid var(--electric-blue);
+        }
+
+        .quiz-question {
+            color: var(--electric-blue);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .quiz-option {
+            background: var(--obsidian);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--accent);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .quiz-option:hover {
+            border-color: var(--electric-blue);
+            transform: translateX(5px);
+        }
+
+        .quiz-option.selected {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: var(--electric-blue);
+        }
+
+        .quiz-option.correct {
+            background: rgba(80, 250, 123, 0.2);
+            border-color: var(--neon-green);
+        }
+
+        .quiz-option.incorrect {
+            background: rgba(255, 121, 198, 0.2);
+            border-color: #ff79c6;
+        }
+
+        .quiz-result {
+            display: none;
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+
+        .quiz-result.success {
+            background: rgba(80, 250, 123, 0.1);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+        }
+
+        .quiz-result.error {
+            background: rgba(255, 121, 198, 0.1);
+            border: 1px solid #ff79c6;
+            color: #ff79c6;
+        }
+
+        /* NEW: Certification Badge */
+        .certification-badge {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(135deg, var(--midnight-blue), var(--accent));
+            border-radius: 12px;
+            margin: 3rem 0;
+            border: 2px solid var(--neon-green);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .certification-badge::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(80, 250, 123, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .badge-icon {
+            font-size: 4rem;
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge-title {
+            color: var(--electric-blue);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .badge-desc {
+            color: var(--slate-gray);
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* NEW: Related Resources */
+        .related-resources {
+            margin: 3rem 0;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .resource-card {
+            background: var(--accent);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            transition: var(--transition);
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--electric-blue);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.2);
+        }
+
+        .resource-icon {
+            font-size: 2rem;
+            color: var(--neon-green);
+            margin-bottom: 1rem;
+        }
+
+        .resource-card h4 {
+            color: var(--electric-blue);
+            margin-bottom: 1rem;
+        }
+
+        .resource-link {
+            display: inline-block;
+            color: var(--purple-accent);
+            text-decoration: none;
+            margin-top: 1rem;
+            font-weight: 600;
+        }
+
+        .resource-link:hover {
+            text-decoration: underline;
+        }
+
+        /* NEW: Downloadable Cheatsheet */
+        .cheatsheet-section {
+            background: linear-gradient(135deg, rgba(189, 147, 249, 0.1), rgba(56, 189, 248, 0.1));
+            border-radius: 12px;
+            padding: 2.5rem;
+            margin: 3rem 0;
+            border: 1px solid var(--purple-accent);
+            text-align: center;
+        }
+
+        .cheatsheet-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--purple-accent);
+            color: var(--obsidian);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(189, 147, 249, 0.3);
+        }
+
+        /* NEW: Author Bio */
+        .author-bio {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            background: rgba(30, 41, 59, 0.7);
+            padding: 2rem;
+            border-radius: 12px;
+            margin: 3rem 0;
+            border: 1px solid var(--accent);
+        }
+
+        .author-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--electric-blue), var(--purple-accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--obsidian);
+            flex-shrink: 0;
+        }
+
+        .author-info h4 {
+            color: var(--electric-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .author-info p {
+            color: var(--slate-gray);
+            margin-bottom: 1rem;
+        }
+
+        .author-social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .author-social a {
+            color: var(--slate-gray);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .author-social a:hover {
+            color: var(--neon-green);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero p {
+                font-size: 1rem;
+            }
+
+            .content-section h2 {
+                font-size: 2rem;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .code-actions {
+                flex-direction: column;
+            }
+
+            .toc-container {
+                display: none;
+            }
+
+            .author-bio {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Table of Contents -->
+    <aside class="toc-container">
+        <h3 class="toc-header"><i class="fas fa-list"></i> Table of Contents</h3>
+        <ul class="toc-list">
+            <li><a href="#home">Introduction</a></li>
+            <li><a href="#basics">Function Fundamentals</a>
+                <ul class="toc-sub">
+                    <li><a href="#basics">Basic Syntax</a></li>
+                    <li><a href="#basics">Parameters</a></li>
+                    <li><a href="#basics">Default Parameters</a></li>
+                </ul>
+            </li>
+            <li><a href="#advanced">Advanced Concepts</a>
+                <ul class="toc-sub">
+                    <li><a href="#advanced">Lambda Functions</a></li>
+                    <li><a href="#advanced">Decorators</a></li>
+                    <li><a href="#advanced">*args & **kwargs</a></li>
+                </ul>
+            </li>
+            <li><a href="#examples">Practical Examples</a></li>
+            <li><a href="#quiz">Knowledge Check</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#resources">Additional Resources</a></li>
+        </ul>
+    </aside>
+
+    <!-- Breadcrumb Navigation -->
+    <nav class="breadcrumb">
+        <ol>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Tutorials</a></li>
+            <li><a href="#">Python</a></li>
+            <li>Functions Masterclass</li>
+        </ol>
+    </nav>
+
+    <!-- Newsletter Modal -->
+    <div id="newsletterModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('newsletterModal')">&times;</button>
+            <h3><i class="fas fa-envelope"></i> Join Our Newsletter</h3>
+            <form id="newsletterForm" class="modal-form">
+                <input type="text" class="modal-input" placeholder="Your Name" required>
+                <input type="email" class="modal-input" placeholder="Your Email" required>
+                <button type="submit" class="modal-btn">
+                    <i class="fas fa-paper-plane"></i> Subscribe Now
+                </button>
+            </form>
+            <div id="newsletterMessage" class="modal-message"></div>
+        </div>
+    </div>
+
+    <!-- Legal Modal -->
+    <div id="legalModal" class="modal">
+        <div class="modal-content legal-modal-content">
+            <button class="modal-close" onclick="closeModal('legalModal')">&times;</button>
+            <h3><i class="fas fa-balance-scale"></i> Legal Information</h3>
+            
+            <div class="legal-section-modal">
+                <h4><i class="fas fa-shield-alt"></i> Privacy Policy</h4>
+                <p>We value your privacy. Any information collected through our newsletter is used solely for sending updates and educational content. We never share your data with third parties.</p>
+            </div>
+
+            <div class="legal-section-modal">
+                <h4><i class="fas fa-file-contract"></i> Terms of Service</h4>
+                <p>By using this website, you agree to use the provided code examples and tutorials for educational purposes. All content is provided "as is" without warranties.</p>
+            </div>
+
+            <div class="legal-section-modal">
+                <h4><i class="fas fa-copyright"></i> Copyright Notice</h4>
+                <p>&copy; 2026 Poetic Codes. All code examples are provided under MIT License unless otherwise specified. You are free to use, modify, and distribute the code.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header with Hamburger on Top Right -->
+    <header>
+        <div class="logo">
+            <i class="fas fa-code"></i>
+            POETIC CODES
+        </div>
+        <div class="nav-container">
+            <nav id="navMenu">
+                <ul>
+                    <li><a href="#home"><i class="fas fa-home"></i>Home</a></li>
+                    <li><a href="#basics"><i class="fas fa-book"></i>Basics</a></li>
+                    <li><a href="#advanced"><i class="fas fa-rocket"></i>Advanced</a></li>
+                    <li><a href="#examples"><i class="fas fa-code-branch"></i>Examples</a></li>
+                    <li><a href="#quiz"><i class="fas fa-question-circle"></i>Quiz</a></li>
+                    <li><a href="#newsletter"><i class="fas fa-envelope"></i>Newsletter</a></li>
+                </ul>
+            </nav>
+            <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <h1>Master Python Functions</h1>
+        <p>Your complete guide to writing powerful, reusable, and elegant Python code. Learn from basics to advanced concepts with interactive examples.</p>
+        
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="functionCount">0</div>
+                <div class="stat-label">Function Types Covered</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="exampleCount">0</div>
+                <div class="stat-label">Code Examples</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="exerciseCount">0</div>
+                <div class="stat-label">Hands-on Exercises</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ALL ORIGINAL TUTORIAL CONTENT PRESERVED BELOW -->
+
+    <!-- Main Content -->
+    <div class="content-section" id="basics">
+        <h2><i class="fas fa-lightbulb"></i> Function Fundamentals</h2>
+        <p>Functions are reusable blocks of code that perform specific tasks. They help organize code, reduce repetition, and make programs more maintainable.</p>
+
+        <!-- Explanation for Basic Function -->
+        <div class="code-explanation">
+            <h4><i class="fas fa-info-circle"></i> Explanation: Basic Function Syntax</h4>
+            <p>This example demonstrates the fundamental structure of a Python function:</p>
+            <ul class="explanation-points">
+                <li><strong>def</strong> keyword: Used to define a new function</li>
+                <li><strong>Function name</strong>: "greet" - follows naming conventions (lowercase with underscores)</li>
+                <li><strong>Parameters</strong>: "name" - variable that receives input when function is called</li>
+                <li><strong>Docstring</strong>: Triple-quoted string explaining function purpose (optional but recommended)</li>
+                <li><strong>return statement</strong>: Sends a value back to the caller (optional)</li>
+                <li><strong>Function call</strong>: greet("Alice") - executes the function with "Alice" as argument</li>
+            </ul>
+        </div>
+
+        <h3>Basic Function Syntax</h3>
+        <div class="code-wrapper">
+            <div class="code-header">
+                <span class="code-title">basic_function.py</span>
+                <div class="code-actions">
+                    <button class="run-btn" onclick="runCode('basic')"><i class="fas fa-play"></i> Run</button>
+                    <button class="copy-btn" onclick="copyCode('basic')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+            <pre id="code-basic"><code>def greet(name):
+    """Greet someone by name"""
+    return f"Hello, {name}! Welcome to Python Functions."
+
+# Test the function
+result = greet("Alice")
+print(result)</code></pre>
+            <div id="output-basic" class="output-box">
+                <div class="output-label"><i class="fas fa-terminal"></i> Output:</div>
+                <div class="output-content" id="output-content-basic"></div>
+            </div>
+        </div>
+
+        <!-- Explanation for Multiple Parameters -->
+        <div class="code-explanation">
+            <h4><i class="fas fa-info-circle"></i> Explanation: Functions with Multiple Parameters</h4>
+            <p>This example shows how functions can accept multiple input values:</p>
+            <ul class="explanation-points">
+                <li><strong>Multiple parameters</strong>: Functions can accept any number of parameters separated by commas</li>
+                <li><strong>Order matters</strong>: Arguments are matched to parameters in the order they appear</li>
+                <li><strong>Parameter names</strong>: Should be descriptive (length, width instead of x, y)</li>
+                <li><strong>Return value</strong>: The function calculates and returns the area</li>
+                <li><strong>Reusability</strong>: Same function can be called with different values</li>
+            </ul>
+        </div>
+
+        <h3>Function with Multiple Parameters</h3>
+        <div class="code-wrapper">
+            <div class="code-header">
+                <span class="code-title">multiple_params.py</span>
+                <div class="code-actions">
+                    <button class="run-btn" onclick="runCode('params')"><i class="fas fa-play"></i> Run</button>
+                    <button class="copy-btn" onclick="copyCode('params')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+            <pre id="code-params"><code>def calculate_area(length, width):
+    """Calculate rectangle area"""
+    area = length * width
+    return area
+
+# Test with different values
+result1 = calculate_area(5, 3)
+result2 = calculate_area(10, 7)
+print(f"Area 1: {result1} sq units")
+print(f"Area 2: {result2} sq units")</code></pre>
+            <div id="output-params" class="output-box">
+                <div class="output-label"><i class="fas fa-terminal"></i> Output:</div>
+                <div class="output-content" id="output-content-params"></div>
+            </div>
+        </div>
+
+        <!-- Explanation for Default Parameters -->
+        <div class="code-explanation">
+            <h4><i class="fas fa-info-circle"></i> Explanation: Default Parameters</h4>
+            <p>Default parameters provide fallback values when arguments aren't provided:</p>
+            <ul class="explanation-points">
+                <li><strong>Default value</strong>: exponent=2 provides a default if no second argument is given</li>
+                <li><strong>Optional arguments</strong>: Functions become more flexible with sensible defaults</li>
+                <li><strong>Rightmost defaults</strong>: Default parameters must come after non-default parameters</li>
+                <li><strong>Exponent operator</strong>: ** is Python's exponentiation operator (base ** exponent)</li>
+                <li><strong>Flexible calling</strong>: Can call with one argument (uses default) or two arguments</li>
+            </ul>
+        </div>
+
+        <h3>Default Parameters</h3>
+        <div class="code-wrapper">
+            <div class="code-header">
+                <span class="code-title">default_params.py</span>
+                <div class="code-actions">
+                    <button class="run-btn" onclick="runCode('default')"><i class="fas fa-play"></i> Run</button>
+                    <button class="copy-btn" onclick="copyCode('default')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+            <pre id="code-default"><code>def power(base, exponent=2):
+    """Calculate base raised to exponent (default: squared)"""
+    return base ** exponent
+
+# Test with and without default
+print(f"5 squared: {power(5)}")
+print(f"5 cubed: {power(5, 3)}")
+print(f"2 to the 10th: {power(2, 10)}")</code></pre>
+            <div id="output-default" class="output-box">
+                <div class="output-label"><i class="fas fa-terminal"></i> Output:</div>
+                <div class="output-content" id="output-content-default"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Section -->
+    <div class="content-section" id="advanced">
+        <h2><i class="fas fa-rocket"></i> Advanced Concepts</h2>
+        
+        <!-- Explanation for Lambda Functions -->
+        <div class="code-explanation">
+            <h4><i class="fas fa-info-circle"></i> Explanation: Lambda Functions</h4>
+            <p>Lambda functions are small, anonymous functions defined with the lambda keyword:</p>
+            <ul class="explanation-points">
+                <li><strong>Anonymous</strong>: No function name required, defined inline</li>
+                <li><strong>Single expression</strong>: Can only contain one expression (no statements)</li>
+                <li><strong>Implicit return</strong>: Returns the result of the expression automatically</li>
+                <li><strong>Use with map()</strong>: Apply function to every item in a sequence</li>
+                <li><strong>Use with filter()</strong>: Keep only items where function returns True</li>
+                <li><strong>Best for simple operations</strong>: Great for one-time use, small operations</li>
+            </ul>
+        </div>
+
+        <h3>Lambda Functions</h3>
+        <div class="code-wrapper">
+            <div class="code-header">
+                <span class="code-title">lambda_examples.py</span>
+                <div class="code-actions">
+                    <button class="run-btn" onclick="runCode('lambda')"><i class="fas fa-play"></i> Run</button>
+                    <button class="copy-btn" onclick="copyCode('lambda')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+            <pre id="code-lambda"><code># Lambda functions in action
+square = lambda x: x ** 2
+add = lambda x, y: x + y
+is_even = lambda x: x % 2 == 0
+
+# Using lambda with map
+numbers = [1, 2, 3, 4, 5]
+squared = list(map(lambda x: x ** 2, numbers))
+
+# Using lambda with filter
+even_numbers = list(filter(lambda x: x % 2 == 0, numbers))
+
+print(f"Square of 5: {square(5)}")
+print(f"Sum of 3 and 7: {add(3, 7)}")
+print(f"Is 4 even? {is_even(4)}")
+print(f"Squared numbers: {squared}")
+print(f"Even numbers: {even_numbers}")</code></pre>
+            <div id="output-lambda" class="output-box">
+                <div class="output-label"><i class="fas fa-terminal"></i> Output:</div>
+                <div class="output-content" id="output-content-lambda"></div>
+            </div>
+        </div>
+
+        <!-- Explanation for Decorators -->
+        <div class="code-explanation">
+            <h4><i class="fas fa-info-circle"></i> Explanation: Decorators</h4>
+            <p>Decorators modify or enhance functions without changing their source code:</p>
+            <ul class="explanation-points">
+                <li><strong>Higher-order functions</strong>: Functions that take other functions as arguments</li>
+                <li><strong>@ syntax</strong>: Clean syntax for applying decorators (@timer_decorator)</li>
+                <li><strong>Wrapper function</strong>: Inner function that wraps the original function</li>
+                <li><strong>*args, **kwargs</strong>: Accepts any number of arguments to pass to original function</li>
+                <li><strong>Timing functionality</strong>: Measures execution time - useful for performance analysis</li>
+                <li><strong>Non-invasive</strong>: Adds functionality without modifying original function code</li>
+            </ul>
+        </div>
+
+        <h3>Decorators</h3>
+        <div class="code-wrapper">
+            <div class="code-header">
+                <span class="code-title">decorators.py</span>
+                <div class="code-actions">
+                    <button class="run-btn" onclick="runCode('decorator')"><i class="fas fa-play"></i> Run</button>
+                    <button class="copy-btn" onclick="copyCode('decorator')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+            <pre id="code-decorator"><code>import time
+
+def timer_decorator(func):
+    """Decorator to measure function execution time"""
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(f"{func.__name__} took {end - start:.6f} seconds")
+        return result
+    return wrapper
+
+@timer_decorator
+def calculate_sum(n):
+    """Calculate sum of numbers from 1 to n"""
+    return sum(range(1, n + 1))
+
+# Test the decorated function
+result = calculate_sum(1000000)
+print(f"Sum: {result}")</code></pre>
+            <div id="output-decorator" class="output-box">
+                <div class="output-label"><i class="fas fa-terminal"></i> Output:</div>
+                <div class="output-content" id="output-content-decorator"></div>
+            </div>
+        </div>
+
+        <!-- Explanation for *args and **kwargs -->
+        <div class="code-explanation">
+            <h4><i class="fas fa-info-circle"></i> Explanation: *args and **kwargs</h4>
+            <p>Special syntax for handling variable numbers of arguments:</p>
+            <ul class="explanation-points">
+                <li><strong>*args</strong>: Collects extra positional arguments into a tuple</li>
+                <li><strong>**kwargs</strong>: Collects extra keyword arguments into a dictionary</li>
+                <li><strong>Variable arguments</strong>: Functions can accept any number of inputs</li>
+                <li><strong>Flexible APIs</strong>: Useful for creating flexible function interfaces</li>
+                <li><strong>Order matters</strong>: Must be defined as (normal_args, *args, **kwargs)</li>
+                <li><strong>Dictionary unpacking</strong>: **kwargs allows passing dictionaries as keyword arguments</li>
+            </ul>
+        </div>
+
+        <h3>*args and **kwargs</h3>
+        <div class="code-wrapper">
+            <div class="code-header">
+                <span class="code-title">args_kwargs.py</span>
+                <div class="code-actions">
+                    <button class="run-btn" onclick="runCode('args')"><i class="fas fa-play"></i> Run</button>
+                    <button class="copy-btn" onclick="copyCode('args')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+            <pre id="code-args"><code>def print_args(*args, **kwargs):
+    """Demonstrate *args and **kwargs"""
+    print(f"Positional arguments: {args}")
+    print(f"Keyword arguments: {kwargs}")
+    
+    total = sum(args) if args else 0
+    print(f"Sum of positional args: {total}")
+
+# Test with different arguments
+print("Test 1:")
+print_args(1, 2, 3, 4, 5)
+
+print("\nTest 2:")
+print_args(10, 20, name="Alice", age=25, city="NYC")</code></pre>
+            <div id="output-args" class="output-box">
+                <div class="output-label"><i class="fas fa-terminal"></i> Output:</div>
+                <div class="output-content" id="output-content-args"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Practical Examples Section -->
+    <div class="content-section" id="examples">
+        <h2><i class="fas fa-code-branch"></i> Practical Examples</h2>
+        
+        <!-- Explanation for Data Processing -->
+        <div class="code-explanation">
+            <h4><i class="fas fa-info-circle"></i> Explanation: Data Processing Function</h4>
+            <p>A practical example of processing real-world data:</p>
+            <ul class="explanation-points">
+                <li><strong>Data validation</strong>: Checks if scores list is empty first</li>
+                <li><strong>Built-in functions</strong>: Uses sum(), max(), min() for calculations</li>
+                <li><strong>List comprehension</strong>: [s for s in scores if s >= 60] filters passing scores</li>
+                <li><strong>Dictionary return</strong>: Returns multiple values in a structured format</li>
+                <li><strong>round() function</strong>: Limits decimal places for cleaner output</li>
+                <li><strong>Real-world application</strong>: Models actual data analysis tasks</li>
+            </ul>
+        </div>
+
+        <h3>Data Processing Function</h3>
+        <div class="code-wrapper">
+            <div class="code-header">
+                <span class="code-title">data_processing.py</span>
+                <div class="code-actions">
+                    <button class="run-btn" onclick="runCode('dataproc')"><i class="fas fa-play"></i> Run</button>
+                    <button class="copy-btn" onclick="copyCode('dataproc')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+            <pre id="code-dataproc"><code>def analyze_scores(scores):
+    """Analyze a list of test scores"""
+    if not scores:
+        return "No scores to analyze"
+    
+    average = sum(scores) / len(scores)
+    highest = max(scores)
+    lowest = min(scores)
+    passing = [s for s in scores if s >= 60]
+    pass_rate = (len(passing) / len(scores)) * 100
+    
+    return {
+        'average': round(average, 2),
+        'highest': highest,
+        'lowest': lowest,
+        'pass_rate': round(pass_rate, 2)
+    }
+
+# Test with sample data
+test_scores = [85, 92, 78, 95, 67, 88, 55, 90, 82, 75]
+results = analyze_scores(test_scores)
+
+print("Score Analysis:")
+for key, value in results.items():
+    print(f"  {key.replace('_', ' ').title()}: {value}")</code></pre>
+            <div id="output-dataproc" class="output-box">
+                <div class="output-label"><i class="fas fa-terminal"></i> Output:</div>
+                <div class="output-content" id="output-content-dataproc"></div>
+            </div>
+        </div>
+
+        <!-- Explanation for Recursive Functions -->
+        <div class="code-explanation">
+            <h4><i class="fas fa-info-circle"></i> Explanation: Recursive Functions</h4>
+            <p>Functions that call themselves to solve problems:</p>
+            <ul class="explanation-points">
+                <li><strong>Base cases</strong>: if n <= 0 and if n == 1 or n == 2 prevent infinite recursion</li>
+                <li><strong>Recursive case</strong>: fibonacci(n - 1) + fibonacci(n - 2) breaks problem down</li>
+                <li><strong>Mathematical definition</strong>: Direct implementation of Fibonacci sequence formula</li>
+                <li><strong>Stack frames</strong>: Each call creates a new stack frame in memory</li>
+                <li><strong>Inefficient but clear</strong>: This implementation is exponential O(2^n) but clearly demonstrates recursion</li>
+                <li><strong>For educational purposes</strong>: Shows recursion concept clearly, not optimized for production</li>
+            </ul>
+        </div>
+
+        <h3>Recursive Function</h3>
+        <div class="code-wrapper">
+            <div class="code-header">
+                <span class="code-title">recursion.py</span>
+                <div class="code-actions">
+                    <button class="run-btn" onclick="runCode('recursive')"><i class="fas fa-play"></i> Run</button>
+                    <button class="copy-btn" onclick="copyCode('recursive')"><i class="fas fa-copy"></i> Copy</button>
+                </div>
+            </div>
+            <pre id="code-recursive"><code>def fibonacci(n):
+    """Calculate the nth Fibonacci number"""
+    if n <= 0:
+        return "Please enter a positive integer"
+    elif n == 1 or n == 2:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+
+# Generate Fibonacci sequence
+print("First 10 Fibonacci numbers:")
+for i in range(1, 11):
+    print(f"F({i}) = {fibonacci(i)}")</code></pre>
+            <div id="output-recursive" class="output-box">
+                <div class="output-label"><i class="fas fa-terminal"></i> Output:</div>
+                <div class="output-content" id="output-content-recursive"></div>
+            </div>
+        </div>
+
+        <h3>Interactive Lambda Demo</h3>
+        <div class="interactive-demo">
+            <h3>Try Lambda Functions Live</h3>
+            <div class="demo-controls">
+                <select id="lambdaSelect" class="demo-select">
+                    <option value="square">Square: x² </option>
+                    <option value="add">Add: sum all values</option>
+                    <option value="uppercase">Uppercase: convert text</option>
+                    <option value="even">Even/Odd checker</option>
+                </select>
+                <input type="text" id="lambdaInput" class="demo-input" placeholder="Enter values (comma-separated): 1,2,3,4,5" value="1,2,3,4,5">
+                <button class="demo-btn" onclick="runLambda()"><i class="fas fa-play"></i> Execute Lambda</button>
+            </div>
+            <div id="lambdaOutput" class="demo-output">Result will appear here...</div>
+        </div>
+    </div>
+
+    <!-- Key Features -->
+    <div class="content-section">
+        <h2><i class="fas fa-star"></i> Key Takeaways</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-recycle"></i></div>
+                <h3>Reusability</h3>
+                <p>Write once, use many times. Functions eliminate code duplication and make maintenance easier.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-cube"></i></div>
+                <h3>Modularity</h3>
+                <p>Break complex problems into smaller, manageable pieces. Each function does one thing well.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-book-reader"></i></div>
+                <h3>Readability</h3>
+                <p>Well-named functions make code self-documenting and easier to understand for others.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-bug"></i></div>
+                <h3>Testing</h3>
+                <p>Isolated functions are easier to test, debug, and verify for correctness.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
+                <h3>Abstraction</h3>
+                <p>Hide implementation details and expose simple interfaces for complex operations.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fas fa-rocket"></i></div>
+                <h3>Performance</h3>
+                <p>Optimize critical functions without affecting the rest of your codebase.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Quiz Section -->
+    <div class="content-section" id="quiz">
+        <h2><i class="fas fa-graduation-cap"></i> Knowledge Check</h2>
+        <div class="quiz-section">
+            <h3>Test Your Understanding</h3>
+            <div class="quiz-question" id="quizQuestion">
+                What is the output of the following code?
+                <pre><code>def multiply(x, y=2):
+    return x * y
+
+print(multiply(5))</code></pre>
+            </div>
+            
+            <div class="quiz-options" id="quizOptions">
+                <div class="quiz-option" data-correct="true" onclick="selectAnswer(this)">
+                    10
+                </div>
+                <div class="quiz-option" onclick="selectAnswer(this)">
+                    5
+                </div>
+                <div class="quiz-option" onclick="selectAnswer(this)">
+                    7
+                </div>
+                <div class="quiz-option" onclick="selectAnswer(this)">
+                    Error
+                </div>
+            </div>
+            
+            <button class="demo-btn" onclick="checkAnswer()">
+                <i class="fas fa-check"></i> Submit Answer
+            </button>
+            
+            <div class="quiz-result" id="quizResult">
+                <i class="fas fa-check-circle"></i> <span id="resultText"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: FAQ Section -->
+    <div class="content-section" id="faq">
+        <h2><i class="fas fa-question-circle"></i> Frequently Asked Questions</h2>
+        <div class="faq-section">
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    What's the difference between parameters and arguments?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Parameters are the variables listed in the function definition, while arguments are the actual values passed to the function when it's called. For example, in `def greet(name)`, `name` is a parameter. When you call `greet("Alice")`, `"Alice"` is the argument.
+                </div>
+            </div>
+            
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    When should I use lambda functions?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Lambda functions are best for simple, one-time operations where defining a full function would be overkill. They're commonly used with functions like `map()`, `filter()`, and `sorted()` for short transformations. For complex logic or reusable code, regular functions are better.
+                </div>
+            </div>
+            
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    Can functions return multiple values?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Yes, Python functions can return multiple values by separating them with commas. This actually returns a tuple, which can be unpacked. Example: `return x, y, z` returns a tuple `(x, y, z)` that can be unpacked as `a, b, c = function()`.
+                </div>
+            </div>
+            
+            <div class="faq-item" onclick="toggleFAQ(this)">
+                <div class="faq-question">
+                    What is the difference between local and global scope?
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    Local scope refers to variables defined inside a function, which are only accessible within that function. Global scope refers to variables defined outside any function, which are accessible throughout the entire program. Use the `global` keyword to modify global variables from within a function.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Certification Badge -->
+    <div class="content-section">
+        <div class="certification-badge">
+            <div class="badge-icon">
+                <i class="fas fa-award"></i>
+            </div>
+            <h2 class="badge-title">Python Functions Master</h2>
+            <p class="badge-desc">
+                Congratulations! By completing this tutorial, you've earned recognition for mastering Python functions. Share your achievement with the community.
+            </p>
+            <button class="newsletter-btn" style="margin-top: 2rem; position: relative; z-index: 1;" onclick="generateCertificate()">
+                <i class="fas fa-download"></i> Download Certificate
+            </button>
+        </div>
+    </div>
+
+    <!-- NEW: Downloadable Cheatsheet -->
+    <div class="content-section">
+        <div class="cheatsheet-section">
+            <h3><i class="fas fa-file-pdf"></i> Quick Reference Cheatsheet</h3>
+            <p style="color: var(--slate-gray); margin: 1rem 0;">
+                Download our comprehensive Python functions cheatsheet with syntax examples, best practices, and common patterns.
+            </p>
+            <a href="#" class="download-btn" onclick="downloadCheatsheet()">
+                <i class="fas fa-download"></i> Download Cheatsheet (PDF)
+            </a>
+        </div>
+    </div>
+
+    <!-- Newsletter Section -->
+    <section class="newsletter-section" id="newsletter">
+        <h2><i class="fas fa-envelope"></i> Stay Updated</h2>
+        <p>Get the latest Python tutorials, tips, and tricks delivered to your inbox.</p>
+        <form class="newsletter-form" id="mainNewsletterForm" onsubmit="handleNewsletterSubmit(event)">
+            <input type="text" class="newsletter-input" placeholder="Your Name" required>
+            <input type="email" class="newsletter-input" placeholder="Your Email" required>
+            <button type="submit" class="newsletter-btn">
+                <i class="fas fa-paper-plane"></i> Subscribe Now
+            </button>
+        </form>
+        <div id="mainNewsletterMessage" class="modal-message"></div>
+    </section>
+
+    <!-- Social Sharing Section -->
+    <section class="social-sharing">
+        <h3><i class="fas fa-share-alt"></i> Share This Tutorial</h3>
+        <p style="color: var(--slate-gray); margin-bottom: 2rem;">Help others learn Python functions!</p>
+        <div class="social-buttons">
+            <a href="https://twitter.com/intent/tweet?text=Master%20Python%20Functions%20-%20Complete%20Guide&url=https://pansensoyglenn-dev.github.io/poetic-codes/python-functions.html" target="_blank" class="social-btn twitter">
+                <i class="fab fa-twitter"></i> Share on Twitter
+            </a>
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://pansensoyglenn-dev.github.io/poetic-codes/python-functions.html" target="_blank" class="social-btn linkedin">
+                <i class="fab fa-linkedin"></i> Share on LinkedIn
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u=https://pansensoyglenn-dev.github.io/poetic-codes/python-functions.html" target="_blank" class="social-btn facebook">
+                <i class="fab fa-facebook"></i> Share on Facebook
+            </a>
+            <a href="mailto:?subject=Master%20Python%20Functions&body=Check%20out%20this%20comprehensive%20Python%20functions%20tutorial:%20https://pansensoyglenn-dev.github.io/poetic-codes/python-functions.html" class="social-btn email">
+                <i class="fas fa-envelope"></i> Share via Email
+            </a>
+        </div>
+    </section>
+
+    <!-- NEW: Author Bio -->
+    <div class="content-section">
+        <div class="author-bio">
+            <div class="author-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="author-info">
+                <h4>About the Author</h4>
+                <p>Glenn Junsay Pansensoy is a senior Python developer with over 8 years of experience in software engineering and technical education. He specializes in creating accessible programming tutorials that bridge theory with practical application.</p>
+                <div class="author-social">
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NEW: Related Resources -->
+    <div class="content-section" id="resources">
+        <h2><i class="fas fa-external-link-alt"></i> Related Resources</h2>
+        <p style="color: var(--slate-gray); margin-bottom: 2rem;">
+            Continue your Python learning journey with these recommended resources:
+        </p>
+        
+        <div class="resources-grid">
+            <div class="resource-card">
+                <div class="resource-icon">
+                    <i class="fas fa-book"></i>
+                </div>
+                <h4>Official Python Documentation</h4>
+                <p>Comprehensive reference for all Python functions and modules.</p>
+                <a href="https://docs.python.org/3/" target="_blank" class="resource-link">
+                    Visit Documentation →
+                </a>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h4>Interactive Python Course</h4>
+                <p>Hands-on coding exercises and projects to reinforce learning.</p>
+                <a href="#" class="resource-link">
+                    Start Course →
+                </a>
+            </div>
+            
+            <div class="resource-card">
+                <div class="resource-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h4>Real-World Projects</h4>
+                <p>Build practical applications using Python functions.</p>
+                <a href="#" class="resource-link">
+                    View Projects →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ENHANCED: Professional Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Poetic Codes</h3>
+                <p>Empowering developers with quality tutorials, interactive examples, and best practices for modern programming.</p>
+                <div class="footer-newsletter">
+                    <input type="email" placeholder="Your email address" id="footerEmail">
+                    <button onclick="subscribeFooter()">Subscribe</button>
+                    <p style="font-size: 0.8rem; margin-top: 0.5rem;">Get weekly coding insights</p>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#home">Home</a>
+                <a href="#basics">Function Basics</a>
+                <a href="#advanced">Advanced Topics</a>
+                <a href="#examples">Code Examples</a>
+                <a href="#quiz">Knowledge Quiz</a>
+                <a href="faq.html">FAQ</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Python Resources</h>
+                <a href="beginners.html">Beginner's Guide</a>
+                <a href="advanced-patterns.html">Advanced Patterns</a>
+                <a href="templates.html">Project Templates</a>
+                <a href="python-faq.html">Interview Questions</a>
+                <a href="best-practices.html">Best Practices</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Connect With Us</h3>
+                <a href="https://pansensoyglenn-dev.github.io/poetic-codes"><i class="fab fa-github"></i> GitHub</a>
+                <a href="https://x.com/@GlennPansensoy"><i class="fab fa-twitter"></i> Twitter</a>
+                <a href="www.linkedin.com/in/glenn-pansensoy-6288453a2"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                <a href="https://www.youtube.com/@GlennPansensoy"><i class="fab fa-youtube"></i> YouTube</a>
+                <a href="#" onclick="openModal('newsletterModal'); return false;"><i class="fas fa-envelope"></i> Contact</a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-links">
+                <a href="#" onclick="openModal('legalModal'); return false;">Privacy Policy</a>
+                <a href="#" onclick="openModal('legalModal'); return false;">Terms of Service</a>
+                <a href="#" onclick="openModal('newsletterModal'); return false;">Newsletter</a>
+                <a href="sitemap.html">Sitemap</a>
+                <a href="accessibility.html">Accessibility</a>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2026 Poetic Codes || Glenn Junsay Pansensoy. All rights reserved.</p>
+                <p style="margin-top: 0.5rem;">Made with <i class="fas fa-heart" style="color: #ff79c6;"></i> for the developer community</p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem;">Last updated: <span id="currentDate"></span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        
+        function updateProgressBar() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progressBar").style.width = scrolled + "%";
+        }
+
+        window.onscroll = function() {
+            updateProgressBar();
+            updateTocHighlight();
+        };
+
+        function updateTocHighlight() {
+            const sections = document.querySelectorAll('.content-section');
+            const navLinks = document.querySelectorAll('.toc-list a');
+            
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (scrollY >= (sectionTop - 100)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                    link.style.color = 'var(--neon-green)';
+                } else {
+                    link.style.color = '';
+                }
+            });
+        }
+
+        
+        let selectedAnswer = null;
+
+        function selectAnswer(element) {
+            
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            
+            element.classList.add('selected');
+            selectedAnswer = element;
+        }
+
+        function checkAnswer() {
+            const resultDiv = document.getElementById('quizResult');
+            const resultText = document.getElementById('resultText');
+            
+            if (!selectedAnswer) {
+                resultText.textContent = "Please select an answer!";
+                resultDiv.className = "quiz-result error";
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            const isCorrect = selectedAnswer.getAttribute('data-correct') === 'true';
+            
+            if (isCorrect) {
+                resultText.textContent = "Correct! The default parameter y=2 is used, so 5 * 2 = 10.";
+                resultDiv.className = "quiz-result success";
+            } else {
+                resultText.textContent = "Not quite. Remember that default parameters provide fallback values.";
+                resultDiv.className = "quiz-result error";
+            }
+            
+            resultDiv.style.display = 'block';
+            
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                if (opt.getAttribute('data-correct') === 'true') {
+                    opt.classList.add('correct');
+                } else if (opt !== selectedAnswer) {
+                    opt.classList.remove('selected');
+                }
+            });
+        }
+
+  
+        function toggleFAQ(element) {
+            element.classList.toggle('active');
+        }
+
+        function generateCertificate() {
+            alert("Certificate generated! This would typically create a PDF with your name and completion date.");
+            
+        }
+
+        function downloadCheatsheet() {
+            alert("Downloading cheatsheet...");
+            
+        }
+        function animateAllCounters() {
+            animateCounter('functionCount', 8);
+            animateCounter('exampleCount', 22);
+            animateCounter('exerciseCount', 15);
+        }
+
+        const newsletterBackend = {
+            async subscribe(email, name) {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const subscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');
+                        if (subscribers.includes(email)) {
+                            resolve({ 
+                                success: false, 
+                                message: 'This email is already subscribed!' 
+                            });
+                        } else {
+                            subscribers.push(email);
+                            localStorage.setItem('newsletter_subscribers', JSON.stringify(subscribers));
+                            resolve({ 
+                                success: true, 
+                                message: 'Successfully subscribed!' 
+                            });
+                        }
+                    }, 1000);
+                });
+            }
+        };
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+    
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+    
+        function toggleMenu() {
+            const menu = document.getElementById('navMenu');
+            const hamburger = document.getElementById('hamburger');
+            menu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('navMenu');
+            const hamburger = document.getElementById('hamburger');
+            
+            if (!event.target.closest('.nav-container') && !event.target.closest('.hamburger')) {
+                menu.classList.remove('active');
+                hamburger.classList.remove('active');
+            }
+        });
+
+        document.querySelectorAll('nav a').forEach(link => {
+            link.addEventListener('click', () => {
+                const menu = document.getElementById('navMenu');
+                const hamburger = document.getElementById('hamburger');
+                menu.classList.remove('active');
+                hamburger.classList.remove('active');
+            });
+        });
+
+        document.getElementById('newsletterForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const email = form.querySelector('input[type="email"]').value;
+            const name = form.querySelector('input[type="text"]').value;
+            const messageDiv = document.getElementById('newsletterMessage');
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subscribing...';
+            submitBtn.disabled = true;
+            
+            try {
+                const result = await newsletterBackend.subscribe(email, name);
+                
+                if (result.success) {
+                    messageDiv.style.display = 'block';
+                    messageDiv.style.background = 'rgba(80, 250, 123, 0.1)';
+                    messageDiv.style.borderColor = 'var(--neon-green)';
+                    messageDiv.innerHTML = `
+                        <i class="fas fa-check-circle"></i> ${result.message}
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+                            Welcome to the Poetic Codes community!
+                        </p>
+                    `;
+                    form.reset();
+                } else {
+                    messageDiv.style.display = 'block';
+                    messageDiv.style.background = 'rgba(255, 121, 198, 0.1)';
+                    messageDiv.style.borderColor = '#ff79c6';
+                    messageDiv.innerHTML = `<i class="fas fa-info-circle"></i> ${result.message}`;
+                }
+            } catch (error) {
+                messageDiv.style.display = 'block';
+                messageDiv.style.background = 'rgba(255, 121, 198, 0.1)';
+                messageDiv.style.borderColor = '#ff79c6';
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Subscription failed. Please try again.`;
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        });
+
+        function handleNewsletterSubmit(e) {
+            e.preventDefault();
+            
+            const form = e.target;
+            const email = form.querySelector('input[type="email"]').value;
+            const name = form.querySelector('input[type="text"]').value;
+            const messageDiv = document.getElementById('mainNewsletterMessage');
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Subscribing...';
+            submitBtn.disabled = true;
+            
+            newsletterBackend.subscribe(email, name).then(result => {
+                if (result.success) {
+                    messageDiv.style.display = 'block';
+                    messageDiv.style.background = 'rgba(80, 250, 123, 0.1)';
+                    messageDiv.style.borderColor = 'var(--neon-green)';
+                    messageDiv.innerHTML = `
+                        <i class="fas fa-check-circle"></i> ${result.message}
+                        <p style="margin-top: 0.5rem; font-size: 0.9rem;">
+                            Welcome to the Poetic Codes community!
+                        </p>
+                    `;
+                    form.reset();
+                } else {
+                    messageDiv.style.display = 'block';
+                    messageDiv.style.background = 'rgba(255, 121, 198, 0.1)';
+                    messageDiv.style.borderColor = '#ff79c6';
+                    messageDiv.innerHTML = `<i class="fas fa-info-circle"></i> ${result.message}`;
+                }
+            }).catch(error => {
+                messageDiv.style.display = 'block';
+                messageDiv.style.background = 'rgba(255, 121, 198, 0.1)';
+                messageDiv.style.borderColor = '#ff79c6';
+                messageDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> Subscription failed. Please try again.`;
+            }).finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            });
+        }
+
+      
+        function subscribeFooter() {
+            const email = document.getElementById('footerEmail').value;
+            if (!email) {
+                alert('Please enter your email address');
+                return;
+            }
+            
+            newsletterBackend.subscribe(email, 'Footer Subscriber').then(result => {
+                if (result.success) {
+                    alert('Successfully subscribed to newsletter!');
+                    document.getElementById('footerEmail').value = '';
+                } else {
+                    alert(result.message);
+                }
+            });
+        }
+
+        function runCode(id) {
+            const codeElement = document.getElementById(`code-${id}`);
+            const outputElement = document.getElementById(`output-${id}`);
+            const outputContent = document.getElementById(`output-content-${id}`);
+            
+            if (!codeElement || !outputElement || !outputContent) {
+                console.error('Elements not found for id:', id);
+                return;
+            }
+            
+            const code = codeElement.textContent;
+            
+            let output = '';
+            
+            try {
+                
+                outputContent.textContent = '';
+                
+                
+                outputElement.classList.add('show');
+                
+            
+                if (id === 'basic') {
+                    const greet = (name) => `Hello, ${name}! Welcome to Python Functions.`;
+                    output = greet("Alice");
+                } else if (id === 'params') {
+                    const calculate_area = (length, width) => length * width;
+                    const result1 = calculate_area(5, 3);
+                    const result2 = calculate_area(10, 7);
+                    output = `Area 1: ${result1} sq units\nArea 2: ${result2} sq units`;
+                } else if (id === 'default') {
+                    const power = (base, exponent = 2) => Math.pow(base, exponent);
+                    output = `5 squared: ${power(5)}\n5 cubed: ${power(5, 3)}\n2 to the 10th: ${power(2, 10)}`;
+                } else if (id === 'lambda') {
+                    const square = x => x ** 2;
+                    const add = (x, y) => x + y;
+                    const is_even = x => x % 2 === 0;
+                    const numbers = [1, 2, 3, 4, 5];
+                    const squared = numbers.map(x => x ** 2);
+                    const even_numbers = numbers.filter(x => x % 2 === 0);
+                    
+                    output = `Square of 5: ${square(5)}\n`;
+                    output += `Sum of 3 and 7: ${add(3, 7)}\n`;
+                    output += `Is 4 even? ${is_even(4)}\n`;
+                    output += `Squared numbers: [${squared.join(', ')}]\n`;
+                    output += `Even numbers: [${even_numbers.join(', ')}]`;
+                } else if (id === 'decorator') {
+                    const calculate_sum = (n) => {
+                        let sum = 0;
+                        for (let i = 1; i <= n; i++) {
+                            sum += i;
+                        }
+                        return sum;
+                    };
+                    const start = performance.now();
+                    const result = calculate_sum(1000000);
+                    const end = performance.now();
+                    const time = ((end - start) / 1000).toFixed(6);
+                    output = `calculate_sum took ${time} seconds\nSum: ${result}`;
+                } else if (id === 'args') {
+                    const print_args = (...args) => {
+                        const kwargs = args.length > 0 && typeof args[args.length - 1] === 'object' && !Array.isArray(args[args.length - 1]) ? args.pop() : {};
+                        return { args, kwargs };
+                    };
+                    
+                    const test1 = print_args(1, 2, 3, 4, 5);
+                    const sum1 = test1.args.reduce((a, b) => a + b, 0);
+                    
+                    output = `Test 1:\n`;
+                    output += `Positional arguments: (${test1.args.join(', ')})\n`;
+                    output += `Keyword arguments: {}\n`;
+                    output += `Sum of positional args: ${sum1}\n\n`;
+                    
+                    const test2Args = [10, 20];
+                    const test2Kwargs = { name: 'Alice', age: 25, city: 'NYC' };
+                    const sum2 = test2Args.reduce((a, b) => a + b, 0);
+                    
+                    output += `Test 2:\n`;
+                    output += `Positional arguments: (${test2Args.join(', ')})\n`;
+                    output += `Keyword arguments: ${JSON.stringify(test2Kwargs)}\n`;
+                    output += `Sum of positional args: ${sum2}`;
+                } else if (id === 'dataproc') {
+                    const analyze_scores = (scores) => {
+                        if (!scores || scores.length === 0) return "No scores to analyze";
+                        
+                        const average = scores.reduce((a, b) => a + b, 0) / scores.length;
+                        const highest = Math.max(...scores);
+                        const lowest = Math.min(...scores);
+                        const passing = scores.filter(s => s >= 60);
+                        const pass_rate = (passing.length / scores.length) * 100;
+                        
+                        return {
+                            average: average.toFixed(2),
+                            highest,
+                            lowest,
+                            pass_rate: pass_rate.toFixed(2)
+                        };
+                    };
+                    
+                    const test_scores = [85, 92, 78, 95, 67, 88, 55, 90, 82, 75];
+                    const results = analyze_scores(test_scores);
+                    
+                    output = 'Score Analysis:\n';
+                    for (const [key, value] of Object.entries(results)) {
+                        const label = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                        output += `  ${label}: ${value}\n`;
+                    }
+                } else if (id === 'recursive') {
+                    const fibonacci = (n) => {
+                        if (n <= 0) return "Please enter a positive integer";
+                        if (n === 1 || n === 2) return 1;
+                        return fibonacci(n - 1) + fibonacci(n - 2);
+                    };
+                    
+                    output = 'First 10 Fibonacci numbers:\n';
+                    for (let i = 1; i <= 10; i++) {
+                        output += `F(${i}) = ${fibonacci(i)}\n`;
+                    }
+                }
+                
+                outputContent.textContent = output;
+            } catch (error) {
+                outputContent.textContent = `Error: ${error.message}`;
+                outputContent.style.color = '#ff79c6';
+            }
+        }
+
+        function copyCode(id) {
+            const codeElement = document.getElementById(`code-${id}`);
+            const code = codeElement.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+              
+                const wrapper = codeElement.closest('.code-wrapper');
+                const copyBtn = wrapper.querySelector('.copy-btn');
+                const originalHTML = copyBtn.innerHTML;
+                
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                copyBtn.style.background = 'var(--neon-green)';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.style.background = 'var(--electric-blue)';
+                }, 2000);
+            });
+        }
+
+        
+        function runLambda() {
+            const select = document.getElementById('lambdaSelect');
+            const input = document.getElementById('lambdaInput').value;
+            const output = document.getElementById('lambdaOutput');
+            
+            const values = input.split(',').map(v => v.trim());
+            
+            let result = '';
+            
+            switch(select.value) {
+                case 'square':
+                    const square = x => x * x;
+                    result = values.map(v => square(Number(v)));
+                    output.innerHTML = `<strong>Lambda:</strong> λx. x²<br><strong>Input:</strong> ${values}<br><strong>Result:</strong> ${JSON.stringify(result)}`;
+                    break;
+                case 'add':
+                    if (values.length >= 2) {
+                        result = values.reduce((a, b) => Number(a) + Number(b), 0);
+                        output.innerHTML = `<strong>Lambda:</strong> λx,y. x+y<br><strong>Input:</strong> ${values}<br><strong>Result:</strong> ${result}`;
+                    } else {
+                        output.innerHTML = "⚠️ Need at least 2 values";
+                    }
+                    break;
+                case 'uppercase':
+                    const uppercase = s => s.toUpperCase();
+                    result = values.map(v => uppercase(v));
+                    output.innerHTML = `<strong>Lambda:</strong> λs. s.upper()<br><strong>Input:</strong> ${values}<br><strong>Result:</strong> ${JSON.stringify(result)}`;
+                    break;
+                case 'even':
+                    const isEven = x => x % 2 === 0;
+                    result = values.map(v => `${v} is ${isEven(Number(v)) ? 'even' : 'odd'}`);
+                    output.innerHTML = `<strong>Lambda:</strong> λx. x%2==0<br><strong>Input:</strong> ${values}<br><strong>Results:</strong><br>${result.join('<br>')}`;
+                    break;
+            }
+        }
+
+        
+        function animateCounter(elementId, target, duration = 2000) {
+            const element = document.getElementById(elementId);
+            let start = 0;
+            const increment = target / (duration / 16);
+            
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(start);
+                }
+            }, 16);
+        }
+
+      
+        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateAllCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        observer.observe(document.querySelector('.hero'));
+
+        
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') {
+                    e.preventDefault();
+                    return;
+                }
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    e.preventDefault();
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    
+                    const menu = document.getElementById('navMenu');
+                    const hamburger = document.getElementById('hamburger');
+                    menu.classList.remove('active');
+                    hamburger.classList.remove('active');
+                }
+            });
+        });
+
+    
+        if (!localStorage.getItem('newsletter_subscribers')) {
+            localStorage.setItem('newsletter_subscribers', JSON.stringify([]));
+        }
+
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressBar();
+            
+            document.addEventListener('click', function(event) {
+                const menu = document.getElementById('navMenu');
+                const hamburger = document.getElementById('hamburger');
+                
+                if (!event.target.closest('.nav-container') && !event.target.closest('.hamburger')) {
+                    menu.classList.remove('active');
+                    hamburger.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
