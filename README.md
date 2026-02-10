@@ -1,22 +1,14 @@
-# 🚀 Project Title
-> A brief, one-sentence description of what this project does and why it exists.
+Python OOP Tutorial 2026
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
+This is a comprehensive python tutorial for 2026.
 
----
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.9%2B-blue)](https://www.python.org/)
+[![GitHub last commit](https://img.shields.io/github/last-commit/pansensoyglenn-dev.github.io/poetic-codes/)](https://github.com/pansensoyglenn-dev.github.io/poetic-codes/)
+[![GitHub issues](https://img.shields.io/github/issues/pansensoyglenn-dev.github.io/poetic-codes/)](https://github.com/pansensoyglenn-dev.github.io/poetic-codes/issues)
 
-## 🧐 Features
-* **Feature A**: Blazing fast performance.
-* **Feature B**: User-friendly interface with dark mode support.
-* **Feature C**: Seamless integration with third-party APIs.
+This project is an educational platform where the students will profoundly learn programming in Python OOP in 2026.
 
----
 
-## 🛠 Installation
 
-Provide a step-by-step series of examples that tell you how to get a development env running.
-
-1. **Clone the repo**
-   ```bash
-   git clone [https://github.com/yourusername/projectname.git](https://github.com/yourusername/projectname.git)
+This project is designed to educate the students regarding the core concepts of Python programming language.
