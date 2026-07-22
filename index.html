@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🐍 Plantation Expenditure System</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Courier New', monospace, system-ui, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #0a0e1a 0%, #1a1f2f 50%, #0d1117 100%);
+      min-height: 100vh;
+      padding: 2rem 1.5rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .app-container {
+      max-width: 1400px;
+      width: 100%;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      background: rgba(22, 28, 46, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 1.2rem 2rem;
+      border-radius: 48px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(100, 150, 255, 0.1);
+      margin-bottom: 2rem;
+      border: 1px solid rgba(66, 133, 244, 0.2);
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .logo-icon {
+      font-size: 2.4rem;
+      color: #4a8af4;
+      text-shadow: 0 0 20px rgba(74, 138, 244, 0.3);
+    }
+
+    .app-title {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #e6edf3;
+      letter-spacing: -0.5px;
+    }
+
+    .app-title span {
+      color: #4a8af4;
+      font-weight: 300;
+    }
+
+    .stats-badge {
+      background: #1a2332;
+      color: #b7c9e2;
+      padding: 0.5rem 1.4rem;
+      border-radius: 40px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      border: 1px solid rgba(66, 133, 244, 0.15);
+    }
+
+    .stats-badge i {
+      color: #4a8af4;
+    }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 1.8rem;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .menu-panel {
+      background: rgba(22, 28, 46, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 32px;
+      padding: 1.8rem 0.8rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(66, 133, 244, 0.12);
+      height: fit-content;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .menu-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .menu-panel::-webkit-scrollbar-track {
+      background: #1a2332;
+      border-radius: 10px;
+    }
+
+    .menu-panel::-webkit-scrollbar-thumb {
+      background: #4a8af4;
+      border-radius: 10px;
+    }
+
+    .menu-section {
+      margin-bottom: 1.8rem;
+    }
+
+    .menu-section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #7a9bcb;
+      padding: 0 1rem;
+      margin-bottom: 0.6rem;
+      font-weight: 600;
+      opacity: 0.8;
+    }
+
+    .menu-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      width: 100%;
+      padding: 0.7rem 1.2rem;
+      background: transparent;
+      border: none;
+      border-radius: 40px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #b7c9e2;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      margin-bottom: 0.2rem;
+    }
+
+    .menu-btn i {
+      width: 1.6rem;
+      font-size: 1.1rem;
+      color: #4a8af4;
+      transition: 0.1s;
+    }
+
+    .menu-btn:hover {
+      background: rgba(74, 138, 244, 0.12);
+      color: #e6edf3;
+      transform: translateX(4px);
+    }
+
+    .menu-btn:active {
+      background: rgba(74, 138, 244, 0.2);
+      transform: scale(0.97);
+    }
+
+    .menu-btn.active {
+      background: rgba(74, 138, 244, 0.2);
+      color: #e6edf3;
+      box-shadow: 0 6px 14px rgba(74, 138, 244, 0.15);
+    }
+
+    .menu-btn.active i {
+      color: #6a9af4;
+    }
+
+    .menu-btn.danger:hover {
+      background: rgba(255, 70, 70, 0.15);
+      color: #ff6b6b;
+    }
+
+    .menu-btn.danger i {
+      color: #ff6b6b;
+    }
+
+    .content-panel {
+      background: rgba(22, 28, 46, 0.85);
+      backdrop-filter: blur(12px);
+      border-radius: 32px;
+      padding: 2rem 2.2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(66, 133, 244, 0.10);
+      min-height: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .content-panel::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .content-panel::-webkit-scrollbar-track {
+      background: #1a2332;
+      border-radius: 10px;
+    }
+
+    .content-panel::-webkit-scrollbar-thumb {
+      background: #4a8af4;
+      border-radius: 10px;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.8rem;
+      flex-wrap: wrap;
+    }
+
+    .panel-header h2 {
+      font-size: 1.7rem;
+      font-weight: 600;
+      color: #e6edf3;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .panel-header h2 i {
+      color: #4a8af4;
+    }
+
+    .action-hint {
+      color: #7a9bcb;
+      font-size: 0.9rem;
+      background: rgba(26, 35, 50, 0.6);
+      padding: 0.3rem 1rem;
+      border-radius: 50px;
+      border: 1px solid rgba(66, 133, 244, 0.1);
+    }
+
+    .record-card {
+      background: rgba(26, 35, 50, 0.6);
+      border-radius: 24px;
+      padding: 1.5rem 1.8rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border-left: 6px solid #4a8af4;
+      transition: 0.15s;
+    }
+
+    .record-card:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      transform: translateY(-2px);
+      border-left-color: #6a9af4;
+    }
+
+    .record-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    .record-id {
+      font-weight: 700;
+      color: #4a8af4;
+      background: rgba(74, 138, 244, 0.15);
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      font-size: 0.85rem;
+    }
+
+    .record-plant {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #e6edf3;
+    }
+
+    .record-date {
+      color: #7a9bcb;
+      background: rgba(74, 138, 244, 0.08);
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      font-size: 0.85rem;
+    }
+
+    .record-detail-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.8rem;
+      margin-top: 0.8rem;
+      background: rgba(13, 17, 23, 0.4);
+      padding: 0.8rem 1rem;
+      border-radius: 20px;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.95rem;
+      color: #b7c9e2;
+    }
+
+    .detail-item i {
+      color: #4a8af4;
+      width: 1.4rem;
+    }
+
+    .worker-tag {
+      background: rgba(74, 138, 244, 0.12);
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      display: inline-block;
+      margin: 0.2rem 0.2rem 0 0;
+      color: #b7c9e2;
+      border: 1px solid rgba(74, 138, 244, 0.1);
+    }
+
+    .item-tag {
+      background: rgba(74, 138, 244, 0.08);
+      padding: 0.1rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      display: inline-block;
+      margin: 0.2rem 0.2rem 0 0;
+      color: #b7c9e2;
+      border: 1px solid rgba(74, 138, 244, 0.08);
+    }
+
+    .total-amount {
+      font-weight: 700;
+      color: #4a8af4;
+      font-size: 1.2rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #7a9bcb;
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      opacity: 0.3;
+      margin-bottom: 0.8rem;
+      color: #4a8af4;
+    }
+
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 500;
+      color: #b7c9e2;
+      margin-bottom: 0.3rem;
+      font-size: 0.9rem;
+    }
+
+    .input-group input, 
+    .input-group select {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: 1px solid rgba(74, 138, 244, 0.2);
+      border-radius: 30px;
+      font-size: 1rem;
+      background: rgba(13, 17, 23, 0.6);
+      color: #e6edf3;
+      transition: 0.1s;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: #4a8af4;
+      box-shadow: 0 0 0 3px rgba(74, 138, 244, 0.15);
+    }
+
+    .input-group input::placeholder {
+      color: #5a7a9a;
+    }
+
+    .btn {
+      padding: 0.65rem 1.8rem;
+      border: none;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      background: rgba(26, 35, 50, 0.6);
+      color: #b7c9e2;
+      cursor: pointer;
+      transition: 0.1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid rgba(74, 138, 244, 0.1);
+    }
+
+    .btn-primary {
+      background: #4a8af4;
+      color: #0a0e1a;
+      box-shadow: 0 4px 12px rgba(74, 138, 244, 0.3);
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: #5a9af4;
+      transform: scale(1.02);
+      box-shadow: 0 6px 16px rgba(74, 138, 244, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #4a8af4;
+      color: #4a8af4;
+    }
+
+    .btn-outline:hover {
+      background: rgba(74, 138, 244, 0.1);
+    }
+
+    .btn-danger {
+      background: #ff4444;
+      color: white;
+      border: none;
+    }
+
+    .btn-danger:hover {
+      background: #ff5555;
+    }
+
+    .flex-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .mt-2 { margin-top: 1.2rem; }
+    .mb-1 { margin-bottom: 0.6rem; }
+    .text-muted { color: #7a9bcb; }
+
+    .summary-stat {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 1rem;
+      background: rgba(13, 17, 23, 0.4);
+      padding: 1.2rem;
+      border-radius: 28px;
+      margin: 1rem 0;
+      border: 1px solid rgba(74, 138, 244, 0.08);
+    }
+
+    .stat-box {
+      text-align: center;
+    }
+
+    .stat-box .number {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #4a8af4;
+    }
+
+    .stat-box .label {
+      font-size: 0.8rem;
+      color: #7a9bcb;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid rgba(74, 138, 244, 0.15);
+      margin: 1.2rem 0;
+    }
+
+    .toc-container {
+      background: rgba(13, 17, 23, 0.4);
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      border: 1px solid rgba(74, 138, 244, 0.08);
+    }
+
+    .toc-container details {
+      margin-bottom: 0.5rem;
+    }
+
+    .toc-container summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #e6edf3;
+      padding: 0.5rem;
+      border-radius: 10px;
+      transition: background 0.2s;
+    }
+
+    .toc-container summary:hover {
+      background: rgba(74, 138, 244, 0.08);
+    }
+
+    .toc-container summary::-webkit-details-marker {
+      color: #4a8af4;
+    }
+
+    .toc-list {
+      list-style: none;
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+    }
+
+    .toc-list li {
+      padding: 0.3rem 0;
+      border-bottom: 1px solid rgba(74, 138, 244, 0.06);
+    }
+
+    .toc-list li:last-child {
+      border-bottom: none;
+    }
+
+    .toc-list a {
+      color: #b7c9e2;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 8px;
+      transition: background 0.2s;
+    }
+
+    .toc-list a:hover {
+      background: rgba(74, 138, 244, 0.08);
+      color: #e6edf3;
+    }
+
+    .toc-list a i {
+      width: 1.2rem;
+      color: #4a8af4;
+    }
+
+    .help-section {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: rgba(13, 17, 23, 0.4);
+      border-radius: 20px;
+      border-left: 4px solid #4a8af4;
+    }
+
+    .help-section h3 {
+      color: #e6edf3;
+      margin-bottom: 0.5rem;
+    }
+
+    .help-section h4 {
+      color: #b7c9e2;
+      margin: 0.8rem 0 0.3rem 0;
+    }
+
+    .help-section code {
+      background: rgba(13, 17, 23, 0.6);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: #4a8af4;
+    }
+
+    .help-section pre {
+      background: rgba(13, 17, 23, 0.6);
+      padding: 1rem;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 0.5rem 0;
+      border: 1px solid rgba(74, 138, 244, 0.08);
+    }
+
+    .help-section pre code {
+      color: #b7c9e2;
+    }
+
+    .help-section ul, .help-section ol {
+      padding-left: 1.5rem;
+      margin: 0.5rem 0;
+      color: #b7c9e2;
+    }
+
+    .help-section li {
+      margin: 0.3rem 0;
+    }
+
+    .help-section p {
+      color: #b7c9e2;
+    }
+
+    .help-section strong {
+      color: #e6edf3;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(74, 138, 244, 0.2);
+      color: #4a8af4;
+      padding: 0.2rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      .content-panel { padding: 1.2rem; }
+      .app-header { padding: 0.8rem 1.2rem; }
+      .menu-btn { font-size: 0.85rem; padding: 0.5rem 0.8rem; }
+      .record-detail-grid { grid-template-columns: 1fr; }
+      .toc-list { padding-left: 0.5rem; }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .worker-list, .item-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.3rem;
+    }
+
+    .scrollable {
+      max-height: 480px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .scrollable::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .scrollable::-webkit-scrollbar-track {
+      background: #1a2332;
+      border-radius: 10px;
+    }
+
+    .scrollable::-webkit-scrollbar-thumb {
+      background: #4a8af4;
+      border-radius: 10px;
+    }
+
+    .worker-tag i, .item-tag i {
+      color: #4a8af4;
+    }
+
+    .worker-tag .fa-times, .item-tag .fa-times {
+      color: #ff6b6b !important;
+    }
+
+    h4 {
+      color: #e6edf3;
+    }
+
+    h4 i {
+      color: #4a8af4;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <header class="app-header">
+    <div class="logo-area">
+      <i class="fas fa-python logo-icon"></i>
+      <span class="app-title">Plantation<span>Expenditure</span></span>
+    </div>
+    <div class="stats-badge">
+      <i class="fas fa-code"></i>
+      <span id="recordCounter">0 records</span>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <nav class="menu-panel" id="menuPanel">
+      <div class="menu-section">
+        <div class="menu-section-title"><i class="fas fa-pen"></i> Record</div>
+        <button class="menu-btn" data-action="addCoconut"><i class="fas fa-tree"></i> Coconut</button>
+        <button class="menu-btn" data-action="addLanzones"><i class="fas fa-leaf"></i> Lanzones</button>
+        <button class="menu-btn" data-action="addDurian"><i class="fas fa-seedling"></i> Durian</button>
+        <button class="menu-btn" data-action="addMaize"><i class="fas fa-corn"></i> Maize</button>
+        <button class="menu-btn" data-action="viewAll"><i class="fas fa-list"></i> View All</button>
+        <button class="menu-btn" data-action="search"><i class="fas fa-search"></i> Search</button>
+      </div>
+      <div class="menu-section">
+        <div class="menu-section-title"><i class="fas fa-chart-pie"></i> Reports</div>
+        <button class="menu-btn" data-action="stats"><i class="fas fa-chart-simple"></i> Statistics</button>
+        <button class="menu-btn" data-action="byDate"><i class="fas fa-calendar-day"></i> By Date</button>
+        <button class="menu-btn" data-action="byDateRange"><i class="fas fa-calendar-range"></i> Date Range</button>
+        <button class="menu-btn" data-action="itemsByDate"><i class="fas fa-box"></i> Items by Date</button>
+        <button class="menu-btn" data-action="fullSummary"><i class="fas fa-clipboard-list"></i> Full Summary</button>
+      </div>
+      <div class="menu-section">
+        <div class="menu-section-title"><i class="fas fa-user"></i> Workers</div>
+        <button class="menu-btn" data-action="workerHistory"><i class="fas fa-user-clock"></i> Worker History</button>
+        <button class="menu-btn" data-action="workerSummary"><i class="fas fa-users"></i> Worker Summary</button>
+      </div>
+      <div class="menu-section">
+        <div class="menu-section-title"><i class="fas fa-tools"></i> System</div>
+        <button class="menu-btn" data-action="help"><i class="fas fa-question-circle"></i> Help / Guide</button>
+        <button class="menu-btn" data-action="exportCsv"><i class="fas fa-file-export"></i> Export CSV</button>
+        <button class="menu-btn danger" data-action="deleteRecord"><i class="fas fa-trash"></i> Delete Record</button>
+        <button class="menu-btn" data-action="clear"><i class="fas fa-undo-alt"></i> Clear view</button>
+      </div>
+    </nav>
+
+    <section class="content-panel" id="contentPanel">
+      <div class="panel-header">
+        <h2><i class="fas fa-terminal"></i> <span id="panelTitle">Dashboard</span></h2>
+        <span class="action-hint" id="actionHint"><i class="fas fa-info-circle"></i> Select an action</span>
+      </div>
+      <div id="dynamicContent" class="fade-in">
+        <div class="empty-state">
+          <i class="fas fa-python"></i>
+          <p>Welcome to Plantation Expenditure System</p>
+          <p style="font-size:0.9rem; margin-top:0.5rem;">Use the menu to manage records and view reports.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  (function(){
+    "use strict";
+
+    let records = [];
+    let nextId = 1;
+    const DEFAULT_WAGE = 350.0;
+    const DATE_EXAMPLE = "2026-07-05";
+
+    function loadFromStorage() {
+      try {
+        const raw = localStorage.getItem('plantationRecords');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            records = parsed;
+            if (records.length) {
+              const maxId = records.reduce((max, r) => Math.max(max, r.id || 0), 0);
+              nextId = maxId + 1;
+            }
+          }
+        }
+      } catch (e) { }
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem('plantationRecords', JSON.stringify(records));
+      } catch (e) { }
+    }
+
+    function getTodayStr() {
+      return new Date().toISOString().slice(0,10);
+    }
+
+    function formatCurrency(v) { return '₱' + Number(v).toFixed(2); }
+
+    function round2(v) { return Math.round(v * 100) / 100; }
+
+    function calcWorkerCost(w) {
+      const days = (w.fullDays || 0) + (w.halfDays || 0) * 0.5;
+      return round2(days * (w.dailyWage || DEFAULT_WAGE));
+    }
+
+    function calcRecordTotals(record) {
+      const workers = record.workers || [];
+      let labor = 0, totalWorkers = workers.length, fullDays=0, halfDays=0;
+      workers.forEach(w => {
+        fullDays += (w.fullDays || 0);
+        halfDays += (w.halfDays || 0);
+        labor += calcWorkerCost(w);
+      });
+      const items = record.items || [];
+      let itemsTotal = 0;
+      items.forEach(it => { itemsTotal += (it.cost || 0); });
+      const total = round2(labor + itemsTotal);
+      record.laborCost = round2(labor);
+      record.itemsTotal = round2(itemsTotal);
+      record.totalExpenditure = total;
+      record.totalWorkers = totalWorkers;
+      record.fullDays = round2(fullDays);
+      record.halfDays = round2(halfDays);
+      if (!record.dailyWage) record.dailyWage = DEFAULT_WAGE;
+      return record;
+    }
+
+    function createRecord(plantationType, data) {
+      const id = nextId++;
+      const rec = {
+        id,
+        plantationType,
+        date: data.date || getTodayStr(),
+        workers: data.workers || [],
+        items: data.items || [],
+        dailyWage: data.dailyWage || DEFAULT_WAGE,
+        laborCost: 0,
+        itemsTotal: 0,
+        totalExpenditure: 0,
+        totalWorkers: 0,
+        fullDays: 0,
+        halfDays: 0,
+      };
+      calcRecordTotals(rec);
+      return rec;
+    }
+
+    function addRecord(rec) {
+      records.push(rec);
+      saveToStorage();
+      return rec.id;
+    }
+
+    function deleteRecordById(id) {
+      const idx = records.findIndex(r => r.id === id);
+      if (idx === -1) return false;
+      records.splice(idx, 1);
+      saveToStorage();
+      return true;
+    }
+
+    function getRecord(id) { return records.find(r => r.id === id); }
+
+    function searchRecords(filters) {
+      let res = records;
+      if (filters.plantationType) {
+        res = res.filter(r => r.plantationType && r.plantationType.toLowerCase().includes(filters.plantationType.toLowerCase()));
+      }
+      if (filters.dateFrom) res = res.filter(r => r.date >= filters.dateFrom);
+      if (filters.dateTo) res = res.filter(r => r.date <= filters.dateTo);
+      if (filters.minCost !== undefined) res = res.filter(r => (r.totalExpenditure || 0) >= filters.minCost);
+      if (filters.maxCost !== undefined) res = res.filter(r => (r.totalExpenditure || 0) <= filters.maxCost);
+      if (filters.workerName) {
+        const name = filters.workerName.toLowerCase();
+        res = res.filter(r => (r.workers || []).some(w => w.name && w.name.toLowerCase().includes(name)));
+      }
+      return res;
+    }
+
+    function getWorkerHistory(name) {
+      const lower = name.toLowerCase();
+      const result = [];
+      records.forEach(r => {
+        (r.workers || []).forEach(w => {
+          if (w.name && w.name.toLowerCase().includes(lower)) {
+            result.push({
+              date: r.date,
+              recordId: r.id,
+              name: w.name,
+              job: w.jobDescription || 'General Labor',
+              fullDays: w.fullDays || 0,
+              halfDays: w.halfDays || 0,
+              dailyWage: w.dailyWage || r.dailyWage || DEFAULT_WAGE,
+              laborCost: calcWorkerCost(w)
+            });
+          }
+        });
+      });
+      return result;
+    }
+
+    function getWorkerSummaryByDate(date) {
+      const dayRecords = records.filter(r => r.date === date);
+      if (!dayRecords.length) return null;
+      const summary = {};
+      let totalLabor = 0;
+      dayRecords.forEach(r => {
+        (r.workers || []).forEach(w => {
+          const name = w.name || 'Unknown';
+          if (!summary[name]) {
+            summary[name] = { job: w.jobDescription || 'General Labor', fullDays: 0, halfDays: 0, laborCost: 0, records: [] };
+          }
+          summary[name].fullDays += (w.fullDays || 0);
+          summary[name].halfDays += (w.halfDays || 0);
+          const cost = calcWorkerCost(w);
+          summary[name].laborCost += cost;
+          summary[name].records.push(r.id);
+          totalLabor += cost;
+        });
+      });
+      return { date, workerSummary: summary, totalLaborCost: totalLabor };
+    }
+
+    function getFullSummaryByDate(date) {
+      const dayRecords = records.filter(r => r.date === date);
+      if (!dayRecords.length) return null;
+      let totalLabor = 0, totalItems = 0;
+      const items = [];
+      const workerSummary = {};
+      dayRecords.forEach(r => {
+        totalLabor += (r.laborCost || 0);
+        totalItems += (r.itemsTotal || 0);
+        (r.items || []).forEach(it => {
+          items.push({ name: it.name, cost: it.cost, recordId: r.id, plantation: r.plantationType });
+        });
+        (r.workers || []).forEach(w => {
+          const name = w.name || 'Unknown';
+          if (!workerSummary[name]) {
+            workerSummary[name] = { job: w.jobDescription || 'General Labor', fullDays: 0, halfDays: 0, laborCost: 0, records: [] };
+          }
+          workerSummary[name].fullDays += (w.fullDays || 0);
+          workerSummary[name].halfDays += (w.halfDays || 0);
+          workerSummary[name].laborCost += calcWorkerCost(w);
+          workerSummary[name].records.push(r.id);
+        });
+      });
+      return {
+        date,
+        recordCount: dayRecords.length,
+        totalLaborCost: round2(totalLabor),
+        totalItemsCost: round2(totalItems),
+        totalExpenditure: round2(totalLabor + totalItems),
+        items,
+        workerSummary
+      };
+    }
+
+    function getStatistics() {
+      if (!records.length) return null;
+      let totalCost = 0, totalLabor = 0, totalItems = 0, totalWorkers = 0;
+      records.forEach(r => {
+        totalCost += (r.totalExpenditure || 0);
+        totalLabor += (r.laborCost || 0);
+        totalItems += (r.itemsTotal || 0);
+        totalWorkers += (r.workers || []).length;
+      });
+      const costs = records.map(r => r.totalExpenditure || 0);
+      const maxCost = Math.max(...costs);
+      const minCost = Math.min(...costs);
+      const avgCost = totalCost / records.length;
+      const workerMap = {};
+      records.forEach(r => {
+        (r.workers || []).forEach(w => {
+          const name = w.name || 'Unknown';
+          if (!workerMap[name]) workerMap[name] = { laborCost: 0, records: 0, jobs: new Set() };
+          workerMap[name].laborCost += calcWorkerCost(w);
+          workerMap[name].records += 1;
+          if (w.jobDescription) workerMap[name].jobs.add(w.jobDescription);
+        });
+      });
+      const topWorkers = Object.entries(workerMap).sort((a,b) => b[1].laborCost - a[1].laborCost).slice(0,10).map(([name, data]) => ({
+        name,
+        laborCost: round2(data.laborCost),
+        records: data.records,
+        jobs: Array.from(data.jobs).slice(0,2)
+      }));
+      return {
+        totalRecords: records.length,
+        totalCost: round2(totalCost),
+        totalLaborCost: round2(totalLabor),
+        totalItemsCost: round2(totalItems),
+        totalWorkers,
+        averageCost: round2(avgCost),
+        maxCost: round2(maxCost),
+        minCost: round2(minCost),
+        topWorkers
+      };
+    }
+
+    function getExpendituresByDate(date) {
+      const dayRecords = records.filter(r => r.date === date);
+      if (!dayRecords.length) return null;
+      let labor=0, items=0;
+      dayRecords.forEach(r => { labor += (r.laborCost || 0); items += (r.itemsTotal || 0); });
+      return { date, recordCount: dayRecords.length, totalLaborCost: round2(labor), totalItemsCost: round2(items), totalExpenditure: round2(labor+items), records: dayRecords };
+    }
+
+    const content = document.getElementById('dynamicContent');
+    const panelTitle = document.getElementById('panelTitle');
+    const actionHint = document.getElementById('actionHint');
+    const recordCounter = document.getElementById('recordCounter');
+
+    function updateCounter() {
+      recordCounter.textContent = records.length + ' record' + (records.length !== 1 ? 's' : '');
+    }
+
+    function render(html) {
+      content.innerHTML = html;
+      content.classList.remove('fade-in');
+      setTimeout(() => content.classList.add('fade-in'), 10);
+      updateCounter();
+    }
+
+    function showEmpty(title, msg) {
+      panelTitle.textContent = title || 'Info';
+      actionHint.textContent = 'ℹ️ ' + (msg || '');
+      render(`
+        <div class="empty-state">
+          <i class="fas fa-info-circle"></i>
+          <p>${msg || 'No data'}</p>
+        </div>
+      `);
+    }
+
+    function renderRecordCards(list) {
+      if (!list || !list.length) {
+        render(`<div class="empty-state"><i class="fas fa-box-open"></i><p>No records found</p></div>`);
+        return;
+      }
+      let html = `<div class="scrollable">`;
+      list.forEach(r => {
+        const workers = r.workers || [];
+        const items = r.items || [];
+        html += `
+          <div class="record-card">
+            <div class="record-header">
+              <span class="record-plant"><i class="fas fa-tree"></i> ${r.plantationType || 'Unknown'}</span>
+              <span class="record-id">#${r.id}</span>
+              <span class="record-date"><i class="far fa-calendar-alt"></i> ${r.date || 'N/A'}</span>
+            </div>
+            <div class="record-detail-grid">
+              <div class="detail-item"><i class="fas fa-users"></i> ${workers.length} worker${workers.length!==1?'s':''}</div>
+              <div class="detail-item"><i class="fas fa-user-clock"></i> ${(r.fullDays||0).toFixed(1)} full / ${(r.halfDays||0).toFixed(1)} half</div>
+              <div class="detail-item"><i class="fas fa-box"></i> ${items.length} item${items.length!==1?'s':''}</div>
+              <div class="detail-item total-amount"><i class="fas fa-coins"></i> ${formatCurrency(r.totalExpenditure)}</div>
+            </div>
+            <div style="margin-top:0.5rem;">
+              ${workers.slice(0,4).map(w => `<span class="worker-tag"><i class="fas fa-user"></i> ${w.name || 'Unknown'}</span>`).join('')}
+              ${workers.length > 4 ? `<span class="worker-tag">+${workers.length-4} more</span>` : ''}
+              ${items.slice(0,4).map(it => `<span class="item-tag"><i class="fas fa-cube"></i> ${it.name}</span>`).join('')}
+              ${items.length > 4 ? `<span class="item-tag">+${items.length-4}</span>` : ''}
+            </div>
+          </div>
+        `;
+      });
+      html += `</div>`;
+      render(html);
+    }
+
+    function showHelp() {
+      panelTitle.textContent = '📖 Help & User Guide';
+      actionHint.textContent = 'Interactive table of contents and documentation';
+      
+      const helpHTML = `
+        <div class="toc-container">
+          <h3><i class="fas fa-book-open"></i> Interactive Table of Contents</h3>
+          
+          <details open>
+            <summary><strong>🚀 Quick Start</strong></summary>
+            <ul class="toc-list">
+              <li><a href="#quick-start"><i class="fas fa-rocket"></i> Getting Started</a></li>
+              <li><a href="#installation"><i class="fas fa-download"></i> Installation</a></li>
+              <li><a href="#first-use"><i class="fas fa-play"></i> First Use</a></li>
+            </ul>
+          </details>
+
+          <details>
+            <summary><strong>🎯 Core Features</strong></summary>
+            <ul class="toc-list">
+              <li><a href="#record-management"><i class="fas fa-pen"></i> Record Management</a></li>
+              <li><a href="#worker-tracking"><i class="fas fa-users"></i> Worker Tracking</a></li>
+              <li><a href="#item-tracking"><i class="fas fa-box"></i> Item/Expense Tracking</a></li>
+              <li><a href="#reporting"><i class="fas fa-chart-bar"></i> Reporting System</a></li>
+            </ul>
+          </details>
+
+          <details>
+            <summary><strong>📊 Reports & Analytics</strong></summary>
+            <ul class="toc-list">
+              <li><a href="#stats-dashboard"><i class="fas fa-chart-pie"></i> Statistics Dashboard</a></li>
+              <li><a href="#date-reports"><i class="fas fa-calendar"></i> Date-Based Reports</a></li>
+              <li><a href="#worker-reports"><i class="fas fa-user-clock"></i> Worker Reports</a></li>
+              <li><a href="#export"><i class="fas fa-file-export"></i> Export Capabilities</a></li>
+            </ul>
+          </details>
+
+          <details>
+            <summary><strong>💡 User Guide</strong></summary>
+            <ul class="toc-list">
+              <li><a href="#adding-records"><i class="fas fa-plus-circle"></i> Adding Records</a></li>
+              <li><a href="#managing-workers"><i class="fas fa-user-cog"></i> Managing Workers</a></li>
+              <li><a href="#searching"><i class="fas fa-search"></i> Searching Records</a></li>
+              <li><a href="#generating-reports"><i class="fas fa-file-alt"></i> Generating Reports</a></li>
+            </ul>
+          </details>
+
+          <details>
+            <summary><strong>🔧 Customization</strong></summary>
+            <ul class="toc-list">
+              <li><a href="#config"><i class="fas fa-sliders-h"></i> Configuration Options</a></li>
+              <li><a href="#styling"><i class="fas fa-palette"></i> Styling</a></li>
+              <li><a href="#new-types"><i class="fas fa-plus"></i> Adding New Plantation Types</a></li>
+            </ul>
+          </details>
+
+          <details>
+            <summary><strong>❓ FAQ</strong></summary>
+            <ul class="toc-list">
+              <li><a href="#faq-common"><i class="fas fa-question"></i> Common Questions</a></li>
+              <li><a href="#troubleshooting"><i class="fas fa-tools"></i> Troubleshooting</a></li>
+            </ul>
+          </details>
+        </div>
+
+        <div id="quick-start" class="help-section">
+          <h3><i class="fas fa-rocket"></i> Quick Start</h3>
+          <p>Welcome to the Plantation Expenditure System! This app helps you track expenses, workers, and items for your plantation operations.</p>
+          
+          <h4 id="installation">Installation</h4>
+          <p>No installation needed! Simply open <code>index.html</code> in any modern web browser.</p>
+          <ul>
+            <li><strong>Chrome</strong> 60+ ✅</li>
+            <li><strong>Firefox</strong> 60+ ✅</li>
+            <li><strong>Safari</strong> 12+ ✅</li>
+            <li><strong>Edge</strong> 79+ ✅</li>
+          </ul>
+
+          <h4 id="first-use">First Use</h4>
+          <ol>
+            <li>Click on any plantation type (Coconut, Lanzones, Durian, or Maize)</li>
+            <li>Fill in the date and daily wage</li>
+            <li>Add workers with their details</li>
+            <li>Add purchased items</li>
+            <li>Click "Save Record"</li>
+          </ol>
+        </div>
+
+        <div id="record-management" class="help-section">
+          <h3><i class="fas fa-pen"></i> Record Management</h3>
+          <ul>
+            <li><strong>Add Records:</strong> Create new plantation expenditure records</li>
+            <li><strong>Delete Records:</strong> Remove records by ID (use with caution)</li>
+            <li><strong>View All:</strong> Display all records in reverse chronological order</li>
+          </ul>
+        </div>
+
+        <div id="worker-tracking" class="help-section">
+          <h3><i class="fas fa-users"></i> Worker Tracking</h3>
+          <p>Each worker record includes:</p>
+          <ul>
+            <li>Name and job description</li>
+            <li>Full days and half days worked</li>
+            <li>Individual daily wage (can differ from default)</li>
+          </ul>
+          <p><strong>Calculation:</strong> <code>Worker Cost = (Full Days + Half Days × 0.5) × Daily Wage</code></p>
+        </div>
+
+        <div id="item-tracking" class="help-section">
+          <h3><i class="fas fa-box"></i> Item/Expense Tracking</h3>
+          <p>Track purchased items with:</p>
+          <ul>
+            <li>Item name</li>
+            <li>Cost amount</li>
+          </ul>
+        </div>
+
+        <div id="reporting" class="help-section">
+          <h3><i class="fas fa-chart-bar"></i> Reporting System</h3>
+          <ul>
+            <li><strong>Statistics Dashboard:</strong> Overview of all records</li>
+            <li><strong>Date Range Reports:</strong> Filter by date range</li>
+            <li><strong>Worker History:</strong> Track worker performance</li>
+            <li><strong>Daily Summaries:</strong> Comprehensive daily reports</li>
+          </ul>
+        </div>
+
+        <div id="stats-dashboard" class="help-section">
+          <h3><i class="fas fa-chart-pie"></i> Statistics Dashboard</h3>
+          <p>Shows:</p>
+          <ul>
+            <li>Total records count</li>
+            <li>Total expenditure</li>
+            <li>Labor vs Items breakdown</li>
+            <li>Top workers by labor cost</li>
+            <li>Average cost per record</li>
+          </ul>
+        </div>
+
+        <div id="date-reports" class="help-section">
+          <h3><i class="fas fa-calendar"></i> Date-Based Reports</h3>
+          <ol>
+            <li><strong>By Date:</strong> View all records for a specific date</li>
+            <li><strong>Date Range:</strong> Filter records between two dates</li>
+            <li><strong>Items by Date:</strong> See all items purchased on a date</li>
+            <li><strong>Full Summary:</strong> Comprehensive daily breakdown</li>
+          </ol>
+        </div>
+
+        <div id="worker-reports" class="help-section">
+          <h3><i class="fas fa-user-clock"></i> Worker Reports</h3>
+          <ol>
+            <li><strong>Worker History:</strong> All records for a specific worker</li>
+            <li><strong>Worker Summary:</strong> Daily worker performance</li>
+          </ol>
+        </div>
+
+        <div id="export" class="help-section">
+          <h3><i class="fas fa-file-export"></i> Export Capabilities</h3>
+          <ul>
+            <li><strong>CSV Export:</strong> Download all data in CSV format</li>
+            <li><strong>Data Structure:</strong> ID, Date, Plantation, Worker, Job, Days, Costs</li>
+          </ul>
+        </div>
+
+        <div id="adding-records" class="help-section">
+          <h3><i class="fas fa-plus-circle"></i> Adding Records</h3>
+          <ol>
+            <li>Select plantation type from the menu</li>
+            <li>Enter date and daily wage</li>
+            <li>Add workers with name, job, full days, and half days</li>
+            <li>Add items with name and cost</li>
+            <li>Click "Save Record"</li>
+          </ol>
+        </div>
+
+        <div id="managing-workers" class="help-section">
+          <h3><i class="fas fa-user-cog"></i> Managing Workers</h3>
+          <ul>
+            <li>Each worker can have different daily wages</li>
+            <li>Track both full and half days</li>
+            <li>Add job descriptions for better tracking</li>
+          </ul>
+        </div>
+
+        <div id="searching" class="help-section">
+          <h3><i class="fas fa-search"></i> Searching Records</h3>
+          <p><strong>Search Filters:</strong></p>
+          <ul>
+            <li><strong>Plantation Type:</strong> Partial or full name</li>
+            <li><strong>Date Range:</strong> From and To dates</li>
+            <li><strong>Cost Range:</strong> Minimum and maximum</li>
+            <li><strong>Worker Name:</strong> Partial name search</li>
+          </ul>
+          <p><strong>Tips:</strong></p>
+          <ul>
+            <li>Leave fields blank to include all records</li>
+            <li>Use partial names for broader results</li>
+            <li>Combine filters for precise results</li>
+          </ul>
+        </div>
+
+        <div id="generating-reports" class="help-section">
+          <h3><i class="fas fa-file-alt"></i> Generating Reports</h3>
+          <ol>
+            <li><strong>Statistics Dashboard:</strong> Click "Statistics" for overview</li>
+            <li><strong>Date Reports:</strong> Use "By Date" or "Date Range"</li>
+            <li><strong>Full Summary:</strong> Get detailed daily analysis</li>
+          </ol>
+        </div>
+
+        <div id="config" class="help-section">
+          <h3><i class="fas fa-sliders-h"></i> Configuration Options</h3>
+          <p>Default values in the code:</p>
+          <pre><code>const DEFAULT_WAGE = 350.00;  // Default daily wage
+const DATE_EXAMPLE = "2026-07-05";  // Date format</code></pre>
+        </div>
+
+        <div id="styling" class="help-section">
+          <h3><i class="fas fa-palette"></i> Styling</h3>
+          <p>Modify the CSS variables for custom colors:</p>
+          <pre><code>:root {
+  --primary-blue: #4a8af4;
+  --secondary-blue: #6a9af4;
+  --dark-bg: #0a0e1a;
+  --card-bg: #1a2332;
+}</code></pre>
+        </div>
+
+        <div id="new-types" class="help-section">
+          <h3><i class="fas fa-plus"></i> Adding New Plantation Types</h3>
+          <ol>
+            <li>Add menu button in HTML</li>
+            <li>Add case in JavaScript switch statement</li>
+            <li>Add Font Awesome icon</li>
+          </ol>
+        </div>
+
+        <div id="faq-common" class="help-section">
+          <h3><i class="fas fa-question"></i> Common Questions</h3>
+          <ul>
+            <li><strong>Does it work offline?</strong> Yes! Once loaded, the app works completely offline.</li>
+            <li><strong>Where is my data stored?</strong> In your browser's localStorage. It stays on your device.</li>
+            <li><strong>Can I use this on mobile?</strong> Yes! The interface is fully responsive.</li>
+            <li><strong>How many records can I store?</strong> Limited by browser storage (typically 5-10MB).</li>
+          </ul>
+        </div>
+
+        <div id="troubleshooting" class="help-section">
+          <h3><i class="fas fa-tools"></i> Troubleshooting</h3>
+          <ul>
+            <li><strong>Records Not Saving:</strong> Check browser localStorage permissions</li>
+            <li><strong>Page Not Loading:</strong> Verify all files are present</li>
+            <li><strong>Data Lost:</strong> Check if localStorage is full</li>
+            <li><strong>Performance Issues:</strong> Limit records or use date filters</li>
+          </ul>
+        </div>
+
+        <div class="help-section" style="background:rgba(74,138,244,0.05);border-left-color:#4a8af4;">
+          <h3><i class="fas fa-heart" style="color:#4a8af4;"></i> Support</h3>
+          <p>For support, feature requests, or bug reports:</p>
+          <ul>
+            <li><strong>GitHub Issues:</strong> Create an issue in the repository</li>
+            <li><strong>Documentation:</strong> Check the full documentation</li>
+          </ul>
+          <p style="margin-top:1rem;font-size:0.9rem;color:#7a9bcb;">
+            <i class="fas fa-python"></i> Made with ❤️ for the agricultural community
+          </p>
+        </div>
+      `;
+      
+      render(helpHTML);
+      
+      document.querySelectorAll('.toc-list a, .help-section a[href^="#"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const targetId = this.getAttribute('href');
+          if (targetId && targetId.startsWith('#')) {
+            const target = document.querySelector(targetId);
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        });
+      });
+    }
+
+    function showAddForm(plantationType) {
+      panelTitle.textContent = `Add ${plantationType}`;
+      actionHint.textContent = 'Fill in details and save';
+      render(`
+        <div>
+          <div class="input-group"><label>Date</label><input type="date" id="recDate" value="${getTodayStr()}" /></div>
+          <div class="input-group"><label>Daily Wage (₱)</label><input type="number" id="recWage" step="0.01" value="${DEFAULT_WAGE}" /></div>
+          <hr>
+          <h4><i class="fas fa-user"></i> Workers</h4>
+          <div id="workerContainer">
+            <div class="flex-row mb-1"><input type="text" id="workerName" placeholder="Name" style="flex:1;" /> 
+            <input type="text" id="workerJob" placeholder="Job" style="flex:1;" />
+            <input type="number" id="workerFull" placeholder="Full days" style="width:80px;" />
+            <input type="number" id="workerHalf" placeholder="Half days" style="width:80px;" />
+            <button class="btn btn-primary" id="addWorkerBtn"><i class="fas fa-plus"></i> Add</button></div>
+            <div id="workerList" class="worker-list"></div>
+          </div>
+          <hr>
+          <h4><i class="fas fa-box"></i> Items</h4>
+          <div id="itemContainer">
+            <div class="flex-row mb-1"><input type="text" id="itemName" placeholder="Item name" style="flex:2;" />
+            <input type="number" id="itemCost" placeholder="Cost" style="width:100px;" />
+            <button class="btn btn-primary" id="addItemBtn"><i class="fas fa-plus"></i> Add</button></div>
+            <div id="itemList" class="item-list"></div>
+          </div>
+          <div class="flex-row mt-2">
+            <button class="btn btn-primary" id="saveRecordBtn"><i class="fas fa-save"></i> Save Record</button>
+            <button class="btn btn-outline" id="cancelAddBtn">Cancel</button>
+          </div>
+        </div>
+      `);
+
+      const workers = [];
+      const items = [];
+
+      function refreshWorkerUI() {
+        const container = document.getElementById('workerList');
+        if (!container) return;
+        container.innerHTML = workers.map((w, idx) => 
+          `<span class="worker-tag">${w.name} (${w.job}) ${w.fullDays}d ${w.halfDays}hd <i class="fas fa-times" style="cursor:pointer;color:#ff6b6b;" data-idx="${idx}"></i></span>`
+        ).join('');
+        document.querySelectorAll('#workerList .fa-times').forEach(el => {
+          el.addEventListener('click', function() {
+            const idx = parseInt(this.dataset.idx);
+            workers.splice(idx, 1);
+            refreshWorkerUI();
+          });
+        });
+      }
+
+      function refreshItemUI() {
+        const container = document.getElementById('itemList');
+        if (!container) return;
+        container.innerHTML = items.map((it, idx) => 
+          `<span class="item-tag">${it.name} ${formatCurrency(it.cost)} <i class="fas fa-times" style="cursor:pointer;color:#ff6b6b;" data-idx="${idx}"></i></span>`
+        ).join('');
+        document.querySelectorAll('#itemList .fa-times').forEach(el => {
+          el.addEventListener('click', function() {
+            const idx = parseInt(this.dataset.idx);
+            items.splice(idx, 1);
+            refreshItemUI();
+          });
+        });
+      }
+
+      document.getElementById('addWorkerBtn').addEventListener('click', function() {
+        const name = document.getElementById('workerName').value.trim();
+        const job = document.getElementById('workerJob').value.trim() || 'General Labor';
+        const full = parseFloat(document.getElementById('workerFull').value) || 0;
+        const half = parseFloat(document.getElementById('workerHalf').value) || 0;
+        if (!name) { alert('Worker name required'); return; }
+        workers.push({ name, jobDescription: job, fullDays: full, halfDays: half, dailyWage: parseFloat(document.getElementById('recWage').value) || DEFAULT_WAGE });
+        refreshWorkerUI();
+        document.getElementById('workerName').value = ''; document.getElementById('workerJob').value = ''; 
+        document.getElementById('workerFull').value = ''; document.getElementById('workerHalf').value = '';
+      });
+
+      document.getElementById('addItemBtn').addEventListener('click', function() {
+        const name = document.getElementById('itemName').value.trim();
+        const cost = parseFloat(document.getElementById('itemCost').value) || 0;
+        if (!name) { alert('Item name required'); return; }
+        items.push({ name, cost });
+        refreshItemUI();
+        document.getElementById('itemName').value = ''; document.getElementById('itemCost').value = '';
+      });
+
+      document.getElementById('saveRecordBtn').addEventListener('click', function() {
+        const date = document.getElementById('recDate').value;
+        const wage = parseFloat(document.getElementById('recWage').value) || DEFAULT_WAGE;
+        if (!date) { alert('Date required'); return; }
+        const rec = createRecord(plantationType, { date, workers: workers.slice(), items: items.slice(), dailyWage: wage });
+        addRecord(rec);
+        showAllRecords();
+      });
+
+      document.getElementById('cancelAddBtn').addEventListener('click', function() {
+        showAllRecords();
+      });
+    }
+
+    function showAllRecords() {
+      panelTitle.textContent = 'All Records';
+      actionHint.textContent = `${records.length} record${records.length!==1?'s':''}`;
+      if (!records.length) { showEmpty('No Records', 'No records found. Add a new record using the menu.'); return; }
+      renderRecordCards(records.slice().reverse());
+    }
+
+    function showSearch() {
+      panelTitle.textContent = 'Search Records';
+      actionHint.textContent = 'Fill any fields to filter';
+      render(`
+        <div>
+          <div class="input-group"><label>Plantation type</label><input type="text" id="searchPlant" placeholder="e.g. Coconut" /></div>
+          <div class="input-group"><label>Date from</label><input type="date" id="searchDateFrom" /></div>
+          <div class="input-group"><label>Date to</label><input type="date" id="searchDateTo" /></div>
+          <div class="input-group"><label>Min cost</label><input type="number" id="searchMin" step="0.01" placeholder="0" /></div>
+          <div class="input-group"><label>Max cost</label><input type="number" id="searchMax" step="0.01" placeholder="999999" /></div>
+          <div class="input-group"><label>Worker name</label><input type="text" id="searchWorker" placeholder="Name" /></div>
+          <button class="btn btn-primary" id="doSearchBtn"><i class="fas fa-search"></i> Search</button>
+          <button class="btn btn-outline" id="clearSearchBtn" style="margin-left:0.5rem;">Clear</button>
+        </div>
+      `);
+      document.getElementById('doSearchBtn').addEventListener('click', function() {
+        const filters = {
+          plantationType: document.getElementById('searchPlant').value.trim() || undefined,
+          dateFrom: document.getElementById('searchDateFrom').value || undefined,
+          dateTo: document.getElementById('searchDateTo').value || undefined,
+          minCost: parseFloat(document.getElementById('searchMin').value) || undefined,
+          maxCost: parseFloat(document.getElementById('searchMax').value) || undefined,
+          workerName: document.getElementById('searchWorker').value.trim() || undefined
+        };
+        const results = searchRecords(filters);
+        panelTitle.textContent = `Search Results (${results.length})`;
+        actionHint.textContent = results.length ? 'Matching records' : 'No matches';
+        renderRecordCards(results);
+      });
+      document.getElementById('clearSearchBtn').addEventListener('click', function() {
+        showAllRecords();
+      });
+    }
+
+    function showStatistics() {
+      const stats = getStatistics();
+      if (!stats) { showEmpty('Statistics', 'No records to analyze.'); return; }
+      panelTitle.textContent = '📈 Statistics';
+      actionHint.textContent = 'Overview of all records';
+      let workerHtml = stats.topWorkers.map(w => 
+        `<div style="display:flex;justify-content:space-between;border-bottom:1px solid rgba(74,138,244,0.1);padding:0.3rem 0;color:#b7c9e2;">
+          <span><i class="fas fa-user" style="color:#4a8af4;"></i> ${w.name}</span>
+          <span style="color:#4a8af4;">${formatCurrency(w.laborCost)} (${w.records} rec)</span>
+        </div>`
+      ).join('');
+      render(`
+        <div>
+          <div class="summary-stat">
+            <div class="stat-box"><div class="number">${stats.totalRecords}</div><div class="label">Records</div></div>
+            <div class="stat-box"><div class="number">${formatCurrency(stats.totalCost)}</div><div class="label">Total</div></div>
+            <div class="stat-box"><div class="number">${formatCurrency(stats.totalLaborCost)}</div><div class="label">Labor</div></div>
+            <div class="stat-box"><div class="number">${formatCurrency(stats.totalItemsCost)}</div><div class="label">Items</div></div>
+            <div class="stat-box"><div class="number">${stats.totalWorkers}</div><div class="label">Workers</div></div>
+            <div class="stat-box"><div class="number">${formatCurrency(stats.averageCost)}</div><div class="label">Avg / record</div></div>
+          </div>
+          <div style="margin-top:1rem;color:#e6edf3;"><strong style="color:#4a8af4;">Top workers by labor cost</strong>
+            <div style="margin-top:0.5rem;">${workerHtml || 'None'}</div>
+          </div>
+        </div>
+      `);
+    }
+
+    function showByDate() {
+      const date = prompt('Enter date (YYYY-MM-DD):', getTodayStr());
+      if (!date) return;
+      const data = getExpendituresByDate(date);
+      if (!data) { showEmpty('Date View', `No records for ${date}`); return; }
+      panelTitle.textContent = `📅 ${date}`;
+      actionHint.textContent = `${data.recordCount} records, total ${formatCurrency(data.totalExpenditure)}`;
+      renderRecordCards(data.records);
+    }
+
+    function showDateRange() {
+      const from = prompt('Start date (YYYY-MM-DD):', getTodayStr());
+      if (!from) return;
+      const to = prompt('End date (YYYY-MM-DD):', getTodayStr());
+      if (!to) return;
+      if (from > to) { alert('Start date must be <= end date'); return; }
+      const filtered = records.filter(r => r.date >= from && r.date <= to);
+      panelTitle.textContent = `Date Range ${from} → ${to}`;
+      actionHint.textContent = `${filtered.length} records`;
+      renderRecordCards(filtered);
+    }
+
+    function showItemsByDate() {
+      const date = prompt('Enter date (YYYY-MM-DD):', getTodayStr());
+      if (!date) return;
+      const dayRecs = records.filter(r => r.date === date);
+      if (!dayRecs.length) { showEmpty('Items', `No items for ${date}`); return; }
+      let allItems = [];
+      dayRecs.forEach(r => {
+        (r.items || []).forEach(it => allItems.push({ ...it, plantation: r.plantationType, recordId: r.id }));
+      });
+      if (!allItems.length) { showEmpty('Items', `No items purchased on ${date}`); return; }
+      panelTitle.textContent = `📦 Items on ${date}`;
+      actionHint.textContent = `${allItems.length} items`;
+      let html = `<div style="color:#e6edf3;"><strong style="color:#4a8af4;">Total items cost: ${formatCurrency(allItems.reduce((s,it) => s + (it.cost||0), 0))}</strong><div style="margin-top:0.8rem;">`;
+      allItems.forEach(it => {
+        html += `<div class="record-card" style="border-left-color:#6a9af4;"><i class="fas fa-cube" style="color:#4a8af4;"></i> ${it.name} — ${formatCurrency(it.cost)} <span style="color:#7a9bcb;font-size:0.8rem;">(#${it.recordId} ${it.plantation})</span></div>`;
+      });
+      html += `</div></div>`;
+      render(html);
+    }
+
+    function showFullSummary() {
+      const date = prompt('Enter date (YYYY-MM-DD):', getTodayStr());
+      if (!date) return;
+      const data = getFullSummaryByDate(date);
+      if (!data) { showEmpty('Summary', `No records for ${date}`); return; }
+      panelTitle.textContent = `🧾 Full Summary ${date}`;
+      actionHint.textContent = `${data.recordCount} records`;
+      let html = `
+        <div class="summary-stat">
+          <div class="stat-box"><div class="number">${data.recordCount}</div><div class="label">Records</div></div>
+          <div class="stat-box"><div class="number">${formatCurrency(data.totalLaborCost)}</div><div class="label">Labor</div></div>
+          <div class="stat-box"><div class="number">${formatCurrency(data.totalItemsCost)}</div><div class="label">Items</div></div>
+          <div class="stat-box"><div class="number">${formatCurrency(data.totalExpenditure)}</div><div class="label">Total</div></div>
+        </div>
+        <h4><i class="fas fa-box"></i> Items</h4>
+        ${data.items.length ? data.items.map(it => `<div style="color:#b7c9e2;"><i class="fas fa-cube" style="color:#4a8af4;"></i> ${it.name} — ${formatCurrency(it.cost)} (${it.plantation})</div>`).join('') : '<div class="text-muted">None</div>'}
+        <hr><h4><i class="fas fa-users"></i> Workers</h4>
+        ${Object.entries(data.workerSummary).map(([name, info]) => `
+          <div style="background:rgba(13,17,23,0.4);padding:0.5rem 1rem;border-radius:20px;margin-bottom:0.4rem;border:1px solid rgba(74,138,244,0.08);color:#b7c9e2;">
+            <strong style="color:#e6edf3;">${name}</strong> (${info.job}) — ${info.fullDays.toFixed(1)}d / ${info.halfDays.toFixed(1)}hd — <span style="color:#4a8af4;">${formatCurrency(info.laborCost)}</span>
+          </div>
+        `).join('') || '<div class="text-muted">None</div>'}
+      `;
+      render(html);
+    }
+
+    function showWorkerHistory() {
+      const name = prompt('Enter worker name:');
+      if (!name) return;
+      const history = getWorkerHistory(name);
+      if (!history.length) { showEmpty('Worker History', `No records found for "${name}"`); return; }
+      panelTitle.textContent = `👷 ${name}`;
+      actionHint.textContent = `${history.length} entries`;
+      let total = 0, full=0, half=0;
+      history.forEach(h => { total += h.laborCost; full += h.fullDays; half += h.halfDays; });
+      let html = `<div style="color:#e6edf3;"><strong style="color:#4a8af4;">Total labor cost: ${formatCurrency(total)}</strong> | Full days: ${full.toFixed(1)} | Half: ${half.toFixed(1)}</div><div style="margin-top:0.8rem;">`;
+      history.forEach(h => {
+        html += `<div class="record-card" style="border-left-color:#6a9af4;">
+          <div style="color:#b7c9e2;"><strong style="color:#e6edf3;">${h.date}</strong>  #${h.recordId} — ${h.job}</div>
+          <div style="color:#b7c9e2;">${h.fullDays}d / ${h.halfDays}hd — ${formatCurrency(h.dailyWage)}/day → <span style="color:#4a8af4;">${formatCurrency(h.laborCost)}</span></div>
+        </div>`;
+      });
+      html += `</div>`;
+      render(html);
+    }
+
+    function showWorkerSummaryByDate() {
+      const date = prompt('Enter date (YYYY-MM-DD):', getTodayStr());
+      if (!date) return;
+      const data = getWorkerSummaryByDate(date);
+      if (!data) { showEmpty('Worker Summary', `No records for ${date}`); return; }
+      panelTitle.textContent = `👷 Worker Summary ${date}`;
+      actionHint.textContent = `Total labor ${formatCurrency(data.totalLaborCost)}`;
+      let html = `<div style="color:#e6edf3;"><strong style="color:#4a8af4;">Total labor cost: ${formatCurrency(data.totalLaborCost)}</strong></div><div style="margin-top:0.8rem;">`;
+      Object.entries(data.workerSummary).forEach(([name, info]) => {
+        html += `<div class="record-card" style="border-left-color:#5a8af4;">
+          <strong style="color:#e6edf3;">${name}</strong> <span style="color:#b7c9e2;">(${info.job})</span> — ${info.fullDays.toFixed(1)}d / ${info.halfDays.toFixed(1)}hd — <span style="color:#4a8af4;">${formatCurrency(info.laborCost)}</span> <span style="font-size:0.8rem;color:#7a9bcb;">records: ${info.records.join(', ')}</span>
+        </div>`;
+      });
+      html += `</div>`;
+      render(html);
+    }
+
+    function deleteRecordFlow() {
+      const id = prompt('Enter record ID to delete:');
+      if (!id) return;
+      const num = parseInt(id);
+      if (isNaN(num)) { alert('Invalid ID'); return; }
+      const rec = getRecord(num);
+      if (!rec) { alert('Record not found'); return; }
+      if (confirm(`Delete record #${num} (${rec.plantationType})?`)) {
+        if (deleteRecordById(num)) {
+          alert('Record deleted');
+          showAllRecords();
+        } else {
+          alert('Delete failed');
+        }
+      }
+    }
+
+    function exportCSV() {
+      if (!records.length) { alert('No records to export'); return; }
+      let csv = 'ID,Date,Plantation,Worker,Job,FullDays,HalfDays,DailyWage,LaborCost,ItemsTotal,Total\n';
+      records.forEach(r => {
+        const workers = r.workers || [];
+        if (workers.length) {
+          workers.forEach(w => {
+            csv += `${r.id},${r.date},"${r.plantationType}","${w.name || ''}","${w.jobDescription || ''}",${w.fullDays||0},${w.halfDays||0},${w.dailyWage||r.dailyWage||DEFAULT_WAGE},${calcWorkerCost(w)},${r.itemsTotal||0},${r.totalExpenditure||0}\n`;
+          });
+        } else {
+          csv += `${r.id},${r.date},"${r.plantationType}",,,0,0,${r.dailyWage||DEFAULT_WAGE},0,${r.itemsTotal||0},${r.totalExpenditure||0}\n`;
+        }
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'plantation_export.csv';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      alert('Export complete');
+    }
+
+    function initMenu() {
+      document.querySelectorAll('.menu-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const action = this.dataset.action;
+          switch(action) {
+            case 'addCoconut': showAddForm('Coconut Plantation'); break;
+            case 'addLanzones': showAddForm('Lanzones Plantation'); break;
+            case 'addDurian': showAddForm('Durian Plantation'); break;
+            case 'addMaize': showAddForm('Maize Production'); break;
+            case 'viewAll': showAllRecords(); break;
+            case 'search': showSearch(); break;
+            case 'stats': showStatistics(); break;
+            case 'byDate': showByDate(); break;
+            case 'byDateRange': showDateRange(); break;
+            case 'itemsByDate': showItemsByDate(); break;
+            case 'fullSummary': showFullSummary(); break;
+            case 'workerHistory': showWorkerHistory(); break;
+            case 'workerSummary': showWorkerSummaryByDate(); break;
+            case 'deleteRecord': deleteRecordFlow(); break;
+            case 'exportCsv': exportCSV(); break;
+            case 'help': showHelp(); break;
+            case 'clear': showAllRecords(); break;
+            default: showAllRecords();
+          }
+        });
+      });
+    }
+
+    loadFromStorage();
+    updateCounter();
+    showAllRecords();
+    initMenu();
+
+  })();
+</script>
+</body>
+</html>
