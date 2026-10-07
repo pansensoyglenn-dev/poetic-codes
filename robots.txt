@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://poetic-codes.pansensoyglenn150.workers.dev/sitemap.xml
