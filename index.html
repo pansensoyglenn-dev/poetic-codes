@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>The Commonplace — Essays on History, Philosophy, Economy, Code & Culture</title>
+  <meta name="description" content="A personal commonplace book of essays spanning history, philosophy, economy, programming, culture, and politics — a running record of what's worth thinking about.">
+  <meta name="keywords" content="commonplace book, personal essays, history, philosophy, economy, programming, culture, politics, long-form writing">
+  <meta name="author" content="Glenn Pansensoy">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://poetic-codes.pages.dev/">
+  <meta name="theme-color" content="#3c2a1f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="The Commonplace">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="The Commonplace">
+  <meta property="og:title" content="The Commonplace — Essays on History, Philosophy, Economy, Code & Culture">
+  <meta property="og:description" content="A personal commonplace book of essays spanning history, philosophy, economy, programming, culture, and politics.">
+  <meta property="og:url" content="https://poetic-codes.pages.dev/">
+  <meta property="og:image" content="https://raw.githubusercontent.com/pansensoyglenn-dev/current-situation/main/IMG_1735.jpeg">
+  <meta property="og:locale" content="en_US">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="The Commonplace — Essays on History, Philosophy, Economy, Code & Culture">
+  <meta name="twitter:description" content="A personal commonplace book of essays spanning history, philosophy, economy, programming, culture, and politics.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/pansensoyglenn-dev/current-situation/main/IMG_1735.jpeg">
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6428799122405621" crossorigin="anonymous"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "The Commonplace",
+    "description": "A personal commonplace book of essays spanning history, philosophy, economy, programming, culture, and politics.",
+    "url": "https://poetic-codes.pages.dev/",
+    "image": "https://raw.githubusercontent.com/pansensoyglenn-dev/current-situation/main/IMG_1735.jpeg",
+    "author": {
+      "@type": "Person",
+      "name": "Glenn Pansensoy"
+    }
+  }
+  </script>
+
+  <style>
+    .hero-banner {
+      width: 100%;
+      max-height: 440px;
+      border-radius: 6px;
+      margin: 1.25rem 0 1.5rem;
+      display: block;
+      box-shadow: 0 4px 22px rgba(0,0,0,0.22);
+      overflow: hidden;
+      background: #f4ede2;
+    }
+    .hero-banner svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .hero-caption {
+      font-size: 12px;
+      color: var(--faint);
+      text-align: right;
+      margin-bottom: 1.5rem;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+  <noscript>
+    <p style="padding:2rem;font-family:sans-serif;color:var(--text);">
+      The Commonplace is a personal essay archive by Glenn Pansensoy, covering history, philosophy, economy,
+      programming, culture, and politics. Enable JavaScript to read entries — this app stores all writing
+      locally in your browser.
+    </p>
+  </noscript>
+  <div class="loading-overlay" id="loading-overlay"><div class="spinner"></div></div>
+
+  <div class="app-layout">
+    <nav class="spine" id="spine" aria-label="Categories">
+      <div class="spine-mark">
+        <div class="spine-ribbon"></div>
+        <svg viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <path d="M8 8 L8 32 L20 27 L32 32 L32 8 Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+          <line x1="20" y1="10" x2="20" y2="27" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="spine-title">The<span>Common</span>place</div>
+
+      <div class="spine-nav">
+        <a class="spine-link active" data-view="home">Home</a>
+        <a class="spine-link" data-view="write">Write</a>
+        <a class="spine-link" data-view="articles">All Articles</a>
+      </div>
+
+      <div class="spine-divider"></div>
+      <div class="spine-label">Sections</div>
+      <div class="spine-tabs" id="spine-tabs"></div>
+    </nav>
+
+    <div class="content-col">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false">☰</button>
+      <div class="topbar-title" id="topbar-title">The Commonplace</div>
+      <div class="topbar-search-wrap">
+        <input type="text" id="search-input" placeholder="Search articles…" aria-label="Search articles" autocomplete="off">
+        <div class="search-results" id="search-results" role="listbox"></div>
+      </div>
+    </header>
+
+    <main class="shell">
+
+      <section class="view active" id="view-home">
+        <div class="card ledger-panel" id="migrate-banner" style="display:none;border-color:var(--stamp);">
+          <h2>Local Articles Found</h2>
+          <p id="migrate-banner-text" style="color:var(--text-secondary);font-size:14px;margin-bottom:12px;"></p>
+          <div class="btn-row">
+            <button class="btn-primary" id="migrate-local-btn">Move them to the database</button>
+          </div>
+          <div id="migrate-status" style="margin-top:10px;font-size:13px;color:var(--faint);"></div>
+        </div>
+
+        <div class="hero-block">
+          <h1>The Commonplace</h1>
+          <p class="hero-sub">A running record of what's worth thinking about — history, philosophy, economy, code, culture, and the world as it turns.</p>
+
+          <div class="hero-banner" role="img" aria-label="An open commonplace book under warm lamplight">
+            <svg viewBox="0 0 1200 440" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#f7efe0"/>
+                  <stop offset="55%" stop-color="#efe0c8"/>
+                  <stop offset="100%" stop-color="#d9c3a1"/>
+                </linearGradient>
+                <radialGradient id="glow" cx="0.5" cy="0.3" r="0.7" fx="0.5" fy="0.25" gradientUnits="objectBoundingBox">
+                  <stop offset="0%" stop-color="#fff6e0" stop-opacity="0.95"/>
+                  <stop offset="60%" stop-color="#f4dcaa" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#f4dcaa" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="lamp" cx="0.5" cy="0.5" r="0.5">
+                  <stop offset="0%" stop-color="#ffe9b0" stop-opacity="1"/>
+                  <stop offset="45%" stop-color="#ffd27a" stop-opacity="0.55"/>
+                  <stop offset="100%" stop-color="#ffd27a" stop-opacity="0"/>
+                </radialGradient>
+                <linearGradient id="pageLeft" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#efe3cd"/>
+                  <stop offset="100%" stop-color="#fbf4e6"/>
+                </linearGradient>
+                <linearGradient id="pageRight" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#fbf4e6"/>
+                  <stop offset="100%" stop-color="#e6d3b3"/>
+                </linearGradient>
+                <linearGradient id="desk" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#5a3d28"/>
+                  <stop offset="100%" stop-color="#2f1c11"/>
+                </linearGradient>
+                <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="1.1"/>
+                </filter>
+              </defs>
+
+              <rect width="1200" height="440" fill="url(#sky)"/>
+              <ellipse cx="600" cy="180" rx="620" ry="320" fill="url(#glow)"/>
+
+              <circle cx="960" cy="90" r="180" fill="url(#lamp)"/>
+              <circle cx="960" cy="90" r="14" fill="#fff2c9" opacity="0.9"/>
+              <circle cx="960" cy="90" r="6" fill="#ffffff"/>
+
+              <g opacity="0.18" stroke="#8a6a44" stroke-width="1.4" fill="none">
+                <rect x="60" y="40" width="220" height="170"/>
+                <line x1="170" y1="40" x2="170" y2="210"/>
+                <line x1="60" y1="125" x2="280" y2="125"/>
+                <rect x="80" y="60" width="180" height="130" opacity="0.5"/>
+              </g>
+
+              <g fill="#fff6dc" opacity="0.55">
+                <circle cx="330" cy="140" r="1.6"/>
+                <circle cx="410" cy="90" r="1.2"/>
+                <circle cx="520" cy="170" r="1.8"/>
+                <circle cx="700" cy="120" r="1.3"/>
+                <circle cx="820" cy="200" r="1.6"/>
+                <circle cx="900" cy="150" r="1.1"/>
+                <circle cx="260" cy="210" r="1.4"/>
+                <circle cx="640" cy="70" r="1.2"/>
+              </g>
+
+              <rect x="0" y="330" width="1200" height="110" fill="url(#desk)"/>
+              <rect x="0" y="330" width="1200" height="3" fill="#7a5433" opacity="0.7"/>
+
+              <ellipse cx="600" cy="352" rx="330" ry="20" fill="#1c0e05" opacity="0.45" filter="url(#soft)"/>
+
+              <g transform="translate(0, 18)">
+                <path d="M 300 340
+                         C 300 300, 310 250, 330 220
+                         C 400 190, 500 190, 590 218
+                         L 590 336
+                         C 500 312, 400 312, 320 336
+                         Z"
+                      fill="url(#pageLeft)" stroke="#c9b48f" stroke-width="1.2"/>
+                <path d="M 610 218
+                         C 700 190, 800 190, 870 220
+                         C 890 250, 900 300, 900 340
+                         L 880 336
+                         C 800 312, 700 312, 610 336
+                         Z"
+                      fill="url(#pageRight)" stroke="#c9b48f" stroke-width="1.2"/>
+                <path d="M 590 218
+                         L 610 218
+                         L 610 336
+                         L 590 336 Z"
+                      fill="#d8c19c"/>
+                <path d="M 592 220 L 608 220 L 608 334 L 592 334 Z"
+                      fill="#b89871" opacity="0.55"/>
+
+                <g stroke="#8b7350" stroke-width="1.1" opacity="0.55">
+                  <line x1="360" y1="250" x2="540" y2="242"/>
+                  <line x1="360" y1="266" x2="552" y2="258"/>
+                  <line x1="360" y1="282" x2="548" y2="274"/>
+                  <line x1="360" y1="298" x2="540" y2="290"/>
+                  <line x1="360" y1="314" x2="552" y2="307"/>
+                </g>
+
+                <g stroke="#8b7350" stroke-width="1.1" opacity="0.55">
+                  <line x1="660" y1="242" x2="840" y2="250"/>
+                  <line x1="660" y1="258" x2="846" y2="266"/>
+                  <line x1="660" y1="274" x2="838" y2="282"/>
+                  <line x1="660" y1="290" x2="846" y2="298"/>
+                  <line x1="660" y1="307" x2="836" y2="314"/>
+                </g>
+
+                <path d="M 596 220 L 604 220 L 608 300 L 600 288 L 592 300 Z"
+                      fill="#8a2c2c" opacity="0.9"/>
+
+                <path d="M 292 342
+                         C 292 300, 302 248, 324 216
+                         L 336 216
+                         C 316 246, 308 298, 308 342 Z"
+                      fill="#3a2416"/>
+                <path d="M 892 342
+                         C 892 300, 882 248, 860 216
+                         L 848 216
+                         C 868 246, 876 298, 876 342 Z"
+                      fill="#3a2416"/>
+              </g>
+
+              <g transform="translate(955 300) rotate(-28)" opacity="0.85">
+                <rect x="-4" y="-110" width="8" height="120" rx="3" fill="#3b2a1c"/>
+                <path d="M -10 -110 L 10 -110 L 4 -170 L -4 -170 Z" fill="#e6dcc7" stroke="#a08a63" stroke-width="1"/>
+                <line x1="0" y1="-165" x2="0" y2="-118" stroke="#a08a63" stroke-width="0.8"/>
+              </g>
+
+              <rect width="1200" height="440" fill="none"/>
+              <radialGradient id="vig" cx="0.5" cy="0.5" r="0.75">
+                <stop offset="60%" stop-color="#000" stop-opacity="0"/>
+                <stop offset="100%" stop-color="#2a1608" stop-opacity="0.35"/>
+              </radialGradient>
+              <rect width="1200" height="440" fill="url(#vig)"/>
+
+              <g text-anchor="middle" font-family="'Libre Caslon Display', 'Libre Caslon Text', Georgia, serif">
+                <text x="600" y="95" font-size="46" fill="#3c2a1f" letter-spacing="2">The Commonplace</text>
+                <line x1="470" y1="112" x2="730" y2="112" stroke="#8a6a44" stroke-width="1" opacity="0.5"/>
+                <text x="600" y="136" font-size="15" fill="#6b5538" letter-spacing="4" font-family="'Inter', sans-serif" font-style="italic">essays &amp; notations</text>
+              </g>
+            </svg>
+          </div>
+          <div class="hero-caption">An open commonplace book — illustrated banner</div>
+
+          <div class="intro-prose">
+            <p>For centuries, readers have kept <em>commonplace books</em> — private notebooks where a passage
+            worth remembering, a half-formed argument, or a stray observation was copied down and filed by
+            theme, so that a lifetime of reading and thinking could be found again later. This is that
+            practice, made public.</p>
+            <p>What you'll find here moves across <a class="inline-link" href="history.html">history</a>,
+            <a class="inline-link" href="philosophy.html">philosophy</a>,
+            <a class="inline-link" href="economy.html">economy</a>,
+            <a class="inline-link" href="programming.html">programming</a>,
+            <a class="inline-link" href="culture.html">culture</a>,
+            <a class="inline-link" href="culinary.html">food</a>,
+            <a class="inline-link" href="local-politics.html">local</a> and
+            <a class="inline-link" href="global-politics.html">global politics</a>,
+            <a class="inline-link" href="weather.html">weather</a>,
+            <a class="inline-link" href="farming.html">farming</a>,
+            <a class="inline-link" href="ai.html">artificial intelligence</a>, and
+            <a class="inline-link" href="music-video.html">music videos</a> — not because these fields have
+            much in common on the surface, but because a mind paying attention doesn't stay in one lane.
+            There's no editorial calendar and no algorithm deciding what comes next — just a running record
+            of what seemed worth thinking about, written down before it was forgotten.</p>
+          </div>
+        </div>
+
+        <div class="card index-card" id="latest-entry-card">
+          <h2>Latest Entry</h2>
+          <div id="latest-entry-content"></div>
+        </div>
+
+        <div class="card index-card">
+          <h2>The Shelf</h2>
+          <div id="shelf-rows"></div>
+        </div>
+
+        <div class="card index-card">
+          <h2>Recently Written <span class="n" id="recent-count-label"></span></h2>
+          <div id="recent-list"></div>
+        </div>
+
+        <div class="ad-slot page-col" id="ad-home">
+          <span class="ad-label">Advertisement</span>
+          <ins class="adsbygoogle"
+               style="display:block"
+               data-ad-client="ca-pub-6428799122405621"
+               data-ad-slot="8844498658"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          <script>
+              (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+        </div>
+
+        <div class="card ledger-panel">
+          <h2>GitHub Auto-Deploy</h2>
+          <p style="color:var(--text-secondary);font-size:14px;margin-bottom:12px;">
+            Every saved article pushes straight to this repo as markdown, photo included. Needs a Personal
+            Access Token with <strong>Contents: read & write</strong> access — kept on this device only.
+          </p>
+          <div class="grid cols-2">
+            <div class="field">
+              <label for="gh-username">GitHub username / org</label>
+              <input type="text" id="gh-username" placeholder="e.g. pansensoyglenn-dev">
+            </div>
+            <div class="field">
+              <label for="gh-repo">Repository name</label>
+              <input type="text" id="gh-repo" placeholder="e.g. poetic-codes">
+            </div>
+            <div class="field">
+              <label for="gh-branch">Branch</label>
+              <input type="text" id="gh-branch" placeholder="main">
+            </div>
+            <div class="field">
+              <label for="gh-token">Personal Access Token</label>
+              <input type="password" id="gh-token" placeholder="ghp_…" autocomplete="off">
+            </div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--text-secondary);margin:8px 0 12px;">
+            <input type="checkbox" id="gh-autodeploy" style="width:16px;height:16px;">
+            Automatically deploy every saved article to GitHub
+          </label>
+          <div class="btn-row">
+            <button class="btn-primary" id="gh-settings-save-btn">Save GitHub settings</button>
+          </div>
+          <div id="gh-status" style="margin-top:10px;font-size:13px;color:var(--faint);"></div>
+        </div>
+
+        <div class="card ledger-panel">
+          <h2>Facebook Auto-Post</h2>
+          <p style="color:var(--text-secondary);font-size:14px;margin-bottom:12px;">
+            Deployed articles post straight to this Page, preview built automatically from the article's own
+            tags. Needs a Page ID and access token from
+            <a class="inline-link" href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noopener">Graph API Explorer</a> —
+            kept on this device only.
+          </p>
+          <div class="grid cols-2">
+            <div class="field">
+              <label for="fb-page-id">Facebook Page ID</label>
+              <input type="text" id="fb-page-id" placeholder="e.g. 123456789012345">
+            </div>
+            <div class="field">
+              <label for="fb-access-token">Page Access Token</label>
+              <input type="password" id="fb-access-token" placeholder="EAAG…" autocomplete="off">
+            </div>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--text-secondary);margin:8px 0 12px;">
+            <input type="checkbox" id="fb-autopost" style="width:16px;height:16px;">
+            Automatically post every newly deployed article to this Page
+          </label>
+          <div class="btn-row">
+            <button class="btn-primary" id="fb-settings-save-btn">Save Facebook settings</button>
+          </div>
+          <div id="fb-status" style="margin-top:10px;font-size:13px;color:var(--faint);"></div>
+        </div>
+
+        <div class="card ledger-panel">
+          <h2>Backup &amp; Restore</h2>
+          <p style="color:var(--text-secondary);font-size:14px;margin-bottom:12px;">
+            Everything in the database — articles, photos, video links — plus your GitHub/Facebook settings, in one file.
+            ⚠️ Includes your GitHub and Facebook tokens in plain text. Keep it private.
+          </p>
+          <div class="btn-row">
+            <button class="btn-primary" id="backup-download-btn">💾 Download Backup</button>
+          </div>
+          <div id="backup-download-status" style="margin-top:10px;font-size:13px;color:var(--faint);"></div>
+
+          <div style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--border);">
+            <div class="field">
+              <label for="restore-json-input">Backup file (.json)</label>
+              <input type="file" id="restore-json-input" accept="application/json">
+            </div>
+            <div class="btn-row">
+              <button class="btn-danger" id="backup-restore-btn">📥 Restore from Backup</button>
+            </div>
+            <div id="backup-restore-status" style="margin-top:10px;font-size:13px;color:var(--faint);"></div>
+          </div>
+        </div>
+
+        <div class="card ledger-panel">
+          <h2>Deploy to GitHub</h2>
+          <p style="color:var(--text-secondary);font-size:14px;margin-bottom:12px;">
+            All articles as markdown, organized by category, with YAML frontmatter for Jekyll/GitHub Pages.
+          </p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn-primary" id="export-github-btn">📤 Export All to GitHub</button>
+            <button class="btn-ghost" id="export-json-btn">💾 Export as JSON</button>
+            <button class="btn-ghost" id="export-html-btn">🌐 Export as HTML</button>
+          </div>
+          <div id="export-status" style="margin-top:10px;font-size:13px;color:var(--faint);"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-write">
+        <div class="card">
+          <h2 id="write-title">Write a new entry</h2>
+          <div class="field">
+            <label for="entry-title">Title</label>
+            <input type="text" id="entry-title" placeholder="e.g. On the Weight of Borrowed Ideas">
+          </div>
+          <div class="grid cols-2">
+            <div class="field">
+              <label for="entry-category">Section</label>
+              <select id="entry-category"></select>
+              <div class="category-hint" id="entry-category-hint"></div>
+            </div>
+            <div class="field">
+              <label for="entry-date">Date</label>
+              <input type="date" id="entry-date">
+            </div>
+          </div>
+          <div class="field">
+            <label for="entry-format">Content format</label>
+            <select id="entry-format">
+              <option value="text">Plain text (paragraphs auto-formatted)</option>
+              <option value="html">Raw HTML (paste your own markup)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="entry-body" id="entry-body-label">Entry</label>
+            <textarea id="entry-body" rows="16" placeholder="Write freely. Paragraphs break on blank lines."></textarea>
+          </div>
+          <div class="field">
+            <label for="entry-summary">Summary (optional)</label>
+            <textarea id="entry-summary" rows="2" placeholder="A one- or two-sentence summary"></textarea>
+          </div>
+          <div class="field">
+            <label for="entry-tags">Tags (optional, comma-separated)</label>
+            <input type="text" id="entry-tags" placeholder="e.g. land, seasons, memory">
+          </div>
+          <div class="grid cols-2">
+            <div class="field">
+              <label for="entry-photo">Photo (optional)</label>
+              <input type="file" id="entry-photo" accept="image/*">
+              <div id="entry-photo-preview" style="margin-top:8px;"></div>
+            </div>
+            <div class="field">
+              <label for="entry-video-url">YouTube link (optional)</label>
+              <input type="url" id="entry-video-url" placeholder="https://www.youtube.com/watch?v=…" autocomplete="off" autocapitalize="off" spellcheck="false">
+              <div class="category-hint">Upload the video to YouTube (Unlisted works well), then paste its link here.</div>
+              <div id="entry-video-preview" style="margin-top:8px;"></div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" id="entry-save-btn">Save entry</button>
+            <button class="btn-ghost" id="entry-cancel-btn" style="display:none;">Cancel edit</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-articles">
+        <div class="card index-card">
+          <h2 id="articles-title">All Articles</h2>
+          <div class="section-cover-wrap" id="articles-category-cover" style="display:none;"></div>
+          <div class="category-intro" id="articles-category-intro" style="display:none;"></div>
+          <div class="filter-row">
+            <select id="articles-category-filter"></select>
+            <input type="text" id="articles-search" placeholder="Filter by title…">
+            <button class="btn-ghost btn-sm" id="articles-clear-btn">Clear</button>
+          </div>
+          <div id="articles-list"></div>
+        </div>
+      </section>
+
+      <section class="view" id="view-article">
+        <div class="card index-card">
+          <button class="btn-ghost btn-sm" id="article-back-btn">← Back</button>
+          <div class="article-header">
+            <span class="category-tag" id="article-category-tag"></span>
+            <span class="article-date" id="article-date"></span>
+          </div>
+          <h1 id="article-title"></h1>
+          <div class="tag-row" id="article-tags"></div>
+          <p class="article-summary" id="article-summary" style="display:none;"></p>
+          <div id="article-media"></div>
+          <div class="article-body" id="article-body"></div>
+
+          <div class="ad-slot page-col" id="ad-article">
+            <span class="ad-label">Advertisement</span>
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-6428799122405621"
+                 data-ad-slot="1982565389"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+          </div>
+
+          <div class="share-label">Share to</div>
+          <div class="share-row" id="article-share-row">
+            <a class="share-icon-btn" id="share-fb" href="#" target="_blank" rel="noopener">Facebook</a>
+            <a class="share-icon-btn" id="share-x" href="#" target="_blank" rel="noopener">X</a>
+            <a class="share-icon-btn" id="share-linkedin" href="#" target="_blank" rel="noopener">LinkedIn</a>
+            <a class="share-icon-btn" id="share-whatsapp" href="#" target="_blank" rel="noopener">WhatsApp</a>
+            <a class="share-icon-btn" id="share-telegram" href="#" target="_blank" rel="noopener">Telegram</a>
+            <a class="share-icon-btn" id="share-reddit" href="#" target="_blank" rel="noopener">Reddit</a>
+            <a class="share-icon-btn" id="share-email" href="#">Email</a>
+          </div>
+          <div id="share-link-note" style="font-size:12px;color:var(--faint);margin-bottom:8px;"></div>
+
+          <div class="btn-row">
+            <button class="btn-ghost btn-sm" id="article-edit-btn">Edit entry</button>
+            <button class="btn-ghost btn-sm" id="article-listen-btn">🔊 Listen</button>
+            <button class="btn-primary btn-sm" id="article-share-btn">📤 Share (device)</button>
+            <button class="btn-primary btn-sm" id="article-fb-post-btn">📘 Post to Facebook</button>
+            <button class="btn-danger btn-sm" id="article-delete-btn">Delete entry</button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="site-footer">
+        <div class="footer-links">
+          <a href="privacy.html">Data Privacy</a>
+          <a href="terms.html">Terms of Service</a>
+          <a href="cookies.html">Cookies</a>
+          <a href="about.html">About this Page</a>
+          <a href="accessibility.html">Accessibility</a>
+          <a href="sitemap.html">Sitemap</a>
+        </div>
+        <p class="footer-note">© <span id="footer-year"></span> The Commonplace</p>
+      </footer>
+
+    </main>
+    </div>
+  </div>
+
+  <div class="mobile-drawer" id="mobile-drawer">
+    <div class="mobile-drawer-nav">
+      <a data-view="home">🏠 Home</a>
+      <a data-view="write">✍️ Write</a>
+      <a data-view="articles">📚 All Articles</a>
+    </div>
+    <div class="spine-divider"></div>
+    <div class="spine-label">Sections</div>
+    <div id="mobile-tabs"></div>
+  </div>
+
+  <div class="modal-backdrop" id="share-fallback-modal">
+    <div class="modal">
+      <h3>📤 Share this entry</h3>
+      <p>Your browser doesn't support direct device sharing. Download the photo below or copy the caption, then post it on Facebook, Instagram, or wherever you like.</p>
+      <div class="btn-row" id="share-fallback-actions"></div>
+      <div class="btn-row">
+        <button class="btn-ghost" id="share-fallback-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="alert" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
