@@ -159,6 +159,7 @@ This section is a record of songs and images that stuck. Not a definitive list, 
 
 const SITE_URL = 'https://poetic-codes.pages.dev/';
 const CANONICAL_URL = 'https://poetic-codes.pages.dev/';
+const API_URL = 'https://poetic-codes.pansensoyglenn150.workers.dev/';
 
 const DB_NAME = 'CommonplaceDB';
 const DB_VERSION = 1;
@@ -429,7 +430,7 @@ function showToast(msg, type = 'info', duration = 3000) {
   toastTimer = setTimeout(() => t.classList.remove('show'), duration);
 }
 
-function apiUrl(path) { return `${CANONICAL_URL}api/${path}`; }
+function apiUrl(path) { return `${API_URL}api/${path}`; }
 
 async function apiErrorMessage(res, fallback) {
   try {
