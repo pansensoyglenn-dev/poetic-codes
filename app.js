@@ -2298,7 +2298,7 @@ document.getElementById('export-html-btn')?.addEventListener('click', () => {
 
   const sorted = [...articles].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
   for (const article of sorted) {
-    const cat = categoryOf(="ad-label">Advertisementarticle.category);
+    const cat = categoryOf(article.category);
     const bodyHtml = article.contentType === 'html'
       ? sanitizeHtml(article.body)
       : escapeHtml(article.body).replace(/\n/g, '<br>');
