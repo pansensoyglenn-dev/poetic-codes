@@ -1996,6 +1996,9 @@ document.getElementById('share-fallback-close')?.addEventListener('click', () =>
 document.getElementById('share-fallback-modal')?.addEventListener('click', (e) => {
   if (e.target.id === 'share-fallback-modal') e.target.classList.remove('open');
 });
+document.getElementById('article-edit-btn')?.addEventListener('click', () => {
+  if (currentArticleId) location.href = 'portal.html#edit=' + currentArticleId;
+});
 
 function renderSearchResults(query) {
   const box = document.getElementById('search-results');
