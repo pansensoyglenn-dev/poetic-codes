@@ -431,7 +431,7 @@
               <i class="fas fa-paper-plane" aria-hidden="true"></i> Publish to Blogspot + GitHub
             </button>
             <button class="btn-primary" id="update-btn" type="button" style="display:none;background:linear-gradient(135deg,#8a6d1f,#c9a84c);">
-              <i class="fas fa-save" aria-hidden="true"></i> Save changes
+              <i class="fas fa-save" aria-hidden="true"></i> Update article
             </button>
             <button class="btn-outline" id="import-cs-btn" type="button">
               <i class="fas fa-download" aria-hidden="true"></i> Import from The Commonplace
@@ -2114,8 +2114,8 @@ function loadCsArticleIntoForm(article) {
   }
 
   csEditing = null;
-  if (article._source === 'worker' && article.id != null) {
-    csEditing = { id: article.id, date: article.date, category: article.category, photoUrl: article.photoUrl || '', title: title };
+  if (article.id != null) {
+    csEditing = { id: article.id, source: article._source, date: article.date, category: article.category, photoUrl: article.photoUrl || '', title: title };
   }
   updateEditUI(article);
   showToast('Loaded: ' + title.slice(0, 40) + (title.length > 40 ? '…' : ''), 'success', 2500);
@@ -2129,7 +2129,7 @@ function updateEditUI(article) {
   if (!banner || !btn) return;
   if (csEditing) {
     banner.style.display = 'block';
-    banner.textContent = 'Editing Commonplace entry #' + csEditing.id;
+    banner.textContent = 'Editing Commonplace entry #' + csEditing.id + ' — press Update article to update it on the main site.';
     btn.style.display = 'inline-flex';
   } else if (article && article._source === 'vercel') {
     banner.style.display = 'block';
@@ -2162,14 +2162,19 @@ async function updateCommonplaceEntry() {
 
   const original = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Saving…';
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Updating…';
   try {
-    const r = await fetch(COMMONPLACE_API + 'articles/' + encodeURIComponent(csEditing.id), {
+    const isVercel = csEditing.source === 'vercel';
+    const putUrl = isVercel
+      ? CS_SOURCE_API + '?id=' + encodeURIComponent(csEditing.id)
+      : COMMONPLACE_API + 'articles/' + encodeURIComponent(csEditing.id);
+    const sameSection = csSectionFor(csEditing.category) === category;
+    const r = await fetch(putUrl, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
       body: JSON.stringify({
         title,
-        category: CP_CATEGORY[category] || csEditing.category || 'culture',
+        category: sameSection ? (csEditing.category || CP_CATEGORY[category]) : (CP_CATEGORY[category] || csEditing.category || 'culture'),
         date: (csEditing.date || '').slice(0, 10) || new Date().toLocaleDateString('en-CA'),
         contentType: 'html',
         body: payload.body,
@@ -2186,8 +2191,8 @@ async function updateCommonplaceEntry() {
       }
       throw new Error(j.error || 'HTTP ' + r.status);
     }
-    showToast('Entry #' + csEditing.id + ' updated.', 'success', 4000);
-    const cached = csArticlesCache.find(a => a._key === 'worker:' + csEditing.id);
+    showToast('Entry #' + csEditing.id + ' updated on the main site. Refresh poetic-codes.pages.dev to see it.', 'success', 6000);
+    const cached = csArticlesCache.find(a => a._key === csEditing.source + ':' + csEditing.id);
     if (cached) { cached.title = title; cached.summary = excerpt; cached.body = payload.body; cached.tags = tags; }
   } catch (err) {
     errorBox.textContent = err.message;
