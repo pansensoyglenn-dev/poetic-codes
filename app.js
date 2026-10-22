@@ -2173,7 +2173,6 @@ async function init() {
   primeVoices();
   populateCategorySelects();
   renderCategoryNav();
-  injectBloggerSidebarCards();
   routeFromHash();
   finishStartupUi();
   setTimeout(loadAds, 1000);
