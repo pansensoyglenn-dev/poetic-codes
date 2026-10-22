@@ -2025,7 +2025,7 @@ function deleteArticleGated(article) {
       ? CS_SOURCE_API + '?id=' + encodeURIComponent(article.id)
       : COMMONPLACE_API + 'articles/' + encodeURIComponent(article.id);
     try {
-      const r = await fetch(url, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + accessToken } });
+      const r = await fetch(url, { method: 'DELETE' });
       if (!r.ok && r.status !== 404) {
         const j = await r.json().catch(() => ({}));
         throw new Error(j.error || 'HTTP ' + r.status);
@@ -2216,7 +2216,7 @@ async function updateCommonplaceEntry() {
     const sameSection = csSectionFor(csEditing.category) === category;
     const r = await fetch(putUrl, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         title,
         category: sameSection ? (csEditing.category || CP_CATEGORY[category]) : (CP_CATEGORY[category] || csEditing.category || 'culture'),
