@@ -638,6 +638,7 @@
 
 <script>
 const BLOGGER_CLIENT_ID = '790965276439-flja0u6tel45rqbg47p6l8fp6aua1tch.apps.googleusercontent.com';
+const SITE_URL = 'https://poetic-codes.pages.dev';
 const OWNER_EMAIL = 'pansensoyglenn150@gmail.com';
 const BLOGGER_BLOG_URL  = 'https://poetic-bytes.blogspot.com';
 const BLOGSPOT_ABOUT_URL   = 'https://poetic-bytes.blogspot.com/2026/04/about_01131455884.html';
@@ -1984,7 +1985,11 @@ function renderAllArticles(filter) {
           <div class="cs-picker-title">${esc(a.title || '(untitled)')}</div>
           <div class="cs-picker-meta">${esc(section)} · ${esc(a.date.slice(0, 10))}<span class="cs-src-badge">${a._source === 'worker' ? 'Worker' : 'Vercel'}</span></div>
         </div>
-        <button type="button" class="cs-edit-btn" data-all-edit="${esc(a._key)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
+          <button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>
+          <button type="button" class="cs-edit-btn" data-all-edit="${esc(a._key)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
+          <button type="button" class="cs-edit-btn" data-all-del="${esc(a._key)}" style="color:var(--rose);"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>
+        </div>
       </li>`;
   }).join('');
   list.querySelectorAll('[data-all-edit]').forEach(btn => {
@@ -1992,6 +1997,46 @@ function renderAllArticles(filter) {
       const article = csFindByKey(btn.dataset.allEdit);
       if (article) editArticleGated(article);
     });
+  });
+  list.querySelectorAll('[data-all-read]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const article = csFindByKey(btn.dataset.allRead);
+      if (article) readArticle(article);
+    });
+  });
+  list.querySelectorAll('[data-all-del]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const article = csFindByKey(btn.dataset.allDel);
+      if (article) deleteArticleGated(article);
+    });
+  });
+}
+
+function readArticle(article) {
+  if (article.id == null) { showToast('This article has no id, so it cannot be opened.', 'error'); return; }
+  window.open(SITE_URL + '/#/article/' + encodeURIComponent(article.id), '_blank', 'noopener');
+}
+
+function deleteArticleGated(article) {
+  requireSignIn(async () => {
+    if (article.id == null) { showToast('This article has no id.', 'error'); return; }
+    if (!confirm('Delete "' + (article.title || 'this article') + '" permanently from the main site? This cannot be undone.')) return;
+    const url = article._source === 'vercel'
+      ? CS_SOURCE_API + '?id=' + encodeURIComponent(article.id)
+      : COMMONPLACE_API + 'articles/' + encodeURIComponent(article.id);
+    try {
+      const r = await fetch(url, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + accessToken } });
+      if (!r.ok && r.status !== 404) {
+        const j = await r.json().catch(() => ({}));
+        throw new Error(j.error || 'HTTP ' + r.status);
+      }
+      csArticlesCache = csArticlesCache.filter(a => a._key !== article._key);
+      if (csEditing && String(csEditing.id) === String(article.id) && csEditing.source === article._source) { csEditing = null; updateEditUI(null); }
+      renderAllArticles(document.getElementById('all-articles-search').value);
+      showToast('Deleted: ' + (article.title || '').slice(0, 40), 'success', 4000);
+    } catch (err) {
+      showToast('Delete failed: ' + err.message, 'error', 6000);
+    }
   });
 }
 
