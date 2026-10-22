@@ -308,6 +308,19 @@
       </div>
     </section>
 
+    <section class="submit-box" id="all-articles-panel" aria-labelledby="all-articles-heading" style="margin-bottom:1.5rem;">
+      <h2 id="all-articles-heading" class="section-title"><i class="fas fa-book-open" aria-hidden="true"></i> All Articles</h2>
+      <p style="color:var(--muted);font-size:0.95rem;margin-bottom:0.8rem;">Every article from The Commonplace. Press <strong>Edit</strong> and you will be asked to sign in with Google first; once signed in, the article opens in the editor below.</p>
+      <div style="margin-bottom:0.8rem;display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="all-articles-search" class="webhook-input" placeholder="Filter by title or category…" style="flex:1;min-width:180px;">
+        <button class="btn-save-hook" id="all-articles-refresh" type="button">Refresh</button>
+      </div>
+      <ul id="all-articles-list" class="cs-picker-list" style="max-height:520px;overflow-y:auto;">
+        <li style="padding:1rem;text-align:center;color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:0.65rem;">Loading…</li>
+      </ul>
+      <div id="all-articles-status" style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);margin-top:0.6rem;min-height:1rem;"></div>
+    </section>
+
     <div id="form-state">
       <div class="editor-layout">
 
@@ -625,6 +638,7 @@
 
 <script>
 const BLOGGER_CLIENT_ID = '790965276439-flja0u6tel45rqbg47p6l8fp6aua1tch.apps.googleusercontent.com';
+const OWNER_EMAIL = 'pansensoyglenn150@gmail.com';
 const BLOGGER_BLOG_URL  = 'https://poetic-bytes.blogspot.com';
 const BLOGSPOT_ABOUT_URL   = 'https://poetic-bytes.blogspot.com/2026/04/about_01131455884.html';
 const BLOGSPOT_PRIVACY_URL = 'https://poetic-bytes.blogspot.com/2026/04/privacy-policy_01328570854.html';
@@ -1153,7 +1167,8 @@ function handleVideoFiles(files) {
   warning.style.display = hasLarge ? 'block' : 'none';
 }
 
-function signInBlogger() {
+function signInBlogger(onSuccess) {
+  if (typeof onSuccess !== 'function') onSuccess = null;
   if (typeof google === 'undefined' || !google.accounts) {
     if (signInRetries >= 5) {
       showToast('Google Sign-In failed to load. Check your network or ad-blocker.', 'error', 6000);
@@ -1162,22 +1177,36 @@ function signInBlogger() {
     }
     signInRetries++;
     showToast('Google Sign-In loading, retrying… (' + signInRetries + '/5)', 'error', 2500);
-    setTimeout(signInBlogger, 1500);
+    setTimeout(() => signInBlogger(onSuccess), 1500);
     return;
   }
   signInRetries = 0;
   try {
     const client = google.accounts.oauth2.initTokenClient({
       client_id: BLOGGER_CLIENT_ID,
-      scope: 'https://www.googleapis.com/auth/blogger',
+      scope: 'https://www.googleapis.com/auth/blogger https://www.googleapis.com/auth/userinfo.email',
       callback: response => {
         if (response.error) { showToast('Sign-in failed: ' + response.error, 'error', 5000); updateAuthUI(false); return; }
-        accessToken = response.access_token;
-        tokenExpiry = Date.now() + (response.expires_in * 1000);
-        localStorage.setItem('blogger_access_token', accessToken);
-        localStorage.setItem('blogger_token_expiry', String(tokenExpiry));
-        updateAuthUI(true);
-        showToast('Connected to Blogger.', 'success');
+        const token = response.access_token;
+        fetch('https://www.googleapis.com/oauth2/v3/userinfo', { headers: { Authorization: 'Bearer ' + token } })
+          .then(r => r.json())
+          .then(info => {
+            if (!info || String(info.email || '').toLowerCase() !== OWNER_EMAIL || info.email_verified === false) {
+              try { google.accounts.oauth2.revoke(token, () => {}); } catch (_) {}
+              signOutBlogger();
+              showToast('Access denied: this account is not the site owner.', 'error', 6000);
+              return;
+            }
+            accessToken = token;
+            tokenExpiry = Date.now() + (response.expires_in * 1000);
+            localStorage.setItem('blogger_access_token', accessToken);
+            localStorage.setItem('blogger_token_expiry', String(tokenExpiry));
+            localStorage.setItem('pc_owner_ok', '1');
+            updateAuthUI(true);
+            showToast('Signed in as owner.', 'success');
+            if (onSuccess) onSuccess();
+          })
+          .catch(() => showToast('Could not verify your Google account. Try again.', 'error', 5000));
       }
     });
     client.requestAccessToken();
@@ -1189,11 +1218,12 @@ function signOutBlogger() {
   accessToken = ''; tokenExpiry = 0;
   localStorage.removeItem('blogger_access_token');
   localStorage.removeItem('blogger_token_expiry');
+  localStorage.removeItem('pc_owner_ok');
   updateAuthUI(false);
   showToast('Signed out from Blogger.');
 }
 function isTokenValid() {
-  return !!(accessToken && Date.now() < tokenExpiry - 60000);
+  return !!(accessToken && Date.now() < tokenExpiry - 60000 && localStorage.getItem('pc_owner_ok') === '1');
 }
 function updateAuthUI(connected) {
   const box     = document.getElementById('auth-status-box');
@@ -1919,6 +1949,68 @@ function csSectionFor(category) {
   return opts.find(v => v.toLowerCase() === lower) || '';
 }
 
+function requireSignIn(action) {
+  if (isTokenValid()) { action(); return; }
+  showToast('Please sign in with Google to edit articles.', 'info', 4000);
+  signInBlogger(action);
+}
+
+function editArticleGated(article) {
+  requireSignIn(() => {
+    csImportQueue = [];
+    closeCsPicker();
+    loadCsArticleIntoForm(article);
+  });
+}
+
+function renderAllArticles(filter) {
+  const list = document.getElementById('all-articles-list');
+  if (!list) return;
+  const q = (filter || '').trim().toLowerCase();
+  const items = csArticlesCache.filter(a => !q
+    || a.title.toLowerCase().includes(q)
+    || a.category.toLowerCase().includes(q)
+    || csSectionFor(a.category).toLowerCase().includes(q));
+  if (items.length === 0) {
+    list.innerHTML = '<li style="padding:1rem;text-align:center;color:var(--dim);font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;">No articles found.</li>';
+    return;
+  }
+  items.sort((a, b) => b.date.localeCompare(a.date));
+  list.innerHTML = items.map(a => {
+    const section = csSectionFor(a.category) || a.category || 'Uncategorised';
+    return `
+      <li class="cs-picker-row">
+        <div style="flex:1;min-width:0;">
+          <div class="cs-picker-title">${esc(a.title || '(untitled)')}</div>
+          <div class="cs-picker-meta">${esc(section)} · ${esc(a.date.slice(0, 10))}<span class="cs-src-badge">${a._source === 'worker' ? 'Worker' : 'Vercel'}</span></div>
+        </div>
+        <button type="button" class="cs-edit-btn" data-all-edit="${esc(a._key)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
+      </li>`;
+  }).join('');
+  list.querySelectorAll('[data-all-edit]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const article = csFindByKey(btn.dataset.allEdit);
+      if (article) editArticleGated(article);
+    });
+  });
+}
+
+async function loadAllArticles() {
+  const list = document.getElementById('all-articles-list');
+  const status = document.getElementById('all-articles-status');
+  if (!list) return;
+  status.textContent = 'Fetching articles…';
+  try {
+    const result = await fetchCommonplaceArticles();
+    csArticlesCache = result.articles;
+    status.textContent = '✅ ' + csArticlesCache.length + ' article(s) — ' + result.notes.join(' · ');
+    renderAllArticles(document.getElementById('all-articles-search').value);
+  } catch (e) {
+    list.innerHTML = '<li style="padding:1rem;color:var(--rose);font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;">Failed to load: ' + esc(e.message) + '</li>';
+    status.textContent = '⚠️ ' + e.message;
+  }
+}
+
 function csFindByKey(key) { return csArticlesCache.find(a => a._key === key); }
 
 function renderCsPickerList(filter) {
@@ -1961,9 +2053,7 @@ function renderCsPickerList(filter) {
       e.stopPropagation();
       const article = csFindByKey(btn.dataset.csEdit);
       if (!article) return;
-      csImportQueue = [];
-      closeCsPicker();
-      loadCsArticleIntoForm(article);
+      editArticleGated(article);
     });
   });
 }
@@ -2076,7 +2166,7 @@ async function updateCommonplaceEntry() {
   try {
     const r = await fetch(COMMONPLACE_API + 'articles/' + encodeURIComponent(csEditing.id), {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + accessToken },
       body: JSON.stringify({
         title,
         category: CP_CATEGORY[category] || csEditing.category || 'culture',
@@ -2186,7 +2276,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('reset-btn').addEventListener('click',         resetFormWithToast);
   document.getElementById('submit-another-btn').addEventListener('click',submitAnother);
 
-  document.getElementById('signin-btn').addEventListener('click',        signInBlogger);
+  document.getElementById('signin-btn').addEventListener('click',        () => signInBlogger());
   document.getElementById('signout-btn').addEventListener('click',       signOutBlogger);
 
   document.getElementById('save-webhook-btn').addEventListener('click',  saveWebhookUrl);
@@ -2214,6 +2304,10 @@ document.addEventListener('DOMContentLoaded', function() {
       handleVideoFiles(e.dataTransfer.files);
     });
   }
+
+  document.getElementById('all-articles-search').addEventListener('input', function() { renderAllArticles(this.value); });
+  document.getElementById('all-articles-refresh').addEventListener('click', loadAllArticles);
+  loadAllArticles();
 
   document.getElementById('import-cs-btn').addEventListener('click', openCsPicker);
   document.getElementById('cs-picker-close').addEventListener('click', closeCsPicker);
