@@ -43,19 +43,9 @@
     "description": "The desk where I write and publish for Poetic Bytes and The Commonplace.",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Any (Web-based)",
-    "author": {
-      "@type": "Person",
-      "name": "Glenn Junsay Pansensoy"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Poetic Bytes"
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    }
+    "author": { "@type": "Person", "name": "Glenn Junsay Pansensoy" },
+    "publisher": { "@type": "Organization", "name": "Poetic Bytes" },
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
   }
   </script>
 
@@ -90,30 +80,14 @@
     .intro-lead p { color:var(--muted); font-size:0.92rem; line-height:1.85; margin-bottom:1rem; text-align:justify; }
     .intro-lead p:last-child { margin-bottom:0; }
 
-    .intro-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.4rem; }
-    @media(max-width:820px) { .intro-steps { grid-template-columns:repeat(2,1fr); } }
-    @media(max-width:480px) { .intro-steps { grid-template-columns:1fr; } }
-    .intro-step { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.2rem 1.1rem; transition:border-color 0.2s, transform 0.2s; }
-    .intro-step:hover { border-color:var(--blue); transform:translateY(-2px); }
-    .intro-step .num { font-family:'JetBrains Mono',monospace; font-size:0.55rem; color:var(--teal); letter-spacing:0.15em; display:block; margin-bottom:0.5rem; }
-    .intro-step h3 { font-family:'Cinzel Decorative',serif; font-size:0.82rem; color:var(--text); margin-bottom:0.5rem; }
-    .intro-step p { font-size:0.78rem; color:var(--muted); line-height:1.65; }
-
     .intro-panel { background:var(--card); border:1px solid var(--border); border-radius:16px; padding:1.4rem 1.6rem; margin-bottom:1.4rem; }
     .intro-panel:last-child { margin-bottom:0; }
     .intro-panel h3 { font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:var(--teal); text-transform:uppercase; letter-spacing:0.12em; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem; }
     .intro-panel h3 i { color:var(--blue-lt); }
-    .intro-panel > p { font-size:0.82rem; color:var(--muted); line-height:1.75; margin-bottom:1rem; }
 
     .intro-chips { display:flex; flex-wrap:wrap; gap:0.5rem; }
     .intro-chip { font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); background:rgba(58,123,213,0.08); border:1px solid rgba(58,123,213,0.25); border-radius:20px; padding:0.35rem 0.85rem; transition:0.2s; cursor:pointer; }
     .intro-chip:hover { border-color:var(--blue); color:var(--blue-lt); background:rgba(58,123,213,0.14); }
-
-    .intro-list { list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:0.8rem 1.4rem; }
-    @media(max-width:640px) { .intro-list { grid-template-columns:1fr; } }
-    .intro-list li { display:flex; align-items:flex-start; gap:0.7rem; font-size:0.82rem; color:var(--muted); line-height:1.65; }
-    .intro-list li i { flex-shrink:0; margin-top:0.3rem; width:16px; text-align:center; color:var(--teal); }
-    .intro-list li strong { color:var(--text); }
 
     #main { padding:3rem 0 6rem; }
     .editor-layout { display:grid; grid-template-columns:1fr 270px; gap:1.8rem; align-items:start; }
@@ -197,9 +171,6 @@
     .dist-result.ok   { background:rgba(61,220,122,0.08); border:1px solid rgba(61,220,122,0.25); color:#3ddc84; }
     .dist-result.fail { background:rgba(224,82,82,0.08);  border:1px solid rgba(224,82,82,0.25);  color:var(--rose); }
 
-    .info-note { background:rgba(58,123,213,0.07); border-left:3px solid var(--blue); border-radius:8px; padding:0.7rem 1rem; font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--muted); line-height:1.7; margin-bottom:1rem; }
-    .info-note a { color:var(--blue-lt); }
-
     #progress-bar { position:fixed; top:0; left:0; height:2px; background:linear-gradient(90deg,var(--blue),var(--teal)); width:0; z-index:2000; transition:width 0.3s; pointer-events:none; }
 
     #preview-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:1500; overflow-y:auto; padding:2rem 1rem; }
@@ -210,12 +181,7 @@
     .preview-content h2 { font-size:0.9rem; margin:1.5rem 0 0.8rem; border-top:1px solid var(--border); padding-top:0.8rem; }
     .preview-content p  { font-size:0.88rem; text-align:justify; margin-bottom:1.2rem; line-height:1.85; }
 
-    .vid-upload-zone {
-      border:2px dashed rgba(201,168,76,0.45); border-radius:12px;
-      padding:1.4rem 1rem; text-align:center; cursor:pointer;
-      transition:border-color 0.2s, background 0.2s;
-      background:rgba(7,13,24,0.6); position:relative; overflow:hidden;
-    }
+    .vid-upload-zone { border:2px dashed rgba(201,168,76,0.45); border-radius:12px; padding:1.4rem 1rem; text-align:center; cursor:pointer; transition:border-color 0.2s, background 0.2s; background:rgba(7,13,24,0.6); position:relative; overflow:hidden; }
     .vid-upload-zone:hover,.vid-upload-zone.dragover { border-color:var(--gold); background:rgba(201,168,76,0.07); }
     .vid-upload-zone input[type=file] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
     .vid-upload-icon  { font-size:1.8rem; color:var(--gold); margin-bottom:0.5rem; }
@@ -242,13 +208,6 @@
     .vid-method-tab.active { background:rgba(201,168,76,0.2); border-color:var(--gold); color:var(--gold); }
     .vid-method-panel { display:none; }
     .vid-method-panel.active { display:block; }
-
-    .vid-url-note { font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:var(--dim); line-height:1.7; margin-bottom:0.6rem; }
-    .vid-url-note a { color:var(--blue-lt); }
-
-    .token-help { background:rgba(201,168,76,0.07); border:1px solid rgba(201,168,76,0.25); border-radius:8px; padding:0.6rem 0.8rem; margin-top:0.6rem; font-family:'JetBrains Mono',monospace; font-size:0.55rem; color:var(--gold); line-height:1.7; }
-    .token-help a    { color:#e8c46a; }
-    .token-help code { background:rgba(0,0,0,0.3); padding:0.1em 0.35em; border-radius:3px; font-size:0.9em; }
 
     #publish-error-box { display:none; margin-top:1rem; padding:0.8rem 1rem; background:rgba(224,82,82,0.08); border:1px solid rgba(224,82,82,0.3); border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:#e05252; line-height:1.7; white-space:pre-wrap; }
 
@@ -526,6 +485,7 @@
             <div style="display:flex;gap:0.4rem;">
               <button class="btn-save-hook" id="save-gh-btn"  type="button" style="flex:1;">Save Token</button>
               <button class="btn-save-hook" id="test-gh-btn"  type="button" style="flex:1;">Test</button>
+              <button class="btn-save-hook" id="clear-gh-btn" type="button" style="flex:1;background:var(--rose);">Clear</button>
             </div>
             <div id="gh-config-status" style="font-family:'JetBrains Mono',monospace;font-size:0.55rem;margin-top:0.4rem;min-height:0.8rem;line-height:1.6;" aria-live="polite"></div>
             <div class="dist-item" style="margin-top:0.8rem;">
@@ -646,7 +606,7 @@ const BLOGSPOT_PRIVACY_URL = 'https://poetic-bytes.blogspot.com/2026/04/privacy-
 const BLOGSPOT_TERMS_URL   = 'https://poetic-bytes.blogspot.com/2026/04/terms-of-service_01797605838.html';
 const BLOGSPOT_COOKIES_URL = 'https://poetic-bytes.blogspot.com/2026/04/cookie-policy.html';
 const GH_USERNAME = 'pansensoyglenn-dev';
-const GH_REPO     = 'current-situation';
+const GH_REPO     = 'poetic-codes';
 const GH_BRANCH   = 'main';
 
 const COMMONPLACE_API = 'https://poetic-codes.pansensoyglenn150.workers.dev/api/';
@@ -685,9 +645,9 @@ const CS_SLUG_TO_SECTION = {
   'music-video':     'Music Video'
 };
 
-const MAX_VIDEO_BYTES       = 50 * 1024 * 1024 * 1024;  // 50 GB
-const SINGLE_UPLOAD_LIMIT   = 90 * 1024 * 1024;         // above this, use multipart
-const MULTIPART_PART_SIZE   = 25 * 1024 * 1024;         // 25 MB parts (safe on iPad Safari)
+const MAX_VIDEO_BYTES     = 50 * 1024 * 1024 * 1024;
+const SINGLE_UPLOAD_LIMIT = 90 * 1024 * 1024;
+const MULTIPART_PART_SIZE = 25 * 1024 * 1024;
 
 let currentMode        = 'text';
 let currentVidMethod   = 'upload';
@@ -696,9 +656,9 @@ let accessToken  = localStorage.getItem('blogger_access_token') || '';
 let tokenExpiry  = parseInt(localStorage.getItem('blogger_token_expiry') || '0');
 let signInRetries = 0;
 
-let csArticlesCache   = [];
-let csImportQueue     = [];
-let csEditing         = null;
+let csArticlesCache = [];
+let csImportQueue   = [];
+let csEditing       = null;
 
 function esc(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -925,13 +885,6 @@ function submitAnother() {
   window.scrollTo({ top:0, behavior:'smooth' });
 }
 
-/* ───────────── R2 uploads ─────────────
-   Files up to SINGLE_UPLOAD_LIMIT use the original single-request upload.
-   Larger files use multipart routes on the Worker:
-     POST /api/upload/multipart/create?filename=..&contentType=..   -> { key, uploadId }
-     PUT  /api/upload/multipart/part?key=..&uploadId=..&partNumber=.. -> { partNumber, etag }
-     POST /api/upload/multipart/complete  { key, uploadId, parts }    -> { url }
-*/
 function makeUploadFilename(file) {
   const ext      = file.name.split('.').pop().toLowerCase() || 'mp4';
   const safeName = slugify(file.name.replace(/\.[^.]+$/, '')) || 'video';
@@ -1312,18 +1265,13 @@ function updateGitHubStatusUI(connected, username, repo) {
 function saveGitHubConfig() {
   const tokenInput = document.getElementById('gh-token-input');
   const status     = document.getElementById('gh-config-status');
-  const helpEl     = document.getElementById('gh-token-help');
   const token      = tokenInput ? tokenInput.value.trim() : '';
   if (!token) {
     if (status) { status.style.color='var(--rose)'; status.textContent='Please enter a token.'; }
-    if (helpEl) helpEl.style.display = 'block';
     return null;
   }
   if (!token.startsWith('ghp_') && !token.startsWith('github_pat_') && !token.startsWith('gho_')) {
     if (status) { status.style.color='var(--gold)'; status.textContent='Unusual token format — expected ghp_ or github_pat_'; }
-    if (helpEl) helpEl.style.display = 'block';
-  } else {
-    if (helpEl) helpEl.style.display = 'none';
   }
   localStorage.setItem('pc_gh_token', token);
   if (status) { status.style.color='#3ddc84'; status.textContent='Token saved.'; }
@@ -1331,9 +1279,29 @@ function saveGitHubConfig() {
   setTimeout(() => { if (status) status.textContent=''; }, 3000);
   return token;
 }
+function clearGitHubToken() {
+  if (!confirm('Remove the saved GitHub token from this browser?\n\nYou will need to paste it again to publish to GitHub. The token is NOT revoked on GitHub — do that at github.com/settings/tokens if it was exposed.')) return;
+
+  localStorage.removeItem('pc_gh_token');
+
+  const input  = document.getElementById('gh-token-input');
+  const status = document.getElementById('gh-config-status');
+
+  if (input)  input.value = '';
+  updateGitHubStatusUI(false, '', '');
+
+  if (status) {
+    status.style.color = 'var(--gold)';
+    status.textContent = 'Token removed from this browser.';
+    setTimeout(() => {
+      if (status.textContent === 'Token removed from this browser.') status.textContent = 'No token saved yet.';
+    }, 3000);
+  }
+
+  showToast('GitHub token cleared.', '', 2500);
+}
 async function testGitHubConnection() {
   const status = document.getElementById('gh-config-status');
-  const helpEl = document.getElementById('gh-token-help');
   const savedToken = saveGitHubConfig();
   if (!savedToken) return;
   const cfg = getGitHubConfig();
@@ -1345,12 +1313,10 @@ async function testGitHubConnection() {
     if (res.ok) {
       const data = await res.json();
       if (status) { status.style.color='#3ddc84'; status.textContent='Repo found: '+data.full_name; }
-      if (helpEl) helpEl.style.display = 'none';
       updateGitHubStatusUI(true, cfg.username, cfg.repo);
     } else {
       const err = await res.json().catch(() => ({}));
       if (status) { status.style.color='var(--rose)'; status.textContent=(err.message||'HTTP '+res.status); }
-      if (helpEl) helpEl.style.display = 'block';
     }
   } catch(e) {
     if (status) { status.style.color='var(--rose)'; status.textContent='Network error: '+e.message; }
@@ -1368,21 +1334,10 @@ function generateCoverImage(title, category) {
   ctx.strokeStyle='#7ec8e3'; ctx.lineWidth=1; ctx.strokeRect(40,40,1120,550);
 
   const icons = {
-    'culture':'🎭',
-    'national affairs':'🇵🇭',
-    'international condition':'🌍',
-    'programming':'💻',
-    'philosophy':'🧠',
-    'history':'📜',
-    'christian':'✝️',
-    'ai':'🤖',
-    'economy':'💰',
-    'culinary':'🍲',
-    'local politics':'🏛️',
-    'global politics':'🌐',
-    'weather':'🌦️',
-    'farming':'🌾',
-    'music video':'🎬'
+    'culture':'🎭','national affairs':'🇵🇭','international condition':'🌍',
+    'programming':'💻','philosophy':'🧠','history':'📜','christian':'✝️',
+    'ai':'🤖','economy':'💰','culinary':'🍲','local politics':'🏛️',
+    'global politics':'🌐','weather':'🌦️','farming':'🌾','music video':'🎬'
   };
   const icon = icons[(category||'').toLowerCase()] || '✦';
 
@@ -1537,7 +1492,7 @@ async function publishToBlogger(title, bodyHTML, labels, publishType) {
   const cleanLabels = sanitizeLabels(labels);
 
   async function attempt(payload) {
-    const res = await fetchWithTimeout(endpoint, {
+    return fetchWithTimeout(endpoint, {
       method:'POST',
       headers:{
         'Authorization': 'Bearer ' + accessToken,
@@ -1545,7 +1500,6 @@ async function publishToBlogger(title, bodyHTML, labels, publishType) {
       },
       body: JSON.stringify(payload)
     }, 30000);
-    return res;
   }
 
   const firstPayload = isPage
@@ -1555,7 +1509,6 @@ async function publishToBlogger(title, bodyHTML, labels, publishType) {
   let res = await attempt(firstPayload);
 
   if (res.status === 400 && !isPage && cleanLabels.length > 0) {
-    console.warn('Blogger 400 with labels — retrying without labels…');
     res = await attempt({ title: String(title).slice(0, 500), content: bodyHTML });
   }
 
@@ -1579,7 +1532,7 @@ async function publishToBlogger(title, bodyHTML, labels, publishType) {
   if (res.status === 401) throw new Error(`Blogger token expired or invalid. Sign out and sign in again.\n${info}\n${errorMsg}`);
   if (res.status === 403) throw new Error(`Access denied (403). Confirm this Google account owns poetic-bytes.blogspot.com.\n${info}\n${errorMsg}`);
   if (res.status === 404) throw new Error(`Blog not found (404). Check the Blog ID.\n${info}\n${errorMsg}`);
-  if (res.status === 400) throw new Error(`Blogger rejected the request (400) even after retrying without labels.\n${info}\n${errorMsg}\n\nTip: try publishing as a "Page" instead of a "Post" from the Publish As dropdown.`);
+  if (res.status === 400) throw new Error(`Blogger rejected the request (400) even after retrying without labels.\n${info}\n${errorMsg}\n\nTry publishing as a "Page" instead of a "Post" from the Publish As dropdown.`);
   throw new Error(`Blogger API error: ${errorMsg}\n${info}`);
 }
 
@@ -1608,7 +1561,19 @@ async function publishToGitHub(slug, htmlContent) {
   const body = { message:'Publish: '+slug, content:b64, branch:cfg.branch };
   if (sha) body.sha = sha;
 
-  const res = await fetch(apiURL, { method:'PUT', headers, body:JSON.stringify(body) });
+  let res = await fetch(apiURL, { method:'PUT', headers, body:JSON.stringify(body) });
+
+  if (!res.ok && (res.status === 409 || res.status === 422)) {
+    try {
+      const recheck = await fetch(apiURL, { headers });
+      if (recheck.ok) {
+        const fresh = await recheck.json();
+        body.sha = fresh.sha;
+        res = await fetch(apiURL, { method:'PUT', headers, body:JSON.stringify(body) });
+      }
+    } catch (_) {}
+  }
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error('GitHub error: '+((err.message)||'HTTP '+res.status));
@@ -1629,6 +1594,7 @@ async function fireWebhook(payload) {
 
 function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug) {
   const pubDate = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
+  const canonicalURL = `${SITE_URL}/articles/${esc(slug)}.html`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1642,11 +1608,11 @@ function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug) {
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(excerpt)}">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://${GH_USERNAME}.github.io/${GH_REPO}/articles/${esc(slug)}.html">
+<meta property="og:url" content="${canonicalURL}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(excerpt)}">
-<link rel="canonical" href="https://${GH_USERNAME}.github.io/${GH_REPO}/articles/${esc(slug)}.html">
+<link rel="canonical" href="${canonicalURL}">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Article","headline":"${esc(title)}","author":{"@type":"Person","name":"${esc(author)}"},"datePublished":"${new Date().toISOString()}","description":"${esc(excerpt)}","articleSection":"${esc(category)}"}
@@ -1821,7 +1787,7 @@ async function submitArticle() {
       document.getElementById('dist-whatsapp').checked ||
       document.getElementById('dist-reddit').checked;
 
-    let hookRes = { skipped:true, note:'No social channels enabled or no webhook configured' };
+    let hookRes = { skipped:true };
     if (hasAnyDist) {
       hookRes = await fireWebhook({
         title, author, category, excerpt, tags, slug, bloggerURL, githubURL, publishType,
@@ -1979,17 +1945,19 @@ function renderAllArticles(filter) {
   items.sort((a, b) => b.date.localeCompare(a.date));
   list.innerHTML = items.map(a => {
     const section = csSectionFor(a.category) || a.category || 'Uncategorised';
+    const isVercel = a._source === 'vercel';
+    const btns = isVercel
+      ? `<button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>`
+      : `<button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>
+         <button type="button" class="cs-edit-btn" data-all-edit="${esc(a._key)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
+         <button type="button" class="cs-edit-btn" data-all-del="${esc(a._key)}" style="color:var(--rose);"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>`;
     return `
       <li class="cs-picker-row">
         <div style="flex:1;min-width:0;">
           <div class="cs-picker-title">${esc(a.title || '(untitled)')}</div>
           <div class="cs-picker-meta">${esc(section)} · ${esc(a.date.slice(0, 10))}<span class="cs-src-badge">${a._source === 'worker' ? 'Worker' : 'Vercel'}</span></div>
         </div>
-        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">
-          <button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>
-          <button type="button" class="cs-edit-btn" data-all-edit="${esc(a._key)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
-          <button type="button" class="cs-edit-btn" data-all-del="${esc(a._key)}" style="color:var(--rose);"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>
-        </div>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">${btns}</div>
       </li>`;
   }).join('');
   list.querySelectorAll('[data-all-edit]').forEach(btn => {
@@ -2295,7 +2263,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const savedToken = localStorage.getItem('pc_gh_token') || '';
   const tokenInput = document.getElementById('gh-token-input');
   const statusEl   = document.getElementById('gh-config-status');
-  const helpEl     = document.getElementById('gh-token-help');
   if (savedToken && tokenInput) {
     tokenInput.value = savedToken;
     updateGitHubStatusUI(true, GH_USERNAME, GH_REPO);
@@ -2303,7 +2270,6 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     updateGitHubStatusUI(false,'','');
     if (statusEl) { statusEl.style.color='var(--gold)'; statusEl.textContent='No token saved yet.'; }
-    if (helpEl) helpEl.style.display = 'block';
   }
 
   document.getElementById('tab-text').addEventListener('click',    () => setMode('text'));
@@ -2334,6 +2300,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('save-blogid-btn').addEventListener('click',   saveBlogId);
   document.getElementById('save-gh-btn').addEventListener('click',       saveGitHubConfig);
   document.getElementById('test-gh-btn').addEventListener('click',       testGitHubConnection);
+  document.getElementById('clear-gh-btn').addEventListener('click',      clearGitHubToken);
 
   document.getElementById('preview-close-btn').addEventListener('click', closePreview);
   document.getElementById('preview-modal').addEventListener('click', e => { if (e.target === document.getElementById('preview-modal')) closePreview(); });
