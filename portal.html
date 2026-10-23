@@ -610,6 +610,7 @@ const GH_REPO     = 'poetic-codes';
 const GH_BRANCH   = 'main';
 
 const COMMONPLACE_API = 'https://poetic-codes.pansensoyglenn150.workers.dev/api/';
+const CP_PUBLISH_API  = 'https://current-situation.vercel.app/api/'; // Added for workaround
 const CS_SOURCE_API   = 'https://current-situation.vercel.app/api/articles';
 
 const CP_CATEGORY = {
@@ -1648,7 +1649,8 @@ ${bodyHTML}
 async function uploadCover(dataUrl, slug) {
   const blob = await (await fetch(dataUrl)).blob();
   const qs = new URLSearchParams({ filename: slug + '.png', contentType: 'image/png' });
-  const r = await fetch(COMMONPLACE_API + 'upload?' + qs, {
+  // CHANGED: Now points to Vercel API
+  const r = await fetch(CP_PUBLISH_API + 'upload?' + qs, {
     method: 'POST', body: blob
   });
   if (!r.ok) throw new Error('cover upload failed (' + r.status + ')');
@@ -1675,7 +1677,8 @@ function commonplacePayload(content, title, caption) {
 async function publishToCommonplace(meta, payload, coverDataUrl) {
   let photoUrl = null;
   try { photoUrl = await uploadCover(coverDataUrl, meta.slug); } catch (e) { }
-  const r = await fetch(COMMONPLACE_API + 'articles', {
+  // CHANGED: Now points to Vercel API
+  const r = await fetch(CP_PUBLISH_API + 'articles', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
