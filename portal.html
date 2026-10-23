@@ -1772,7 +1772,8 @@ async function submitArticle() {
           distLines.push('– Commonplace: skipped (' + payload.skip + ')');
         } else {
           await publishToCommonplace({ title, category, excerpt, tags, slug }, payload, generateCoverImage(title, category));
-          distLines.push('✓ Commonplace: saved to Cloudflare — deploying to current-situation, poetic-codes + Vercel (~1 min)');
+          // ENHANCED: Changed message to reflect Vercel database
+          distLines.push('✓ Commonplace: saved to the database (Vercel)');
         }
       } catch (e) {
         distLines.push('⚠ Commonplace: ' + e.message);
@@ -1948,7 +1949,10 @@ function renderAllArticles(filter) {
   items.sort((a, b) => b.date.localeCompare(a.date));
   list.innerHTML = items.map(a => {
     const section = csSectionFor(a.category) || a.category || 'Uncategorised';
-    const isVercel = a._source === 'vercel';
+    
+    // ENHANCED: Force all buttons (Read, Edit, Delete) to show for all articles
+    const isVercel = false; 
+    
     const btns = isVercel
       ? `<button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>`
       : `<button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>
