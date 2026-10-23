@@ -407,6 +407,13 @@
 
         <aside class="sidebar" aria-label="Configuration and publishing settings">
 
+          <section class="sidebar-card" aria-labelledby="sc-admin">
+            <h3 class="sidebar-card-title" id="sc-admin"><i class="fas fa-shield-alt" aria-hidden="true"></i> Admin Security Key</h3>
+            <input type="password" id="admin-key-input" class="webhook-input" aria-label="Admin key" style="width:100%;margin-top:0.3rem;" placeholder="Paste your ADMIN_KEY here">
+            <button class="btn-save-hook" id="save-admin-key-btn" type="button" style="margin-top:0.4rem;width:100%;">Save Key</button>
+            <div id="admin-key-status" style="font-family:'JetBrains Mono',monospace;font-size:0.55rem;margin-top:0.3rem;" aria-live="polite"></div>
+          </section>
+
           <section class="sidebar-card" aria-labelledby="sc-blogger">
             <h3 class="sidebar-card-title" id="sc-blogger"><i class="fab fa-blogger-b" aria-hidden="true"></i> Blogger Connection</h3>
             <div id="auth-status-box" class="auth-status disconnected">
@@ -708,18 +715,17 @@ function plainToHTML(text) {
 }
 
 function getAdminKey() {
-  let k = localStorage.getItem('pc_admin_key') || '';
-  if (!k) {
-    k = (prompt('Enter your admin key to save changes:') || '').trim();
-    if (k) localStorage.setItem('pc_admin_key', k);
-  }
-  return k;
+  const input = document.getElementById('admin-key-input');
+  if (input && input.value.trim()) return input.value.trim();
+  return localStorage.getItem('pc_admin_key') || '';
 }
 function adminHeaders(extra) {
   return Object.assign({ 'X-Admin-Key': getAdminKey() }, extra || {});
 }
 function clearAdminKeyOn401(res) {
   if (res && res.status === 401) {
+    const input = document.getElementById('admin-key-input');
+    if (input) input.value = '';
     localStorage.removeItem('pc_admin_key');
   }
 }
@@ -934,7 +940,9 @@ function uploadSingleToR2(file, filename, onProgress) {
         }
       } else if (xhr.status === 401) {
         localStorage.removeItem('pc_admin_key');
-        reject(new Error('Admin key rejected — try again to re-enter it.'));
+        const input = document.getElementById('admin-key-input');
+        if (input) input.value = '';
+        reject(new Error('Admin key rejected — please check your key and try again.'));
       } else if (xhr.status === 413) {
         reject(new Error('File too large for a single request (413).'));
       } else {
@@ -2269,6 +2277,27 @@ document.addEventListener('DOMContentLoaded', function() {
   loadDisqusShortname();
   updateAuthUI(isTokenValid());
 
+  const adminKeyInput = document.getElementById('admin-key-input');
+  const adminKeyStatus = document.getElementById('admin-key-status');
+  
+  if (adminKeyInput) {
+    adminKeyInput.value = localStorage.getItem('pc_admin_key') || '';
+    
+    document.getElementById('save-admin-key-btn').addEventListener('click', function() {
+      const val = adminKeyInput.value.trim();
+      if (!val) {
+        localStorage.removeItem('pc_admin_key');
+        adminKeyStatus.style.color = 'var(--rose)';
+        adminKeyStatus.textContent = 'Key cleared.';
+      } else {
+        localStorage.setItem('pc_admin_key', val);
+        adminKeyStatus.style.color = '#3ddc84';
+        adminKeyStatus.textContent = '✅ Key saved to this browser.';
+      }
+      setTimeout(() => { adminKeyStatus.textContent = ''; }, 3000);
+    });
+  }
+
   const chips = document.getElementById('intro-chips');
   if (chips) {
     const sections = [
@@ -2295,10 +2324,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const savedToken = localStorage.getItem('pc_gh_token') || '';
   const tokenInput = document.getElementById('gh-token-input');
   const statusEl   = document.getElementById('gh-config-status');
-  if (savedToken && tokenInput) {
+  if (('savedToken && tokenInputsave) {
     tokenInput.value = savedToken;
-    updateGitHubStatusUI(true, GH_USERNAME, GH_REPO);
-    if (statusEl) { statusEl.style.color='#3ddc84'; statusEl.textContent='Token loaded.'; setTimeout(() => { statusEl.textContent=''; }, 3000); }
+-    updateGitHubStatusUI(truegh, GH_USERNAME, GH_RE-btnPO);
+    if (status').El) { statusEl.style.color='#3ddc84'; statusEl.textContent='Token loaded.'; setTimeout(() => { statusEl.textContent=''; }, 3000); }
   } else {
     updateGitHubStatusUI(false,'','');
     if (statusEl) { statusEl.style.color='var(--gold)'; statusEl.textContent='No token saved yet.'; }
@@ -2330,7 +2359,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('save-webhook-btn').addEventListener('click',  saveWebhookUrl);
   document.getElementById('save-disqus-btn').addEventListener('click',   saveDisqusShortname);
   document.getElementById('save-blogid-btn').addEventListener('click',   saveBlogId);
-  document.getElementById('save-gh-btn').addEventListener('click',       saveGitHubConfig);
+  document.getElementByIdaddEventListener('click',       saveGitHubConfig);
   document.getElementById('test-gh-btn').addEventListener('click',       testGitHubConnection);
   document.getElementById('clear-gh-btn').addEventListener('click',      clearGitHubToken);
 
