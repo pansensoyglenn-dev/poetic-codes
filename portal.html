@@ -610,7 +610,7 @@ const GH_REPO     = 'poetic-codes';
 const GH_BRANCH   = 'main';
 
 const COMMONPLACE_API = 'https://poetic-codes.pansensoyglenn150.workers.dev/api/';
-const CP_PUBLISH_API  = 'https://current-situation.vercel.app/api/'; // Added for workaround
+const CP_PUBLISH_API  = 'https://current-situation.vercel.app/api/';
 const CS_SOURCE_API   = 'https://current-situation.vercel.app/api/articles';
 
 const CP_CATEGORY = {
@@ -705,6 +705,23 @@ function plainToHTML(text) {
       }
       return `<p style="text-align:justify;margin-bottom:1.4rem;line-height:1.85;">${p.replace(/\n/g,' ')}</p>`;
     }).join('\n');
+}
+
+function getAdminKey() {
+  let k = localStorage.getItem('pc_admin_key') || '';
+  if (!k) {
+    k = (prompt('Enter your admin key to save changes:') || '').trim();
+    if (k) localStorage.setItem('pc_admin_key', k);
+  }
+  return k;
+}
+function adminHeaders(extra) {
+  return Object.assign({ 'X-Admin-Key': getAdminKey() }, extra || {});
+}
+function clearAdminKeyOn401(res) {
+  if (res && res.status === 401) {
+    localStorage.removeItem('pc_admin_key');
+  }
 }
 
 function getYouTubeId(url) {
@@ -897,6 +914,8 @@ function uploadSingleToR2(file, filename, onProgress) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', COMMONPLACE_API + 'upload?' + qs.toString(), true);
+    const adminKey = getAdminKey();
+    if (adminKey) xhr.setRequestHeader('X-Admin-Key', adminKey);
     xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
     xhr.upload.onprogress = e => {
       if (e.lengthComputable && typeof onProgress === 'function') {
@@ -913,6 +932,9 @@ function uploadSingleToR2(file, filename, onProgress) {
         } catch (e) {
           reject(new Error('Invalid JSON from Worker: ' + xhr.responseText.slice(0, 120)));
         }
+      } else if (xhr.status === 401) {
+        localStorage.removeItem('pc_admin_key');
+        reject(new Error('Admin key rejected — try again to re-enter it.'));
       } else if (xhr.status === 413) {
         reject(new Error('File too large for a single request (413).'));
       } else {
@@ -930,7 +952,8 @@ async function uploadMultipartToR2(file, filename, onProgress) {
 
   const createRes = await fetch(base + 'create?' + new URLSearchParams({
     filename, contentType: file.type || 'video/mp4'
-  }), { method: 'POST' });
+  }), { method: 'POST', headers: adminHeaders() });
+  clearAdminKeyOn401(createRes);
   if (!createRes.ok) {
     throw new Error('Large uploads need the multipart routes on the Worker (create returned HTTP ' + createRes.status + ').');
   }
@@ -946,7 +969,8 @@ async function uploadMultipartToR2(file, filename, onProgress) {
       try {
         const r = await fetch(base + 'part?' + new URLSearchParams({
           key: init.key, uploadId: init.uploadId, partNumber: String(i + 1)
-        }), { method: 'PUT', body: blob });
+        }), { method: 'PUT', headers: adminHeaders(), body: blob });
+        clearAdminKeyOn401(r);
         if (!r.ok) throw new Error('HTTP ' + r.status);
         parts.push(await r.json());
         break;
@@ -960,9 +984,10 @@ async function uploadMultipartToR2(file, filename, onProgress) {
 
   const done = await fetch(base + 'complete', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: adminHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({ key: init.key, uploadId: init.uploadId, parts })
   });
+  clearAdminKeyOn401(done);
   if (!done.ok) throw new Error('Could not finalize upload (HTTP ' + done.status + ').');
   const data = await done.json();
   const url  = data.url || data.publicUrl || data.location;
@@ -1649,10 +1674,12 @@ ${bodyHTML}
 async function uploadCover(dataUrl, slug) {
   const blob = await (await fetch(dataUrl)).blob();
   const qs = new URLSearchParams({ filename: slug + '.png', contentType: 'image/png' });
-  // CHANGED: Now points to Vercel API
   const r = await fetch(CP_PUBLISH_API + 'upload?' + qs, {
-    method: 'POST', body: blob
+    method: 'POST',
+    headers: adminHeaders(),
+    body: blob
   });
+  clearAdminKeyOn401(r);
   if (!r.ok) throw new Error('cover upload failed (' + r.status + ')');
   return (await r.json()).url;
 }
@@ -1677,10 +1704,9 @@ function commonplacePayload(content, title, caption) {
 async function publishToCommonplace(meta, payload, coverDataUrl) {
   let photoUrl = null;
   try { photoUrl = await uploadCover(coverDataUrl, meta.slug); } catch (e) { }
-  // CHANGED: Now points to Vercel API
   const r = await fetch(CP_PUBLISH_API + 'articles', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: adminHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({
       title: meta.title,
       category: CP_CATEGORY[meta.category] || 'culture',
@@ -1693,6 +1719,7 @@ async function publishToCommonplace(meta, payload, coverDataUrl) {
       videoUrl: payload.videoUrl
     })
   });
+  clearAdminKeyOn401(r);
   if (!r.ok) throw new Error(((await r.json().catch(() => ({}))).error) || 'HTTP ' + r.status);
   return r.json();
 }
@@ -1772,7 +1799,6 @@ async function submitArticle() {
           distLines.push('– Commonplace: skipped (' + payload.skip + ')');
         } else {
           await publishToCommonplace({ title, category, excerpt, tags, slug }, payload, generateCoverImage(title, category));
-          // ENHANCED: Changed message to reflect Vercel database
           distLines.push('✓ Commonplace: saved to the database (Vercel)');
         }
       } catch (e) {
@@ -1949,10 +1975,7 @@ function renderAllArticles(filter) {
   items.sort((a, b) => b.date.localeCompare(a.date));
   list.innerHTML = items.map(a => {
     const section = csSectionFor(a.category) || a.category || 'Uncategorised';
-    
-    // ENHANCED: Force all buttons (Read, Edit, Delete) to show for all articles
-    const isVercel = false; 
-    
+    const isVercel = false;
     const btns = isVercel
       ? `<button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>`
       : `<button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>
@@ -2000,7 +2023,8 @@ function deleteArticleGated(article) {
       ? CS_SOURCE_API + '?id=' + encodeURIComponent(article.id)
       : COMMONPLACE_API + 'articles/' + encodeURIComponent(article.id);
     try {
-      const r = await fetch(url, { method: 'DELETE' });
+      const r = await fetch(url, { method: 'DELETE', headers: adminHeaders() });
+      clearAdminKeyOn401(r);
       if (!r.ok && r.status !== 404) {
         const j = await r.json().catch(() => ({}));
         throw new Error(j.error || 'HTTP ' + r.status);
@@ -2191,7 +2215,7 @@ async function updateCommonplaceEntry() {
     const sameSection = csSectionFor(csEditing.category) === category;
     const r = await fetch(putUrl, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         title,
         category: sameSection ? (csEditing.category || CP_CATEGORY[category]) : (CP_CATEGORY[category] || csEditing.category || 'culture'),
@@ -2204,6 +2228,7 @@ async function updateCommonplaceEntry() {
         videoUrl: payload.videoUrl
       })
     });
+    clearAdminKeyOn401(r);
     if (!r.ok) {
       const j = await r.json().catch(() => ({}));
       if (r.status === 404 || r.status === 405) {
