@@ -459,9 +459,32 @@ function showToast(msg, type = 'info', duration = 3000) {
   toastTimer = setTimeout(() => t.classList.remove('show'), duration);
 }
 
+function getAdminKey() {
+  let k = localStorage.getItem('pc_admin_key') || '';
+  if (!k) {
+    k = (prompt('Enter your admin key to save changes:') || '').trim();
+    if (k) localStorage.setItem('pc_admin_key', k);
+  }
+  return k;
+}
+
+function adminHeaders(extra) {
+  return Object.assign({ 'X-Admin-Key': getAdminKey() }, extra || {});
+}
+
+function clearAdminKeyOn401(res) {
+  if (res && res.status === 401) {
+    localStorage.removeItem('pc_admin_key');
+  }
+}
+
 function apiUrl(path) { return `${API_URL}api/${path}`; }
 
 async function apiErrorMessage(res, fallback) {
+  if (res.status === 401) {
+    localStorage.removeItem('pc_admin_key');
+    return 'Admin key rejected — you will be asked for it again';
+  }
   try {
     const data = await res.json();
     if (data && data.error) return `${data.error} (${res.status})`;
@@ -477,7 +500,7 @@ async function apiListArticles() {
 async function apiCreateArticle(payload) {
   const res = await fetch(apiUrl('articles'), {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: adminHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload)
   });
   if (!res.ok) throw new Error(await apiErrorMessage(res, 'Could not save article'));
@@ -486,14 +509,17 @@ async function apiCreateArticle(payload) {
 async function apiUpdateArticle(id, payload) {
   const res = await fetch(apiUrl(`articles?id=${id}`), {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: adminHeaders({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(payload)
   });
   if (!res.ok) throw new Error(await apiErrorMessage(res, 'Could not update article'));
   return res.json();
 }
 async function apiDeleteArticle(id) {
-  const res = await fetch(apiUrl(`articles?id=${id}`), { method: 'DELETE' });
+  const res = await fetch(apiUrl(`articles?id=${id}`), {
+    method: 'DELETE',
+    headers: adminHeaders()
+  });
   if (!res.ok && res.status !== 404) throw new Error(await apiErrorMessage(res, 'Could not delete article'));
 }
 
@@ -507,7 +533,11 @@ async function apiUploadPhoto(file) {
     filename: toSend.name || 'photo.jpg',
     contentType: toSend.type || 'image/jpeg'
   });
-  const res = await fetch(apiUrl(`upload?${qs}`), { method: 'POST', body: toSend });
+  const res = await fetch(apiUrl(`upload?${qs}`), {
+    method: 'POST',
+    headers: adminHeaders(),
+    body: toSend
+  });
   if (!res.ok) throw new Error(await apiErrorMessage(res, 'Photo upload failed'));
   const data = await res.json();
   return data.url;
@@ -2110,7 +2140,7 @@ document.getElementById('export-github-btn')?.addEventListener('click', exportTo
 document.getElementById('backup-download-btn')?.addEventListener('click', downloadBackup);
 document.getElementById('backup-restore-btn')?.addEventListener('click', restoreFromBackup);
 document.getElementById('migrate-local-btn')?.addEventListener('click', migrateLocalArticles);
-document.getElementById('gh-settings-save-btn')?.addEventListener('click', saveGithubSettings);
+0document.getElementById('gh-settings-save-btn')?.addEventListener('click', saveGithubSettings);
 document.getElementById('fb-settings-save-btn')?.addEventListener('click', saveFbSettings);
 document.getElementById('article-fb-post-btn')?.addEventListener('click', () => {
   const a = articles.find(x => x.id === currentArticleId);
@@ -2133,7 +2163,7 @@ document.getElementById('export-html-btn')?.addEventListener('click', () => {
     return;
   }
 
-  let html = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>The Commonplace — Export</title>\n  <style>\n    body { font-family: 'Source Serif 4', serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #2A1A0F; background: #F5F0EA; }\n    h1 { font-size: 2.5rem; border-bottom: 2px solid #C8BDB0; padding-bottom: 0.5rem; color: #3C2A1F; }\n    .article { margin: 2rem 0; padding-bottom: 2rem; border-bottom: 1px solid #C8BDB0; }\n    .article h2 { margin-bottom: 0.25rem; color: #3C2A1F; }\n    .meta { color: #5A4A3A; font-size: 0.9rem; }\n    .category { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px; font-size: 0.8rem; background: #EDE8E0; color: #3C2A1F; border: 1px solid #C8BDB0; }\n    .body { margin-top: 1rem; color: #5A4A3A; }\n    .summary { margin-top: 0.5rem; font-style: italic; color: #5A4A3A; }\n    .tags { margin-top: 0.5rem; }\n    .tags span { display: inline-block; margin-right: 0.4rem; font-size: 0.8rem; color: #8B6B4A; }\n  </style>\n</head>\n<body>\n  <h1>The Commonplace — Export</h1>\n  <p style="color:#5A4A3A;">Exported on ${new Date().toLocaleString()} · ${articles.length} articles</p>\n`;
+  let html = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset="UTF-8">\n  <title>The Commonplace — Export</title>\n  <style>\n    body { font-family: 'Source Serif 4', serif; max-width: 800px; margin: 2rem auto; padding:  1rem; line-height: 1.6; color: #2A1A0F; background: #F5F0EA; }\n    h1 { font-size: 2.5rem; border-bottom: 2px solid #C8BDB0; padding-bottom: 0.5rem; color: #3C2A1F; }\n    .article { margin: 2rem 0; padding-bottom: 2rem; border-bottom: 1px solid #C8BDB0; }\n    .article h2 { margin-bottom: 0.25rem; color: #3C2A1F; }\n    .meta { color: #5A4A3A; font-size: 0.9rem; }\n    .category { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px; font-size: 0.8rem; background: #EDE8E0; color: #3C2A1F; border: 1px solid #C8BDB0; }\n    .body { margin-top: 1rem; color: #5A4A3A; }\n    .summary { margin-top: 0.5rem; font-style: italic; color: #5A4A3A; }\n    .tags { margin-top: 0.5rem; }\n    .tags span { display: inline-block; margin-right: 0.4rem; font-size: 0.8rem; color: #8B6B4A; }\n  </style>\n</head>\n<body>\n  <h1>The Commonplace — Export</h1>\n  <p style="color:#5A4A3A;">Exported on ${new Date().toLocaleString()} · ${articles.length} articles</p>\n`;
 
   const sorted = [...articles].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
   for (const article of sorted) {
