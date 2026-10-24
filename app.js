@@ -1124,10 +1124,7 @@ function articleStaticHtml(article, cat, canonicalUrl, imageAbsUrl) {
 `;
 }
 
-// Deploys a markdown copy plus a static share page (with Open Graph tags) for one article.
-// Returns the live share-page URL on success, or null if nothing was deployed.
-// opts.force      – deploy even when auto-deploy is switched off (used for on-demand sharing)
-// opts.skipAutoPost – don't trigger the Facebook auto-post afterwards
+
 async function deployArticleToGitHub(article, opts = {}) {
   if (!githubSettings.autoDeploy && !opts.force) return null;
   if (!githubSettings.username || !githubSettings.repo || !githubSettings.token) {
@@ -1260,8 +1257,6 @@ async function waitForUrlLive(url, timeoutMs = 240000, intervalMs = 8000) {
   return false;
 }
 
-// Returns a real, crawlable article URL. If the article has no share page yet,
-// deploys one first (and waits for it to go live) so Facebook can read its preview tags.
 async function ensureSharePage(article) {
   if (article.pageUrl) return article.pageUrl;
   showToast('⏳ Creating a share page for this article…', 'info', 5000);
@@ -2049,14 +2044,13 @@ document.getElementById('article-edit-btn')?.addEventListener('click', () => {
   if (currentArticleId) location.href = 'portal.html#edit=' + currentArticleId;
 });
 
-// Social share links: if the article has no share page yet, create one first,
-// then open the platform's share dialog with the real article URL.
+
 document.getElementById('article-share-row')?.addEventListener('click', async (e) => {
   const link = e.target.closest('a.share-icon-btn');
   const a = articles.find(x => x.id === currentArticleId);
   if (!link || !a || a.pageUrl) return;
   e.preventDefault();
-  // Open the window synchronously so mobile browsers don't block it as a popup.
+  
   const win = link.id === 'share-email' ? null : window.open('about:blank', '_blank');
   const ok = await ensureSharePage(a);
   if (!ok) { if (win) win.close(); return; }
@@ -2140,7 +2134,7 @@ document.getElementById('export-github-btn')?.addEventListener('click', exportTo
 document.getElementById('backup-download-btn')?.addEventListener('click', downloadBackup);
 document.getElementById('backup-restore-btn')?.addEventListener('click', restoreFromBackup);
 document.getElementById('migrate-local-btn')?.addEventListener('click', migrateLocalArticles);
-0document.getElementById('gh-settings-save-btn')?.addEventListener('click', saveGithubSettings);
+document.getElementById('gh-settings-save-btn')?.addEventListener('click', saveGithubSettings);
 document.getElementById('fb-settings-save-btn')?.addEventListener('click', saveFbSettings);
 document.getElementById('article-fb-post-btn')?.addEventListener('click', () => {
   const a = articles.find(x => x.id === currentArticleId);
