@@ -1875,7 +1875,6 @@ async function submitArticle() {
 }
 
 const CS_SOURCES = [
-  { key: 'worker', label: 'Worker', url: COMMONPLACE_API + 'articles' },
   { key: 'vercel', label: 'Vercel', url: CS_SOURCE_API }
 ];
 
@@ -2324,10 +2323,10 @@ document.addEventListener('DOMContentLoaded', function() {
   const savedToken = localStorage.getItem('pc_gh_token') || '';
   const tokenInput = document.getElementById('gh-token-input');
   const statusEl   = document.getElementById('gh-config-status');
-  if (('savedToken && tokenInputsave) {
+  if (savedToken && tokenInput) {
     tokenInput.value = savedToken;
--    updateGitHubStatusUI(truegh, GH_USERNAME, GH_RE-btnPO);
-    if (status').El) { statusEl.style.color='#3ddc84'; statusEl.textContent='Token loaded.'; setTimeout(() => { statusEl.textContent=''; }, 3000); }
+    updateGitHubStatusUI(true, GH_USERNAME, GH_REPO);
+    if (statusEl) { statusEl.style.color='#3ddc84'; statusEl.textContent='Token loaded.'; setTimeout(() => { statusEl.textContent=''; }, 3000); }
   } else {
     updateGitHubStatusUI(false,'','');
     if (statusEl) { statusEl.style.color='var(--gold)'; statusEl.textContent='No token saved yet.'; }
@@ -2359,7 +2358,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('save-webhook-btn').addEventListener('click',  saveWebhookUrl);
   document.getElementById('save-disqus-btn').addEventListener('click',   saveDisqusShortname);
   document.getElementById('save-blogid-btn').addEventListener('click',   saveBlogId);
-  document.getElementByIdaddEventListener('click',       saveGitHubConfig);
+  document.getElementById('save-gh-btn').addEventListener('click',       saveGitHubConfig);
   document.getElementById('test-gh-btn').addEventListener('click',       testGitHubConnection);
   document.getElementById('clear-gh-btn').addEventListener('click',      clearGitHubToken);
 
@@ -2385,7 +2384,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('all-articles-search').addEventListener('input', function() { renderAllArticles(this.value); });
   document.getElementById('all-articles-refresh').addEventListener('click', loadAllArticles);
-  loadAllArticles();
+  
+  
+  setTimeout(loadAllArticles, 300); 
 
   document.getElementById('import-cs-btn').addEventListener('click', openCsPicker);
   document.getElementById('cs-picker-close').addEventListener('click', closeCsPicker);
