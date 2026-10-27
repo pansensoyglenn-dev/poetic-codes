@@ -157,11 +157,11 @@ This section is a record of songs and images that stuck. Not a definitive list, 
   }
 ];
 
-const SITE_URL = 'https://poetic-codes.pages.dev/';
+
+const SITE_URL = 'https://poetic-coded.pages.dev/';
 const CANONICAL_URL = 'https://poetic-codes.pages.dev/';
+const API_URL = 'https://poetic-codes.vercel.app/';
 
-
-const API_URL = 'https://current-situation.vercel.app/';
 
 const BLOGGER_CLIENT_ID = '790965276439-flja0u6tel45rqbg47p6l8fp6aua1tch.apps.googleusercontent.com';
 const BLOGGER_BLOG_URL  = 'https://poetic-bytes.blogspot.com';
@@ -1108,7 +1108,7 @@ function articleStaticHtml(article, cat, canonicalUrl, imageAbsUrl) {
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${desc}">
 
-  <link rel="stylesheet" href="${SITE_URL}styles.css">
+  <link rel="stylesheet" href="/styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
