@@ -101,7 +101,7 @@ The writing tries to present competing viewpoints fairly and to separate reporte
 
 Readers will not find instant reactions in this section. They will find slower analysis meant to help them understand a complicated world and form their own conclusions with more confidence. That is a deliberate choice. Instant reactions are cheap and usually wrong. Slower analysis takes more work to read and more work to write, but it holds up better when the facts on the ground change — which they always do.
 
-The world is complicated, and pretending otherwise serves no one. But complication is not the same as confusion, and understanding is possible without pretending to certainty. The essays here aim for that middle ground: serious, careful, and honest about the limits of what anyone can know. If they help a reader follow international events with more clarity than they otherwise would, they have done their work.`
+The world is complicated, and pretending otherwise serves no one. But complication is not the same as confusion, and understanding is possible without pretending to certainty. The essays here aim for that middle ground: serious, careful, and honest about the limits of what anyone can know. If they help a reader follow international events with more clarity than they otherwise would, they have done their job.`
   },
   {
     slug: 'weather', name: 'Weather', color: '#5A7F97',
@@ -551,9 +551,9 @@ function mapDbArticleToLocal(row) {
     title: row.title,
     category: row.category,
     date: typeof row.date === 'string' ? row.date.slice(0, 10) : row.date,
-    contentType: row.content_type || row.contentType,
-    body: row.body,
-    summary: row.summary || '',
+    contentType: row.content_type || row.contentType || 'text',
+    body: row.content,
+    summary: row.excerpt || '',
     tags: row.tags || [],
     photo: row.photo_url || row.photoUrl || null,
     video: row.video_url || row.videoUrl || null,
@@ -1697,7 +1697,7 @@ function articleShareUrl(a) {
 
 function shareSnippet(a) {
   if (a.summary) return a.summary;
-  const plain = a.body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  const plain = a.content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
   return plain.slice(0, 180) + (plain.length > 180 ? '…' : '');
 }
 
