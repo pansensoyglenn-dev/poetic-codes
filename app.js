@@ -159,8 +159,10 @@ This section is a record of songs and images that stuck. Not a definitive list, 
 
 const SITE_URL = 'https://poetic-codes.pages.dev/';
 const CANONICAL_URL = 'https://poetic-codes.pages.dev/';
-const API_URL = 'https://poetic-codes.vercel.app/';
+
+
 const API_URL = 'https://current-situation.vercel.app/';
+
 const BLOGGER_CLIENT_ID = '790965276439-flja0u6tel45rqbg47p6l8fp6aua1tch.apps.googleusercontent.com';
 const BLOGGER_BLOG_URL  = 'https://poetic-bytes.blogspot.com';
 const ADSENSE_PUBLISHER = 'ca-pub-6428799122405621';
