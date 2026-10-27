@@ -159,7 +159,7 @@ This section is a record of songs and images that stuck. Not a definitive list, 
 
 const SITE_URL = 'https://poetic-codes.pages.dev/';
 const CANONICAL_URL = 'https://poetic-codes.pages.dev/';
-const API_URL = 'https://current-situation.vercel.app/';
+const API_URL = 'https://poetic-codes.vercel.app/';
 
 const BLOGGER_CLIENT_ID = '790965276439-flja0u6tel45rqbg47p6l8fp6aua1tch.apps.googleusercontent.com';
 const BLOGGER_BLOG_URL  = 'https://poetic-bytes.blogspot.com';
@@ -929,7 +929,6 @@ async function loadGithubSettings() {
     const res = await window.storage.get(GITHUB_SETTINGS_KEY);
     if (res && res.value) githubSettings = { ...githubSettings, ...JSON.parse(res.value) };
   } catch (e) { }
-  // Fall back to the token saved in the Editor Portal (localStorage)
   if (!githubSettings.token) {
     githubSettings.token = localStorage.getItem('pc_gh_token') || '';
   }
@@ -2195,7 +2194,6 @@ async function init() {
     showToast('⚠️ Local storage is unavailable — saved settings won\'t persist on this device.', 'error', 6000);
   }
 
-  // Ask Safari/Chrome not to evict saved settings
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { }
 
   await loadArticles();
