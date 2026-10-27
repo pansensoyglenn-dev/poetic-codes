@@ -607,7 +607,7 @@
 const BLOGGER_CLIENT_ID = '790965276439-flja0u6tel45rqbg47p6l8fp6aua1tch.apps.googleusercontent.com';
 
 const SITE_URL = 'https://poetic-codes.pages.dev';
-const API_BASE = 'https://poetic-codes.vercel.app';
+const API_BASE = 'https://current-situation.vercel.app';
 
 const OWNER_EMAIL = 'pansensoyglenn150@gmail.com';
 const BLOGGER_BLOG_URL  = 'https://poetic-bytes.blogspot.com';
@@ -2243,7 +2243,7 @@ async function updateCommonplaceEntry() {
       }
       throw new Error(j.error || 'HTTP ' + r.status);
     }
-    showToast('Entry #' + csEditing.id + ' updated on the main site. Refresh poetic-coded.pages.dev to see it.', 'success', 6000);
+    showToast('Entry #' + csEditing.id + ' updated on the main site. Refresh poetic-codes.pages.dev to see it.', 'success', 6000);
     const cached = csArticlesCache.find(a => a._key === csEditing.source + ':' + csEditing.id);
     if (cached) { cached.title = title; cached.summary = excerpt; cached.body = payload.body; cached.tags = tags; }
   } catch (err) {
