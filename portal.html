@@ -10,20 +10,20 @@
   <meta name="author" content="Glenn Junsay Pansensoy">
   <meta name="robots" content="index, follow">
   <meta name="theme-color" content="#0b0f17">
-  <link rel="canonical" href="https://poetic-codes.pages.dev/portal.html">
+  <link rel="canonical" href="https://poetic-coded.pages.dev/portal.html">
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Poetic Bytes">
   <meta property="og:title" content="Editor Portal | Poetic Bytes">
   <meta property="og:description" content="The desk where I write and publish for Poetic Bytes and The Commonplace.">
-  <meta property="og:url" content="https://poetic-codes.pages.dev/portal.html">
+  <meta property="og:url" content="https://poetic-coded.pages.dev/portal.html">
   <meta property="og:locale" content="en_US">
-  <meta property="og:image" content="https://poetic-codes.pages.dev/og-editor-portal.png">
+  <meta property="og:image" content="https://poetic-coded.pages.dev/og-editor-portal.png">
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Editor Portal | Poetic Bytes">
   <meta name="twitter:description" content="The desk where I write and publish for Poetic Bytes and The Commonplace.">
-  <meta name="twitter:image" content="https://poetic-codes.pages.dev/og-editor-portal.png">
+  <meta name="twitter:image" content="https://poetic-coded.pages.dev/og-editor-portal.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,7 +39,7 @@
     "@context": "https://schema.org",
     "@type": "WebApplication",
     "name": "Editor Portal – Poetic Bytes",
-    "url": "https://poetic-codes.pages.dev/portal.html",
+    "url": "https://poetic-coded.pages.dev/portal.html",
     "description": "The desk where I write and publish for Poetic Bytes and The Commonplace.",
     "applicationCategory": "BusinessApplication",
     "operatingSystem": "Any (Web-based)",
@@ -237,7 +237,7 @@
   <span class="brand">Poetic Codes</span>
   <div style="display:flex;gap:0.6rem;align-items:center;">
     <a href="https://poetic-bytes.blogspot.com" target="_blank" rel="noopener" class="nav-link" title="Visit the Poetic Bytes blog"><i class="fas fa-external-link-alt" aria-hidden="true"></i> Poetic Bytes Blog</a>
-    <a href="https://poetic-codes.pages.dev" target="_blank" rel="noopener" class="nav-link" title="Visit the main site"><i class="fas fa-globe" aria-hidden="true"></i> Main Site</a>
+    <a href="https://poetic-coded.pages.dev" target="_blank" rel="noopener" class="nav-link" title="Visit the main site"><i class="fas fa-globe" aria-hidden="true"></i> Main Site</a>
   </div>
 </nav>
 
@@ -605,7 +605,10 @@
 
 <script>
 const BLOGGER_CLIENT_ID = '790965276439-flja0u6tel45rqbg47p6l8fp6aua1tch.apps.googleusercontent.com';
+
 const SITE_URL = 'https://poetic-codes.pages.dev';
+const API_BASE = 'https://poetic-codes.vercel.app';
+
 const OWNER_EMAIL = 'pansensoyglenn150@gmail.com';
 const BLOGGER_BLOG_URL  = 'https://poetic-bytes.blogspot.com';
 const BLOGSPOT_ABOUT_URL   = 'https://poetic-bytes.blogspot.com/2026/04/about_01131455884.html';
@@ -616,7 +619,6 @@ const GH_USERNAME = 'pansensoyglenn-dev';
 const GH_REPO     = 'poetic-codes';
 const GH_BRANCH   = 'main';
 
-const API_BASE = 'https://current-situation.vercel.app';
 const COMMONPLACE_API  = 'https://poetic-codes.pansensoyglenn150.workers.dev/api/';
 const CP_PUBLISH_API   = API_BASE + '/api/';
 const CS_SOURCE_API    = API_BASE + '/api/articles';
@@ -2241,7 +2243,7 @@ async function updateCommonplaceEntry() {
       }
       throw new Error(j.error || 'HTTP ' + r.status);
     }
-    showToast('Entry #' + csEditing.id + ' updated on the main site. Refresh poetic-codes.pages.dev to see it.', 'success', 6000);
+    showToast('Entry #' + csEditing.id + ' updated on the main site. Refresh poetic-coded.pages.dev to see it.', 'success', 6000);
     const cached = csArticlesCache.find(a => a._key === csEditing.source + ':' + csEditing.id);
     if (cached) { cached.title = title; cached.summary = excerpt; cached.body = payload.body; cached.tags = tags; }
   } catch (err) {
