@@ -616,9 +616,10 @@ const GH_USERNAME = 'pansensoyglenn-dev';
 const GH_REPO     = 'poetic-codes';
 const GH_BRANCH   = 'main';
 
-const COMMONPLACE_API = 'https://poetic-codes.pansensoyglenn150.workers.dev/api/';
-const CP_PUBLISH_API  = 'https://current-situation.vercel.app/api/';
-const CS_SOURCE_API   = 'https://current-situation.vercel.app/api/articles';
+const API_BASE         = 'https://poetic-codes.vercel.app';
+const COMMONPLACE_API  = 'https://poetic-codes.pansensoyglenn150.workers.dev/api/';
+const CP_PUBLISH_API   = API_BASE + '/api/';
+const CS_SOURCE_API    = API_BASE + '/api/articles';
 
 const CP_CATEGORY = {
   'History':                 'history',
@@ -1982,10 +1983,7 @@ function renderAllArticles(filter) {
   items.sort((a, b) => b.date.localeCompare(a.date));
   list.innerHTML = items.map(a => {
     const section = csSectionFor(a.category) || a.category || 'Uncategorised';
-    const isVercel = false;
-    const btns = isVercel
-      ? `<button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>`
-      : `<button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>
+    const btns = `<button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>
          <button type="button" class="cs-edit-btn" data-all-edit="${esc(a._key)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
          <button type="button" class="cs-edit-btn" data-all-del="${esc(a._key)}" style="color:var(--rose);"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>`;
     return `
@@ -2116,7 +2114,7 @@ async function openCsPicker() {
   modal.style.display = 'block';
   document.body.style.overflow = 'hidden';
   list.innerHTML = '<li style="padding:1rem;text-align:center;color:var(--dim);font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;">Loading…</li>';
-  status.textContent = 'Fetching articles from the Worker and Vercel…';
+  status.textContent = 'Fetching articles from Vercel…';
   try {
     const result = await fetchCommonplaceArticles();
     csArticlesCache = result.articles;
@@ -2239,7 +2237,7 @@ async function updateCommonplaceEntry() {
     if (!r.ok) {
       const j = await r.json().catch(() => ({}));
       if (r.status === 404 || r.status === 405) {
-        throw new Error('The Worker rejected the update (HTTP ' + r.status + '). It needs a PUT /api/articles/:id route before edits can be saved.');
+        throw new Error('The Vercel API rejected the update (HTTP ' + r.status + '). It needs a PUT /api/articles?id=<id> route before edits can be saved.');
       }
       throw new Error(j.error || 'HTTP ' + r.status);
     }
@@ -2384,7 +2382,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   document.getElementById('all-articles-search').addEventListener('input', function() { renderAllArticles(this.value); });
   document.getElementById('all-articles-refresh').addEventListener('click', loadAllArticles);
-  
   
   setTimeout(loadAllArticles, 300); 
 
