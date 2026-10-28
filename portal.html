@@ -341,6 +341,14 @@
           </div>
 
           <div class="field-group">
+            <label class="field-label" for="f-cover-image">Cover Image (Optional)</label>
+            <input type="file" id="f-cover-image" class="field-input" accept="image/*" style="padding:0.5rem;">
+            <div id="cover-preview" style="margin-top:0.5rem;display:none;text-align:center;">
+              <img id="cover-preview-img" style="max-width:200px;border-radius:8px;">
+            </div>
+          </div>
+
+          <div class="field-group">
             <span class="field-label" id="content-label">Content</span>
             <div class="mode-tabs" id="mode-tabs" role="tablist" aria-label="Content mode">
               <button class="mode-tab active" id="tab-text"    type="button" role="tab" aria-selected="true">Plain Text</button>
@@ -879,6 +887,8 @@ function resetForm() {
   document.getElementById('vid-preview-grid').innerHTML    = '';
   document.getElementById('vid-size-warning').style.display = 'none';
   document.getElementById('publish-error-box').style.display = 'none';
+  document.getElementById('f-cover-image').value = '';
+  document.getElementById('cover-preview').style.display = 'none';
   uploadedVideoFiles = [];
   csEditing = null;
   updateEditUI();
@@ -1157,6 +1167,42 @@ function handleVideoFiles(files) {
 
   warning.style.display = hasLarge ? 'block' : 'none';
 }
+
+async function uploadCoverToSupabase(file) {
+  if (!file) return null;
+  showToast('Uploading cover image...', 'info', 3000);
+  
+  const res = await fetch(API_BASE + '/api/upload', {
+    method: 'POST',
+    headers: {
+      'X-Admin-Key': getAdminKey(),
+      'Content-Type': file.type || 'image/jpeg'
+    },
+    body: file
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Image upload failed');
+  }
+
+  const data = await res.json();
+  return data.url;
+}
+
+document.getElementById('f-cover-image').addEventListener('change', function() {
+  const file = this.files[0];
+  const previewBox = document.getElementById('cover-preview');
+  const previewImg = document.getElementById('cover-preview-img');
+  
+  if (file) {
+    const url = URL.createObjectURL(file);
+    previewImg.src = url;
+    previewBox.style.display = 'block';
+  } else {
+    previewBox.style.display = 'none';
+  }
+});
 
 function signInBlogger(onSuccess) {
   if (typeof onSuccess !== 'function') onSuccess = null;
@@ -1804,12 +1850,26 @@ async function submitArticle() {
     const doCP = document.getElementById('dist-commonplace') && document.getElementById('dist-commonplace').checked;
     if (doCP) {
       try {
+        let uploadedCoverUrl = null;
+        const coverFileInput = document.getElementById('f-cover-image');
+        if (coverFileInput && coverFileInput.files.length > 0) {
+          try {
+            uploadedCoverUrl = await uploadCoverToSupabase(coverFileInput.files[0]);
+          } catch (err) {
+            distLines.push('⚠ Cover image upload failed: ' + err.message);
+          }
+        }
+
         const caption = document.getElementById('vid-caption') ? document.getElementById('vid-caption').value.trim() : '';
         const payload = commonplacePayload(content, title, caption);
         if (payload.skip) {
           distLines.push('– Commonplace: skipped (' + payload.skip + ')');
         } else {
-          await publishToCommonplace({ title, category, excerpt, tags, slug }, payload, generateCoverImage(title, category));
+          await publishToCommonplace(
+            { title, category, excerpt, tags, slug }, 
+            payload, 
+            uploadedCoverUrl || generateCoverImage(title, category)
+          );
           distLines.push('✓ Commonplace: saved to the database (Vercel)');
         }
       } catch (e) {
@@ -2215,6 +2275,16 @@ async function updateCommonplaceEntry() {
   btn.disabled = true;
   btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Updating…';
   try {
+    let uploadedCoverUrl = csEditing.photoUrl || null;
+    const coverFileInput = document.getElementById('f-cover-image');
+    if (coverFileInput && coverFileInput.files.length > 0) {
+      try {
+        uploadedCoverUrl = await uploadCoverToSupabase(coverFileInput.files[0]);
+      } catch (err) {
+        showToast('Cover upload failed: ' + err.message, 'error', 4000);
+      }
+    }
+
     const isVercel = csEditing.source === 'vercel';
     const putUrl = isVercel
       ? CS_SOURCE_API + '?id=' + encodeURIComponent(csEditing.id)
@@ -2231,7 +2301,7 @@ async function updateCommonplaceEntry() {
         body: payload.body,
         summary: excerpt,
         tags,
-        photoUrl: csEditing.photoUrl || null,
+        photoUrl: uploadedCoverUrl,
         videoUrl: payload.videoUrl
       })
     });
@@ -2245,7 +2315,7 @@ async function updateCommonplaceEntry() {
     }
     showToast('Entry #' + csEditing.id + ' updated on the main site. Refresh poetic-codes.pages.dev to see it.', 'success', 6000);
     const cached = csArticlesCache.find(a => a._key === csEditing.source + ':' + csEditing.id);
-    if (cached) { cached.title = title; cached.summary = excerpt; cached.body = payload.body; cached.tags = tags; }
+    if (cached) { cached.title = title; cached.summary = excerpt; cached.body = payload.body; cached.tags = tags; cached.photoUrl = uploadedCoverUrl; }
   } catch (err) {
     errorBox.textContent = err.message;
     errorBox.style.display = 'block';
