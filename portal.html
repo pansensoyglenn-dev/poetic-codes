@@ -683,6 +683,7 @@ let signInRetries = 0;
 let csArticlesCache = [];
 let csImportQueue   = [];
 let csEditing       = null;
+let lastTextMode    = 'text';
 
 function esc(s) {
   return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -783,12 +784,21 @@ function buildVideoEmbedHTML(caption) {
   return parts.join('\n') + capHTML;
 }
 
+// The article text typed in the Plain Text / Raw HTML tabs (used alongside a video in Video mode).
+function getArticleTextHTML() {
+  const plain = document.getElementById('plain-textarea').value.trim();
+  const html  = document.getElementById('html-textarea').value.trim();
+  const raw   = lastTextMode === 'html' ? (html || plain) : (plain || html);
+  if (!raw) return '';
+  return looksLikeHTML(raw) ? raw : plainToHTML(raw);
+}
+
 function getContentHTML() {
   if (currentMode === 'html')  return document.getElementById('html-textarea').value.trim();
   if (currentMode === 'video') {
     const intro   = document.getElementById('vid-intro').value.trim();
     const caption = document.getElementById('vid-caption').value.trim();
-    return (intro ? plainToHTML(intro) : '') + buildVideoEmbedHTML(caption);
+    return (intro ? plainToHTML(intro) : '') + buildVideoEmbedHTML(caption) + getArticleTextHTML();
   }
   const raw = document.getElementById('plain-textarea').value.trim();
   return looksLikeHTML(raw) ? raw : plainToHTML(raw);
@@ -817,6 +827,7 @@ function updateUrlPreview() {
 
 function setMode(mode) {
   currentMode = mode;
+  if (mode === 'text' || mode === 'html') lastTextMode = mode;
   const plainTA   = document.getElementById('plain-textarea');
   const htmlTA    = document.getElementById('html-textarea');
   const videoArea = document.getElementById('video-textarea-area');
@@ -1845,7 +1856,8 @@ function commonplacePayload(content, title, caption) {
   if (currentMode !== 'video') return { body: content, videoUrl: null };
   const intro = document.getElementById('vid-intro').value.trim();
   const cap = document.getElementById('vid-caption').value.trim();
-  const introHTML = intro ? plainToHTML(intro) : '<p>' + esc(cap || title) + '</p>';
+  // The Commonplace shows the video from videoUrl, so the body carries intro + the article text.
+  const introHTML = ((intro ? plainToHTML(intro) : '') + getArticleTextHTML()) || ('<p>' + esc(cap || title) + '</p>');
   if (currentVidMethod !== 'url') {
     const first = uploadedVideoFiles.find(v => v.uploaded && v.url);
     if (first) return { body: introHTML, videoUrl: first.url };
@@ -2328,7 +2340,7 @@ function loadCsArticleIntoForm(article) {
     setMode('video');
     setVidMethod('url');
     document.getElementById('vid-url-input').value = article.videoUrl;
-    if (body) document.getElementById('vid-intro').value = body.replace(/<[^>]+>/g,'').trim();
+    // The body stays in the text editor tab (not the intro box) so the full article text is kept on update.
     updateUrlPreview();
   }
 
