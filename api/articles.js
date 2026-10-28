@@ -16,6 +16,9 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
+  const adminKey = req.headers['x-admin-key'];
+  const isAuthorized = adminKey === process.env.ADMIN_KEY;
+
   if (req.method === 'GET') {
     try {
       const result = await pool.query('SELECT * FROM articles ORDER BY created_at DESC');
@@ -27,8 +30,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'POST') {
-    const adminKey = req.headers['x-admin-key'];
-    if (adminKey !== process.env.ADMIN_KEY) {
+    if (!isAuthorized) {
       return res.status(401).json({ error: 'Unauthorized: Invalid or missing Admin Key' });
     }
 
@@ -62,6 +64,73 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error('Database Insert Error:', error);
       return res.status(500).json({ error: 'Failed to save article', details: error.message });
+    }
+  }
+
+  if (req.method === 'PUT') {
+    if (!isAuthorized) {
+      return res.status(401).json({ error: 'Unauthorized: Invalid or missing Admin Key' });
+    }
+
+    try {
+      const id = req.query.id;
+      if (!id) return res.status(400).json({ error: 'Missing article ID' });
+
+      const { title, category, date, body, summary, tags, photoUrl, videoUrl } = req.body;
+
+      const query = `
+        UPDATE articles 
+        SET title = $1, category = $2, date = $3, content = $4, excerpt = $5, tags = $6, photo_url = $7, video_url = $8
+        WHERE id = $9
+        RETURNING *;
+      `;
+      
+      const values = [
+        title, 
+        category, 
+        date || new Date().toISOString().split('T')[0], 
+        body, 
+        summary || '', 
+        JSON.stringify(tags || []), 
+        photoUrl || null, 
+        videoUrl || null,
+        id
+      ];
+
+      const result = await pool.query(query, values);
+      
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Article not found' });
+      }
+
+      return res.status(200).json({ success: true, article: result.rows[0] });
+
+    } catch (error) {
+      console.error('Database Update Error:', error);
+      return res.status(500).json({ error: 'Failed to update article', details: error.message });
+    }
+  }
+
+  if (req.method === 'DELETE') {
+    if (!isAuthorized) {
+      return res.status(401).json({ error: 'Unauthorized: Invalid or missing Admin Key' });
+    }
+
+    try {
+      const id = req.query.id;
+      if (!id) return res.status(400).json({ error: 'Missing article ID' });
+
+      const result = await pool.query('DELETE FROM articles WHERE id = $1 RETURNING *', [id]);
+      
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Article not found' });
+      }
+
+      return res.status(200).json({ success: true, message: 'Article deleted' });
+
+    } catch (error) {
+      console.error('Database Delete Error:', error);
+      return res.status(500).json({ error: 'Failed to delete article', details: error.message });
     }
   }
 
