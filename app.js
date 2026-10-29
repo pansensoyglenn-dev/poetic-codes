@@ -849,6 +849,22 @@ function populateCategorySelects() {
   }
 }
 
+// SEO FIX: helpers for producing static-friendly article links
+function articleStaticPath(a) {
+  if (!a || !a.pageUrl) return null;
+  try {
+    const u = new URL(a.pageUrl);
+    return u.pathname;
+  } catch (e) {
+    return a.pageUrl.startsWith('/') ? a.pageUrl : null;
+  }
+}
+function articleHref(a) {
+  const staticPath = articleStaticPath(a);
+  if (staticPath) return staticPath;
+  return `#/article/${a.id}`;
+}
+
 function renderHome() {
   const counts = {};
   CATEGORIES.forEach(c => counts[c.slug] = 0);
@@ -879,19 +895,32 @@ function renderHome() {
     if (recent.length === 0) {
       recentOut.innerHTML = `<div class="empty-state"><span class="glyph">✒️</span>Nothing written yet. Start with your first entry.</div>`;
     } else {
+      // SEO FIX: recent items now contain a real <a href> for crawlers
       recentOut.innerHTML = recent.map(a => {
         const cat = categoryOf(a.category);
+        const href = articleHref(a);
         return `
           <div class="recent-item" data-id="${a.id}">
-            <span class="rt-title">${escapeHtml(a.title)}</span>
+            <a class="rt-title" href="${href}">${escapeHtml(a.title)}</a>
             <span class="rt-meta">
               ${cat ? `<span class="rt-cat" style="color:${cat.color};">${cat.name}</span>` : ''}
               <span class="rt-date">${a.date}</span>
             </span>
           </div>`;
       }).join('');
+      // Keep a click-to-open behaviour for the wrapper, but let link clicks win first
       recentOut.querySelectorAll('.recent-item').forEach(el => {
-        el.addEventListener('click', () => navigateTo('article', { id: parseInt(el.getAttribute('data-id'), 10) }));
+        el.addEventListener('click', (ev) => {
+          if (ev.target.closest('a')) return;
+          const id = parseInt(el.getAttribute('data-id'), 10);
+          const art = articles.find(x => x.id === id);
+          const staticPath = art ? articleStaticPath(art) : null;
+          if (staticPath) {
+            window.location.href = staticPath;
+          } else {
+            navigateTo('article', { id });
+          }
+        });
       });
     }
   }
@@ -909,18 +938,17 @@ function renderLatestEntry() {
   const latest = [...articles].sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id)[0];
   const cat = categoryOf(latest.category);
   const snippet = latest.summary || shareSnippet(latest);
+  const href = articleHref(latest);
+  // SEO FIX: title and "Continue reading" are real <a href> elements
   container.innerHTML = `
     <div class="latest-entry-meta">
       ${cat ? `<span class="category-tag" style="color:${cat.color};border-color:${cat.color};background:rgba(33,49,43,0.06);">${cat.name}</span>` : ''}
       <span class="rt-date">${latest.date}</span>
     </div>
-    <h3 class="latest-entry-title" data-id="${latest.id}">${escapeHtml(latest.title)}</h3>
+    <h3 class="latest-entry-title"><a href="${href}">${escapeHtml(latest.title)}</a></h3>
     <p class="latest-entry-snippet">${escapeHtml(snippet)}</p>
-    <button class="btn-primary btn-sm" id="latest-entry-read-btn">Continue reading</button>
+    <a class="btn-primary btn-sm" id="latest-entry-read-btn" href="${href}">Continue reading</a>
   `;
-  const openLatest = () => navigateTo('article', { id: latest.id });
-  container.querySelector('.latest-entry-title').addEventListener('click', openLatest);
-  document.getElementById('latest-entry-read-btn').addEventListener('click', openLatest);
 }
 
 const GITHUB_SETTINGS_KEY = 'commonplace-github-settings';
@@ -1043,6 +1071,99 @@ async function githubPutFile(path, base64Content, message) {
   return res.json();
 }
 
+// SEO FIX: regenerate sitemap.xml from the current article list
+async function regenerateSitemap() {
+  const missing = ['username', 'repo', 'token'].filter(k => !githubSettings[k]);
+  if (missing.length) return;
+
+  const publicBase = 'https://poetic-codes.pages.dev';
+  const today = new Date().toISOString().slice(0, 10);
+
+  const entries = [
+    { loc: `${publicBase}/`,                    lastmod: today, prio: '1.0', freq: 'daily'   },
+    { loc: `${publicBase}/about.html`,          lastmod: today, prio: '0.4', freq: 'yearly'  },
+    { loc: `${publicBase}/privacy.html`,        lastmod: today, prio: '0.3', freq: 'yearly'  },
+    { loc: `${publicBase}/terms.html`,          lastmod: today, prio: '0.3', freq: 'yearly'  },
+    { loc: `${publicBase}/cookies.html`,        lastmod: today, prio: '0.3', freq: 'yearly'  },
+    { loc: `${publicBase}/accessibility.html`,  lastmod: today, prio: '0.3', freq: 'yearly'  },
+    { loc: `${publicBase}/sitemap.html`,        lastmod: today, prio: '0.4', freq: 'monthly' }
+  ];
+
+  articles.forEach(a => {
+    const path = articleStaticPath(a);
+    if (!path) return;
+    entries.push({
+      loc:     publicBase + path,
+      lastmod: (a.date || today).slice(0, 10),
+      prio:    '0.8',
+      freq:    'monthly'
+    });
+  });
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${entries.map(u => `  <url>
+    <loc>${u.loc}</loc>
+    <lastmod>${u.lastmod}</lastmod>
+    <changefreq>${u.freq}</changefreq>
+    <priority>${u.prio}</priority>
+  </url>`).join('\n')}
+</urlset>
+`;
+
+  try {
+    await githubPutFile('sitemap.xml', b64EncodeUnicode(xml), 'Update sitemap');
+  } catch (e) {
+    console.warn('Sitemap update failed:', e);
+  }
+}
+
+// SEO FIX: regenerate feed.xml (RSS) from the current article list
+async function regenerateFeed() {
+  const missing = ['username', 'repo', 'token'].filter(k => !githubSettings[k]);
+  if (missing.length) return;
+
+  const publicBase = 'https://poetic-codes.pages.dev';
+  const sorted = [...articles]
+    .sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id)
+    .slice(0, 50);
+
+  const items = sorted.map(a => {
+    const path = articleStaticPath(a);
+    if (!path) return '';
+    const cat = categoryOf(a.category);
+    const dateStr = (a.date || todayISO()) + 'T12:00:00Z';
+    const pubDate = new Date(dateStr).toUTCString();
+    return `  <item>
+    <title>${escapeHtml(a.title)}</title>
+    <link>${publicBase}${path}</link>
+    <guid isPermaLink="true">${publicBase}${path}</guid>
+    <pubDate>${pubDate}</pubDate>
+    ${cat ? `<category>${escapeHtml(cat.name)}</category>` : ''}
+    <description>${escapeHtml(shareSnippet(a))}</description>
+  </item>`;
+  }).filter(Boolean);
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>The Commonplace</title>
+  <link>${publicBase}/</link>
+  <description>Essays on history, philosophy, economy, code and culture.</description>
+  <language>en-ph</language>
+  <atom:link href="${publicBase}/feed.xml" rel="self" type="application/rss+xml"/>
+${items.join('\n')}
+</channel>
+</rss>
+`;
+
+  try {
+    await githubPutFile('feed.xml', b64EncodeUnicode(xml), 'Update RSS feed');
+  } catch (e) {
+    console.warn('Feed update failed:', e);
+  }
+}
+
 function adBlock(slot) {
   return `<div class="ad-slot" style="margin:1.6rem 0;text-align:center;">`
     + `<ins class="adsbygoogle"`
@@ -1131,7 +1252,8 @@ function articleStaticHtml(article, cat, canonicalUrl, imageAbsUrl) {
 
 
 async function deployArticleToGitHub(article, opts = {}) {
-  if (!githubSettings.autoDeploy && !opts.force) return null;
+  // SEO FIX: Always deploy so every article gets a public, indexable URL.
+  // The `autoDeploy` toggle now only gates the social auto-post (see below).
   const missing = ['username', 'repo', 'token'].filter(k => !githubSettings[k]);
   if (missing.length) {
     showToast(`⚠️ GitHub settings missing: ${missing.join(', ')}`, 'error', 6000);
@@ -1175,8 +1297,12 @@ async function deployArticleToGitHub(article, opts = {}) {
       articles[idx].pageUrl = liveUrl;
       await saveArticleToDb(articles[idx]);
       if (currentArticleId === article.id) updateShareLinks(articles[idx]);
-      if (!wasDeployed && !opts.skipAutoPost) maybeAutoPostFacebook(articles[idx]);
+      if (!wasDeployed && !opts.skipAutoPost && githubSettings.autoDeploy) maybeAutoPostFacebook(articles[idx]);
     }
+
+    // SEO FIX: refresh sitemap + RSS on every deploy
+    try { await regenerateSitemap(); } catch (e) { console.warn(e); }
+    try { await regenerateFeed(); }    catch (e) { console.warn(e); }
 
     showToast('🚀 Deployed — share links now carry a preview image', 'success', 4000);
     return liveUrl;
@@ -1609,15 +1735,17 @@ function renderArticlesList() {
     out.innerHTML = `<div class="empty-state"><span class="glyph">📭</span>No entries here yet.</div>`;
     return;
   }
+  // SEO FIX: title is now a real <a href>; row still clickable via JS as a fallback
   out.innerHTML = list.map(a => {
     const c = categoryOf(a.category);
     const tagsHtml = (a.tags && a.tags.length)
       ? `<div class="tag-row tag-row-sm">${a.tags.map(t => `<span class="tag-chip" data-tag="${escapeHtml(t)}">#${escapeHtml(t)}</span>`).join('')}</div>`
       : '';
+    const href = articleHref(a);
     return `
       <div class="article-row" data-id="${a.id}">
         <div>
-          <div class="ar-title">${escapeHtml(a.title)}</div>
+          <div class="ar-title"><a href="${href}">${escapeHtml(a.title)}</a></div>
           <div class="ar-meta">${a.date}</div>
           ${tagsHtml}
         </div>
@@ -1632,7 +1760,17 @@ function renderArticlesList() {
     });
   });
   out.querySelectorAll('.article-row').forEach(el => {
-    el.addEventListener('click', () => navigateTo('article', { id: parseInt(el.getAttribute('data-id'), 10) }));
+    el.addEventListener('click', (ev) => {
+      if (ev.target.closest('a') || ev.target.closest('.tag-chip')) return;
+      const id = parseInt(el.getAttribute('data-id'), 10);
+      const art = articles.find(x => x.id === id);
+      const staticPath = art ? articleStaticPath(art) : null;
+      if (staticPath) {
+        window.location.href = staticPath;
+      } else {
+        navigateTo('article', { id });
+      }
+    });
   });
 }
 
@@ -2078,17 +2216,12 @@ function renderSearchResults(query) {
     box.classList.add('open');
     return;
   }
+  // SEO FIX: search results are real <a href> elements so crawlers can follow them
   box.innerHTML = matches.map(a => {
     const c = categoryOf(a.category);
-    return `<div class="search-result-item" data-id="${a.id}"><strong>${escapeHtml(a.title)}</strong><br><span style="display:flex;gap:0.5rem;margin-top:2px;">${c ? `<span style="color:${c.color};font-weight:600;">${c.name}</span>` : ''}<span style="color:var(--faint);font-family:'JetBrains Mono',monospace;">${a.date}</span></span></div>`;
+    const href = articleHref(a);
+    return `<a class="search-result-item" href="${href}" data-id="${a.id}"><strong>${escapeHtml(a.title)}</strong><br><span style="display:flex;gap:0.5rem;margin-top:2px;">${c ? `<span style="color:${c.color};font-weight:600;">${c.name}</span>` : ''}<span style="color:var(--faint);font-family:'JetBrains Mono',monospace;">${a.date}</span></span></a>`;
   }).join('');
-  box.querySelectorAll('.search-result-item[data-id]').forEach(el => {
-    el.addEventListener('click', () => {
-      navigateTo('article', { id: parseInt(el.getAttribute('data-id'), 10) });
-      document.getElementById('search-input').value = '';
-      box.classList.remove('open');
-    });
-  });
   box.classList.add('open');
 }
 
