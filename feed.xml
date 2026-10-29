@@ -1,0 +1,109 @@
+
+const SITE = 'https://poetic-codes.pages.dev';
+const API = 'https://poetic-codes.vercel.app/api/articles';
+
+const xml = s => String(s == null ? '' : s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&apos;');
+
+const decode = s => String(s || '')
+  .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'")
+  .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+
+
+const strip = s => String(s || '')
+  .replace(/<head[\s\S]*?<\/head>/gi, ' ')
+  .replace(/<(style|script)[\s\S]*?<\/\1>/gi, ' ')
+  .replace(/<[^>]+>/g, ' ')
+  .replace(/\s+/g, ' ').trim();
+
+
+function metaContent(html, attr, name) {
+  const re1 = new RegExp(`<meta[^>]*${attr}=["']${name}["'][^>]*content=["']([^"']*)["']`, 'i');
+  const re2 = new RegExp(`<meta[^>]*content=["']([^"']*)["'][^>]*${attr}=["']${name}["']`, 'i');
+  const m = html.match(re1) || html.match(re2);
+  return m ? decode(m[1]) : '';
+}
+
+function canonicalOf(html) {
+  const m = html.match(/<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["']/i)
+    || html.match(/<link[^>]*href=["']([^"']+)["'][^>]*rel=["']canonical["']/i);
+  return m ? m[1].trim() : '';
+}
+
+function linkFor(a, html) {
+  const canon = canonicalOf(html);
+  
+  if (canon.startsWith(SITE + '/') && canon !== SITE + '/') return canon;
+  
+  return `${SITE}/#/article/${encodeURIComponent(a.id)}`;
+}
+
+export async function onRequestGet() {
+  let list = [];
+  try {
+    const res = await fetch(API, { headers: { Accept: 'application/json' } });
+    const data = await res.json();
+    list = Array.isArray(data) ? data : (data.articles || data.results || data.data || []);
+  } catch (e) {
+    return new Response('Feed temporarily unavailable', { status: 502 });
+  }
+
+  const items = list
+    .filter(a => a && a.id != null)
+    .map(a => {
+      const html = String(a.content || a.body || '');
+      const summary = a.summary || a.excerpt
+        || metaContent(html, 'name', 'description')
+        || strip(html).slice(0, 280);
+      const photo = a.photo_url || a.photoUrl || metaContent(html, 'property', 'og:image');
+      return {
+        id: a.id,
+        title: a.title || '(untitled)',
+        date: a.date || a.created_at || a.createdAt || '',
+        category: a.category || a.section || '',
+        summary,
+        photo,
+        link: linkFor(a, html)
+      };
+    })
+    .sort((x, y) => String(y.date).localeCompare(String(x.date)))
+    .slice(0, 50);
+
+  const rssItems = items.map(a => {
+    const d = new Date(a.date);
+    const pub = isNaN(d) ? '' : `<pubDate>${d.toUTCString()}</pubDate>`;
+    const isPage = !a.link.includes('/#/');
+    const img = a.photo ? `<enclosure url="${xml(a.photo)}" type="image/jpeg" length="0"/>` : '';
+    return `    <item>
+      <title>${xml(a.title)}</title>
+      <link>${xml(a.link)}</link>
+      <guid isPermaLink="${isPage}">${isPage ? xml(a.link) : 'commonplace-' + xml(a.id)}</guid>
+      ${pub}
+      ${a.category ? `<category>${xml(a.category)}</category>` : ''}
+      <description>${xml(a.summary)}</description>
+      ${img}
+    </item>`;
+  }).join('\n');
+
+  const body = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>The Commonplace</title>
+    <link>${SITE}/</link>
+    <atom:link href="${SITE}/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>Essays on history, philosophy, economy, code, culture and the world as it turns.</description>
+    <language>en</language>
+    <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+${rssItems}
+  </channel>
+</rss>`;
+
+  return new Response(body, {
+    headers: {
+      'Content-Type': 'application/rss+xml; charset=utf-8',
+      'Cache-Control': 'public, max-age=900',
+      'Access-Control-Allow-Origin': '*'
+    }
+  });
+}
