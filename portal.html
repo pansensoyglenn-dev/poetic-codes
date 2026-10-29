@@ -12,6 +12,10 @@
   <meta name="theme-color" content="#0b0f17">
   <link rel="canonical" href="https://poetic-codes.pages.dev/portal.html">
 
+  <!-- SEO FIX: point crawlers at the machine-readable indexes -->
+  <link rel="sitemap" type="application/xml" href="https://poetic-codes.pages.dev/sitemap.xml">
+  <link rel="alternate" type="application/rss+xml" title="The Commonplace" href="https://poetic-codes.pages.dev/feed.xml">
+
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Poetic Bytes">
   <meta property="og:title" content="Editor Portal | Poetic Bytes">
@@ -627,6 +631,8 @@ const BLOGSPOT_COOKIES_URL = 'https://poetic-bytes.blogspot.com/2026/04/cookie-p
 const GH_USERNAME = 'pansensoyglenn-dev';
 const GH_REPO     = 'poetic-codes';
 const GH_BRANCH   = 'main';
+// SEO FIX: static article pages live under this folder in the repo (matches /articles/<slug>.html)
+const GH_ARTICLES_DIR = 'articles';
 
 const COMMONPLACE_API  = 'https://poetic-codes.pages.dev/api/';
 const CP_PUBLISH_API   = API_BASE + '/api/';
@@ -1730,10 +1736,11 @@ async function publishToBlogger(title, bodyHTML, labels, publishType) {
   throw new Error(`Blogger API error: ${errorMsg}\n${info}`);
 }
 
-async function publishToGitHub(slug, htmlContent) {
+// SEO FIX: canonical URL returned here is now the real live URL on poetic-codes.pages.dev
+async function publishToGitHub(slug, htmlContent, coverImageUrl) {
   const cfg = getGitHubConfig();
   if (!cfg.token) throw new Error('No GitHub token saved.');
-  const path    = 'articles/' + slug + '.html';
+  const path    = GH_ARTICLES_DIR + '/' + slug + '.html';
   const apiURL  = `https://api.github.com/repos/${cfg.username}/${cfg.repo}/contents/${path}`;
   const headers = {
     'Authorization':'Bearer '+cfg.token,
@@ -1772,7 +1779,8 @@ async function publishToGitHub(slug, htmlContent) {
     const err = await res.json().catch(() => ({}));
     throw new Error('GitHub error: '+((err.message)||'HTTP '+res.status));
   }
-  return `https://${cfg.username}.github.io/${cfg.repo}/articles/${slug}.html`;
+  // SEO FIX: canonical URL is where the file actually lives after deploy
+  return `${SITE_URL}/${GH_ARTICLES_DIR}/${slug}.html`;
 }
 
 async function fireWebhook(payload) {
@@ -1786,30 +1794,39 @@ async function fireWebhook(payload) {
   }
 }
 
-function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug) {
-  const pubDate = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
-  const canonicalURL = `${SITE_URL}/articles/${esc(slug)}.html`;
+// SEO FIX: rewritten so canonical + og:image + JSON-LD point at poetic-codes.pages.dev/articles/<slug>.html
+function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, coverImageUrl) {
+  const pubDate  = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
+  const isoDate  = new Date().toISOString();
+  const canonicalURL = `${SITE_URL}/${GH_ARTICLES_DIR}/${slug}.html`;
+  const ogImage  = coverImageUrl || `${SITE_URL}/og-default.png`;
+  const safeDesc = excerpt.replace(/\s+/g,' ').slice(0, 160);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)} – Poetic Bytes</title>
-<meta name="description" content="${esc(excerpt)}">
+<meta name="description" content="${esc(safeDesc)}">
 <meta name="keywords" content="${esc(category)}, essay, poetic bytes, glenn pansensoy">
 <meta name="author" content="${esc(author)}">
 <meta name="robots" content="index, follow">
+<link rel="canonical" href="${canonicalURL}">
+<meta property="og:site_name" content="The Commonplace">
 <meta property="og:title" content="${esc(title)}">
-<meta property="og:description" content="${esc(excerpt)}">
+<meta property="og:description" content="${esc(safeDesc)}">
 <meta property="og:type" content="article">
 <meta property="og:url" content="${canonicalURL}">
+<meta property="og:image" content="${esc(ogImage)}">
+<meta property="article:section" content="${esc(category)}">
+<meta property="article:published_time" content="${isoDate}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${esc(title)}">
-<meta name="twitter:description" content="${esc(excerpt)}">
-<link rel="canonical" href="${canonicalURL}">
+<meta name="twitter:description" content="${esc(safeDesc)}">
+<meta name="twitter:image" content="${esc(ogImage)}">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Article","headline":"${esc(title)}","author":{"@type":"Person","name":"${esc(author)}"},"datePublished":"${new Date().toISOString()}","description":"${esc(excerpt)}","articleSection":"${esc(category)}"}
+{"@context":"https://schema.org","@type":"Article","headline":${JSON.stringify(title)},"author":{"@type":"Person","name":${JSON.stringify(author)}},"datePublished":${JSON.stringify(isoDate)},"description":${JSON.stringify(safeDesc)},"articleSection":${JSON.stringify(category)},"mainEntityOfPage":${JSON.stringify(canonicalURL)},"image":${JSON.stringify(ogImage)}}
 <\/script>
 <style>
 body{background:#0b0f17;color:#eef4ff;font-family:"Crimson Pro",Georgia,serif;max-width:760px;margin:0 auto;padding:2rem 1.2rem;line-height:1.85;}
@@ -1819,10 +1836,12 @@ p{text-align:justify;margin-bottom:1.4rem;}
 a{color:#74b9e8;}
 video{max-width:100%;border-radius:12px;}
 iframe{max-width:100%;border-radius:12px;}
+.back{display:inline-block;margin-bottom:1rem;font-size:0.8rem;font-family:monospace;color:#74b9e8;}
 footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size:0.72rem;color:#667fa3;text-align:center;font-family:monospace;line-height:2;}
 </style>
 </head>
 <body>
+<a class="back" href="${SITE_URL}/">← The Commonplace</a>
 <article>
 <h1>${esc(title)}</h1>
 <div class="meta">${esc(author)} · ${esc(category)} · ${pubDate}</div>
@@ -1837,6 +1856,127 @@ ${bodyHTML}
 </footer>
 </body>
 </html>`;
+}
+
+// SEO FIX: build sitemap.xml from the current article list and push to the repo
+async function regenerateSitemap() {
+  const cfg = getGitHubConfig();
+  if (!cfg.token) return;
+  const publicBase = SITE_URL;
+  const today = new Date().toISOString().slice(0, 10);
+
+  const entries = [
+    { loc: `${publicBase}/`,                    lastmod: today, prio: '1.0', freq: 'daily'   },
+    { loc: `${publicBase}/about.html`,          lastmod: today, prio: '0.4', freq: 'yearly'  },
+    { loc: `${publicBase}/privacy.html`,        lastmod: today, prio: '0.3', freq: 'yearly'  },
+    { loc: `${publicBase}/terms.html`,          lastmod: today, prio: '0.3', freq: 'yearly'  },
+    { loc: `${publicBase}/cookies.html`,        lastmod: today, prio: '0.3', freq: 'yearly'  },
+    { loc: `${publicBase}/accessibility.html`,  lastmod: today, prio: '0.3', freq: 'yearly'  },
+    { loc: `${publicBase}/sitemap.html`,        lastmod: today, prio: '0.4', freq: 'monthly' }
+  ];
+
+  csArticlesCache.forEach(a => {
+    const slug = slugify(a.title || '');
+    if (!slug) return;
+    entries.push({
+      loc:     `${publicBase}/${GH_ARTICLES_DIR}/${slug}.html`,
+      lastmod: (a.date || today).slice(0, 10),
+      prio:    '0.8',
+      freq:    'monthly'
+    });
+  });
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${entries.map(u => `  <url>
+    <loc>${u.loc}</loc>
+    <lastmod>${u.lastmod}</lastmod>
+    <changefreq>${u.freq}</changefreq>
+    <priority>${u.prio}</priority>
+  </url>`).join('\n')}
+</urlset>
+`;
+
+  const apiURL = `https://api.github.com/repos/${cfg.username}/${cfg.repo}/contents/sitemap.xml`;
+  const headers = {
+    'Authorization':'Bearer '+cfg.token,
+    'Accept':'application/vnd.github+json',
+    'Content-Type':'application/json',
+    'X-GitHub-Api-Version':'2022-11-28'
+  };
+  let sha = null;
+  try {
+    const check = await fetch(apiURL, { headers });
+    if (check.ok) sha = (await check.json()).sha;
+  } catch (_) {}
+
+  const bytes = new TextEncoder().encode(xml);
+  let binary = ''; bytes.forEach(b => binary += String.fromCharCode(b));
+  const body = { message: 'Update sitemap', content: btoa(binary), branch: cfg.branch };
+  if (sha) body.sha = sha;
+  try {
+    await fetch(apiURL, { method:'PUT', headers, body:JSON.stringify(body) });
+  } catch (e) { console.warn('Sitemap push failed:', e); }
+}
+
+// SEO FIX: build feed.xml (RSS 2.0) from the current article list and push to the repo
+async function regenerateFeed() {
+  const cfg = getGitHubConfig();
+  if (!cfg.token) return;
+  const publicBase = SITE_URL;
+  const sorted = [...csArticlesCache]
+    .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+    .slice(0, 50);
+
+  const items = sorted.map(a => {
+    const slug = slugify(a.title || '');
+    if (!slug) return '';
+    const cat = csSectionFor(a.category) || a.category || '';
+    const pubDate = new Date(((a.date || '').slice(0,10) || new Date().toISOString().slice(0,10)) + 'T12:00:00Z').toUTCString();
+    const description = (a.summary || (a.body || '').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,180)).slice(0,200);
+    return `  <item>
+    <title>${esc(a.title || '')}</title>
+    <link>${publicBase}/${GH_ARTICLES_DIR}/${slug}.html</link>
+    <guid isPermaLink="true">${publicBase}/${GH_ARTICLES_DIR}/${slug}.html</guid>
+    <pubDate>${pubDate}</pubDate>
+    ${cat ? `<category>${esc(cat)}</category>` : ''}
+    <description>${esc(description)}</description>
+  </item>`;
+  }).filter(Boolean);
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>The Commonplace</title>
+  <link>${publicBase}/</link>
+  <description>Essays on history, philosophy, economy, code and culture.</description>
+  <language>en-ph</language>
+  <atom:link href="${publicBase}/feed.xml" rel="self" type="application/rss+xml"/>
+${items.join('\n')}
+</channel>
+</rss>
+`;
+
+  const apiURL = `https://api.github.com/repos/${cfg.username}/${cfg.repo}/contents/feed.xml`;
+  const headers = {
+    'Authorization':'Bearer '+cfg.token,
+    'Accept':'application/vnd.github+json',
+    'Content-Type':'application/json',
+    'X-GitHub-Api-Version':'2022-11-28'
+  };
+  let sha = null;
+  try {
+    const check = await fetch(apiURL, { headers });
+    if (check.ok) sha = (await check.json()).sha;
+  } catch (_) {}
+
+  const bytes = new TextEncoder().encode(xml);
+  let binary = ''; bytes.forEach(b => binary += String.fromCharCode(b));
+  const body = { message: 'Update RSS feed', content: btoa(binary), branch: cfg.branch };
+  if (sha) body.sha = sha;
+  try {
+    await fetch(apiURL, { method:'PUT', headers, body:JSON.stringify(body) });
+  } catch (e) { console.warn('Feed push failed:', e); }
 }
 
 async function uploadCover(dataUrl, slug) {
@@ -1856,7 +1996,6 @@ function commonplacePayload(content, title, caption) {
   if (currentMode !== 'video') return { body: content, videoUrl: null };
   const intro = document.getElementById('vid-intro').value.trim();
   const cap = document.getElementById('vid-caption').value.trim();
-  // The Commonplace shows the video from videoUrl, so the body carries intro + the article text.
   const introHTML = ((intro ? plainToHTML(intro) : '') + getArticleTextHTML()) || ('<p>' + esc(cap || title) + '</p>');
   if (currentVidMethod !== 'url') {
     const first = uploadedVideoFiles.find(v => v.uploaded && v.url);
@@ -1870,7 +2009,6 @@ function commonplacePayload(content, title, caption) {
   return { body: introHTML + '<p><a href="' + esc(url) + '" rel="noopener">Watch the video</a></p>', videoUrl: null };
 }
 
-// coverUrlOrDataUrl: either an https:// URL (already uploaded) or a data: URL (generated cover, uploaded here)
 async function publishToCommonplace(meta, payload, coverUrlOrDataUrl) {
   let photoUrl = null;
   if (/^https?:\/\//i.test(coverUrlOrDataUrl || '')) {
@@ -1951,11 +2089,23 @@ async function submitArticle() {
     }
     setProgress(70);
 
+    // SEO FIX: capture uploaded cover URL (if any) so it can be used as the static page's og:image
+    let uploadedCoverUrl = null;
     const doGitHub = document.getElementById('dist-github') && document.getElementById('dist-github').checked;
+    const coverFileInput = document.getElementById('f-cover-image');
+    if (coverFileInput && coverFileInput.files.length > 0) {
+      try {
+        uploadedCoverUrl = await uploadCoverToSupabase(coverFileInput.files[0]);
+        distLines.push('✓ Cover image uploaded');
+      } catch (err) {
+        distLines.push('⚠ Cover image upload failed: ' + err.message + ' (will use the auto-generated cover)');
+      }
+    }
+
     if (doGitHub) {
       try {
-        const ghPage = buildGitHubPage(title, author, category, excerpt, finalBodyHTML, slug);
-        githubURL    = await publishToGitHub(slug, ghPage);
+        const ghPage = buildGitHubPage(title, author, category, excerpt, finalBodyHTML, slug, uploadedCoverUrl);
+        githubURL    = await publishToGitHub(slug, ghPage, uploadedCoverUrl);
         distLines.push('✓ GitHub: '+githubURL);
       } catch(ghErr) {
         distLines.push('⚠ GitHub skipped: '+ghErr.message);
@@ -1967,17 +2117,6 @@ async function submitArticle() {
     const doCP = document.getElementById('dist-commonplace') && document.getElementById('dist-commonplace').checked;
     if (doCP) {
       try {
-        let uploadedCoverUrl = null;
-        const coverFileInput = document.getElementById('f-cover-image');
-        if (coverFileInput && coverFileInput.files.length > 0) {
-          try {
-            uploadedCoverUrl = await uploadCoverToSupabase(coverFileInput.files[0]);
-            distLines.push('✓ Cover image uploaded');
-          } catch (err) {
-            distLines.push('⚠ Cover image upload failed: ' + err.message + ' (used the auto-generated cover instead)');
-          }
-        }
-
         const caption = document.getElementById('vid-caption') ? document.getElementById('vid-caption').value.trim() : '';
         const payload = commonplacePayload(content, title, caption);
         if (payload.skip) {
@@ -1997,6 +2136,10 @@ async function submitArticle() {
       distLines.push('– Commonplace: skipped (unchecked)');
     }
     setProgress(85);
+
+    // SEO FIX: refresh sitemap.xml + feed.xml after a successful publish
+    try { await regenerateSitemap(); } catch (e) { console.warn('Sitemap:', e); }
+    try { await regenerateFeed(); }    catch (e) { console.warn('Feed:', e); }
 
     const hasAnyDist =
       document.getElementById('dist-facebook').checked ||
@@ -2315,7 +2458,6 @@ function closeCsPicker() {
 }
 
 function loadCsArticleIntoForm(article) {
-  // FIX: after publishing, the success screen hides the editor — bring it back first.
   showFormState();
   resetForm();
   const title   = article.title || '';
@@ -2340,11 +2482,9 @@ function loadCsArticleIntoForm(article) {
     setMode('video');
     setVidMethod('url');
     document.getElementById('vid-url-input').value = article.videoUrl;
-    // The body stays in the text editor tab (not the intro box) so the full article text is kept on update.
     updateUrlPreview();
   }
 
-  // Show the article's current cover so it is clear what will be kept or replaced.
   if (article.photoUrl) {
     const previewBox = document.getElementById('cover-preview');
     const previewImg = document.getElementById('cover-preview-img');
@@ -2410,7 +2550,6 @@ async function updateCommonplaceEntry() {
       try {
         uploadedCoverUrl = await uploadCoverToSupabase(coverFileInput.files[0]);
       } catch (err) {
-        // Stop here so the person is not left thinking the new cover was saved.
         throw new Error('Cover image upload failed, so nothing was saved.\n' + err.message);
       }
     }
