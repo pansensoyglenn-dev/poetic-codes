@@ -1,9 +1,33 @@
+
+"""
+Make a narrated video with a slowly moving picture for every pending article job in video-jobs/.
+
+Flow per job file (video-jobs/<slug>.json, written by portal.html):
+  1. Build slides (title, a few text slides, closing slide) with Pillow.
+  2. Narrate each slide with a male neural voice (edge-tts; espeak-ng as fallback).
+  3. Stitch the slides + narration into an MP4 with ffmpeg.
+  4. Upload the MP4 to Cloudflare R2 (same /api/upload route the portal uses).
+  5. Attach the video URL to the article on The Commonplace (PUT /api/articles?id=...).
+  6. Write a marker in video-jobs/done/ so the job is not repeated.
+
+Environment:
+  ADMIN_KEY   required (GitHub secret) - same key you paste in the portal
+  TTS_VOICE   optional, default en-US-ChristopherNeural
+  TTS_RATE    optional, default -5%
+  MAX_WORDS   optional, narrated words of article body, default 6000 (the whole article)
+  MIN_SECONDS optional, target minimum length, default 600; narration is slowed (down to -20%) to reach it
+  CF_ACCOUNT_ID, CF_API_TOKEN  optional, Cloudflare Workers AI for generated pictures (otherwise a free service is used)
+  AI_IMAGES=0 turn generated pictures off; AI_IMAGE_MAX caps how many are made (default 24)
+  DRY_RUN=1   build the video but do not upload / attach / write markers
+  TTS_FAKE=1  use silent audio instead of speech (for offline testing)
+"""
 import asyncio
 import glob
 import html
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -17,6 +41,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 CROPW, CROPH = 2000, 1125
+MAX_MB = float(os.environ.get("MAX_MB", "45"))
 MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "600"))
 WPM = 155.0
 
@@ -27,6 +52,10 @@ ARTICLES_API = os.environ.get("ARTICLES_API", "https://poetic-codes.vercel.app/a
 VIDEO_URL_API = os.environ.get("VIDEO_URL_API", "https://poetic-codes.vercel.app/api/video-upload-url")
 UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/upload")
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
+AI_IMAGES = os.environ.get("AI_IMAGES", "1") != "0"
+AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "24"))
+CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID", "")
+CF_API_TOKEN = os.environ.get("CF_API_TOKEN", "")
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
 RATE = os.environ.get("TTS_RATE", "-5%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
@@ -301,22 +330,23 @@ def probe_duration(path):
 MOTIONS = [(0.0, 1.0, 0.0, 1.0), (1.0, 0.0, 1.0, 0.0), (1.0, 0.0, 0.0, 1.0), (0.0, 1.0, 1.0, 0.0)]
 
 
-def make_clip(bg_png, ov_png, mp3, out, motion=0, pad=0.7):
+def make_clip(bg_png, ov_png, mp3, out, motion=0, pad=0.7, vkbps=900):
     dur = probe_duration(mp3) + pad
     rx, ry = BGW - CROPW, BGH - CROPH
     x0, x1, y0, y1 = MOTIONS[motion % len(MOTIONS)]
     xe = f"{x0 * rx:.1f}+({(x1 - x0) * rx:.1f})*t/{dur:.2f}"
     ye = f"{y0 * ry:.1f}+({(y1 - y0) * ry:.1f})*t/{dur:.2f}"
+    ow, oh = (960, 540) if vkbps < 450 else (W, H)
     fc = (f"[0:v]crop={CROPW}:{CROPH}:x='{xe}':y='{ye}',scale={W}:{H}:flags=bicubic,setsar=1[bg];"
-          f"[bg][1:v]overlay=format=auto,fade=t=in:st=0:d=0.35,"
+          f"[bg][1:v]overlay=format=auto,scale={ow}:{oh}:flags=bicubic,fade=t=in:st=0:d=0.35,"
           f"fade=t=out:st={max(dur - 0.35, 0):.2f}:d=0.35,format=yuv420p[v]")
     run(["ffmpeg", "-y", "-loop", "1", "-framerate", str(FPS), "-i", str(bg_png),
          "-loop", "1", "-framerate", str(FPS), "-i", str(ov_png), "-i", str(mp3),
          "-filter_complex", fc, "-map", "[v]", "-map", "2:a", "-t", f"{dur:.2f}",
          "-af", f"apad=pad_dur={pad}",
-         "-c:v", "libx264", "-preset", "veryfast", "-crf", "29",
-         "-maxrate", "900k", "-bufsize", "1800k", "-r", str(FPS),
-         "-c:a", "aac", "-b:a", "64k", "-ar", "44100", "-ac", "1", str(out)])
+         "-c:v", "libx264", "-preset", "veryfast", "-b:v", f"{vkbps}k",
+         "-maxrate", f"{int(vkbps * 1.25)}k", "-bufsize", f"{vkbps * 2}k", "-r", str(FPS),
+         "-c:a", "aac", "-b:a", "40k", "-ar", "24000", "-ac", "1", str(out)])
     return dur
 
 
@@ -328,8 +358,99 @@ def load_cover(url):
         r.raise_for_status()
         return Image.open(BytesIO(r.content)).convert("RGB")
     except Exception as e:
-        log(f"  cover image not usable ({e}); using gradient background")
+        log(f"  image not usable ({str(e)[:80]})")
         return None
+
+
+def load_photos(job):
+    urls = []
+    for u in [job.get("coverUrl")] + list(job.get("images") or []):
+        if u and str(u).startswith("http") and u not in urls:
+            urls.append(u)
+    photos = []
+    for u in urls[:21]:
+        img = load_cover(u)
+        if img is not None and img.width >= 400 and img.height >= 250:
+            photos.append(img)
+    log(f"  {len(photos)} photograph(s) available for the background")
+    return photos
+
+
+STYLE = ("documentary photograph, cinematic lighting, muted natural colors, "
+         "detailed, realistic, wide shot, no text, no letters, no watermark")
+
+
+def _from_bytes(data):
+    img = Image.open(BytesIO(data)).convert("RGB")
+    if img.width < 400 or img.height < 250:
+        return None
+    return img
+
+
+def gen_image_cloudflare(prompt):
+    if not (CF_ACCOUNT_ID and CF_API_TOKEN):
+        return None
+    r = requests.post(
+        f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell",
+        headers={"Authorization": f"Bearer {CF_API_TOKEN}"},
+        json={"prompt": prompt[:1900], "steps": 4}, timeout=120,
+    )
+    r.raise_for_status()
+    import base64
+    return _from_bytes(base64.b64decode(r.json()["result"]["image"]))
+
+
+def gen_image_free(prompt, seed):
+    from urllib.parse import quote
+    url = (f"https://image.pollinations.ai/prompt/{quote(prompt[:600])}"
+           f"?width=1280&height=720&model=flux&nologo=true&seed={seed}")
+    r = requests.get(url, timeout=150)
+    r.raise_for_status()
+    if "image" not in r.headers.get("content-type", ""):
+        raise RuntimeError("not an image")
+    return _from_bytes(r.content)
+
+
+def gen_image(prompt, seed):
+    for attempt in range(3):
+        for fn in (lambda: gen_image_cloudflare(prompt), lambda: gen_image_free(prompt, seed + attempt)):
+            try:
+                img = fn()
+                if img is not None:
+                    return img
+            except Exception as e:
+                last = str(e)[:100]
+        time.sleep(3 * (attempt + 1))
+    return None
+
+
+def make_ai_images(segs, job):
+    if not AI_IMAGES:
+        return []
+    body_idx = [i for i, g in enumerate(segs) if g["kind"] == "body"]
+    if not body_idx:
+        return []
+    k = min(len(body_idx), AI_IMAGE_MAX)
+    title = clean_text(job.get("title"))
+    category = clean_text(job.get("category"))
+    out = []
+    for j in range(k):
+        lo = j * len(body_idx) // k
+        text = segs[body_idx[lo]]["text"]
+        text = " ".join(text.split()[:35])
+        prompt = f"{STYLE}. Scene: {text} Theme: {title}. {category}."
+        img = gen_image(prompt, 1000 + j * 7)
+        out.append(img)
+        if (j + 1) % 6 == 0 or j + 1 == k:
+            log(f"  generated pictures {j + 1}/{k}")
+    got = sum(1 for x in out if x is not None)
+    log(f"  {got} of {k} generated pictures usable")
+    return out
+
+
+def pick_bitrate(total_dur):
+    total_kbits = MAX_MB * 8192 * 0.92
+    return int(max(120, min(1200, total_kbits / max(total_dur, 1.0) - 40)))
 
 
 def build_video(job):
@@ -338,16 +459,35 @@ def build_video(job):
     RATE = pick_rate(segs)
     log(f"  {len(segs)} slides, narration rate {RATE}")
     tmp = Path(tempfile.mkdtemp(prefix="vid_"))
-    cover = load_cover(job.get("coverUrl"))
-    clips, engines, total_dur = [], set(), 0.0
+    photos = load_photos(job)
+    ai = make_ai_images(segs, job)
+    body_total = sum(1 for g in segs if g["kind"] == "body")
+
+    engines, mp3s, est = set(), [], 0.0
     for i, seg in enumerate(segs):
-        bgp, ovp = tmp / f"b{i}.png", tmp / f"o{i}.png"
-        mp3, clip = tmp / f"a{i}.mp3", tmp / f"c{i}.mp4"
+        mp3 = tmp / f"a{i}.mp3"
+        engines.add(synth(seg["speech"], str(mp3)))
+        mp3s.append(mp3)
+        est += probe_duration(mp3) + 0.7
+    vkbps = pick_bitrate(est)
+    log(f"  narration {est:.0f}s; video bitrate {vkbps} kbps to stay near {MAX_MB:.0f} MB")
+
+    clips, total_dur, body_seen = [], 0.0, 0
+    for i, seg in enumerate(segs):
+        bgp, ovp, clip = tmp / f"b{i}.png", tmp / f"o{i}.png", tmp / f"c{i}.mp4"
+        cover = photos[i % len(photos)] if photos else None
+        if seg["kind"] == "body":
+            if ai:
+                pic = ai[body_seen * len(ai) // max(body_total, 1)]
+                if pic is not None:
+                    cover = pic
+            body_seen += 1
+        elif photos:
+            cover = photos[0]
         bg_img, ov_img = render_layers(seg, i, len(segs), cover)
         bg_img.save(bgp)
         ov_img.save(ovp)
-        engines.add(synth(seg["speech"], str(mp3)))
-        total_dur += make_clip(bgp, ovp, mp3, clip, i)
+        total_dur += make_clip(bgp, ovp, mp3s[i], clip, i, vkbps=vkbps)
         clips.append(clip)
         bgp.unlink()
         if (i + 1) % 10 == 0 or i + 1 == len(segs):
@@ -358,6 +498,7 @@ def build_video(job):
     final = tmp / "final.mp4"
     run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listing),
          "-c", "copy", "-movflags", "+faststart", str(final)])
+    log(f"  final file {final.stat().st_size / 1048576:.1f} MB")
     return final, total_dur, ",".join(sorted(engines))
 
 
@@ -381,7 +522,7 @@ def upload_via_supabase(path, filename):
     if r.status_code == 401:
         raise RuntimeError("Upload rejected (401): the ADMIN_KEY secret is wrong or missing.")
     if not r.ok:
-        raise RuntimeError(f"video-upload-url: HTTP {r.status_code} {(r.text or '')[:200]}")
+        raise RuntimeError(f"video-upload-url: HTTP {r.status_code} {(r.text or '')[:400]}")
     info = r.json()
     with open(path, "rb") as fh:
         put = requests.put(
@@ -440,7 +581,7 @@ def _git(*args, check=True):
 def publish_to_repo(path, filename):
     """Fallback: commit the MP4 into the repo under videos/ so the site serves it."""
     size_mb = os.path.getsize(path) / 1048576
-    if size_mb > 90:
+    if size_mb > 95:
         raise RuntimeError(f"Video is {size_mb:.0f} MB, too big to store in the repo.")
     Path("videos").mkdir(exist_ok=True)
     dest = Path("videos") / filename
@@ -469,9 +610,9 @@ def upload_video(path, filename):
         except RuntimeError as e:
             if "401" in str(e)[:60]:
                 raise
-            print(f"  Supabase route unavailable ({str(e)[:160]}); trying the other upload addresses")
+            print(f"  Supabase route unavailable ({str(e)[:450]}); trying the other upload addresses")
         except Exception as e:
-            print(f"  Supabase route failed ({str(e)[:160]}); trying the other upload addresses")
+            print(f"  Supabase route failed ({str(e)[:450]}); trying the other upload addresses")
         return upload_to_endpoints(path, filename)
     except RuntimeError as e:
         if "401" in str(e)[:60]:
@@ -601,6 +742,8 @@ def process_job(path):
             return "dry"
 
         fname = f"{slugify(title)[:60]}-video-{str(job.get('jobId', ''))[-6:]}.mp4"
+        Path("out").mkdir(exist_ok=True)
+        shutil.copy(final, Path("out") / fname)
         url = upload_video(final, fname)
         log(f"  uploaded: {url}")
         attached = False
