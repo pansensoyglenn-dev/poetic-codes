@@ -228,6 +228,14 @@
     .cs-edit-btn { flex-shrink:0; background:transparent; border:1px solid var(--blue); border-radius:20px; color:var(--blue-lt); font-family:'JetBrains Mono',monospace; font-size:0.58rem; padding:0.3rem 0.8rem; cursor:pointer; transition:0.2s; }
     .cs-edit-btn:hover { background:rgba(58,123,213,0.18); }
     .cs-src-badge { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.5rem; color:var(--teal); border:1px solid rgba(126,200,227,0.35); border-radius:10px; padding:0 0.45rem; margin-left:0.4rem; vertical-align:middle; }
+
+    /* NEW: Speak (text-to-speech) controls */
+    .tts-row { display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; }
+    .tts-row .webhook-input { flex:1; min-width:160px; max-width:320px; }
+    .tts-sliders { display:flex; gap:1rem; flex-wrap:wrap; margin-top:0.6rem; font-family:'JetBrains Mono',monospace; font-size:0.58rem; color:var(--muted); }
+    .tts-sliders label { display:flex; align-items:center; gap:0.4rem; }
+    .tts-sliders input[type=range] { accent-color:var(--blue); width:110px; }
+    .audio-tools { background:rgba(7,13,24,0.6); border:1px dashed rgba(126,200,227,0.35); border-radius:12px; padding:1rem; }
   </style>
 </head>
 <body>
@@ -396,6 +404,34 @@
                 <textarea id="vid-intro" class="field-textarea" style="min-height:100px;" placeholder="A few words before the video"></textarea>
               </div>
             </div>
+          </div>
+
+          <!-- NEW: Read aloud (text-to-speech) -->
+          <div class="field-group audio-tools">
+            <span class="field-label"><i class="fas fa-volume-up" aria-hidden="true"></i> Read aloud (male educator voice)</span>
+            <div class="tts-row">
+              <button class="btn-outline" id="speak-btn" type="button">
+                <i class="fas fa-volume-up" aria-hidden="true"></i> Speak
+              </button>
+              <select id="voice-select" class="webhook-input" aria-label="Voice"></select>
+            </div>
+            <div class="tts-sliders">
+              <label>Speed <input type="range" id="tts-rate" min="0.6" max="1.3" step="0.02" value="0.92"> <span id="tts-rate-val">0.92</span></label>
+              <label>Pitch <input type="range" id="tts-pitch" min="0.5" max="1.3" step="0.02" value="0.85"> <span id="tts-pitch-val">0.85</span></label>
+            </div>
+            <div id="tts-status" style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--dim);margin-top:0.5rem;" aria-live="polite"></div>
+          </div>
+
+          <!-- NEW: Import audio -->
+          <div class="field-group audio-tools">
+            <span class="field-label"><i class="fas fa-music" aria-hidden="true"></i> Audio (optional)</span>
+            <input type="file" id="audio-file-input" class="field-input" accept="audio/*" style="padding:0.5rem;">
+            <input type="text" id="audio-url-input" class="field-input" placeholder="…or paste a direct .mp3 / .m4a / .wav URL" style="margin-top:0.5rem;">
+            <input type="text" id="audio-caption-input" class="field-input" placeholder="Audio caption (optional)" maxlength="200" style="margin-top:0.5rem;">
+            <button class="btn-outline" id="insert-audio-btn" type="button" style="margin-top:0.6rem;">
+              <i class="fas fa-music" aria-hidden="true"></i> Insert audio player
+            </button>
+            <div id="audio-status" style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;margin-top:0.4rem;" aria-live="polite"></div>
           </div>
 
           <div class="submit-actions">
@@ -720,8 +756,9 @@ function showToast(msg, type, duration) {
 function setProgress(pct) {
   document.getElementById('progress-bar').style.width = pct + '%';
 }
+// CHANGED: added "audio|source" so inserted audio players are recognised as HTML
 function looksLikeHTML(text) {
-  return /<\s*(p|h[1-6]|div|span|br|ul|ol|li|blockquote|pre|code|strong|em|a|img|figure|video|table|thead|tbody|tr|td|th)\b[^>]*>/i.test(text);
+  return /<\s*(p|h[1-6]|div|span|br|ul|ol|li|blockquote|pre|code|strong|em|a|img|figure|video|audio|source|table|thead|tbody|tr|td|th)\b[^>]*>/i.test(text);
 }
 function plainToHTML(text) {
   if (!text) return '';
@@ -911,6 +948,14 @@ function resetForm() {
   document.getElementById('publish-error-box').style.display = 'none';
   document.getElementById('f-cover-image').value = '';
   document.getElementById('cover-preview').style.display = 'none';
+  // NEW: clear audio import fields and stop any speech
+  ['audio-file-input','audio-url-input','audio-caption-input'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const audioStatus = document.getElementById('audio-status');
+  if (audioStatus) audioStatus.textContent = '';
+  if (window.pcStopSpeaking) window.pcStopSpeaking();
   uploadedVideoFiles = [];
   csEditing = null;
   updateEditUI();
@@ -1835,6 +1880,7 @@ h1{font-family:"Cinzel Decorative",serif;font-size:clamp(1rem,4vw,1.8rem);margin
 p{text-align:justify;margin-bottom:1.4rem;}
 a{color:#74b9e8;}
 video{max-width:100%;border-radius:12px;}
+audio{width:100%;}
 iframe{max-width:100%;border-radius:12px;}
 .back{display:inline-block;margin-bottom:1rem;font-size:0.8rem;font-family:monospace;color:#74b9e8;}
 footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size:0.72rem;color:#667fa3;text-align:center;font-family:monospace;line-height:2;}
@@ -2613,6 +2659,214 @@ function importSelectedFromCs() {
   showToast('Loaded article 1 of ' + selected.length + '. After publishing, you\'ll be prompted for the next.', 'success', 5000);
 }
 
+/* =====================================================================
+   NEW: Read aloud (browser text-to-speech, male educator voice)
+   ===================================================================== */
+(function initSpeech() {
+  const btn    = document.getElementById('speak-btn');
+  const sel    = document.getElementById('voice-select');
+  const rateEl = document.getElementById('tts-rate');
+  const pitchEl= document.getElementById('tts-pitch');
+  const rateV  = document.getElementById('tts-rate-val');
+  const pitchV = document.getElementById('tts-pitch-val');
+  const status = document.getElementById('tts-status');
+  if (!btn || !sel) return;
+
+  if (!('speechSynthesis' in window)) {
+    btn.disabled = true;
+    sel.style.display = 'none';
+    status.textContent = 'Text-to-speech is not supported in this browser.';
+    return;
+  }
+
+  const synth = window.speechSynthesis;
+  let voices = [];
+  let token  = 0;
+  let active = false;
+
+  const FEMALE = /female|zira|samantha|victoria|karen|susan|linda|moira|tessa|fiona|serena|joanna|salli|kimberly|ivy|kendra|aria|jenny|hazel|heera|sonia|libby|natasha|clara/i;
+  const MALE   = /\bmale\b|david|mark|daniel|alex|fred|guy|ryan|tom|james|george|thomas|matthew|brian|eric|arthur|oliver|andrew|christopher|roger|gordon|rishi|aaron|ravi/i;
+  const isMale = v => MALE.test(v.name) && !FEMALE.test(v.name);
+
+  function loadVoices() {
+    const all = synth.getVoices();
+    if (!all.length) return;
+    let en = all.filter(v => /^en/i.test(v.lang));
+    if (!en.length) en = all;
+    // male-sounding English voices first
+    en.sort((a, b) => (isMale(b) ? 1 : 0) - (isMale(a) ? 1 : 0));
+    voices = en;
+    const saved = localStorage.getItem('pc_tts_voice') || '';
+    sel.innerHTML = voices.map((v, i) =>
+      `<option value="${i}">${esc(v.name)} (${esc(v.lang)})${isMale(v) ? ' ♂' : ''}</option>`
+    ).join('');
+    const savedIdx = voices.findIndex(v => v.name === saved);
+    if (savedIdx >= 0) sel.value = String(savedIdx);
+    status.textContent = voices.some(isMale)
+      ? ''
+      : 'No clearly male voice found on this device — lower the Pitch slider, or install more voices in your device settings.';
+  }
+  loadVoices();
+  synth.onvoiceschanged = loadVoices;
+
+  const savedRate  = localStorage.getItem('pc_tts_rate');
+  const savedPitch = localStorage.getItem('pc_tts_pitch');
+  if (savedRate)  rateEl.value  = savedRate;
+  if (savedPitch) pitchEl.value = savedPitch;
+  rateV.textContent  = rateEl.value;
+  pitchV.textContent = pitchEl.value;
+  rateEl.addEventListener('input',  () => { rateV.textContent  = rateEl.value;  localStorage.setItem('pc_tts_rate',  rateEl.value); });
+  pitchEl.addEventListener('input', () => { pitchV.textContent = pitchEl.value; localStorage.setItem('pc_tts_pitch', pitchEl.value); });
+  sel.addEventListener('change', () => {
+    const v = voices[parseInt(sel.value, 10)];
+    if (v) localStorage.setItem('pc_tts_voice', v.name);
+  });
+
+  function chunkText(text, max) {
+    max = max || 200;
+    const sentences = text.replace(/\s+/g, ' ').trim().match(/[^.!?…]+[.!?…]*\s*/g) || [text];
+    const out = [];
+    let cur = '';
+    for (const s of sentences) {
+      if (s.length > max) {
+        if (cur.trim()) { out.push(cur.trim()); cur = ''; }
+        for (let i = 0; i < s.length; i += max) out.push(s.slice(i, i + max).trim());
+        continue;
+      }
+      if (cur && (cur + s).length > max) { out.push(cur.trim()); cur = ''; }
+      cur += s;
+    }
+    if (cur.trim()) out.push(cur.trim());
+    return out;
+  }
+
+  function setIdle() {
+    active = false;
+    btn.innerHTML = '<i class="fas fa-volume-up" aria-hidden="true"></i> Speak';
+  }
+  function stop() {
+    token++;
+    synth.cancel();
+    setIdle();
+  }
+  window.pcStopSpeaking = stop;
+
+  btn.addEventListener('click', () => {
+    if (active) { stop(); return; }
+
+    // Text comes from whichever tab you are using (Plain Text, Raw HTML or Video intro + text).
+    const html = getContentHTML();
+    const text = new DOMParser().parseFromString(html || '', 'text/html').body.textContent.trim();
+    if (!text) { showToast('Type something in the content box first.', 'error'); return; }
+
+    const title  = document.getElementById('f-title').value.trim();
+    const chunks = chunkText((title ? title + '. ' : '') + text);
+    const voice  = voices[parseInt(sel.value || '0', 10)] || null;
+    const my     = ++token;
+    let i = 0;
+
+    synth.cancel();
+    active = true;
+    btn.innerHTML = '<i class="fas fa-stop" aria-hidden="true"></i> Stop';
+
+    (function next() {
+      if (my !== token) return;
+      if (i >= chunks.length) { setIdle(); return; }
+      const u = new SpeechSynthesisUtterance(chunks[i++]);
+      if (voice) { u.voice = voice; u.lang = voice.lang; }
+      u.rate  = parseFloat(rateEl.value)  || 0.92;   // slightly slower = teacher-like pacing
+      u.pitch = parseFloat(pitchEl.value) || 0.85;   // lower = deeper tone
+      u.onend = next;
+      u.onerror = ev => {
+        if (my !== token) return;
+        if (ev && (ev.error === 'interrupted' || ev.error === 'canceled')) return;
+        setIdle();
+      };
+      synth.speak(u);
+    })();
+  });
+
+  // Stop speaking if the tab is closed or reloaded
+  window.addEventListener('beforeunload', () => { try { synth.cancel(); } catch (_) {} });
+})();
+
+/* =====================================================================
+   NEW: Import audio (upload a file to R2, or paste a URL) and insert a player
+   ===================================================================== */
+function initAudioImport() {
+  const fileIn  = document.getElementById('audio-file-input');
+  const urlIn   = document.getElementById('audio-url-input');
+  const capIn   = document.getElementById('audio-caption-input');
+  const status  = document.getElementById('audio-status');
+  const btn     = document.getElementById('insert-audio-btn');
+  if (!btn) return;
+
+  // Turns common share links into direct-playable ones.
+  function normalizeAudioUrl(url) {
+    const drive = url.match(/drive\.google\.com\/file\/d\/([^/]+)/) || url.match(/drive\.google\.com\/open\?id=([^&]+)/);
+    if (drive) return 'https://drive.google.com/uc?export=download&id=' + drive[1];
+    return url.replace(/^http:\/\//i, 'https://');
+  }
+
+  function audioMime(nameOrUrl, fileType) {
+    if (fileType && fileType.startsWith('audio/')) return fileType === 'audio/x-m4a' ? 'audio/mp4' : fileType;
+    const ext = (nameOrUrl.split('?')[0].split('.').pop() || '').toLowerCase();
+    return { mp3:'audio/mpeg', m4a:'audio/mp4', aac:'audio/aac', wav:'audio/wav', ogg:'audio/ogg', oga:'audio/ogg', webm:'audio/webm', flac:'audio/flac' }[ext] || 'audio/mpeg';
+  }
+
+  btn.addEventListener('click', async () => {
+    const file = fileIn.files && fileIn.files[0];
+    let url = urlIn.value.trim();
+    const caption = capIn.value.trim();
+
+    if (!file && !url) {
+      status.style.color = 'var(--rose)';
+      status.textContent = 'Choose an audio file or paste a URL first.';
+      return;
+    }
+    if (file && !file.type.startsWith('audio/') && !/\.(mp3|m4a|aac|wav|ogg|oga|webm|flac)$/i.test(file.name)) {
+      status.style.color = 'var(--rose)';
+      status.textContent = 'That does not look like an audio file.';
+      return;
+    }
+
+    btn.disabled = true;
+    try {
+      let mime;
+      if (file) {
+        status.style.color = 'var(--gold)';
+        status.textContent = 'Uploading… 0%';
+        url  = await uploadToR2(file, pct => { status.textContent = 'Uploading… ' + pct + '%'; });
+        mime = audioMime(file.name, file.type);
+      } else {
+        url  = normalizeAudioUrl(url);
+        mime = audioMime(url, '');
+      }
+
+      const capHTML = caption
+        ? `<p style="text-align:center;font-size:0.82rem;color:#7a6a58;font-style:italic;margin-top:0.4rem;">${esc(caption)}</p>`
+        : '';
+      const tag = `<div style="margin:1.5rem 0;"><audio controls preload="metadata" style="width:100%;"><source src="${esc(url)}" type="${mime}">Your browser does not support audio.</audio>${capHTML}</div>`;
+
+      // Put it at the top of the article, in the Raw HTML editor
+      const html  = document.getElementById('html-textarea');
+      const plain = document.getElementById('plain-textarea');
+      if (!html.value.trim() && plain.value.trim()) html.value = plainToHTML(plain.value.trim());
+      html.value = tag + '\n' + html.value;
+      setMode('html');
+
+      status.style.color = '#3ddc84';
+      status.textContent = '✓ Audio player inserted at the top of the article (Raw HTML tab).';
+      fileIn.value = ''; urlIn.value = ''; capIn.value = '';
+    } catch (e) {
+      status.style.color = 'var(--rose)';
+      status.textContent = '✗ ' + e.message;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   setMode('text');
   setVidMethod('upload');
@@ -2620,6 +2874,7 @@ document.addEventListener('DOMContentLoaded', function() {
   loadBlogId();
   loadDisqusShortname();
   updateAuthUI(isTokenValid());
+  initAudioImport();
 
   const adminKeyInput = document.getElementById('admin-key-input');
   const adminKeyStatus = document.getElementById('admin-key-status');
