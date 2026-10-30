@@ -24,6 +24,7 @@ JOBS_DIR = Path(os.environ.get("JOBS_DIR", "video-jobs"))
 DONE_DIR = JOBS_DIR / "done"
 SITE_URL = os.environ.get("SITE_URL", "https://poetic-codes.pages.dev")
 ARTICLES_API = os.environ.get("ARTICLES_API", "https://poetic-codes.vercel.app/api/articles")
+VIDEO_URL_API = os.environ.get("VIDEO_URL_API", "https://poetic-codes.vercel.app/api/video-upload-url")
 UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/upload")
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
@@ -372,6 +373,26 @@ def _upload_endpoints():
     return out
 
 
+def upload_via_supabase(path, filename):
+    r = requests.post(
+        VIDEO_URL_API, params={"filename": filename},
+        headers={"X-Admin-Key": ADMIN_KEY}, timeout=60,
+    )
+    if r.status_code == 401:
+        raise RuntimeError("Upload rejected (401): the ADMIN_KEY secret is wrong or missing.")
+    if not r.ok:
+        raise RuntimeError(f"video-upload-url: HTTP {r.status_code} {(r.text or '')[:200]}")
+    info = r.json()
+    with open(path, "rb") as fh:
+        put = requests.put(
+            info["uploadUrl"], data=fh, timeout=1800,
+            headers={"Content-Type": "video/mp4", "x-upsert": "false"},
+        )
+    if not put.ok:
+        raise RuntimeError(f"Supabase upload: HTTP {put.status_code} {(put.text or '')[:200]}")
+    return info["url"]
+
+
 def upload_to_endpoints(path, filename):
     errors = []
     for endpoint in _upload_endpoints():
@@ -441,6 +462,16 @@ def publish_to_repo(path, filename):
 
 def upload_video(path, filename):
     try:
+        try:
+            url = upload_via_supabase(path, filename)
+            print(f"  uploaded to Supabase storage")
+            return url
+        except RuntimeError as e:
+            if "401" in str(e)[:60]:
+                raise
+            print(f"  Supabase route unavailable ({str(e)[:160]}); trying the other upload addresses")
+        except Exception as e:
+            print(f"  Supabase route failed ({str(e)[:160]}); trying the other upload addresses")
         return upload_to_endpoints(path, filename)
     except RuntimeError as e:
         if "401" in str(e)[:60]:
