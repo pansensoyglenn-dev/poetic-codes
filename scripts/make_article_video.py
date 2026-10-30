@@ -1,23 +1,5 @@
 
-"""
-Make a short narrated video for every pending article job in video-jobs/.
 
-Flow per job file (video-jobs/<slug>.json, written by portal.html):
-  1. Build slides (title, a few text slides, closing slide) with Pillow.
-  2. Narrate each slide with a male neural voice (edge-tts; espeak-ng as fallback).
-  3. Stitch the slides + narration into an MP4 with ffmpeg.
-  4. Upload the MP4 to Cloudflare R2 (same /api/upload route the portal uses).
-  5. Attach the video URL to the article on The Commonplace (PUT /api/articles?id=...).
-  6. Write a marker in video-jobs/done/ so the job is not repeated.
-
-Environment:
-  ADMIN_KEY   required (GitHub secret) - same key you paste in the portal
-  TTS_VOICE   optional, default en-US-ChristopherNeural
-  TTS_RATE    optional, default -5%
-  MAX_WORDS   optional, narrated words of article body, default 170 (about 70 s)
-  DRY_RUN=1   build the video but do not upload / attach / write markers
-  TTS_FAKE=1  use silent audio instead of speech (for offline testing)
-"""
 import asyncio
 import glob
 import html
