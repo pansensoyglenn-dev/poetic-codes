@@ -1,4 +1,23 @@
-#!/usr/bin/env python3
+
+"""
+Make a short narrated video for every pending article job in video-jobs/.
+
+Flow per job file (video-jobs/<slug>.json, written by portal.html):
+  1. Build slides (title, a few text slides, closing slide) with Pillow.
+  2. Narrate each slide with a male neural voice (edge-tts; espeak-ng as fallback).
+  3. Stitch the slides + narration into an MP4 with ffmpeg.
+  4. Upload the MP4 to Cloudflare R2 (same /api/upload route the portal uses).
+  5. Attach the video URL to the article on The Commonplace (PUT /api/articles?id=...).
+  6. Write a marker in video-jobs/done/ so the job is not repeated.
+
+Environment:
+  ADMIN_KEY   required (GitHub secret) - same key you paste in the portal
+  TTS_VOICE   optional, default en-US-ChristopherNeural
+  TTS_RATE    optional, default -5%
+  MAX_WORDS   optional, narrated words of article body, default 170 (about 70 s)
+  DRY_RUN=1   build the video but do not upload / attach / write markers
+  TTS_FAKE=1  use silent audio instead of speech (for offline testing)
+"""
 import asyncio
 import glob
 import html
@@ -243,6 +262,7 @@ async def _edge_synth(text, out):
 
 
 def synth(text, out_mp3):
+    """Narrate text to out_mp3. Returns the engine name used."""
     if TTS_FAKE:
         dur = max(1.5, len(text.split()) / 2.6)
         run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
@@ -329,7 +349,7 @@ def _upload_endpoints():
     return out
 
 
-def upload_video(path, filename):
+def upload_to_endpoints(path, filename):
     errors = []
     for endpoint in _upload_endpoints():
         try:
@@ -367,6 +387,43 @@ def upload_video(path, filename):
             return url
         errors.append(f"{endpoint}: no URL in response")
     raise RuntimeError("All upload endpoints failed: " + " | ".join(errors))
+
+
+def _git(*args, check=True):
+    return subprocess.run(["git", *args], check=check, capture_output=True, text=True)
+
+
+def publish_to_repo(path, filename):
+    """Fallback: commit the MP4 into the repo under videos/ so the site serves it."""
+    size_mb = os.path.getsize(path) / 1048576
+    if size_mb > 90:
+        raise RuntimeError(f"Video is {size_mb:.0f} MB, too big to store in the repo.")
+    Path("videos").mkdir(exist_ok=True)
+    dest = Path("videos") / filename
+    dest.write_bytes(Path(path).read_bytes())
+    _git("config", "user.name", "article-video-bot")
+    _git("config", "user.email", "article-video-bot@users.noreply.github.com")
+    _git("add", str(dest))
+    _git("commit", "-m", f"Add article video {filename}")
+    last = None
+    for _ in range(3):
+        _git("pull", "--rebase", "origin", "main", check=False)
+        r = _git("push", "origin", "HEAD:main", check=False)
+        if r.returncode == 0:
+            return SITE_URL.rstrip("/") + "/videos/" + filename
+        last = r.stderr.strip()[-200:]
+        time.sleep(3)
+    raise RuntimeError("Could not push the video to the repo: " + str(last))
+
+
+def upload_video(path, filename):
+    try:
+        return upload_to_endpoints(path, filename)
+    except RuntimeError as e:
+        if "401" in str(e)[:60]:
+            raise
+        print(f"  upload endpoints failed, saving the video in the repo instead ({str(e)[:120]})")
+        return publish_to_repo(path, filename)
 
 
 def fetch_articles():
