@@ -1,9 +1,6 @@
 {
-  "jobId": "1793345501658",
-  "status": "done",
-  "title": "Spanish Colonial Rule in the Philippines: Conquest, Transformation, and Enduring Legacies (1565\u20131898)",
-  "videoUrl": "https://poetic-codes.pages.dev/videos/spanish-colonial-rule-in-the-philippines-conquest-transforma-video-501658.mp4",
-  "attached": true,
-  "engine": "edge-tts",
-  "seconds": 94
+  "jobId": "1793356216647",
+  "status": "skipped",
+  "reason": "article already has a video",
+  "title": "Spanish Colonial Rule in the Philippines: Conquest, Transformation, and Enduring Legacies (1565\u20131898)"
 }
