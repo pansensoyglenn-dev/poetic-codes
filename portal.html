@@ -416,8 +416,8 @@
               <select id="voice-select" class="webhook-input" aria-label="Voice"></select>
             </div>
             <div class="tts-sliders">
-              <label>Speed <input type="range" id="tts-rate" min="0.6" max="1.3" step="0.02" value="0.92"> <span id="tts-rate-val">0.92</span></label>
-              <label>Pitch <input type="range" id="tts-pitch" min="0.5" max="1.3" step="0.02" value="0.85"> <span id="tts-pitch-val">0.85</span></label>
+              <label>Speed <input type="range" id="tts-rate" min="0.6" max="1.3" step="0.01" value="0.95"> <span id="tts-rate-val">0.95</span></label>
+              <label>Pitch <input type="range" id="tts-pitch" min="0.5" max="1.3" step="0.01" value="1"> <span id="tts-pitch-val">1</span></label>
             </div>
             <div id="tts-status" style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--dim);margin-top:0.5rem;" aria-live="polite"></div>
           </div>
@@ -555,6 +555,17 @@
             <div class="dist-item">
               <input type="checkbox" id="dist-commonplace" checked>
               <label for="dist-commonplace"><i class="fas fa-cloud" aria-hidden="true"></i> Publish to The Commonplace</label>
+            </div>
+          </section>
+
+          <section class="sidebar-card" aria-labelledby="sc-autovideo">
+            <h3 class="sidebar-card-title" id="sc-autovideo"><i class="fas fa-film" aria-hidden="true"></i> Automatic Video</h3>
+            <div class="dist-item">
+              <input type="checkbox" id="dist-autovideo" checked>
+              <label for="dist-autovideo"><i class="fas fa-film" aria-hidden="true"></i> Make a narrated video for every article</label>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:0.55rem;color:var(--dim);line-height:1.7;margin-top:0.5rem;">
+              Needs the GitHub token above. The video is built by GitHub (1–3 min) and attached to the article on The Commonplace by itself. Use the Video button in All Articles for older articles.
             </div>
           </section>
 
@@ -2082,6 +2093,90 @@ async function publishToCommonplace(meta, payload, coverUrlOrDataUrl) {
   return r.json();
 }
 
+/* =====================================================================
+   NEW: Automatic article video
+   The portal writes a small job file to video-jobs/ in your GitHub repo.
+   The "Article video" GitHub Action picks it up, narrates and renders
+   the video, uploads it to R2 and attaches it to the article.
+   ===================================================================== */
+const VIDEO_JOBS_DIR = 'video-jobs';
+
+// Plain text of an article body (no tags, scripts, players), safe to send in a job file.
+function htmlToPlainText(html) {
+  const doc = new DOMParser().parseFromString(html || '', 'text/html');
+  doc.querySelectorAll('script,style,audio,video,iframe,noscript').forEach(n => n.remove());
+  doc.querySelectorAll('p,div,br,h1,h2,h3,h4,li,blockquote').forEach(n => n.insertAdjacentText('afterend', ' '));
+  return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+async function githubPutText(path, text, message) {
+  const cfg = getGitHubConfig();
+  if (!cfg.token) throw new Error('No GitHub token saved (needed to start the video).');
+  const apiURL  = `https://api.github.com/repos/${cfg.username}/${cfg.repo}/contents/${path}`;
+  const headers = {
+    'Authorization': 'Bearer ' + cfg.token,
+    'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+  async function currentSha() {
+    try {
+      const c = await fetch(apiURL + '?ref=' + encodeURIComponent(cfg.branch), { headers, cache: 'no-store' });
+      if (c.ok) return (await c.json()).sha;
+    } catch (_) {}
+    return null;
+  }
+  const bytes = new TextEncoder().encode(text);
+  let binary = '';
+  bytes.forEach(b => { binary += String.fromCharCode(b); });
+  const b64 = btoa(binary);
+
+  for (let tries = 0; tries < 2; tries++) {
+    const body = { message, content: b64, branch: cfg.branch };
+    const sha = await currentSha();
+    if (sha) body.sha = sha;
+    const res = await fetch(apiURL, { method: 'PUT', headers, body: JSON.stringify(body) });
+    if (res.ok) return true;
+    if (tries === 0 && (res.status === 409 || res.status === 422)) continue;
+    const err = await res.json().catch(() => ({}));
+    throw new Error('GitHub: ' + (err.message || 'HTTP ' + res.status));
+  }
+  return false;
+}
+
+// job = { title, author, category, excerpt, body, tags, slug, articleId, coverUrl }
+async function queueVideoJob(job) {
+  const slug = job.slug || slugify(job.title || '') || ('article-' + Date.now());
+  const payload = {
+    jobId: String(Date.now()),
+    createdAt: new Date().toISOString(),
+    title: job.title || '',
+    author: job.author || 'Glenn Junsay Pansensoy',
+    category: job.category || '',
+    excerpt: job.excerpt || '',
+    body: String(job.body || '').slice(0, 8000),
+    tags: job.tags || [],
+    slug,
+    articleId: job.articleId == null ? null : job.articleId,
+    coverUrl: job.coverUrl || null
+  };
+  await githubPutText(VIDEO_JOBS_DIR + '/' + slug + '.json', JSON.stringify(payload, null, 2), 'Queue video: ' + slug);
+  return payload;
+}
+
+function videoJobFromCsArticle(a) {
+  return {
+    title: a.title,
+    category: csSectionFor(a.category) || a.category,
+    excerpt: a.summary || '',
+    body: htmlToPlainText(a.body),
+    tags: a.tags || [],
+    slug: slugify(a.title || ''),
+    articleId: a.id,
+    coverUrl: a.photoUrl || null
+  };
+}
+
 async function submitArticle() {
   const title       = document.getElementById('f-title').value.trim();
   const author      = document.getElementById('f-author').value.trim() || 'Glenn Junsay Pansensoy';
@@ -2117,6 +2212,8 @@ async function submitArticle() {
   setProgress(15);
 
   let bloggerURL = '', githubURL = '', distLines = [];
+  let cpArticleId = null;
+  let videoCoverUrl = null;
 
   try {
     const bodyHTML = buildBloggerBody(title, author, category, excerpt, content, tags, '');
@@ -2168,11 +2265,16 @@ async function submitArticle() {
         if (payload.skip) {
           distLines.push('– Commonplace: skipped (' + payload.skip + ')');
         } else {
-          await publishToCommonplace(
+          const savedCp = await publishToCommonplace(
             { title, category, excerpt, tags, slug },
             payload,
             uploadedCoverUrl || generateCoverImage(title, category)
           );
+          if (savedCp) {
+            const sid = savedCp.id != null ? savedCp.id : (savedCp.article && savedCp.article.id != null ? savedCp.article.id : null);
+            if (sid != null) cpArticleId = sid;
+            videoCoverUrl = savedCp.photo_url || savedCp.photoUrl || (savedCp.article && (savedCp.article.photo_url || savedCp.article.photoUrl)) || null;
+          }
           distLines.push('✓ Commonplace: saved to the database (Vercel)');
         }
       } catch (e) {
@@ -2180,6 +2282,23 @@ async function submitArticle() {
       }
     } else {
       distLines.push('– Commonplace: skipped (unchecked)');
+    }
+    // NEW: queue the automatic video (built by the GitHub Action, attached to the article)
+    const doVideo = document.getElementById('dist-autovideo') && document.getElementById('dist-autovideo').checked;
+    if (doVideo) {
+      try {
+        await queueVideoJob({
+          title, author, category, excerpt, tags, slug,
+          body: htmlToPlainText(content),
+          articleId: cpArticleId,
+          coverUrl: uploadedCoverUrl || videoCoverUrl
+        });
+        distLines.push('✓ Video: queued — it will appear on the article in about 1–3 minutes');
+      } catch (vErr) {
+        distLines.push('⚠ Video not queued: ' + vErr.message + ' (use the Video button in All Articles to retry)');
+      }
+    } else {
+      distLines.push('– Video: skipped (unchecked)');
     }
     setProgress(85);
 
@@ -2353,6 +2472,7 @@ function renderAllArticles(filter) {
   list.innerHTML = items.map(a => {
     const section = csSectionFor(a.category) || a.category || 'Uncategorised';
     const btns = `<button type="button" class="cs-edit-btn" data-all-read="${esc(a._key)}"><i class="fas fa-book-open" aria-hidden="true"></i> Read</button>
+         <button type="button" class="cs-edit-btn" data-all-video="${esc(a._key)}"><i class="fas fa-film" aria-hidden="true"></i> Video</button>
          <button type="button" class="cs-edit-btn" data-all-edit="${esc(a._key)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
          <button type="button" class="cs-edit-btn" data-all-del="${esc(a._key)}" style="color:var(--rose);"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>`;
     return `
@@ -2368,6 +2488,20 @@ function renderAllArticles(filter) {
     btn.addEventListener('click', () => {
       const article = csFindByKey(btn.dataset.allEdit);
       if (article) editArticleGated(article);
+    });
+  });
+  list.querySelectorAll('[data-all-video]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const article = csFindByKey(btn.dataset.allVideo);
+      if (!article) return;
+      requireSignIn(async () => {
+        try {
+          await queueVideoJob(videoJobFromCsArticle(article));
+          showToast('Video queued for "' + (article.title || '').slice(0, 30) + '" — ready in about 1–3 minutes (skipped if it already has a video).', 'success', 6000);
+        } catch (err) {
+          showToast('Video not queued: ' + err.message, 'error', 6000);
+        }
+      });
     });
   });
   list.querySelectorAll('[data-all-read]').forEach(btn => {
@@ -2774,8 +2908,8 @@ function importSelectedFromCs() {
       if (i >= chunks.length) { setIdle(); return; }
       const u = new SpeechSynthesisUtterance(chunks[i++]);
       if (voice) { u.voice = voice; u.lang = voice.lang; }
-      u.rate  = parseFloat(rateEl.value)  || 0.92;   // slightly slower = teacher-like pacing
-      u.pitch = parseFloat(pitchEl.value) || 0.85;   // lower = deeper tone
+      u.rate  = parseFloat(rateEl.value)  || 0.95;
+      u.pitch = parseFloat(pitchEl.value) || 1;
       u.onend = next;
       u.onerror = ev => {
         if (my !== token) return;
