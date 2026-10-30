@@ -1,3 +1,5 @@
+
+
 import asyncio
 import glob
 import html
@@ -14,7 +16,11 @@ from pathlib import Path
 import requests
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
-W, H, FPS = 1280, 720, 30
+W, H, FPS = 1280, 720, 25
+BGW, BGH = 2560, 1440
+CROPW, CROPH = 2000, 1125
+MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "600"))
+WPM = 155.0
 
 JOBS_DIR = Path(os.environ.get("JOBS_DIR", "video-jobs"))
 DONE_DIR = JOBS_DIR / "done"
@@ -24,7 +30,7 @@ UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/up
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
 RATE = os.environ.get("TTS_RATE", "-5%")
-MAX_WORDS = int(os.environ.get("MAX_WORDS", "170"))
+MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
@@ -92,20 +98,23 @@ def build_chunks(sentences, max_words):
         w = len(words)
         if w < 4:
             continue
-        if w > 60:
-            s = " ".join(words[:55]).rstrip(",;:") + "\u2026"
-            w = 56
-        if total + w > max_words and (chunks or cur):
+        if w > 70:
+            s = " ".join(words[:65]).rstrip(",;:") + "\u2026"
+            w = 66
+        if total + w > max_words:
             break
+        if cur and cw + w > 75:
+            chunks.append(" ".join(cur))
+            cur, cw = [], 0
         cur.append(s)
         cw += w
         total += w
-        if cw >= 32:
+        if cw >= 45:
             chunks.append(" ".join(cur))
             cur, cw = [], 0
     if cur:
         chunks.append(" ".join(cur))
-    return chunks[:6]
+    return chunks[:150]
 
 
 def build_segments(job):
@@ -194,51 +203,69 @@ def draw_lines(d, lines, font, lh, x, y, fill):
     return y
 
 
-def render_slide(seg, idx, total, cover):
-    is_title = seg["kind"] == "title"
+def render_layers(seg, idx, total, cover):
     if cover is not None:
-        img = cover_bg(cover, 0 if is_title else 14, 0.62 if is_title else 0.8)
+        bg = ImageOps.fit(cover, (BGW, BGH), Image.LANCZOS)
     else:
-        img = gradient_bg()
-    d = ImageDraw.Draw(img)
+        bg = gradient_bg().resize((BGW, BGH), Image.BICUBIC)
+    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
     pad = 90
     max_w = W - 2 * pad
+    kind = seg["kind"]
 
-    d.rectangle([0, 0, 10, H], fill=ACCENT)
-    d.text((pad, 40), "THE COMMONPLACE", font=load_font(20, True, serif=False), fill=ACCENT)
+    d.rectangle([0, 0, W, H], fill=(6, 10, 18, 70 if kind == "title" else 40))
+    d.rectangle([0, 0, 10, H], fill=ACCENT + (255,))
+    d.text((pad, 40), "THE COMMONPLACE", font=load_font(20, True, serif=False), fill=ACCENT + (255,))
 
-    if seg["kind"] == "title":
+    if kind == "title":
         font, lines, lh = fit_text(d, seg["title"], max_w, 330, range(66, 33, -4), bold=True)
         sub_font = load_font(28, False, serif=False)
         block = len(lines) * lh + 30 + 40
         y = (H - block) // 2 + 10
-        y = draw_lines(d, lines, font, lh, pad, y, TEXT)
-        d.rectangle([pad, y + 12, pad + 120, y + 15], fill=ACCENT)
-        d.text((pad, y + 30), seg["sub"], font=sub_font, fill=MUTED)
+        d.rectangle([pad - 30, y - 24, W - pad + 30, y + block + 20], fill=(6, 10, 18, 150))
+        y = draw_lines(d, lines, font, lh, pad, y, TEXT + (255,))
+        d.rectangle([pad, y + 12, pad + 120, y + 15], fill=ACCENT + (255,))
+        d.text((pad, y + 30), seg["sub"], font=sub_font, fill=MUTED + (255,))
 
-    elif seg["kind"] == "body":
-        font, lines, lh = fit_text(d, seg["text"], max_w, H - 260, range(46, 25, -2))
+    elif kind == "body":
+        font, lines, lh = fit_text(d, seg["text"], max_w, H - 240, range(44, 25, -2))
         y = (H - len(lines) * lh) // 2
-        draw_lines(d, lines, font, lh, pad, y, TEXT)
+        d.rectangle([pad - 30, y - 26, W - pad + 30, y + len(lines) * lh + 20], fill=(6, 10, 18, 165))
+        draw_lines(d, lines, font, lh, pad, y, TEXT + (255,))
 
     else:
         big = load_font(58, True)
         url_font = load_font(40, True, serif=False)
         sub_font = load_font(28, False, serif=False)
         y = (H - 190) // 2
-        d.text((pad + 2, y + 2), seg["title"], font=big, fill=(0, 0, 0))
-        d.text((pad, y), seg["title"], font=big, fill=TEXT)
-        d.rectangle([pad, y + 82, pad + 120, y + 85], fill=ACCENT)
-        d.text((pad, y + 105), seg["url"], font=url_font, fill=ACCENT)
-        d.text((pad, y + 160), seg["sub"], font=sub_font, fill=MUTED)
+        d.rectangle([pad - 30, y - 24, W - pad + 30, y + 215], fill=(6, 10, 18, 150))
+        d.text((pad + 2, y + 2), seg["title"], font=big, fill=(0, 0, 0, 255))
+        d.text((pad, y), seg["title"], font=big, fill=TEXT + (255,))
+        d.rectangle([pad, y + 82, pad + 120, y + 85], fill=ACCENT + (255,))
+        d.text((pad, y + 105), seg["url"], font=url_font, fill=ACCENT + (255,))
+        d.text((pad, y + 160), seg["sub"], font=sub_font, fill=MUTED + (255,))
 
-    d.rectangle([0, H - 8, int(W * (idx + 1) / total), H], fill=ACCENT)
-    return img
+    d.rectangle([0, H - 8, int(W * (idx + 1) / total), H], fill=ACCENT + (255,))
+    return bg, ov
 
 
 async def _edge_synth(text, out):
     import edge_tts
     await edge_tts.Communicate(text, VOICE, rate=RATE).save(out)
+
+
+def pick_rate(segs):
+    words = sum(len(g["speech"].split()) for g in segs)
+    if TTS_FAKE or words == 0:
+        return RATE
+    base = float(RATE.strip("%")) if RATE.endswith("%") else -5.0
+    est = words / (WPM * (1 + base / 100.0)) + len(segs) * 0.7
+    if est >= MIN_SECONDS:
+        return RATE
+    need = (words / max(MIN_SECONDS - len(segs) * 0.7, 60)) / WPM
+    pct = max(-20, min(base, round((need - 1) * 100)))
+    return f"{int(pct)}%"
 
 
 def synth(text, out_mp3):
@@ -272,15 +299,25 @@ def probe_duration(path):
     return float(p.stdout.decode().strip())
 
 
-def make_clip(png, mp3, out, pad=0.7):
+MOTIONS = [(0.0, 1.0, 0.0, 1.0), (1.0, 0.0, 1.0, 0.0), (1.0, 0.0, 0.0, 1.0), (0.0, 1.0, 1.0, 0.0)]
+
+
+def make_clip(bg_png, ov_png, mp3, out, motion=0, pad=0.7):
     dur = probe_duration(mp3) + pad
-    vf = (f"fade=t=in:st=0:d=0.35,fade=t=out:st={max(dur - 0.35, 0):.2f}:d=0.35,"
-          "format=yuv420p")
-    run(["ffmpeg", "-y", "-loop", "1", "-framerate", str(FPS), "-i", str(png),
-         "-i", str(mp3), "-t", f"{dur:.2f}", "-vf", vf,
+    rx, ry = BGW - CROPW, BGH - CROPH
+    x0, x1, y0, y1 = MOTIONS[motion % len(MOTIONS)]
+    xe = f"{x0 * rx:.1f}+({(x1 - x0) * rx:.1f})*t/{dur:.2f}"
+    ye = f"{y0 * ry:.1f}+({(y1 - y0) * ry:.1f})*t/{dur:.2f}"
+    fc = (f"[0:v]crop={CROPW}:{CROPH}:x='{xe}':y='{ye}',scale={W}:{H}:flags=bicubic,setsar=1[bg];"
+          f"[bg][1:v]overlay=format=auto,fade=t=in:st=0:d=0.35,"
+          f"fade=t=out:st={max(dur - 0.35, 0):.2f}:d=0.35,format=yuv420p[v]")
+    run(["ffmpeg", "-y", "-loop", "1", "-framerate", str(FPS), "-i", str(bg_png),
+         "-loop", "1", "-framerate", str(FPS), "-i", str(ov_png), "-i", str(mp3),
+         "-filter_complex", fc, "-map", "[v]", "-map", "2:a", "-t", f"{dur:.2f}",
          "-af", f"apad=pad_dur={pad}",
-         "-c:v", "libx264", "-preset", "veryfast", "-crf", "23", "-r", str(FPS),
-         "-c:a", "aac", "-b:a", "128k", "-ar", "44100", "-ac", "2", str(out)])
+         "-c:v", "libx264", "-preset", "veryfast", "-crf", "29",
+         "-maxrate", "900k", "-bufsize", "1800k", "-r", str(FPS),
+         "-c:a", "aac", "-b:a", "64k", "-ar", "44100", "-ac", "1", str(out)])
     return dur
 
 
@@ -297,17 +334,25 @@ def load_cover(url):
 
 
 def build_video(job):
+    global RATE
     segs = build_segments(job)
+    RATE = pick_rate(segs)
+    log(f"  {len(segs)} slides, narration rate {RATE}")
     tmp = Path(tempfile.mkdtemp(prefix="vid_"))
     cover = load_cover(job.get("coverUrl"))
     clips, engines, total_dur = [], set(), 0.0
     for i, seg in enumerate(segs):
-        png, mp3, clip = tmp / f"s{i}.png", tmp / f"a{i}.mp3", tmp / f"c{i}.mp4"
-        render_slide(seg, i, len(segs), cover).save(png)
+        bgp, ovp = tmp / f"b{i}.png", tmp / f"o{i}.png"
+        mp3, clip = tmp / f"a{i}.mp3", tmp / f"c{i}.mp4"
+        bg_img, ov_img = render_layers(seg, i, len(segs), cover)
+        bg_img.save(bgp)
+        ov_img.save(ovp)
         engines.add(synth(seg["speech"], str(mp3)))
-        total_dur += make_clip(png, mp3, clip)
+        total_dur += make_clip(bgp, ovp, mp3, clip, i)
         clips.append(clip)
-        log(f"  slide {i + 1}/{len(segs)} ready")
+        bgp.unlink()
+        if (i + 1) % 10 == 0 or i + 1 == len(segs):
+            log(f"  slide {i + 1}/{len(segs)} ready")
 
     listing = tmp / "list.txt"
     listing.write_text("".join(f"file '{c}'\n" for c in clips), encoding="utf-8")
