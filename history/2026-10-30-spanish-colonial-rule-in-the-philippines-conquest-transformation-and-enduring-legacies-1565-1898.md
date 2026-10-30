@@ -7,6 +7,8 @@ content_type: html
 summary: "Explore 300 years of Spanish rule in the Philippines: conquest, culture, and legacy."
 tags: ["Spanish colonial rule Philippines", "Philippine history", "Spanish colonization", "Catholicism Philippines", "Manila-Acapulco galleon trade", "reduccion", "polo y servicio", "ilustrados", "Jose Rizal", "Philippine revolution", "colonial legacy", "Filipino identity", "Spanish influence Philippines"]
 has_photo: true
+has_video: true
+video_url: "https://poetic-codes.pages.dev/videos/spanish-colonial-rule-in-the-philippines-conquest-transforma-video-501658.mp4"
 ---
 
 <!DOCTYPE html>
