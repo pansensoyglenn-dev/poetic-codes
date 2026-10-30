@@ -1,6 +1,7 @@
 {
-  "jobId": "1793393724307",
-  "status": "skipped",
-  "reason": "article already has a video",
+  "jobId": "1793393971852",
+  "status": "failed",
+  "attempts": 1,
+  "error": "Video is 151 MB, too big to store in the repo.",
   "title": "Spanish Colonial Rule in the Philippines: Conquest, Transformation, and Enduring Legacies (1565\u20131898)"
 }
