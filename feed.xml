@@ -7,6 +7,14 @@
   <language>en-ph</language>
   <atom:link href="https://poetic-codes.pages.dev/feed.xml" rel="self" type="application/rss+xml"/>
   <item>
+    <title>Automation</title>
+    <link>https://poetic-codes.pages.dev/articles/automation.html</link>
+    <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/automation.html</guid>
+    <pubDate>Fri, 30 Oct 2026 12:00:00 GMT</pubDate>
+    <category>Programming</category>
+    <description>This is an automation program utilizing Python.</description>
+  </item>
+  <item>
     <title>ATM System in Python OOP: Encapsulation Masterclass</title>
     <link>https://poetic-codes.pages.dev/articles/atm-system-in-python-oop-encapsulation-masterclass.html</link>
     <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/atm-system-in-python-oop-encapsulation-masterclass.html</guid>
