@@ -1,23 +1,4 @@
 #!/usr/bin/env python3
-"""
-Make a short narrated video for every pending article job in video-jobs/.
-
-Flow per job file (video-jobs/<slug>.json, written by portal.html):
-  1. Build slides (title, a few text slides, closing slide) with Pillow.
-  2. Narrate each slide with a male neural voice (edge-tts; espeak-ng as fallback).
-  3. Stitch the slides + narration into an MP4 with ffmpeg.
-  4. Upload the MP4 to Cloudflare R2 (same /api/upload route the portal uses).
-  5. Attach the video URL to the article on The Commonplace (PUT /api/articles?id=...).
-  6. Write a marker in video-jobs/done/ so the job is not repeated.
-
-Environment:
-  ADMIN_KEY   required (GitHub secret) - same key you paste in the portal
-  TTS_VOICE   optional, default en-US-ChristopherNeural
-  TTS_RATE    optional, default -5%
-  MAX_WORDS   optional, narrated words of article body, default 170 (about 70 s)
-  DRY_RUN=1   build the video but do not upload / attach / write markers
-  TTS_FAKE=1  use silent audio instead of speech (for offline testing)
-"""
 import asyncio
 import glob
 import html
@@ -61,9 +42,6 @@ FONT_DIRS = [
 ]
 
 
-# ----------------------------------------------------------------------------
-# helpers
-# ----------------------------------------------------------------------------
 def log(*a):
     print(*a, flush=True)
 
@@ -108,9 +86,6 @@ def slugify(s):
     return re.sub(r"(^-|-$)", "", re.sub(r"[^a-z0-9]+", "-", (s or "").lower())) or "article"
 
 
-# ----------------------------------------------------------------------------
-# story plan
-# ----------------------------------------------------------------------------
 def build_chunks(sentences, max_words):
     chunks, cur, cw, total = [], [], 0, 0
     for s in sentences:
@@ -163,9 +138,6 @@ def build_segments(job):
     return segs
 
 
-# ----------------------------------------------------------------------------
-# slides
-# ----------------------------------------------------------------------------
 def gradient_bg():
     img = Image.new("RGB", (W, H))
     d = ImageDraw.Draw(img)
@@ -250,7 +222,7 @@ def render_slide(seg, idx, total, cover):
         y = (H - len(lines) * lh) // 2
         draw_lines(d, lines, font, lh, pad, y, TEXT)
 
-    else:  # end
+    else:
         big = load_font(58, True)
         url_font = load_font(40, True, serif=False)
         sub_font = load_font(28, False, serif=False)
@@ -265,16 +237,12 @@ def render_slide(seg, idx, total, cover):
     return img
 
 
-# ----------------------------------------------------------------------------
-# audio / video
-# ----------------------------------------------------------------------------
 async def _edge_synth(text, out):
     import edge_tts
     await edge_tts.Communicate(text, VOICE, rate=RATE).save(out)
 
 
 def synth(text, out_mp3):
-    """Narrate text to out_mp3. Returns the engine name used."""
     if TTS_FAKE:
         dur = max(1.5, len(text.split()) / 2.6)
         run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
@@ -287,7 +255,7 @@ def synth(text, out_mp3):
             asyncio.run(_edge_synth(text, out_mp3))
             if os.path.exists(out_mp3) and os.path.getsize(out_mp3) > 1000:
                 return "edge-tts"
-        except Exception as e:  # network / service problems
+        except Exception as e:
             last = e
             time.sleep(2 * (attempt + 1))
     log(f"  edge-tts failed ({last}); falling back to espeak-ng")
@@ -349,9 +317,6 @@ def build_video(job):
     return final, total_dur, ",".join(sorted(engines))
 
 
-# ----------------------------------------------------------------------------
-# Commonplace API
-# ----------------------------------------------------------------------------
 def _upload_endpoints():
     out = [UPLOAD_API]
     for extra in (
@@ -467,9 +432,6 @@ def attach_video(row, video_url):
     r.raise_for_status()
 
 
-# ----------------------------------------------------------------------------
-# job bookkeeping
-# ----------------------------------------------------------------------------
 def read_marker(name):
     p = DONE_DIR / name
     if p.exists():
