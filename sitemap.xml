@@ -43,6 +43,12 @@
     <priority>0.4</priority>
   </url>
   <url>
+    <loc>https://poetic-codes.pages.dev/articles/automation.html</loc>
+    <lastmod>2026-10-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://poetic-codes.pages.dev/articles/atm-system-in-python-oop-encapsulation-masterclass.html</loc>
     <lastmod>2026-10-30</lastmod>
     <changefreq>monthly</changefreq>
