@@ -1,7 +1,7 @@
 {
-  "jobId": "1793340415184",
+  "jobId": "1793345501658",
   "status": "failed",
-  "attempts": 2,
+  "attempts": 1,
   "error": "All upload endpoints failed: https://poetic-codes.pages.dev/api/upload: HTTP 405  | https://rhythmic.pansensoyglenn150.workers.dev/api/upload: HTTP 404 <!DOCTYPE html> <!--[if lt IE 7]> <html class=\"no-js ie6 oldie\" lang=\"en-US\"> <![endif]--> <!--[if IE 7]>    <html class=\"no-js ie7 oldie\" lang=\"en-US\"> <![endif]--> <!--[if IE 8]>    <html class=\"no- | https://poetic-codes.vercel.app/api/upload: H",
   "title": "Spanish Colonial Rule in the Philippines: Conquest, Transformation, and Enduring Legacies (1565\u20131898)"
 }
