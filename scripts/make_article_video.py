@@ -1,5 +1,23 @@
 #!/usr/bin/env python3
+"""
+Make a short narrated video for every pending article job in video-jobs/.
 
+Flow per job file (video-jobs/<slug>.json, written by portal.html):
+  1. Build slides (title, a few text slides, closing slide) with Pillow.
+  2. Narrate each slide with a male neural voice (edge-tts; espeak-ng as fallback).
+  3. Stitch the slides + narration into an MP4 with ffmpeg.
+  4. Upload the MP4 to Cloudflare R2 (same /api/upload route the portal uses).
+  5. Attach the video URL to the article on The Commonplace (PUT /api/articles?id=...).
+  6. Write a marker in video-jobs/done/ so the job is not repeated.
+
+Environment:
+  ADMIN_KEY   required (GitHub secret) - same key you paste in the portal
+  TTS_VOICE   optional, default en-US-ChristopherNeural
+  TTS_RATE    optional, default -5%
+  MAX_WORDS   optional, narrated words of article body, default 170 (about 70 s)
+  DRY_RUN=1   build the video but do not upload / attach / write markers
+  TTS_FAKE=1  use silent audio instead of speech (for offline testing)
+"""
 import asyncio
 import glob
 import html
@@ -43,6 +61,9 @@ FONT_DIRS = [
 ]
 
 
+# ----------------------------------------------------------------------------
+# helpers
+# ----------------------------------------------------------------------------
 def log(*a):
     print(*a, flush=True)
 
@@ -87,6 +108,9 @@ def slugify(s):
     return re.sub(r"(^-|-$)", "", re.sub(r"[^a-z0-9]+", "-", (s or "").lower())) or "article"
 
 
+# ----------------------------------------------------------------------------
+# story plan
+# ----------------------------------------------------------------------------
 def build_chunks(sentences, max_words):
     chunks, cur, cw, total = [], [], 0, 0
     for s in sentences:
@@ -139,6 +163,9 @@ def build_segments(job):
     return segs
 
 
+# ----------------------------------------------------------------------------
+# slides
+# ----------------------------------------------------------------------------
 def gradient_bg():
     img = Image.new("RGB", (W, H))
     d = ImageDraw.Draw(img)
@@ -223,7 +250,7 @@ def render_slide(seg, idx, total, cover):
         y = (H - len(lines) * lh) // 2
         draw_lines(d, lines, font, lh, pad, y, TEXT)
 
-    else:
+    else:  # end
         big = load_font(58, True)
         url_font = load_font(40, True, serif=False)
         sub_font = load_font(28, False, serif=False)
@@ -238,12 +265,16 @@ def render_slide(seg, idx, total, cover):
     return img
 
 
+# ----------------------------------------------------------------------------
+# audio / video
+# ----------------------------------------------------------------------------
 async def _edge_synth(text, out):
     import edge_tts
     await edge_tts.Communicate(text, VOICE, rate=RATE).save(out)
 
 
 def synth(text, out_mp3):
+    """Narrate text to out_mp3. Returns the engine name used."""
     if TTS_FAKE:
         dur = max(1.5, len(text.split()) / 2.6)
         run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
@@ -256,7 +287,7 @@ def synth(text, out_mp3):
             asyncio.run(_edge_synth(text, out_mp3))
             if os.path.exists(out_mp3) and os.path.getsize(out_mp3) > 1000:
                 return "edge-tts"
-        except Exception as e:
+        except Exception as e:  # network / service problems
             last = e
             time.sleep(2 * (attempt + 1))
     log(f"  edge-tts failed ({last}); falling back to espeak-ng")
@@ -318,22 +349,59 @@ def build_video(job):
     return final, total_dur, ",".join(sorted(engines))
 
 
+# ----------------------------------------------------------------------------
+# Commonplace API
+# ----------------------------------------------------------------------------
+def _upload_endpoints():
+    out = [UPLOAD_API]
+    for extra in (
+        "https://poetic-codes.pages.dev/api/upload",
+        "https://rhythmic.pansensoyglenn150.workers.dev/api/upload",
+        "https://poetic-codes.vercel.app/api/upload",
+    ):
+        if extra not in out:
+            out.append(extra)
+    return out
+
+
 def upload_video(path, filename):
-    with open(path, "rb") as fh:
-        r = requests.post(
-            UPLOAD_API,
-            params={"filename": filename, "contentType": "video/mp4"},
-            headers={"X-Admin-Key": ADMIN_KEY, "Content-Type": "video/mp4"},
-            data=fh, timeout=900,
-        )
-    if r.status_code == 401:
-        raise RuntimeError("Upload rejected (401): the ADMIN_KEY secret is wrong or missing.")
-    r.raise_for_status()
-    d = r.json()
-    url = d.get("url") or d.get("publicUrl") or d.get("location")
-    if not url:
-        raise RuntimeError("Upload worked but no URL was returned.")
-    return url
+    errors = []
+    for endpoint in _upload_endpoints():
+        try:
+            with open(path, "rb") as fh:
+                r = requests.post(
+                    endpoint,
+                    params={"filename": filename, "contentType": "video/mp4"},
+                    headers={
+                        "X-Admin-Key": ADMIN_KEY,
+                        "Content-Type": "video/mp4",
+                        "Origin": SITE_URL,
+                        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) article-video-bot",
+                    },
+                    data=fh, timeout=900, allow_redirects=False,
+                )
+        except Exception as e:
+            errors.append(f"{endpoint}: {e}")
+            print(f"  upload via {endpoint} -> network error: {e}")
+            continue
+        print(f"  upload via {endpoint} -> HTTP {r.status_code} {r.headers.get('location', '')}")
+        if r.status_code == 401:
+            raise RuntimeError("Upload rejected (401): the ADMIN_KEY secret is wrong or missing.")
+        if not r.ok:
+            body = (r.text or "")[:200].replace("\n", " ")
+            errors.append(f"{endpoint}: HTTP {r.status_code} {body}")
+            print(f"    response: {body}")
+            continue
+        try:
+            d = r.json()
+        except Exception:
+            errors.append(f"{endpoint}: not JSON")
+            continue
+        url = d.get("url") or d.get("publicUrl") or d.get("location")
+        if url:
+            return url
+        errors.append(f"{endpoint}: no URL in response")
+    raise RuntimeError("All upload endpoints failed: " + " | ".join(errors))
 
 
 def fetch_articles():
@@ -399,6 +467,9 @@ def attach_video(row, video_url):
     r.raise_for_status()
 
 
+# ----------------------------------------------------------------------------
+# job bookkeeping
+# ----------------------------------------------------------------------------
 def read_marker(name):
     p = DONE_DIR / name
     if p.exists():
