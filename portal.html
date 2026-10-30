@@ -2154,11 +2154,12 @@ async function queueVideoJob(job) {
     author: job.author || 'Glenn Junsay Pansensoy',
     category: job.category || '',
     excerpt: job.excerpt || '',
-    body: String(job.body || '').slice(0, 8000),
+    body: String(job.body || '').slice(0, 40000),
     tags: job.tags || [],
     slug,
     articleId: job.articleId == null ? null : job.articleId,
-    coverUrl: job.coverUrl || null
+    coverUrl: job.coverUrl || null,
+    force: !!job.force
   };
   await githubPutText(VIDEO_JOBS_DIR + '/' + slug + '.json', JSON.stringify(payload, null, 2), 'Queue video: ' + slug);
   return payload;
@@ -2173,7 +2174,8 @@ function videoJobFromCsArticle(a) {
     tags: a.tags || [],
     slug: slugify(a.title || ''),
     articleId: a.id,
-    coverUrl: a.photoUrl || null
+    coverUrl: a.photoUrl || null,
+    force: true
   };
 }
 
