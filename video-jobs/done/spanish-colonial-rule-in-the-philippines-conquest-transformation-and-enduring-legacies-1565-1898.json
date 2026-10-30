@@ -1,7 +1,9 @@
 {
-  "jobId": "1793393971852",
-  "status": "failed",
-  "attempts": 1,
-  "error": "Video is 151 MB, too big to store in the repo.",
-  "title": "Spanish Colonial Rule in the Philippines: Conquest, Transformation, and Enduring Legacies (1565\u20131898)"
+  "jobId": "1793401566961",
+  "status": "done",
+  "title": "Spanish Colonial Rule in the Philippines: Conquest, Transformation, and Enduring Legacies (1565\u20131898)",
+  "videoUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/videos/video-1793403439912-spanish-colonial-rule-in-the-philippines-conquest-transforma-video-566961.mp4",
+  "attached": true,
+  "engine": "edge-tts",
+  "seconds": 1317
 }
