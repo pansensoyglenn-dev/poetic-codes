@@ -7,7 +7,7 @@ const TARGETS = [
   { repo: 'poetic-codes',      site: 'https://pansensoyglenn-dev.github.io/poetic-codes/' },
 ];
 const VERCEL_SITE = 'https://current-situation.vercel.app/';
-const ALLOWED_ORIGINS = ['https://current-situation.vercel.app', 'https://pansensoyglenn-dev.github.io'];
+const ALLOWED_ORIGINS = ['https://current-situation.vercel.app', 'https://pansensoyglenn-dev.github.io', 'https://poetic-codes.pages.dev'];
 
 const CATS = {
   history: 'History', philosophy: 'Philosophy', economy: 'Economy', programming: 'Programming',
