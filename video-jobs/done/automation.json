@@ -1,16 +1,16 @@
 {
-  "jobId": "1793439138748",
+  "jobId": "1793439199068",
   "status": "done",
   "title": "Automation",
-  "videoUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/videos/video-1793441455936-automation-video-138748.mp4",
+  "videoUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/videos/video-1793447394871-automation-video-199068.mp4",
   "attached": true,
   "engine": "edge-tts",
   "credits": [
     "Water valvule Automation with WIFI.jpg - Paulvillacreses (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Water_valvule_Automation_with_WIFI.jpg",
     "Automation T2.jpg - AliciaNowaste (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Automation_T2.jpg",
     "Auto wreck, USA, 1923.jpg - National Photo Company, photographer's name not mentioned. (Public domain) https://commons.wikimedia.org/wiki/File:Auto_wreck,_USA,_1923.jpg",
-    "Renault Rafale PHEV 300 Auto Zuerich 2024 DSC 6504.jpg - Alexander-93 (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Renault_Rafale_PHEV_300_Auto_Zuerich_2024_DSC_6504.jpg",
     "Solenoid Valve Closed.png - User:Sparpo (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Solenoid_Valve_Closed.png",
+    "Renault Rafale PHEV 300 Auto Zuerich 2024 DSC 6504.jpg - Alexander-93 (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Renault_Rafale_PHEV_300_Auto_Zuerich_2024_DSC_6504.jpg",
     "Solenoid Valve Open.png - User:Sparpo (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Solenoid_Valve_Open.png",
     "Marketing Email Automation Workflow.png - PathwayPort (CC0) https://commons.wikimedia.org/wiki/File:Marketing_Email_Automation_Workflow.png",
     "Auto hand sanitizer.jpg - Charlie.Smatt (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Auto_hand_sanitizer.jpg",
@@ -19,5 +19,5 @@
     "Automation - poster ENG small.jpg - Swedish Educational Broadcasting Company (UR) (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Automation_-_poster_ENG_small.jpg",
     "BMA Automation Allen Bradley PLC 3.JPG - Elmschrat Coaching-Blog (CC BY-SA 3.0) https://commons.wikimedia.org/wiki/File:BMA_Automation_Allen_Bradley_PLC_3.JPG"
   ],
-  "seconds": 2531
+  "seconds": 2083
 }
