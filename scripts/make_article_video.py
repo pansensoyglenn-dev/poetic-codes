@@ -37,8 +37,8 @@ UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/up
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 AI_IMAGES = os.environ.get("AI_IMAGES", "1") != "0"
 AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "24"))
-CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID", "")
-CF_API_TOKEN = os.environ.get("CF_API_TOKEN", "")
+CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID") or os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
+CF_API_TOKEN = os.environ.get("CF_API_TOKEN") or os.environ.get("CLOUDFLARE_API_TOKEN", "")
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
 RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
@@ -452,7 +452,7 @@ def make_ai_images(segs, job):
     if not AI_IMAGES:
         return []
     if not (CF_ACCOUNT_ID and CF_API_TOKEN):
-        log("  no Cloudflare keys (CF_ACCOUNT_ID / CF_API_TOKEN): skipping generated pictures, using your photos")
+        log("  no Cloudflare keys (CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN): skipping generated pictures, using your photos")
         return []
     body_idx = [i for i, g in enumerate(segs) if g["kind"] == "body"]
     if not body_idx:
