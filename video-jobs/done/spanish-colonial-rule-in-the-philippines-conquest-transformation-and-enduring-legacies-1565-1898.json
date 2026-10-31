@@ -1,9 +1,12 @@
 {
-  "jobId": "1793409759050",
+  "jobId": "1793426234483",
   "status": "done",
   "title": "Spanish Colonial Rule in the Philippines: Conquest, Transformation, and Enduring Legacies (1565\u20131898)",
-  "videoUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/videos/video-1793427135993-spanish-colonial-rule-in-the-philippines-conquest-transforma-video-759050.mp4",
+  "videoUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/videos/video-1793443283147-spanish-colonial-rule-in-the-philippines-conquest-transforma-video-234483.mp4",
   "attached": true,
   "engine": "edge-tts",
-  "seconds": 969
+  "credits": [
+    "Colonial Architecture in the Philippines.jpg - QueenCityCebu (CC BY-SA 4.0) https://commons.wikimedia.org/wiki/File:Colonial_Architecture_in_the_Philippines.jpg"
+  ],
+  "seconds": 966
 }
