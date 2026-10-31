@@ -20,6 +20,9 @@ BGW, BGH = 2560, 1440
 IMGH = 540                      # picture area; the caption band sits underneath it
 BANDH = H - IMGH
 CROPW, CROPH = 2000, 844        # same aspect as W x IMGH
+ZOOM = float(os.environ.get("ZOOM", "0.10"))      # slow push-in / pull-out strength (0 = off)
+GRAIN = int(os.environ.get("GRAIN", "2"))          # light film grain (0 = off; keep low, grain costs bitrate)
+VIGNETTE = os.environ.get("VIGNETTE", "1") != "0"
 CAP_WORDS = int(os.environ.get("CAP_WORDS", "20"))
 MAX_MB = float(os.environ.get("MAX_MB", "45"))
 MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "0"))  # 0 = never slow the voice down to pad length
@@ -338,9 +341,29 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900):
     xe = f"{x0 * rx:.1f}+({(x1 - x0) * rx:.1f})*t/{dur:.2f}"
     ye = f"{y0 * ry:.1f}+({(y1 - y0) * ry:.1f})*t/{dur:.2f}"
     ow, oh = (960, 540) if vkbps < 450 else (W, H)
-    fc = (f"[0:v]crop={CROPW}:{CROPH}:x='{xe}':y='{ye}',scale={W}:{IMGH}:flags=bicubic,"
-          f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
-          f"[v0][1:v]overlay=format=auto[v1];")
+    # picture chain: pan + slow zoom (zoompan) -> vignette -> grain -> soft dip fades (picture only)
+    nfr = max(int(dur * FPS), 1)
+    if ZOOM > 0:
+        zin = motion % 2 == 0
+        zexpr = f"1+{ZOOM}*on/{nfr}" if zin else f"1+{ZOOM}*(1-on/{nfr})"
+        fx = x0 + (x1 - x0) * 0.0
+        px = f"on/{nfr}" if x1 > x0 else f"(1-on/{nfr})"
+        py = f"on/{nfr}" if y1 > y0 else f"(1-on/{nfr})"
+        wide_h = int(BGW * IMGH / W) // 2 * 2          # 2560 x 1080 strip, same aspect as the picture area
+        vr = BGH - wide_h
+        ye2 = f"{y0 * vr:.1f}+({(y1 - y0) * vr:.1f})*t/{dur:.2f}"
+        pic = (f"[0:v]crop={BGW}:{wide_h}:x=0:y='{ye2}',"
+               f"zoompan=z='{zexpr}':x='(iw-iw/zoom)*{px}':y='(ih-ih/zoom)*0.5':d=1:s={W}x{IMGH}:fps={FPS}")
+    else:
+        pic = f"[0:v]crop={CROPW}:{CROPH}:x='{xe}':y='{ye}',scale={W}:{IMGH}:flags=bicubic"
+    if VIGNETTE:
+        pic += ",vignette=PI/5"
+    if GRAIN > 0:
+        pic += f",noise=alls={GRAIN}:allf=t"
+    fd = 0.5
+    pic += (f",fade=t=in:st=0:d={fd},fade=t=out:st={max(dur - fd, 0):.2f}:d={fd},"
+            f"pad={W}:{H}:0:0:color=black,setsar=1[v0];")
+    fc = pic + "[v0][1:v]overlay=format=auto[v1];"
     last = "v1"
     for k, (_, t0, t1) in enumerate(caps):
         t1 = dur + 1 if k == len(caps) - 1 else t1
@@ -348,8 +371,7 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900):
         fc += (f"[{last}][{k + 3}:v]overlay=format=auto:"
                f"enable='between(t,{t0:.2f},{t1:.2f})'[{nxt}];")
         last = nxt
-    fc += (f"[{last}]scale={ow}:{oh}:flags=bicubic,fade=t=in:st=0:d=0.35,"
-           f"fade=t=out:st={max(dur - 0.35, 0):.2f}:d=0.35,format=yuv420p[v]")
+    fc += f"[{last}]scale={ow}:{oh}:flags=bicubic,format=yuv420p[v]"
     cmd = ["ffmpeg", "-y", "-loop", "1", "-framerate", str(FPS), "-i", str(bg_png),
            "-loop", "1", "-framerate", str(FPS), "-i", str(ov_png), "-i", str(mp3)]
     for png, _, _ in caps:
@@ -413,20 +435,9 @@ def gen_image_cloudflare(prompt):
     return _from_bytes(base64.b64decode(r.json()["result"]["image"]))
 
 
-def gen_image_free(prompt, seed):
-    from urllib.parse import quote
-    url = (f"https://image.pollinations.ai/prompt/{quote(prompt[:600])}"
-           f"?width=1280&height=720&model=flux&nologo=true&seed={seed}")
-    r = requests.get(url, timeout=60)
-    r.raise_for_status()
-    if "image" not in r.headers.get("content-type", ""):
-        raise RuntimeError("not an image")
-    return _from_bytes(r.content)
-
-
 def gen_image(prompt, seed):
     for attempt in range(2):
-        for fn in (lambda: gen_image_cloudflare(prompt), lambda: gen_image_free(prompt, seed + attempt)):
+        for fn in (lambda: gen_image_cloudflare(prompt),):
             try:
                 img = fn()
                 if img is not None:
@@ -439,6 +450,9 @@ def gen_image(prompt, seed):
 
 def make_ai_images(segs, job):
     if not AI_IMAGES:
+        return []
+    if not (CF_ACCOUNT_ID and CF_API_TOKEN):
+        log("  no Cloudflare keys (CF_ACCOUNT_ID / CF_API_TOKEN): skipping generated pictures, using your photos")
         return []
     body_idx = [i for i, g in enumerate(segs) if g["kind"] == "body"]
     if not body_idx:
