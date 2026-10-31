@@ -36,6 +36,9 @@ jobs:
           ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
           CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          AI_IMAGES: "0"
+          MAX_WORDS: "3000"
+          TTS_RATE: "+0%"
         run: python scripts/make_article_video.py
 
       - name: Keep a downloadable copy of the video
