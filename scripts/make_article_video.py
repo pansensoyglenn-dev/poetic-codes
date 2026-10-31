@@ -690,9 +690,8 @@ def process_job(path):
     name = path.name
     job = json.loads(path.read_text(encoding="utf-8"))
     marker = read_marker(name)
-    if not DRY_RUN and not needs_work
-  if not DRY_RUN and not needs_work(job, marker):
-        return None
+    if not DRY_RUN and not needs_work(job, marker):
+           return None
 
     title = job.get("title", name)
     log(f"\n=== {title} ({name})")
