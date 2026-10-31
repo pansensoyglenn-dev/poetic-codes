@@ -22,7 +22,7 @@ BANDH = H - IMGH
 CROPW, CROPH = 2000, 844        # same aspect as W x IMGH
 CAP_WORDS = int(os.environ.get("CAP_WORDS", "20"))
 MAX_MB = float(os.environ.get("MAX_MB", "45"))
-MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "600"))
+MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "0"))  # 0 = never slow the voice down to pad length
 WPM = 155.0
 
 JOBS_DIR = Path(os.environ.get("JOBS_DIR", "video-jobs"))
@@ -37,9 +37,13 @@ AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "24"))
 CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID", "")
 CF_API_TOKEN = os.environ.get("CF_API_TOKEN", "")
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
-RATE = os.environ.get("TTS_RATE", "-5%")
+RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
+RUN_START = time.time()
+RUN_BUDGET = float(os.environ.get("MAX_RUN_MINUTES", "100")) * 60   # keep under the workflow timeout
+IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "480"))     # max time spent generating pictures per video
+IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))         # stop generating after this many failures in a row
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
 
@@ -402,7 +406,7 @@ def gen_image_cloudflare(prompt):
     r = requests.post(
         f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell",
         headers={"Authorization": f"Bearer {CF_API_TOKEN}"},
-        json={"prompt": prompt[:1900], "steps": 4}, timeout=120,
+        json={"prompt": prompt[:1900], "steps": 4}, timeout=60,
     )
     r.raise_for_status()
     import base64
@@ -413,7 +417,7 @@ def gen_image_free(prompt, seed):
     from urllib.parse import quote
     url = (f"https://image.pollinations.ai/prompt/{quote(prompt[:600])}"
            f"?width=1280&height=720&model=flux&nologo=true&seed={seed}")
-    r = requests.get(url, timeout=150)
+    r = requests.get(url, timeout=60)
     r.raise_for_status()
     if "image" not in r.headers.get("content-type", ""):
         raise RuntimeError("not an image")
@@ -421,15 +425,15 @@ def gen_image_free(prompt, seed):
 
 
 def gen_image(prompt, seed):
-    for attempt in range(3):
+    for attempt in range(2):
         for fn in (lambda: gen_image_cloudflare(prompt), lambda: gen_image_free(prompt, seed + attempt)):
             try:
                 img = fn()
                 if img is not None:
                     return img
-            except Exception as e:
-                last = str(e)[:100]
-        time.sleep(3 * (attempt + 1))
+            except Exception:
+                pass
+        time.sleep(2 * (attempt + 1))
     return None
 
 
@@ -442,13 +446,19 @@ def make_ai_images(segs, job):
     k = min(len(body_idx), AI_IMAGE_MAX)
     title = clean_text(job.get("title"))
     category = clean_text(job.get("category"))
-    out = []
+    out, fails, t_start = [], 0, time.time()
     for j in range(k):
         lo = j * len(body_idx) // k
         text = segs[body_idx[lo]]["text"]
         text = " ".join(text.split()[:35])
         prompt = f"{STYLE}. Scene: {text} Theme: {title}. {category}."
+        if time.time() - t_start > IMG_BUDGET or fails >= IMG_FAIL_LIMIT:
+            log(f"  picture generation stopped at {j}/{k} "
+                f"({'time budget' if fails < IMG_FAIL_LIMIT else 'too many failures'}); using the rest as photos")
+            out.extend([None] * (k - j))
+            break
         img = gen_image(prompt, 1000 + j * 7)
+        fails = 0 if img is not None else fails + 1
         out.append(img)
         if (j + 1) % 6 == 0 or j + 1 == k:
             log(f"  generated pictures {j + 1}/{k}")
@@ -787,12 +797,19 @@ def main():
     if not files:
         log("No video jobs found.")
         return 0
-    results, done_count = [], 0
+    results, done_count, longest = [], 0, 0.0
     for f in files:
         if done_count >= MAX_JOBS_PER_RUN:
             log("Job limit for this run reached; the rest will be picked up next time.")
             break
+        elapsed = time.time() - RUN_START
+        if longest and elapsed + longest * 1.15 > RUN_BUDGET:
+            log(f"Not enough time left for another job ({elapsed / 60:.0f} min used); it will run next time.")
+            break
+        t0 = time.time()
         res = process_job(f)
+        if res in ("done", "failed", "dry"):
+            longest = max(longest, time.time() - t0)
         if res:
             results.append(res)
             done_count += 1
