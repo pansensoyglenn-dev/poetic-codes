@@ -6,6 +6,11 @@ on:
     paths:
       - 'video-jobs/*.json'
   workflow_dispatch:
+    inputs:
+      only:
+        description: 'Only make the video whose job file name contains this word (leave empty for all)'
+        required: false
+        default: ''
 
 concurrency:
   group: article-video
@@ -39,6 +44,7 @@ jobs:
           AI_IMAGES: "0"
           MAX_WORDS: "3000"
           TTS_RATE: "+0%"
+          ONLY_JOB: ${{ github.event.inputs.only }}
         run: python scripts/make_article_video.py
 
       - name: Keep a downloadable copy of the video
@@ -55,9 +61,23 @@ jobs:
         run: |
           git config user.name "article-video-bot"
           git config user.email "article-video-bot@users.noreply.github.com"
-          git add video-jobs/done 2>/dev/null || true
-          if ! git diff --cached --quiet; then
+          mkdir -p /tmp/new-markers
+          cp -r video-jobs/done/. /tmp/new-markers/ 2>/dev/null || true
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p video-jobs/done
+            cp -r /tmp/new-markers/. video-jobs/done/ 2>/dev/null || true
+            git add video-jobs/done 2>/dev/null || true
+            if git diff --cached --quiet; then
+              echo "No marker changes to save."
+              exit 0
+            fi
             git commit -m "Article videos processed [skip ci]"
-            git pull --rebase origin main || true
-            git push origin main
-          fi
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Push rejected (attempt $attempt); trying again."
+            sleep 5
+          done
+          exit 1
