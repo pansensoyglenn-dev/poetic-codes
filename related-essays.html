@@ -1,0 +1,37 @@
+<!-- Paste where you want "Keep reading" to appear (end of each essay). -->
+<!-- Needs an /essays.json file: [{"title":"...","url":"/essays/slug.html","topic":"culture","summary":"..."}] -->
+<section id="related" class="related">
+  <h2>Keep reading</h2>
+  <div id="related-list"></div>
+</section>
+
+<style>
+  .related { margin: 3rem 0; padding-top: 1.5rem; border-top: 1px solid rgba(128,128,128,.3); }
+  .related h2 { font-size: 1.2rem; margin-bottom: 1rem; }
+  .related a { display: block; padding: .9rem 1rem; margin-bottom: .75rem;
+    border: 1px solid rgba(128,128,128,.3); border-radius: 10px;
+    text-decoration: none; color: inherit; }
+  .related a:hover { border-color: currentColor; }
+  .related strong { display: block; margin-bottom: .25rem; }
+  .related span { font-size: .9rem; opacity: .75; }
+</style>
+
+<script>
+(async function () {
+  const box = document.getElementById('related-list');
+  try {
+    const all = await (await fetch('/essays.json')).json();
+    const here = location.pathname;
+    const current = all.find(e => e.url === here);
+    const others = all.filter(e => e.url !== here);
+    // same-topic first, then the rest; show 3
+    others.sort((a, b) =>
+      (b.topic === (current && current.topic)) - (a.topic === (current && current.topic)));
+    box.innerHTML = others.slice(0, 3).map(e =>
+      `<a href="${e.url}"><strong>${e.title}</strong><span>${e.summary || ''}</span></a>`
+    ).join('');
+  } catch (err) {
+    document.getElementById('related').style.display = 'none';
+  }
+})();
+</script>
