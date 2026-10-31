@@ -1,26 +1,3 @@
-
-"""
-Make a narrated video with a slowly moving picture for every pending article job in video-jobs/.
-
-Flow per job file (video-jobs/<slug>.json, written by portal.html):
-  1. Build slides (title, a few text slides, closing slide) with Pillow.
-  2. Narrate each slide with a male neural voice (edge-tts; espeak-ng as fallback).
-  3. Stitch the slides + narration into an MP4 with ffmpeg.
-  4. Upload the MP4 to Cloudflare R2 (same /api/upload route the portal uses).
-  5. Attach the video URL to the article on The Commonplace (PUT /api/articles?id=...).
-  6. Write a marker in video-jobs/done/ so the job is not repeated.
-
-Environment:
-  ADMIN_KEY   required (GitHub secret) - same key you paste in the portal
-  TTS_VOICE   optional, default en-US-ChristopherNeural
-  TTS_RATE    optional, default -5%
-  MAX_WORDS   optional, narrated words of article body, default 6000 (the whole article)
-  MIN_SECONDS optional, target minimum length, default 600; narration is slowed (down to -20%) to reach it
-  CF_ACCOUNT_ID, CF_API_TOKEN  optional, Cloudflare Workers AI for generated pictures (otherwise a free service is used)
-  AI_IMAGES=0 turn generated pictures off; AI_IMAGE_MAX caps how many are made (default 24)
-  DRY_RUN=1   build the video but do not upload / attach / write markers
-  TTS_FAKE=1  use silent audio instead of speech (for offline testing)
-"""
 import asyncio
 import glob
 import html
@@ -241,8 +218,8 @@ def render_layers(seg, idx, total, cover):
     pad = 90
     max_w = W - 2 * pad
     kind = seg["kind"]
-
-    d.rectangle([0, 0, W, H], fill=(6, 10, 18, 70 if kind == "title" else 40))
+  
+    d.rectangle([0, 0, W, H], fill=(6, 10, 18, 70 if kind == "title" else 15))
     d.rectangle([0, 0, 10, H], fill=ACCENT + (255,))
     d.text((pad, 40), "THE COMMONPLACE", font=load_font(20, True, serif=False), fill=ACCENT + (255,))
 
@@ -257,9 +234,11 @@ def render_layers(seg, idx, total, cover):
         d.text((pad, y + 30), seg["sub"], font=sub_font, fill=MUTED + (255,))
 
     elif kind == "body":
+        
         font, lines, lh = fit_text(d, seg["text"], max_w, H - 240, range(44, 25, -2))
-        y = (H - len(lines) * lh) // 2
-        d.rectangle([pad - 30, y - 26, W - pad + 30, y + len(lines) * lh + 20], fill=(6, 10, 18, 165))
+        text_height = len(lines) * lh
+        y = H - text_height - 80 
+        d.rectangle([pad - 30, y - 26, W - pad + 30, y + text_height + 20], fill=(6, 10, 18, 110))
         draw_lines(d, lines, font, lh, pad, y, TEXT + (255,))
 
     else:
@@ -711,79 +690,4 @@ def process_job(path):
     name = path.name
     job = json.loads(path.read_text(encoding="utf-8"))
     marker = read_marker(name)
-    if not DRY_RUN and not needs_work(job, marker):
-        return None
-
-    title = job.get("title", name)
-    log(f"\n=== {title} ({name})")
-    attempts = (marker.get("attempts", 0) if marker and marker.get("jobId") == job.get("jobId") else 0) + 1
-
-    try:
-        row = None
-        if not DRY_RUN:
-            row = find_article(job, fetch_articles())
-            if row is None:
-                log("  article not found on The Commonplace; the video will be made but not attached")
-            elif existing_video(row) and not job.get("force"):
-                log("  article already has a video; leaving it alone")
-                write_marker(name, {"jobId": job.get("jobId"), "status": "skipped",
-                                    "reason": "article already has a video", "title": title})
-                return "skipped"
-
-        final, dur, engine = build_video(job)
-        log(f"  video built: {dur:.0f}s, voice engine: {engine}")
-
-        if DRY_RUN:
-            out = Path("out")
-            out.mkdir(exist_ok=True)
-            dest = out / f"{slugify(title)}.mp4"
-            dest.write_bytes(Path(final).read_bytes())
-            log(f"  DRY RUN: saved {dest}")
-            return "dry"
-
-        fname = f"{slugify(title)[:60]}-video-{str(job.get('jobId', ''))[-6:]}.mp4"
-        Path("out").mkdir(exist_ok=True)
-        shutil.copy(final, Path("out") / fname)
-        url = upload_video(final, fname)
-        log(f"  uploaded: {url}")
-        attached = False
-        if row is not None:
-            attach_video(row, url)
-            attached = True
-            log(f"  attached to article #{row['id']}")
-        write_marker(name, {"jobId": job.get("jobId"), "status": "done", "title": title,
-                            "videoUrl": url, "attached": attached, "engine": engine,
-                            "seconds": round(dur)})
-        return "done"
-
-    except Exception as e:
-        log(f"  FAILED: {e}")
-        if not DRY_RUN:
-            write_marker(name, {"jobId": job.get("jobId"), "status": "failed",
-                                "attempts": attempts, "error": str(e)[:400], "title": title})
-        return "failed"
-
-
-def main():
-    if not DRY_RUN and not ADMIN_KEY:
-        log("ADMIN_KEY is not set. Add it under Settings > Secrets and variables > Actions.")
-        return 1
-    files = sorted(Path(p) for p in glob.glob(str(JOBS_DIR / "*.json")))
-    if not files:
-        log("No video jobs found.")
-        return 0
-    results, done_count = [], 0
-    for f in files:
-        if done_count >= MAX_JOBS_PER_RUN:
-            log("Job limit for this run reached; the rest will be picked up next time.")
-            break
-        res = process_job(f)
-        if res:
-            results.append(res)
-            done_count += 1
-    log("\nSummary:", {r: results.count(r) for r in set(results)} or "nothing to do")
-    return 1 if "failed" in results else 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+    if not DRY_RUN and not needs_work
