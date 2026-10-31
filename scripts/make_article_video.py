@@ -17,15 +17,15 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
-IMGH = 540                      # picture area; the caption band sits underneath it
+IMGH = 540                      
 BANDH = H - IMGH
-CROPW, CROPH = 2000, 844        # same aspect as W x IMGH
-ZOOM = float(os.environ.get("ZOOM", "0.10"))      # slow push-in / pull-out strength (0 = off)
-GRAIN = int(os.environ.get("GRAIN", "2"))          # light film grain (0 = off; keep low, grain costs bitrate)
+CROPW, CROPH = 2000, 844        
+ZOOM = float(os.environ.get("ZOOM", "0.10"))      
+GRAIN = int(os.environ.get("GRAIN", "2"))          
 VIGNETTE = os.environ.get("VIGNETTE", "1") != "0"
 CAP_WORDS = int(os.environ.get("CAP_WORDS", "20"))
 MAX_MB = float(os.environ.get("MAX_MB", "45"))
-MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "0"))  # 0 = never slow the voice down to pad length
+MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "0"))  
 WPM = 155.0
 
 JOBS_DIR = Path(os.environ.get("JOBS_DIR", "video-jobs"))
@@ -44,9 +44,9 @@ RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
 RUN_START = time.time()
-RUN_BUDGET = float(os.environ.get("MAX_RUN_MINUTES", "100")) * 60   # keep under the workflow timeout
-IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "480"))     # max time spent generating pictures per video
-IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))         # stop generating after this many failures in a row
+RUN_BUDGET = float(os.environ.get("MAX_RUN_MINUTES", "100")) * 60   
+IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "480"))     
+IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))         
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
 
@@ -349,7 +349,7 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900):
         fx = x0 + (x1 - x0) * 0.0
         px = f"on/{nfr}" if x1 > x0 else f"(1-on/{nfr})"
         py = f"on/{nfr}" if y1 > y0 else f"(1-on/{nfr})"
-        wide_h = int(BGW * IMGH / W) // 2 * 2          # 2560 x 1080 strip, same aspect as the picture area
+        wide_h = int(BGW * IMGH / W) // 2 * 2          
         vr = BGH - wide_h
         ye2 = f"{y0 * vr:.1f}+({(y1 - y0) * vr:.1f})*t/{dur:.2f}"
         pic = (f"[0:v]crop={BGW}:{wide_h}:x=0:y='{ye2}',"
