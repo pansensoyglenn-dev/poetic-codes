@@ -17,7 +17,10 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
-CROPW, CROPH = 2000, 1125
+IMGH = 540                      # picture area; the caption band sits underneath it
+BANDH = H - IMGH
+CROPW, CROPH = 2000, 844        # same aspect as W x IMGH
+CAP_WORDS = int(os.environ.get("CAP_WORDS", "20"))
 MAX_MB = float(os.environ.get("MAX_MB", "45"))
 MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "600"))
 WPM = 155.0
@@ -209,52 +212,66 @@ def draw_lines(d, lines, font, lh, x, y, fill):
 
 
 def render_layers(seg, idx, total, cover):
+    """Background picture (panned later) plus a base overlay holding only the caption band.
+    Nothing is drawn over the picture itself."""
     if cover is not None:
         bg = ImageOps.fit(cover, (BGW, BGH), Image.LANCZOS)
     else:
         bg = gradient_bg().resize((BGW, BGH), Image.BICUBIC)
     ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
-    pad = 90
-    max_w = W - 2 * pad
-    kind = seg["kind"]
-  
-    d.rectangle([0, 0, W, H], fill=(6, 10, 18, 70 if kind == "title" else 15))
-    d.rectangle([0, 0, 10, H], fill=ACCENT + (255,))
-    d.text((pad, 40), "THE COMMONPLACE", font=load_font(20, True, serif=False), fill=ACCENT + (255,))
-
-    if kind == "title":
-        font, lines, lh = fit_text(d, seg["title"], max_w, 330, range(66, 33, -4), bold=True)
-        sub_font = load_font(28, False, serif=False)
-        block = len(lines) * lh + 30 + 40
-        y = (H - block) // 2 + 10
-        d.rectangle([pad - 30, y - 24, W - pad + 30, y + block + 20], fill=(6, 10, 18, 150))
-        y = draw_lines(d, lines, font, lh, pad, y, TEXT + (255,))
-        d.rectangle([pad, y + 12, pad + 120, y + 15], fill=ACCENT + (255,))
-        d.text((pad, y + 30), seg["sub"], font=sub_font, fill=MUTED + (255,))
-
-    elif kind == "body":
-        
-        font, lines, lh = fit_text(d, seg["text"], max_w, H - 240, range(44, 25, -2))
-        text_height = len(lines) * lh
-        y = H - text_height - 80 
-        d.rectangle([pad - 30, y - 26, W - pad + 30, y + text_height + 20], fill=(6, 10, 18, 110))
-        draw_lines(d, lines, font, lh, pad, y, TEXT + (255,))
-
-    else:
-        big = load_font(58, True)
-        url_font = load_font(40, True, serif=False)
-        sub_font = load_font(28, False, serif=False)
-        y = (H - 190) // 2
-        d.rectangle([pad - 30, y - 24, W - pad + 30, y + 215], fill=(6, 10, 18, 150))
-        d.text((pad + 2, y + 2), seg["title"], font=big, fill=(0, 0, 0, 255))
-        d.text((pad, y), seg["title"], font=big, fill=TEXT + (255,))
-        d.rectangle([pad, y + 82, pad + 120, y + 85], fill=ACCENT + (255,))
-        d.text((pad, y + 105), seg["url"], font=url_font, fill=ACCENT + (255,))
-        d.text((pad, y + 160), seg["sub"], font=sub_font, fill=MUTED + (255,))
-
+    d.rectangle([0, IMGH, W, H], fill=(6, 10, 18, 255))
+    d.rectangle([0, IMGH, W, IMGH + 3], fill=ACCENT + (255,))
     d.rectangle([0, H - 8, int(W * (idx + 1) / total), H], fill=ACCENT + (255,))
     return bg, ov
+
+
+def split_captions(text, max_words=CAP_WORDS):
+    """Break narration into short caption pieces (sentence by sentence, long ones at commas/length)."""
+    pieces = []
+    for sent in split_sentences(text) or [text]:
+        words = sent.split()
+        if len(words) <= max_words:
+            pieces.append(sent)
+            continue
+        cur = []
+        for w in words:
+            cur.append(w)
+            if (len(cur) >= max_words // 2 and w.endswith((",", ";", ":"))) or len(cur) >= max_words:
+                pieces.append(" ".join(cur))
+                cur = []
+        if cur:
+            if pieces and len(cur) < 4:
+                pieces[-1] += " " + " ".join(cur)
+            else:
+                pieces.append(" ".join(cur))
+    return [p for p in pieces if p.strip()]
+
+
+def render_caption(text):
+    """Transparent W x H layer with the caption text drawn inside the band under the picture."""
+    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    d = ImageDraw.Draw(ov)
+    pad = 70
+    font, lines, lh = fit_text(d, text, W - 2 * pad, BANDH - 36, range(32, 21, -2))
+    y = IMGH + 3 + (BANDH - 3 - len(lines) * lh) // 2 - 4
+    for ln in lines:
+        w = d.textlength(ln, font=font)
+        d.text(((W - w) / 2, y), ln, font=font, fill=TEXT + (255,))
+        y += lh
+    return ov
+
+
+def caption_timings(speech, dur):
+    pieces = split_captions(speech)
+    weights = [max(1, len(p.split())) for p in pieces]
+    total = float(sum(weights))
+    out, t = [], 0.0
+    for p, w in zip(pieces, weights):
+        span = dur * w / total
+        out.append((p, t, t + span))
+        t += span
+    return out
 
 
 async def _edge_synth(text, out):
@@ -309,23 +326,36 @@ def probe_duration(path):
 MOTIONS = [(0.0, 1.0, 0.0, 1.0), (1.0, 0.0, 1.0, 0.0), (1.0, 0.0, 0.0, 1.0), (0.0, 1.0, 1.0, 0.0)]
 
 
-def make_clip(bg_png, ov_png, mp3, out, motion=0, pad=0.7, vkbps=900):
+def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900):
+    """caps: list of (caption_png, start, end). Captions appear only in the band under the picture."""
     dur = probe_duration(mp3) + pad
     rx, ry = BGW - CROPW, BGH - CROPH
     x0, x1, y0, y1 = MOTIONS[motion % len(MOTIONS)]
     xe = f"{x0 * rx:.1f}+({(x1 - x0) * rx:.1f})*t/{dur:.2f}"
     ye = f"{y0 * ry:.1f}+({(y1 - y0) * ry:.1f})*t/{dur:.2f}"
     ow, oh = (960, 540) if vkbps < 450 else (W, H)
-    fc = (f"[0:v]crop={CROPW}:{CROPH}:x='{xe}':y='{ye}',scale={W}:{H}:flags=bicubic,setsar=1[bg];"
-          f"[bg][1:v]overlay=format=auto,scale={ow}:{oh}:flags=bicubic,fade=t=in:st=0:d=0.35,"
-          f"fade=t=out:st={max(dur - 0.35, 0):.2f}:d=0.35,format=yuv420p[v]")
-    run(["ffmpeg", "-y", "-loop", "1", "-framerate", str(FPS), "-i", str(bg_png),
-         "-loop", "1", "-framerate", str(FPS), "-i", str(ov_png), "-i", str(mp3),
-         "-filter_complex", fc, "-map", "[v]", "-map", "2:a", "-t", f"{dur:.2f}",
-         "-af", f"apad=pad_dur={pad}",
-         "-c:v", "libx264", "-preset", "veryfast", "-b:v", f"{vkbps}k",
-         "-maxrate", f"{int(vkbps * 1.25)}k", "-bufsize", f"{vkbps * 2}k", "-r", str(FPS),
-         "-c:a", "aac", "-b:a", "40k", "-ar", "24000", "-ac", "1", str(out)])
+    fc = (f"[0:v]crop={CROPW}:{CROPH}:x='{xe}':y='{ye}',scale={W}:{IMGH}:flags=bicubic,"
+          f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
+          f"[v0][1:v]overlay=format=auto[v1];")
+    last = "v1"
+    for k, (_, t0, t1) in enumerate(caps):
+        t1 = dur + 1 if k == len(caps) - 1 else t1
+        nxt = f"v{k + 2}"
+        fc += (f"[{last}][{k + 3}:v]overlay=format=auto:"
+               f"enable='between(t,{t0:.2f},{t1:.2f})'[{nxt}];")
+        last = nxt
+    fc += (f"[{last}]scale={ow}:{oh}:flags=bicubic,fade=t=in:st=0:d=0.35,"
+           f"fade=t=out:st={max(dur - 0.35, 0):.2f}:d=0.35,format=yuv420p[v]")
+    cmd = ["ffmpeg", "-y", "-loop", "1", "-framerate", str(FPS), "-i", str(bg_png),
+           "-loop", "1", "-framerate", str(FPS), "-i", str(ov_png), "-i", str(mp3)]
+    for png, _, _ in caps:
+        cmd += ["-loop", "1", "-framerate", str(FPS), "-i", str(png)]
+    cmd += ["-filter_complex", fc, "-map", "[v]", "-map", "2:a", "-t", f"{dur:.2f}",
+            "-af", f"apad=pad_dur={pad}",
+            "-c:v", "libx264", "-preset", "veryfast", "-b:v", f"{vkbps}k",
+            "-maxrate", f"{int(vkbps * 1.25)}k", "-bufsize", f"{vkbps * 2}k", "-r", str(FPS),
+            "-c:a", "aac", "-b:a", "40k", "-ar", "24000", "-ac", "1", str(out)]
+    run(cmd)
     return dur
 
 
@@ -466,7 +496,13 @@ def build_video(job):
         bg_img, ov_img = render_layers(seg, i, len(segs), cover)
         bg_img.save(bgp)
         ov_img.save(ovp)
-        total_dur += make_clip(bgp, ovp, mp3s[i], clip, i, vkbps=vkbps)
+        spoken = probe_duration(mp3s[i])
+        caps = []
+        for k, (txt, t0, t1) in enumerate(caption_timings(seg["speech"], spoken)):
+            cp = tmp / f"cap{i}_{k}.png"
+            render_caption(txt).save(cp)
+            caps.append((cp, t0, t1))
+        total_dur += make_clip(bgp, ovp, mp3s[i], clip, caps, i, vkbps=vkbps)
         clips.append(clip)
         bgp.unlink()
         if (i + 1) % 10 == 0 or i + 1 == len(segs):
