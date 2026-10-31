@@ -1,6 +1,6 @@
 {
-  "jobId": "1793411824095",
-  "createdAt": "2026-10-31T01:57:04.095Z",
+  "jobId": "1793411847826",
+  "createdAt": "2026-10-31T01:57:27.826Z",
   "title": "China Market Collapse: AI Boom's $2.4 Trillion Reckoning",
   "author": "Glenn Junsay Pansensoy",
   "category": "Global Politics",
@@ -22,5 +22,5 @@
   "slug": "china-market-collapse-ai-boom-s-2-4-trillion-reckoning",
   "articleId": 20,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793411819089.jpg",
-  "force": false
+  "force": true
 }
