@@ -42,6 +42,7 @@ CF_API_TOKEN = os.environ.get("CF_API_TOKEN") or os.environ.get("CLOUDFLARE_API_
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
 RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
+ONLY_JOB = os.environ.get("ONLY_JOB", "").strip().lower()      # e.g. "philippines" = only job files whose name contains this
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
 RUN_START = time.time()
 RUN_BUDGET = float(os.environ.get("MAX_RUN_MINUTES", "100")) * 60   # keep under the workflow timeout
@@ -418,21 +419,41 @@ def load_photos(job):
 _SKIP_TITLE = re.compile(r"logo|flag|coat of arms|icon|signature|seal of|locator|stub|banner|diagram|chart|graph|screenshot", re.I)
 
 
+_CAP_STOP = {"The", "This", "That", "These", "Those", "When", "Where", "While", "With", "Without", "Many", "Some",
+             "Most", "Their", "There", "They", "Then", "Than", "What", "Which", "Who", "How", "Why", "Because", "Although",
+             "However", "Also", "Even", "Each", "Every", "From", "Into", "Over", "After", "Before", "During", "Between",
+             "Such", "Both", "Other", "Another", "Today", "Still", "Yet", "And", "But", "For", "Not", "Its", "Our", "Your"}
+
+
 def wiki_queries(job):
     title = clean_text(job.get("title"))
     main = re.split(r"[:\u2013\u2014(]", title)[0].strip() or title
-    words = re.findall(r"[A-Za-z][A-Za-z'-]+", main)
     stop = {"the", "a", "an", "of", "in", "on", "and", "to", "for", "with", "is", "are", "how", "why", "what"}
-    key = [w for w in words if w.lower() not in stop][:6]
+    key = [w for w in re.findall(r"[A-Za-z][A-Za-z'-]+", main) if w.lower() not in stop][:6]
+    cat = clean_text(job.get("category"))
+    body = clean_text(job.get("body"))
+    counts = {}
+    for w in re.findall(r"\b[A-Z][a-z]{3,}\b", body):
+        if w not in _CAP_STOP:
+            counts[w] = counts.get(w, 0) + 1
+    nouns = [w for w, c in sorted(counts.items(), key=lambda x: -x[1]) if c >= 3][:4]
     qs = []
     if key:
-        qs.append(" ".join(key))
-    cat = clean_text(job.get("category"))
+        qs.append(" ".join(key[:4]))
+    if len(key) > 2:
+        qs.append(" ".join(key[:2]))
+    for n in nouns[:3]:
+        qs.append(n)
+    if len(nouns) >= 2:
+        qs.append(f"{nouns[0]} {nouns[1]}")
     if cat and key:
-        qs.append(" ".join(key[:3]) + " " + cat)
-    if len(key) > 3:
-        qs.append(" ".join(key[:3]))
-    return qs[:3]
+        qs.append(f"{key[0]} {cat}")
+    seen, out = set(), []
+    for q in qs:
+        if q.lower() not in seen:
+            seen.add(q.lower())
+            out.append(q)
+    return out[:6]
 
 
 def wiki_search(query, limit=20):
@@ -469,7 +490,9 @@ def load_wiki_photos(job, have):
     found, seen = [], set()
     for q in wiki_queries(job):
         try:
-            for item in wiki_search(q):
+            got = wiki_search(q)
+            log(f"  Wikimedia search '{q}': {len(got)} usable result(s)")
+            for item in got:
                 if item["url"] and item["url"] not in seen:
                     seen.add(item["url"])
                     found.append(item)
@@ -488,6 +511,21 @@ def load_wiki_photos(job, have):
                            f'({item["license"] or "see page"}) {item["page"]}')
     log(f"  {len(photos)} photograph(s) added from Wikimedia Commons (searched: {', '.join(wiki_queries(job))})")
     return photos
+
+
+def make_variants(img, n=5):
+    """When there are too few different pictures, cut different framings out of the one we have,
+    so the background still changes from slide to slide."""
+    w, h = img.size
+    out = []
+    spots = [(0.0, 0.0), (1.0, 0.0), (0.0, 1.0), (1.0, 1.0), (0.5, 0.5), (0.5, 0.0), (0.5, 1.0)]
+    for i in range(n):
+        fx, fy = spots[i % len(spots)]
+        cw, ch = int(w * 0.62), int(h * 0.62)
+        x0, y0 = int((w - cw) * fx), int((h - ch) * fy)
+        crop = img.crop((x0, y0, x0 + cw, y0 + ch)).resize((w, h), Image.LANCZOS)
+        out.append(crop)
+    return out
 
 
 STYLE = ("documentary photograph, cinematic lighting, muted natural colors, "
@@ -583,6 +621,9 @@ def build_video(job):
     CREDITS.clear()
     photos = load_photos(job)
     photos += load_wiki_photos(job, len(photos))
+    if photos and len(photos) < 4:
+        log(f"  only {len(photos)} different picture(s) found; adding different framings of the first one")
+        photos = photos + make_variants(photos[0], 6)
     ai = make_ai_images(segs, job)
     body_total = sum(1 for g in segs if g["kind"] == "body")
 
@@ -900,6 +941,9 @@ def main():
         log("ADMIN_KEY is not set. Add it under Settings > Secrets and variables > Actions.")
         return 1
     files = sorted(Path(p) for p in glob.glob(str(JOBS_DIR / "*.json")))
+    if ONLY_JOB:
+        files = [f for f in files if ONLY_JOB in f.name.lower()]
+        log(f"Only making jobs whose file name contains '{ONLY_JOB}': {[f.name for f in files] or 'none found'}")
     if not files:
         log("No video jobs found.")
         return 0
