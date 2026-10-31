@@ -34,8 +34,8 @@ jobs:
       - name: Make videos for pending jobs
         env:
           ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: python scripts/make_article_video.py
 
       - name: Keep a downloadable copy of the video
