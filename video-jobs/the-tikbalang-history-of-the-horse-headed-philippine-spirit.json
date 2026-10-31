@@ -1,6 +1,6 @@
 {
-  "jobId": "1793481639185",
-  "createdAt": "2026-10-31T21:20:39.185Z",
+  "jobId": "1793481653842",
+  "createdAt": "2026-10-31T21:20:53.842Z",
   "title": "The Tikbalang: History of the Horse-Headed Philippine Spirit",
   "author": "Glenn Junsay Pansensoy",
   "category": "Culture",
@@ -14,5 +14,5 @@
   "slug": "the-tikbalang-history-of-the-horse-headed-philippine-spirit",
   "articleId": 24,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793481634659.jpg",
-  "force": false
+  "force": true
 }
