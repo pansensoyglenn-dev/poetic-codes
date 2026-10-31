@@ -17,15 +17,15 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
-IMGH = 540                      
+IMGH = 540                      # picture area; the caption band sits underneath it
 BANDH = H - IMGH
-CROPW, CROPH = 2000, 844        
-ZOOM = float(os.environ.get("ZOOM", "0.10"))      
-GRAIN = int(os.environ.get("GRAIN", "2"))          
+CROPW, CROPH = 2000, 844        # same aspect as W x IMGH
+ZOOM = float(os.environ.get("ZOOM", "0.10"))      # slow push-in / pull-out strength (0 = off)
+GRAIN = int(os.environ.get("GRAIN", "2"))          # light film grain (0 = off; keep low, grain costs bitrate)
 VIGNETTE = os.environ.get("VIGNETTE", "1") != "0"
 CAP_WORDS = int(os.environ.get("CAP_WORDS", "20"))
 MAX_MB = float(os.environ.get("MAX_MB", "45"))
-MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "0"))  
+MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "0"))  # 0 = never slow the voice down to pad length
 WPM = 155.0
 
 JOBS_DIR = Path(os.environ.get("JOBS_DIR", "video-jobs"))
@@ -44,9 +44,13 @@ RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
 RUN_START = time.time()
-RUN_BUDGET = float(os.environ.get("MAX_RUN_MINUTES", "100")) * 60   
-IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "480"))     
-IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))         
+RUN_BUDGET = float(os.environ.get("MAX_RUN_MINUTES", "100")) * 60   # keep under the workflow timeout
+IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "480"))     # max time spent generating pictures per video
+WIKI_IMAGES = os.environ.get("WIKI_IMAGES", "1") != "0"             # real photos from Wikimedia Commons
+WIKI_MAX = int(os.environ.get("WIKI_MAX", "12"))
+UA = "article-video-bot/1.0 (https://poetic-codes.pages.dev; GitHub Actions)"
+CREDITS = []                                                         # filled while building a video
+IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))         # stop generating after this many failures in a row
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
 
@@ -349,7 +353,7 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900):
         fx = x0 + (x1 - x0) * 0.0
         px = f"on/{nfr}" if x1 > x0 else f"(1-on/{nfr})"
         py = f"on/{nfr}" if y1 > y0 else f"(1-on/{nfr})"
-        wide_h = int(BGW * IMGH / W) // 2 * 2          
+        wide_h = int(BGW * IMGH / W) // 2 * 2          # 2560 x 1080 strip, same aspect as the picture area
         vr = BGH - wide_h
         ye2 = f"{y0 * vr:.1f}+({(y1 - y0) * vr:.1f})*t/{dur:.2f}"
         pic = (f"[0:v]crop={BGW}:{wide_h}:x=0:y='{ye2}',"
@@ -389,7 +393,7 @@ def load_cover(url):
     if not url or not str(url).startswith("http"):
         return None
     try:
-        r = requests.get(url, timeout=60)
+        r = requests.get(url, timeout=60, headers={"User-Agent": UA})
         r.raise_for_status()
         return Image.open(BytesIO(r.content)).convert("RGB")
     except Exception as e:
@@ -408,6 +412,81 @@ def load_photos(job):
         if img is not None and img.width >= 400 and img.height >= 250:
             photos.append(img)
     log(f"  {len(photos)} photograph(s) available for the background")
+    return photos
+
+
+_SKIP_TITLE = re.compile(r"logo|flag|coat of arms|icon|signature|seal of|locator|stub|banner|diagram|chart|graph|screenshot", re.I)
+
+
+def wiki_queries(job):
+    title = clean_text(job.get("title"))
+    main = re.split(r"[:\u2013\u2014(]", title)[0].strip() or title
+    words = re.findall(r"[A-Za-z][A-Za-z'-]+", main)
+    stop = {"the", "a", "an", "of", "in", "on", "and", "to", "for", "with", "is", "are", "how", "why", "what"}
+    key = [w for w in words if w.lower() not in stop][:6]
+    qs = []
+    if key:
+        qs.append(" ".join(key))
+    cat = clean_text(job.get("category"))
+    if cat and key:
+        qs.append(" ".join(key[:3]) + " " + cat)
+    if len(key) > 3:
+        qs.append(" ".join(key[:3]))
+    return qs[:3]
+
+
+def wiki_search(query, limit=20):
+    r = requests.get(
+        "https://commons.wikimedia.org/w/api.php",
+        params={"action": "query", "format": "json", "generator": "search", "gsrsearch": query,
+                "gsrnamespace": 6, "gsrlimit": limit, "prop": "imageinfo",
+                "iiprop": "url|size|mime|extmetadata", "iiurlwidth": 1600},
+        headers={"User-Agent": UA}, timeout=30)
+    r.raise_for_status()
+    pages = (r.json().get("query") or {}).get("pages") or {}
+    out = []
+    for p in sorted(pages.values(), key=lambda x: x.get("index", 0)):
+        info = (p.get("imageinfo") or [{}])[0]
+        if info.get("mime") not in ("image/jpeg", "image/png"):
+            continue
+        if info.get("width", 0) < 1000 or info.get("height", 0) < 500:
+            continue
+        title = p.get("title", "")
+        if _SKIP_TITLE.search(title):
+            continue
+        meta = info.get("extmetadata") or {}
+        lic = (meta.get("LicenseShortName") or {}).get("value", "")
+        artist = clean_text((meta.get("Artist") or {}).get("value", ""))[:80]
+        out.append({"url": info.get("thumburl") or info.get("url"), "title": title,
+                    "license": lic, "artist": artist, "page": info.get("descriptionurl", "")})
+    return out
+
+
+def load_wiki_photos(job, have):
+    """Real photographs/paintings from Wikimedia Commons for the essay's topic. Returns PIL images."""
+    if not WIKI_IMAGES or WIKI_MAX <= 0:
+        return []
+    found, seen = [], set()
+    for q in wiki_queries(job):
+        try:
+            for item in wiki_search(q):
+                if item["url"] and item["url"] not in seen:
+                    seen.add(item["url"])
+                    found.append(item)
+        except Exception as e:
+            log(f"  Wikimedia search failed for '{q}' ({str(e)[:80]})")
+        if len(found) >= WIKI_MAX * 2:
+            break
+    photos = []
+    for item in found:
+        if len(photos) >= WIKI_MAX:
+            break
+        img = load_cover(item["url"])
+        if img is not None and img.width >= 800 and img.height >= 400:
+            photos.append(img)
+            CREDITS.append(f'{item["title"].replace("File:", "")} - {item["artist"] or "unknown"} '
+                           f'({item["license"] or "see page"}) {item["page"]}')
+    log(f"  {len(photos)} photograph(s) added from Wikimedia Commons (searched: {', '.join(wiki_queries(job))})")
     return photos
 
 
@@ -430,9 +509,16 @@ def gen_image_cloudflare(prompt):
         headers={"Authorization": f"Bearer {CF_API_TOKEN}"},
         json={"prompt": prompt[:1900], "steps": 4}, timeout=60,
     )
-    r.raise_for_status()
+    if not r.ok:
+        raise RuntimeError(f"Cloudflare HTTP {r.status_code}: {(r.text or '')[:250]}")
     import base64
-    return _from_bytes(base64.b64decode(r.json()["result"]["image"]))
+    data = r.json()
+    if not data.get("success", True) or not (data.get("result") or {}).get("image"):
+        raise RuntimeError(f"Cloudflare gave no image: {str(data)[:250]}")
+    return _from_bytes(base64.b64decode(data["result"]["image"]))
+
+
+LAST_IMG_ERROR = [""]
 
 
 def gen_image(prompt, seed):
@@ -442,8 +528,8 @@ def gen_image(prompt, seed):
                 img = fn()
                 if img is not None:
                     return img
-            except Exception:
-                pass
+            except Exception as e:
+                LAST_IMG_ERROR[0] = str(e)[:300]
         time.sleep(2 * (attempt + 1))
     return None
 
@@ -469,6 +555,8 @@ def make_ai_images(segs, job):
         if time.time() - t_start > IMG_BUDGET or fails >= IMG_FAIL_LIMIT:
             log(f"  picture generation stopped at {j}/{k} "
                 f"({'time budget' if fails < IMG_FAIL_LIMIT else 'too many failures'}); using the rest as photos")
+            if LAST_IMG_ERROR[0]:
+                log(f"  last picture error: {LAST_IMG_ERROR[0]}")
             out.extend([None] * (k - j))
             break
         img = gen_image(prompt, 1000 + j * 7)
@@ -492,7 +580,9 @@ def build_video(job):
     RATE = pick_rate(segs)
     log(f"  {len(segs)} slides, narration rate {RATE}")
     tmp = Path(tempfile.mkdtemp(prefix="vid_"))
+    CREDITS.clear()
     photos = load_photos(job)
+    photos += load_wiki_photos(job, len(photos))
     ai = make_ai_images(segs, job)
     body_total = sum(1 for g in segs if g["kind"] == "body")
 
@@ -783,6 +873,8 @@ def process_job(path):
         fname = f"{slugify(title)[:60]}-video-{str(job.get('jobId', ''))[-6:]}.mp4"
         Path("out").mkdir(exist_ok=True)
         shutil.copy(final, Path("out") / fname)
+        if CREDITS:
+            (Path("out") / (fname + ".credits.txt")).write_text("\n".join(CREDITS), encoding="utf-8")
         url = upload_video(final, fname)
         log(f"  uploaded: {url}")
         attached = False
@@ -791,7 +883,7 @@ def process_job(path):
             attached = True
             log(f"  attached to article #{row['id']}")
         write_marker(name, {"jobId": job.get("jobId"), "status": "done", "title": title,
-                            "videoUrl": url, "attached": attached, "engine": engine,
+                            "videoUrl": url, "attached": attached, "engine": engine, "credits": CREDITS[:30],
                             "seconds": round(dur)})
         return "done"
 
