@@ -1,6 +1,6 @@
 {
-  "jobId": "1793497773613",
-  "createdAt": "2026-11-01T01:49:33.613Z",
+  "jobId": "1793497787718",
+  "createdAt": "2026-11-01T01:49:47.718Z",
   "title": "Salt and Sea: Iloilo's Pre-Colonial Trade",
   "author": "Glenn Junsay Pansensoy",
   "category": "History",
@@ -21,5 +21,5 @@
   "slug": "salt-and-sea-iloilo-s-pre-colonial-trade",
   "articleId": 25,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793497768944.jpg",
-  "force": false
+  "force": true
 }
