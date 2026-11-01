@@ -1,6 +1,6 @@
 {
-  "jobId": "1793512736930",
-  "createdAt": "2026-11-01T05:58:56.930Z",
+  "jobId": "1793512818701",
+  "createdAt": "2026-11-01T06:00:18.701Z",
   "title": "El Nido on ₱2,500 a Day: Budget Guide",
   "author": "Glenn Junsay Pansensoy",
   "category": "Culture",
@@ -22,5 +22,5 @@
   "slug": "el-nido-on-2-500-a-day-budget-guide",
   "articleId": 28,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793512731600.jpg",
-  "force": false
+  "force": true
 }
