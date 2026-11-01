@@ -1,6 +1,6 @@
 {
-  "jobId": "1793504803722",
-  "createdAt": "2026-11-01T03:46:43.722Z",
+  "jobId": "1793504833869",
+  "createdAt": "2026-11-01T03:47:13.869Z",
   "title": "AI and Water: The Hidden Cost of Creativity",
   "author": "Glenn Junsay Pansensoy",
   "category": "AI",
@@ -21,5 +21,5 @@
   "slug": "ai-and-water-the-hidden-cost-of-creativity",
   "articleId": 26,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793504798618.jpg",
-  "force": false
+  "force": true
 }
