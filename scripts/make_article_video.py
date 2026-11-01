@@ -36,7 +36,7 @@ VIDEO_URL_API = os.environ.get("VIDEO_URL_API", "https://poetic-codes.vercel.app
 UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/upload")
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 AI_IMAGES = os.environ.get("AI_IMAGES", "1") != "0"
-AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "24"))
+AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "12"))  # keeps a video inside Cloudflare's free daily allowance
 CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID") or os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
 CF_API_TOKEN = os.environ.get("CF_API_TOKEN") or os.environ.get("CLOUDFLARE_API_TOKEN", "")
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
@@ -53,6 +53,8 @@ WIKI_IMAGES = os.environ.get("WIKI_IMAGES", "1") != "0"
 WIKI_MAX = int(os.environ.get("WIKI_MAX", "12"))
 UA = "article-video-bot/1.0 (https://poetic-codes.pages.dev; GitHub Actions)"
 CREDITS = []
+CREDIT_ROWS = []
+QUOTA_HIT = [False]
 IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
@@ -62,7 +64,7 @@ KLING_ENABLED = os.environ.get("KLING_ENABLED", "0") == "1"
 KLING_API_KEY = os.environ.get("KLING_API_KEY", "") or os.environ.get("FAL_KEY", "") or os.environ.get("PIAPI_API_KEY", "")
 KLING_PROVIDER = os.environ.get("KLING_PROVIDER", "fal").strip().lower()  # fal | piapi | aimlapi
 KLING_MAX_CLIPS = int(os.environ.get("KLING_MAX_CLIPS", "12"))
-KLING_DURATION = int(os.environ.get("KLING_DURATION", "5"))  # 3–10 typical
+KLING_DURATION = int(os.environ.get("KLING_DURATION", "5"))  # 5-10 typical
 KLING_MODEL = os.environ.get("KLING_MODEL", "")  # provider-specific override
 KLING_BUDGET = float(os.environ.get("KLING_BUDGET_SECONDS", "600"))  # max wall time on Kling calls
 KLING_NEG = os.environ.get(
@@ -439,12 +441,15 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_
         ov_idx = 2
         mp3_idx = 3
         cap_base = 4
+        # Crossfade in the middle third so characters appear to shift/move.
+        # Clamp so offset + fade length always fits inside the clip (short clips).
+        fade_dur = min(1.2, max(0.6, dur * 0.28), dur * 0.5)
+        fade_off = max(0.0, min(dur * 0.32, dur - fade_dur - 0.1))
         fc = (
             pic_chain(0, "p0") + ";" +
             pic_chain(1, "p1") + ";" +
-            # Crossfade in the middle third so characters appear to shift/move
-            f"[p0][p1]xfade=transition=fade:duration={min(1.2, max(0.6, dur * 0.28)):.2f}:"
-            f"offset={max(0.4, dur * 0.32):.2f},fade=t=in:st=0:d=0.5,"
+            f"[p0][p1]xfade=transition=fade:duration={fade_dur:.2f}:"
+            f"offset={fade_off:.2f},fade=t=in:st=0:d=0.5,"
             f"fade=t=out:st={max(dur - 0.5, 0):.2f}:d=0.5,"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
@@ -485,8 +490,6 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_
     ]
     run(cmd)
     return dur
-
-
 
 
 def load_cover(url):
@@ -609,6 +612,7 @@ def load_wiki_photos(job, have):
             photos.append(img)
             CREDITS.append(f'{item["title"].replace("File:", "")} - {item["artist"] or "unknown"} '
                            f'({item["license"] or "see page"}) {item["page"]}')
+            CREDIT_ROWS.append((item["artist"], item["license"]))
     log(f"  {len(photos)} photograph(s) added from Wikimedia Commons (searched: {', '.join(wiki_queries(job))})")
     return photos
 
@@ -647,12 +651,11 @@ def visual_focus(text):
     if not t:
         return "people in a real historical scene, mid-action"
     # Prefer clauses with people/action verbs
-    lower = t.lower()
     sentences = re.split(r"(?<=[.!?])\s+", t)
     best = sentences[0] if sentences else t
     for s in sentences:
         sl = s.lower()
-        if any(h in sl for h in MOTIONif any(h in sl for h in MOTION_HINTS) or re.search(
+        if any(h in sl for h in MOTION_HINTS) or re.search(
             r"\b(man|men|woman|women|child|children|people|worker|farmers?|fishermen|"
             r"traders?|soldiers?|family|crowd|villagers?)\b", sl
         ):
@@ -711,6 +714,9 @@ def gen_image_cloudflare(prompt):
         json={"prompt": prompt[:1900], "steps": 4}, timeout=60,
     )
     if not r.ok:
+        low = (r.text or "").lower()
+        if r.status_code == 429 or "neurons" in low or "quota" in low or "daily" in low:
+            QUOTA_HIT[0] = True
         raise RuntimeError(f"Cloudflare HTTP {r.status_code}: {(r.text or '')[:250]}")
     import base64
     data = r.json()
@@ -724,6 +730,8 @@ LAST_IMG_ERROR = [""]
 
 def gen_image(prompt, seed=0):
     for attempt in range(2):
+        if QUOTA_HIT[0]:
+            return None
         try:
             img = gen_image_cloudflare(prompt)
             if img is not None:
@@ -780,6 +788,10 @@ def make_ai_images(segs, job):
             if not segs[nxt].get("is_heading"):
                 seg = segs[nxt]
         prompt = scene_prompt(seg, job)
+        if QUOTA_HIT[0]:
+            log(f"  Cloudflare free quota reached at {j}/{k}; using photos for the rest (no further calls)")
+            out.extend([None] * (k - j))
+            break
         if time.time() - t_start > IMG_BUDGET or fails >= IMG_FAIL_LIMIT:
             log(f"  picture generation stopped at {j}/{k} "
                 f"({'time budget' if fails < IMG_FAIL_LIMIT else 'too many failures'}); using the rest as photos")
@@ -797,12 +809,9 @@ def make_ai_images(segs, job):
     return out
 
 
-
-
 def pick_bitrate(total_dur):
     total_kbits = MAX_MB * 8192 * 0.92
     return int(max(120, min(1200, total_kbits / max(total_dur, 1.0) - 40)))
-
 
 
 def motion_prompt(seg, job):
@@ -972,7 +981,7 @@ def _kling_piapi(image_uri, prompt, duration, out_mp4):
 
 
 def _kling_aimlapi(image_uri, prompt, duration, out_mp4):
-    """AIMLAPI Kling 4.0 image-to-video."""
+    """AIMLAPI Kling image-to-video."""
     headers = {"Authorization": f"Bearer {KLING_API_KEY}", "Content-Type": "application/json"}
     model = KLING_MODEL or "kling-video/v4/image-to-video"
     payload = {
@@ -1018,7 +1027,8 @@ def gen_kling_clip(img, prompt, duration, out_mp4):
         return None
     if img is None:
         return None
-    duration = int(min(10, max(3, duration or KLING_DURATION)))
+    # fal and piapi both need at least 5s, so clamp here to match what you'll be billed for
+    duration = int(min(10, max(5, duration or KLING_DURATION)))
     image_uri = _image_to_data_uri(img)
     providers = {
         "fal": _kling_fal,
@@ -1062,9 +1072,6 @@ def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
             f"fade=t=in:st=0:d=0.4,fade=t=out:st={max(dur - 0.4, 0):.2f}:d=0.4,"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
-    if VIGNETTE:
-        # vignette only on the picture region is hard after pad; light whole-frame is ok
-        pass
     fc = vchain + "[v0][1:v]overlay=format=auto[v1];"
     last = "v1"
     for k, (_, t0, t1) in enumerate(caps):
@@ -1098,7 +1105,6 @@ def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
     return dur
 
 
-
 def build_video(job):
     global RATE
     segs = build_segments(job)
@@ -1106,8 +1112,25 @@ def build_video(job):
     log(f"  {len(segs)} slides, narration rate {RATE}")
     tmp = Path(tempfile.mkdtemp(prefix="vid_"))
     CREDITS.clear()
+    CREDIT_ROWS.clear()
+    QUOTA_HIT[0] = False
     photos = load_photos(job)
     photos += load_wiki_photos(job, len(photos))
+    if CREDIT_ROWS:
+        # Visible attribution for CC-BY / CC-BY-SA images: a short spoken and captioned card before the end card.
+        seen, bits = set(), []
+        for artist, lic in CREDIT_ROWS:
+            who = re.sub(r"\s+", " ", artist or "").strip()[:40] or "unknown author"
+            key = (who.lower(), lic)
+            if key in seen:
+                continue
+            seen.add(key)
+            bits.append(f"{who}, {lic}" if lic else who)
+            if len(bits) >= 8:
+                break
+        credit_speech = ("Photographs courtesy of Wikimedia Commons. Credits: " + "; ".join(bits)
+                         + ". Full credits are in the video description.")
+        segs.insert(len(segs) - 1, {"kind": "credits", "speech": credit_speech})
     if photos and len(photos) < 4:
         log(f"  only {len(photos)} different picture(s) found; adding different framings of the first one")
         photos = photos + make_variants(photos[0], 6)
@@ -1171,7 +1194,7 @@ def build_video(job):
         ):
             mprompt = motion_prompt(seg, job)
             # Match clip length to narration (clamped)
-            kdur = int(min(10, max(3, round(spoken) or KLING_DURATION)))
+            kdur = int(min(10, max(5, round(spoken) or KLING_DURATION)))
             got = gen_kling_clip(cover, mprompt, kdur, kling_mp4)
             if got and Path(got).exists() and Path(got).stat().st_size > 5000:
                 total_dur += make_clip_from_video(got, ovp, mp3s[i], clip, caps, vkbps=vkbps)
@@ -1182,10 +1205,9 @@ def build_video(job):
         if not used_kling:
             bg2_path = None
             if frame_b is not None and frame_a is not frame_b:
-                bg2 = ImageOps.fit(frame_b, (BGW, BGH), Image.LANCZOS) if frame_b else None
-                if bg2 is not None:
-                    bg2.save(bgp2)
-                    bg2_path = bgp2
+                bg2 = ImageOps.fit(frame_b, (BGW, BGH), Image.LANCZOS)
+                bg2.save(bgp2)
+                bg2_path = bgp2
             total_dur += make_clip(bgp, ovp, mp3s[i], clip, caps, i, vkbps=vkbps, bg2_png=bg2_path)
             if bg2_path and Path(bg2_path).exists():
                 Path(bg2_path).unlink(missing_ok=True)
@@ -1310,7 +1332,7 @@ def upload_video(path, filename):
     try:
         try:
             url = upload_via_supabase(path, filename)
-            print(f"  uploaded to Supabase storage")
+            print("  uploaded to Supabase storage")
             return url
         except RuntimeError as e:
             if "401" in str(e)[:60]:
@@ -1361,7 +1383,8 @@ def existing_video(row):
 def attach_video(row, video_url):
     tags = row.get("tags") or []
     if isinstance(tags, str):
-        try:tags = json.loads(tags)
+        try:
+            tags = json.loads(tags)
         except Exception:
             tags = [t.strip() for t in tags.split(",") if t.strip()]
     body = row.get("content")
