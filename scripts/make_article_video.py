@@ -17,15 +17,15 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
-IMGH = 540                      # picture area; the caption band sits underneath it
+IMGH = 540
 BANDH = H - IMGH
-CROPW, CROPH = 2000, 844        # same aspect as W x IMGH
-ZOOM = float(os.environ.get("ZOOM", "0.10"))      # slow push-in / pull-out strength (0 = off)
-GRAIN = int(os.environ.get("GRAIN", "2"))          # light film grain (0 = off; keep low, grain costs bitrate)
+CROPW, CROPH = 2000, 844
+ZOOM = float(os.environ.get("ZOOM", "0.10"))
+GRAIN = int(os.environ.get("GRAIN", "2"))
 VIGNETTE = os.environ.get("VIGNETTE", "1") != "0"
 CAP_WORDS = int(os.environ.get("CAP_WORDS", "20"))
 MAX_MB = float(os.environ.get("MAX_MB", "45"))
-MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "0"))  # 0 = never slow the voice down to pad length
+MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "0"))
 WPM = 155.0
 
 JOBS_DIR = Path(os.environ.get("JOBS_DIR", "video-jobs"))
@@ -42,16 +42,18 @@ CF_API_TOKEN = os.environ.get("CF_API_TOKEN") or os.environ.get("CLOUDFLARE_API_
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
 RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
-ONLY_JOB = os.environ.get("ONLY_JOB", "").strip().lower()      # e.g. "philippines" = only job files whose name contains this
+SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "30"))
+INTRO_TITLE = os.environ.get("INTRO_TITLE", "1") != "0"
+ONLY_JOB = os.environ.get("ONLY_JOB", "").strip().lower()
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
 RUN_START = time.time()
-RUN_BUDGET = float(os.environ.get("MAX_RUN_MINUTES", "100")) * 60   # keep under the workflow timeout
-IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "480"))     # max time spent generating pictures per video
-WIKI_IMAGES = os.environ.get("WIKI_IMAGES", "1") != "0"             # real photos from Wikimedia Commons
+RUN_BUDGET = float(os.environ.get("MAX_RUN_MINUTES", "100")) * 60
+IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "480"))
+WIKI_IMAGES = os.environ.get("WIKI_IMAGES", "1") != "0"
 WIKI_MAX = int(os.environ.get("WIKI_MAX", "12"))
 UA = "article-video-bot/1.0 (https://poetic-codes.pages.dev; GitHub Actions)"
-CREDITS = []                                                         # filled while building a video
-IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))         # stop generating after this many failures in a row
+CREDITS = []
+IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
 
@@ -102,6 +104,27 @@ def clean_text(raw):
     return re.sub(r"\s+", " ", s).strip()
 
 
+def extract_main(raw):
+    s = raw or ""
+    s = re.sub(r"(?m)^\s*```[a-zA-Z]*\s*$", " ", s)
+    m = re.search(r"(?is)<main\b[^>]*>(.*)</main\s*>", s)
+    if m:
+        s = m.group(1)
+    else:
+        b = re.search(r"(?is)<body\b[^>]*>(.*)</body\s*>", s)
+        if b:
+            s = b.group(1)
+        s = re.sub(r"(?is)<head\b.*?</head>", " ", s)
+        for tag in ("header", "footer", "nav", "aside"):
+            s = re.sub(rf"(?is)<{tag}\b.*?</{tag}>", " ", s)
+        s = re.sub(r"(?is)<(div|section)\b[^>]*class=[\"'][^\"']*(ad-slot|footer|header|sidebar|nav)[^\"']*[\"'][^>]*>.*?</\1>", " ", s)
+
+    s = re.sub(r"(?is)<ins\b.*?</ins>", " ", s)
+    s = re.sub(r"(?is)<(header|footer|nav|aside)\b.*?</\1>", " ", s)
+    s = re.sub(r"(?is)<div\b[^>]*class=[\"'][^\"']*ad-slot[^\"']*[\"'][^>]*>.*?</div>", " ", s)
+    return s
+
+
 def split_sentences(text):
     parts = re.split(r"(?<=[.!?\u2026])\s+(?=[A-Z0-9\"\u201c\u2018(])", text)
     return [p.strip() for p in parts if len(p.strip()) > 2]
@@ -111,7 +134,9 @@ def slugify(s):
     return re.sub(r"(^-|-$)", "", re.sub(r"[^a-z0-9]+", "-", (s or "").lower())) or "article"
 
 
-def build_chunks(sentences, max_words):
+def build_chunks(sentences, budget, target=None):
+    target = target or SLIDE_WORDS
+    hard = int(target * 1.6)
     chunks, cur, cw, total = [], [], 0, 0
     for s in sentences:
         words = s.split()
@@ -121,26 +146,25 @@ def build_chunks(sentences, max_words):
         if w > 70:
             s = " ".join(words[:65]).rstrip(",;:") + "\u2026"
             w = 66
-        if total + w > max_words:
+        if total + w > budget:
             break
-        if cur and cw + w > 75:
+        if cur and cw + w > hard:
             chunks.append(" ".join(cur))
             cur, cw = [], 0
         cur.append(s)
         cw += w
         total += w
-        if cw >= 45:
+        if cw >= target:
             chunks.append(" ".join(cur))
             cur, cw = [], 0
     if cur:
         chunks.append(" ".join(cur))
-    return chunks[:150]
+    return chunks, total
 
 
 def build_segments(job):
     title = clean_text(job.get("title")) or "Untitled"
     excerpt = clean_text(job.get("excerpt"))
-    body = clean_text(job.get("body"))
     category = clean_text(job.get("category"))
     author = clean_text(job.get("author")) or "Glenn Junsay Pansensoy"
     sub = f"{category}  \u00b7  {author}" if category else author
@@ -150,12 +174,36 @@ def build_segments(job):
         speech += " " + excerpt
     segs = [{"kind": "title", "title": title, "sub": sub, "speech": speech}]
 
-    sentences = split_sentences(body)
-    if sentences and excerpt and sentences[0][:40].lower() == excerpt[:40].lower():
-        sentences = sentences[1:]
-    for chunk in build_chunks(sentences, MAX_WORDS):
-        segs.append({"kind": "body", "text": chunk, "speech": chunk})
+    main_html = extract_main(job.get("body"))
+    parts = re.split(r"(?is)(<h[1-3]\b[^>]*>.*?</h[1-3]>)", main_html)
+    budget, heading, first = MAX_WORDS, "", True
+    for part in parts:
+        if budget <= 0:
+            break
+        if re.match(r"(?is)<h[1-3]\b", part or ""):
+            h = clean_text(part)
+            if h and h.lower().rstrip(".!?") != title.lower().rstrip(".!?"):
+                heading = h
+                n = len(h.split())
+                if n >= 2 and n <= budget:
+                    segs.append({"kind": "body", "text": h, "speech": h.rstrip(".!?:;,") + ".",
+                                 "heading": h, "is_heading": True})
+                    budget -= n
+            continue
+        sentences = split_sentences(clean_text(part))
+        if first and sentences:
+            if excerpt and sentences[0][:40].lower() == excerpt[:40].lower():
+                sentences = sentences[1:]
+            first = False
+        chunks, used = build_chunks(sentences, budget)
+        budget -= used
+        for chunk in chunks:
+            segs.append({"kind": "body", "text": chunk, "speech": chunk, "heading": heading})
+        if len(segs) > 400:
+            break
 
+    if not INTRO_TITLE and len(segs) > 1:
+        segs = segs[1:]
     segs.append({
         "kind": "end",
         "title": "Read the full essay",
@@ -224,8 +272,6 @@ def draw_lines(d, lines, font, lh, x, y, fill):
 
 
 def render_layers(seg, idx, total, cover):
-    """Background picture (panned later) plus a base overlay holding only the caption band.
-    Nothing is drawn over the picture itself."""
     if cover is not None:
         bg = ImageOps.fit(cover, (BGW, BGH), Image.LANCZOS)
     else:
@@ -239,7 +285,6 @@ def render_layers(seg, idx, total, cover):
 
 
 def split_captions(text, max_words=CAP_WORDS):
-    """Break narration into short caption pieces (sentence by sentence, long ones at commas/length)."""
     pieces = []
     for sent in split_sentences(text) or [text]:
         words = sent.split()
@@ -261,7 +306,6 @@ def split_captions(text, max_words=CAP_WORDS):
 
 
 def render_caption(text):
-    """Transparent W x H layer with the caption text drawn inside the band under the picture."""
     ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     d = ImageDraw.Draw(ov)
     pad = 70
@@ -305,7 +349,6 @@ def pick_rate(segs):
 
 
 def synth(text, out_mp3):
-    """Narrate text to out_mp3. Returns the engine name used."""
     if TTS_FAKE:
         dur = max(1.5, len(text.split()) / 2.6)
         run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
@@ -339,14 +382,12 @@ MOTIONS = [(0.0, 1.0, 0.0, 1.0), (1.0, 0.0, 1.0, 0.0), (1.0, 0.0, 0.0, 1.0), (0.
 
 
 def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900):
-    """caps: list of (caption_png, start, end). Captions appear only in the band under the picture."""
     dur = probe_duration(mp3) + pad
     rx, ry = BGW - CROPW, BGH - CROPH
     x0, x1, y0, y1 = MOTIONS[motion % len(MOTIONS)]
     xe = f"{x0 * rx:.1f}+({(x1 - x0) * rx:.1f})*t/{dur:.2f}"
     ye = f"{y0 * ry:.1f}+({(y1 - y0) * ry:.1f})*t/{dur:.2f}"
     ow, oh = (960, 540) if vkbps < 450 else (W, H)
-    # picture chain: pan + slow zoom (zoompan) -> vignette -> grain -> soft dip fades (picture only)
     nfr = max(int(dur * FPS), 1)
     if ZOOM > 0:
         zin = motion % 2 == 0
@@ -354,7 +395,7 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900):
         fx = x0 + (x1 - x0) * 0.0
         px = f"on/{nfr}" if x1 > x0 else f"(1-on/{nfr})"
         py = f"on/{nfr}" if y1 > y0 else f"(1-on/{nfr})"
-        wide_h = int(BGW * IMGH / W) // 2 * 2          # 2560 x 1080 strip, same aspect as the picture area
+        wide_h = int(BGW * IMGH / W) // 2 * 2
         vr = BGH - wide_h
         ye2 = f"{y0 * vr:.1f}+({(y1 - y0) * vr:.1f})*t/{dur:.2f}"
         pic = (f"[0:v]crop={BGW}:{wide_h}:x=0:y='{ye2}',"
@@ -431,7 +472,7 @@ def wiki_queries(job):
     stop = {"the", "a", "an", "of", "in", "on", "and", "to", "for", "with", "is", "are", "how", "why", "what"}
     key = [w for w in re.findall(r"[A-Za-z][A-Za-z'-]+", main) if w.lower() not in stop][:6]
     cat = clean_text(job.get("category"))
-    body = clean_text(job.get("body"))
+    body = clean_text(extract_main(job.get("body")))
     counts = {}
     for w in re.findall(r"\b[A-Z][a-z]{3,}\b", body):
         if w not in _CAP_STOP:
@@ -484,7 +525,6 @@ def wiki_search(query, limit=20):
 
 
 def load_wiki_photos(job, have):
-    """Real photographs/paintings from Wikimedia Commons for the essay's topic. Returns PIL images."""
     if not WIKI_IMAGES or WIKI_MAX <= 0:
         return []
     found, seen = [], set()
@@ -514,8 +554,6 @@ def load_wiki_photos(job, have):
 
 
 def make_variants(img, n=5):
-    """When there are too few different pictures, cut different framings out of the one we have,
-    so the background still changes from slide to slide."""
     w, h = img.size
     out = []
     spots = [(0.0, 0.0), (1.0, 0.0), (0.0, 1.0), (1.0, 1.0), (0.5, 0.5), (0.5, 0.0), (0.5, 1.0)]
@@ -528,8 +566,9 @@ def make_variants(img, n=5):
     return out
 
 
-STYLE = ("documentary photograph, cinematic lighting, muted natural colors, "
-         "detailed, realistic, wide shot, no text, no letters, no watermark")
+STYLE = ("photorealistic documentary photograph, shot on a 35mm lens, natural light, realistic textures, "
+         "sharp focus, high detail, wide shot, not an illustration, not a painting, not a cartoon, "
+         "no text, no letters, no watermark")
 
 
 def _from_bytes(data):
@@ -572,6 +611,20 @@ def gen_image(prompt, seed):
     return None
 
 
+_SPOTS = [(0.0, 0.0), (1.0, 0.0), (0.0, 1.0), (1.0, 1.0), (0.5, 0.5), (0.5, 0.0), (0.5, 1.0)]
+
+
+def framing(img, k):
+    if k <= 0:
+        return img
+    w, h = img.size
+    frac = 0.78 if k % 2 else 0.64
+    cw, ch = int(w * frac), int(h * frac)
+    fx, fy = _SPOTS[(k - 1) % len(_SPOTS)]
+    x0, y0 = int((w - cw) * fx), int((h - ch) * fy)
+    return img.crop((x0, y0, x0 + cw, y0 + ch)).resize((w, h), Image.LANCZOS)
+
+
 def make_ai_images(segs, job):
     if not AI_IMAGES:
         return []
@@ -587,9 +640,10 @@ def make_ai_images(segs, job):
     out, fails, t_start = [], 0, time.time()
     for j in range(k):
         lo = j * len(body_idx) // k
-        text = segs[body_idx[lo]]["text"]
-        text = " ".join(text.split()[:35])
-        prompt = f"{STYLE}. Scene: {text} Theme: {title}. {category}."
+        rep = next((segs[x] for x in body_idx[lo:] if not segs[x].get("is_heading")), segs[body_idx[lo]])
+        subject = rep.get("heading") or title
+        scene = " ".join(rep["text"].split()[:28])
+        prompt = f"{subject}. {scene} ({title}, {category}). {STYLE}."
         if time.time() - t_start > IMG_BUDGET or fails >= IMG_FAIL_LIMIT:
             log(f"  picture generation stopped at {j}/{k} "
                 f"({'time budget' if fails < IMG_FAIL_LIMIT else 'too many failures'}); using the rest as photos")
@@ -636,15 +690,17 @@ def build_video(job):
     vkbps = pick_bitrate(est)
     log(f"  narration {est:.0f}s; video bitrate {vkbps} kbps to stay near {MAX_MB:.0f} MB")
 
-    clips, total_dur, body_seen = [], 0.0, 0
+    clips, total_dur, body_seen, ai_used = [], 0.0, 0, {}
     for i, seg in enumerate(segs):
         bgp, ovp, clip = tmp / f"b{i}.png", tmp / f"o{i}.png", tmp / f"c{i}.mp4"
-        cover = photos[i % len(photos)] if photos else None
+        cover = framing(photos[i % len(photos)], i // len(photos)) if photos else None
         if seg["kind"] == "body":
             if ai:
-                pic = ai[body_seen * len(ai) // max(body_total, 1)]
+                gi = body_seen * len(ai) // max(body_total, 1)
+                pic = ai[gi]
                 if pic is not None:
-                    cover = pic
+                    cover = framing(pic, ai_used.get(gi, 0))
+                    ai_used[gi] = ai_used.get(gi, 0) + 1
             body_seen += 1
         elif photos:
             cover = photos[0]
@@ -749,7 +805,6 @@ def _git(*args, check=True):
 
 
 def publish_to_repo(path, filename):
-    """Fallback: commit the MP4 into the repo under videos/ so the site serves it."""
     size_mb = os.path.getsize(path) / 1048576
     if size_mb > 95:
         raise RuntimeError(f"Video is {size_mb:.0f} MB, too big to store in the repo.")
