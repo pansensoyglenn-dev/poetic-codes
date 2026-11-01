@@ -1,6 +1,6 @@
 {
-  "jobId": "1793511175540",
-  "createdAt": "2026-11-01T05:32:55.540Z",
+  "jobId": "1793511189934",
+  "createdAt": "2026-11-01T05:33:09.934Z",
   "title": "After the Rain",
   "author": "Glenn Junsay Pansensoy",
   "category": "Culture",
@@ -13,5 +13,5 @@
   "slug": "after-the-rain",
   "articleId": 27,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793511174016.png",
-  "force": false
+  "force": true
 }
