@@ -20,7 +20,7 @@ BGW, BGH = 2560, 1440
 IMGH = 540
 BANDH = H - IMGH
 CROPW, CROPH = 2000, 844
-ZOOM = float(os.environ.get("ZOOM", "0.10"))
+ZOOM = float(os.environ.get("ZOOM", "0.18"))
 GRAIN = int(os.environ.get("GRAIN", "2"))
 VIGNETTE = os.environ.get("VIGNETTE", "1") != "0"
 CAP_WORDS = int(os.environ.get("CAP_WORDS", "20"))
@@ -56,6 +56,19 @@ CREDITS = []
 IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
+
+# Kling image-to-video (real character motion). Off by default — needs API key + budget.
+KLING_ENABLED = os.environ.get("KLING_ENABLED", "0") == "1"
+KLING_API_KEY = os.environ.get("KLING_API_KEY", "") or os.environ.get("FAL_KEY", "") or os.environ.get("PIAPI_API_KEY", "")
+KLING_PROVIDER = os.environ.get("KLING_PROVIDER", "fal").strip().lower()  # fal | piapi | aimlapi
+KLING_MAX_CLIPS = int(os.environ.get("KLING_MAX_CLIPS", "12"))
+KLING_DURATION = int(os.environ.get("KLING_DURATION", "5"))  # 3–10 typical
+KLING_MODEL = os.environ.get("KLING_MODEL", "")  # provider-specific override
+KLING_BUDGET = float(os.environ.get("KLING_BUDGET_SECONDS", "600"))  # max wall time on Kling calls
+KLING_NEG = os.environ.get(
+    "KLING_NEG",
+    "still photo, frozen pose, static image, text, watermark, logo, cartoon, illustration, low quality",
+)
 
 BG1, BG2 = (11, 15, 23), (22, 40, 66)
 ACCENT, TEXT, MUTED = (116, 185, 232), (238, 244, 255), (170, 196, 230)
@@ -378,10 +391,21 @@ def probe_duration(path):
     return float(p.stdout.decode().strip())
 
 
-MOTIONS = [(0.0, 1.0, 0.0, 1.0), (1.0, 0.0, 1.0, 0.0), (1.0, 0.0, 0.0, 1.0), (0.0, 1.0, 1.0, 0.0)]
+MOTIONS = [
+    (0.0, 1.0, 0.0, 1.0),
+    (1.0, 0.0, 1.0, 0.0),
+    (1.0, 0.0, 0.0, 1.0),
+    (0.0, 1.0, 1.0, 0.0),
+    (0.0, 1.0, 0.5, 0.5),
+    (1.0, 0.0, 0.5, 0.5),
+    (0.25, 0.75, 0.0, 1.0),
+    (0.75, 0.25, 1.0, 0.0),
+]
 
 
-def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900):
+def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_png=None):
+    """Animate a still (or pair of stills) so the picture feels alive while narration plays.
+    When bg2_png is set, crossfade between two related frames to imply character movement."""
     dur = probe_duration(mp3) + pad
     rx, ry = BGW - CROPW, BGH - CROPH
     x0, x1, y0, y1 = MOTIONS[motion % len(MOTIONS)]
@@ -389,46 +413,80 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900):
     ye = f"{y0 * ry:.1f}+({(y1 - y0) * ry:.1f})*t/{dur:.2f}"
     ow, oh = (960, 540) if vkbps < 450 else (W, H)
     nfr = max(int(dur * FPS), 1)
-    if ZOOM > 0:
-        zin = motion % 2 == 0
-        zexpr = f"1+{ZOOM}*on/{nfr}" if zin else f"1+{ZOOM}*(1-on/{nfr})"
-        fx = x0 + (x1 - x0) * 0.0
-        px = f"on/{nfr}" if x1 > x0 else f"(1-on/{nfr})"
-        py = f"on/{nfr}" if y1 > y0 else f"(1-on/{nfr})"
-        wide_h = int(BGW * IMGH / W) // 2 * 2
-        vr = BGH - wide_h
-        ye2 = f"{y0 * vr:.1f}+({(y1 - y0) * vr:.1f})*t/{dur:.2f}"
-        pic = (f"[0:v]crop={BGW}:{wide_h}:x=0:y='{ye2}',"
-               f"zoompan=z='{zexpr}':x='(iw-iw/zoom)*{px}':y='(ih-ih/zoom)*0.5':d=1:s={W}x{IMGH}:fps={FPS}")
+    zin = motion % 2 == 0
+    z_amt = max(ZOOM, 0.12)
+    zexpr = f"1+{z_amt}*on/{nfr}" if zin else f"1+{z_amt}*(1-on/{nfr})"
+    px = f"on/{nfr}" if x1 > x0 else f"(1-on/{nfr})"
+    wide_h = int(BGW * IMGH / W) // 2 * 2
+    vr = BGH - wide_h
+    ye2 = f"{y0 * vr:.1f}+({(y1 - y0) * vr:.1f})*t/{dur:.2f}"
+
+    def pic_chain(inp, label):
+        chain = (
+            f"[{inp}:v]crop={BGW}:{wide_h}:x=0:y='{ye2}',"
+            f"zoompan=z='{zexpr}':x='(iw-iw/zoom)*{px}':y='(ih-ih/zoom)*0.5':d=1:s={W}x{IMGH}:fps={FPS}"
+        )
+        if VIGNETTE:
+            chain += ",vignette=PI/5"
+        if GRAIN > 0:
+            chain += f",noise=alls={GRAIN}:allf=t"
+        chain += f"[{label}]"
+        return chain
+
+    inputs = ["-loop", "1", "-framerate", str(FPS), "-i", str(bg_png)]
+    if bg2_png:
+        inputs += ["-loop", "1", "-framerate", str(FPS), "-i", str(bg2_png)]
+        ov_idx = 2
+        mp3_idx = 3
+        cap_base = 4
+        fc = (
+            pic_chain(0, "p0") + ";" +
+            pic_chain(1, "p1") + ";" +
+            # Crossfade in the middle third so characters appear to shift/move
+            f"[p0][p1]xfade=transition=fade:duration={min(1.2, max(0.6, dur * 0.28)):.2f}:"
+            f"offset={max(0.4, dur * 0.32):.2f},fade=t=in:st=0:d=0.5,"
+            f"fade=t=out:st={max(dur - 0.5, 0):.2f}:d=0.5,"
+            f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
+        )
     else:
-        pic = f"[0:v]crop={CROPW}:{CROPH}:x='{xe}':y='{ye}',scale={W}:{IMGH}:flags=bicubic"
-    if VIGNETTE:
-        pic += ",vignette=PI/5"
-    if GRAIN > 0:
-        pic += f",noise=alls={GRAIN}:allf=t"
-    fd = 0.5
-    pic += (f",fade=t=in:st=0:d={fd},fade=t=out:st={max(dur - fd, 0):.2f}:d={fd},"
-            f"pad={W}:{H}:0:0:color=black,setsar=1[v0];")
-    fc = pic + "[v0][1:v]overlay=format=auto[v1];"
+        ov_idx = 1
+        mp3_idx = 2
+        cap_base = 3
+        fc = (
+            pic_chain(0, "p0") + ";" +
+            f"[p0]fade=t=in:st=0:d=0.5,fade=t=out:st={max(dur - 0.5, 0):.2f}:d=0.5,"
+            f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
+        )
+
+    fc += f"[v0][{ov_idx}:v]overlay=format=auto[v1];"
     last = "v1"
     for k, (_, t0, t1) in enumerate(caps):
         t1 = dur + 1 if k == len(caps) - 1 else t1
         nxt = f"v{k + 2}"
-        fc += (f"[{last}][{k + 3}:v]overlay=format=auto:"
-               f"enable='between(t,{t0:.2f},{t1:.2f})'[{nxt}];")
+        fc += (
+            f"[{last}][{cap_base + k}:v]overlay=format=auto:"
+            f"enable='between(t,{t0:.2f},{t1:.2f})'[{nxt}];"
+        )
         last = nxt
     fc += f"[{last}]scale={ow}:{oh}:flags=bicubic,format=yuv420p[v]"
-    cmd = ["ffmpeg", "-y", "-loop", "1", "-framerate", str(FPS), "-i", str(bg_png),
-           "-loop", "1", "-framerate", str(FPS), "-i", str(ov_png), "-i", str(mp3)]
+
+    cmd = ["ffmpeg", "-y"] + inputs
+    cmd += ["-loop", "1", "-framerate", str(FPS), "-i", str(ov_png), "-i", str(mp3)]
     for png, _, _ in caps:
         cmd += ["-loop", "1", "-framerate", str(FPS), "-i", str(png)]
-    cmd += ["-filter_complex", fc, "-map", "[v]", "-map", "2:a", "-t", f"{dur:.2f}",
-            "-af", f"apad=pad_dur={pad}",
-            "-c:v", "libx264", "-preset", "veryfast", "-b:v", f"{vkbps}k",
-            "-maxrate", f"{int(vkbps * 1.25)}k", "-bufsize", f"{vkbps * 2}k", "-r", str(FPS),
-            "-c:a", "aac", "-b:a", "40k", "-ar", "24000", "-ac", "1", str(out)]
+    cmd += [
+        "-filter_complex", fc,
+        "-map", "[v]", "-map", f"{mp3_idx}:a",
+        "-t", f"{dur:.2f}",
+        "-af", f"apad=pad_dur={pad}",
+        "-c:v", "libx264", "-preset", "veryfast", "-b:v", f"{vkbps}k",
+        "-maxrate", f"{int(vkbps * 1.25)}k", "-bufsize", f"{vkbps * 2}k", "-r", str(FPS),
+        "-c:a", "aac", "-b:a", "40k", "-ar", "24000", "-ac", "1", str(out),
+    ]
     run(cmd)
     return dur
+
+
 
 
 def load_cover(url):
@@ -479,10 +537,12 @@ def wiki_queries(job):
             counts[w] = counts.get(w, 0) + 1
     nouns = [w for w, c in sorted(counts.items(), key=lambda x: -x[1]) if c >= 3][:4]
     qs = []
+    # Prefer searches that return people in action, not maps/flags
     if key:
-        qs.append(" ".join(key[:4]))
+        qs.append(" ".join(key[:4]) + " people")
+        qs.append(" ".join(key[:3]))
     if len(key) > 2:
-        qs.append(" ".join(key[:2]))
+        qs.append(" ".join(key[:2]) + " workers")
     for n in nouns[:3]:
         qs.append(n)
     if len(nouns) >= 2:
@@ -566,9 +626,73 @@ def make_variants(img, n=5):
     return out
 
 
-STYLE = ("photorealistic documentary photograph, shot on a 35mm lens, natural light, realistic textures, "
-         "sharp focus, high detail, wide shot, not an illustration, not a painting, not a cartoon, "
-         "no text, no letters, no watermark")
+STYLE = (
+    "photorealistic documentary still from a cinematic film, 35mm lens, natural light, "
+    "realistic skin and fabric textures, sharp focus, high detail, people in mid-action, "
+    "bodies and hands clearly moving through a real moment, not posed studio portrait, "
+    "not an illustration, not a painting, not a cartoon, no text, no letters, no watermark, "
+    "no logos"
+)
+
+MOTION_HINTS = (
+    "walking", "working", "carrying", "reaching", "talking", "gesturing", "looking",
+    "fishing", "cooking", "planting", "harvesting", "loading", "sailing", "rowing",
+    "market", "crowd", "street", "hands", "labor", "procession", "ceremony"
+)
+
+
+def visual_focus(text):
+    """Pull the concrete people, places and actions the narrator is describing."""
+    t = (text or "").strip()
+    if not t:
+        return "people in a real historical scene, mid-action"
+    # Prefer clauses with people/action verbs
+    lower = t.lower()
+    sentences = re.split(r"(?<=[.!?])\s+", t)
+    best = sentences[0] if sentences else t
+    for s in sentences:
+        sl = s.lower()
+        if any(h in sl for h in MOTIONif any(h in sl for h in MOTION_HINTS) or re.search(
+            r"\b(man|men|woman|women|child|children|people|worker|farmers?|fishermen|"
+            r"traders?|soldiers?|family|crowd|villagers?)\b", sl
+        ):
+            best = s
+            break
+    # Keep it short and visual
+    words = best.split()
+    if len(words) > 36:
+        best = " ".join(words[:36])
+    return best.rstrip(" ,.;:")
+
+
+def scene_prompt(seg, job):
+    """Build a prompt that depicts the words being spoken, with moving people."""
+    title = clean_text(job.get("title")) or ""
+    category = clean_text(job.get("category")) or ""
+    heading = clean_text(seg.get("heading") or "")
+    speech = clean_text(seg.get("speech") or seg.get("text") or "")
+    focus = visual_focus(speech)
+    place = heading or title
+    # Force human presence + motion when the text allows it
+    people = ""
+    if re.search(
+        r"\b(he|she|they|people|man|men|woman|women|worker|farmer|child|family|crowd|"
+        r"villager|trader|soldier|fisherman|sailor)\b",
+        focus,
+        re.I,
+    ):
+        people = "people actively moving through the scene, natural body language, "
+    else:
+        people = "figures of people present and in motion in the background or foreground, "
+    parts = [
+        f"{place}." if place else "",
+        focus + ".",
+        people + "documentary moment caught mid-movement.",
+        f"Setting and era: {title}" + (f", {category}" if category else "") + ".",
+        STYLE,
+    ]
+    prompt = " ".join(p for p in parts if p).strip()
+    return prompt[:1900]
 
 
 def _from_bytes(data):
@@ -598,15 +722,14 @@ def gen_image_cloudflare(prompt):
 LAST_IMG_ERROR = [""]
 
 
-def gen_image(prompt, seed):
+def gen_image(prompt, seed=0):
     for attempt in range(2):
-        for fn in (lambda: gen_image_cloudflare(prompt),):
-            try:
-                img = fn()
-                if img is not None:
-                    return img
-            except Exception as e:
-                LAST_IMG_ERROR[0] = str(e)[:300]
+        try:
+            img = gen_image_cloudflare(prompt)
+            if img is not None:
+                return img
+        except Exception as e:
+            LAST_IMG_ERROR[0] = str(e)[:300]
         time.sleep(2 * (attempt + 1))
     return None
 
@@ -615,7 +738,7 @@ _SPOTS = [(0.0, 0.0), (1.0, 0.0), (0.0, 1.0), (1.0, 1.0), (0.5, 0.5), (0.5, 0.0)
 
 
 def framing(img, k):
-    if k <= 0:
+    if k <= 0 or img is None:
         return img
     w, h = img.size
     frac = 0.78 if k % 2 else 0.64
@@ -625,7 +748,17 @@ def framing(img, k):
     return img.crop((x0, y0, x0 + cw, y0 + ch)).resize((w, h), Image.LANCZOS)
 
 
+def motion_pair(img):
+    """Two slightly different crops of the same scene so a crossfade feels like movement."""
+    if img is None:
+        return None, None
+    a = framing(img, 0)
+    b = framing(img, 1)
+    return a, b
+
+
 def make_ai_images(segs, job):
+    """One image per body slide, prompt locked to that slide's spoken words."""
     if not AI_IMAGES:
         return []
     if not (CF_ACCOUNT_ID and CF_API_TOKEN):
@@ -634,16 +767,19 @@ def make_ai_images(segs, job):
     body_idx = [i for i, g in enumerate(segs) if g["kind"] == "body"]
     if not body_idx:
         return []
+    # Prefer 1:1 with body slides; cap by AI_IMAGE_MAX
     k = min(len(body_idx), AI_IMAGE_MAX)
-    title = clean_text(job.get("title"))
-    category = clean_text(job.get("category"))
     out, fails, t_start = [], 0, time.time()
     for j in range(k):
-        lo = j * len(body_idx) // k
-        rep = next((segs[x] for x in body_idx[lo:] if not segs[x].get("is_heading")), segs[body_idx[lo]])
-        subject = rep.get("heading") or title
-        scene = " ".join(rep["text"].split()[:28])
-        prompt = f"{subject}. {scene} ({title}, {category}). {STYLE}."
+        # Map evenly across body slides so later narration still gets matching pictures
+        bi = body_idx[j * len(body_idx) // k]
+        seg = segs[bi]
+        if seg.get("is_heading") and j + 1 < k:
+            # Prefer the following narrative chunk when this slot landed on a heading
+            nxt = body_idx[min(j * len(body_idx) // k + 1, len(body_idx) - 1)]
+            if not segs[nxt].get("is_heading"):
+                seg = segs[nxt]
+        prompt = scene_prompt(seg, job)
         if time.time() - t_start > IMG_BUDGET or fails >= IMG_FAIL_LIMIT:
             log(f"  picture generation stopped at {j}/{k} "
                 f"({'time budget' if fails < IMG_FAIL_LIMIT else 'too many failures'}); using the rest as photos")
@@ -657,13 +793,310 @@ def make_ai_images(segs, job):
         if (j + 1) % 6 == 0 or j + 1 == k:
             log(f"  generated pictures {j + 1}/{k}")
     got = sum(1 for x in out if x is not None)
-    log(f"  {got} of {k} generated pictures usable")
+    log(f"  {got} of {k} generated pictures usable (matched to narration)")
     return out
+
+
 
 
 def pick_bitrate(total_dur):
     total_kbits = MAX_MB * 8192 * 0.92
     return int(max(120, min(1200, total_kbits / max(total_dur, 1.0) - 40)))
+
+
+
+def motion_prompt(seg, job):
+    """Short physical action line for Kling image-to-video, derived from narration."""
+    speech = clean_text(seg.get("speech") or seg.get("text") or "")
+    focus = visual_focus(speech)
+    title = clean_text(job.get("title") or "")
+    heading = clean_text(seg.get("heading") or "")
+    place = heading or title
+    # Prefer action verbs; keep under ~80 words for Kling
+    line = focus
+    if place and place.lower() not in line.lower():
+        line = f"{place}: {line}"
+    extras = (
+        "natural body motion, people moving through the scene, documentary camera, "
+        "realistic physics, continuous movement, no freeze frame"
+    )
+    prompt = f"{line}. {extras}"
+    words = prompt.split()
+    if len(words) > 90:
+        prompt = " ".join(words[:90])
+    return prompt
+
+
+def _image_to_data_uri(img, max_side=1280):
+    """Encode a PIL image as a JPEG data URI for APIs that accept base64."""
+    import base64
+    from io import BytesIO as _B
+    im = img.convert("RGB")
+    w, h = im.size
+    scale = min(1.0, max_side / max(w, h))
+    if scale < 1.0:
+        im = im.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+    buf = _B()
+    im.save(buf, format="JPEG", quality=88)
+    b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    return f"data:image/jpeg;base64,{b64}"
+
+
+def _save_temp_jpeg(img, path, max_side=1280):
+    im = img.convert("RGB")
+    w, h = im.size
+    scale = min(1.0, max_side / max(w, h))
+    if scale < 1.0:
+        im = im.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+    im.save(path, format="JPEG", quality=88)
+    return path
+
+
+LAST_KLING_ERROR = [""]
+
+
+def _kling_fal(image_uri, prompt, duration, out_mp4):
+    """fal.ai Kling image-to-video (v2.1 / v3 standard)."""
+    model = KLING_MODEL or "fal-ai/kling-video/v2.1/standard/image-to-video"
+    # Prefer official fal client when installed; otherwise HTTP queue API
+    try:
+        import fal_client
+        args = {
+            "prompt": prompt[:2500],
+            "image_url": image_uri,
+            "duration": str(min(10, max(5, duration))) if "v2.1" in model else min(10, max(5, duration)),
+            "negative_prompt": KLING_NEG,
+        }
+        result = fal_client.subscribe(model, arguments=args, with_logs=False)
+        url = (result.get("video") or {}).get("url") or result.get("video_url")
+        if not url:
+            raise RuntimeError(f"fal returned no video url: {str(result)[:300]}")
+        r = requests.get(url, timeout=180, headers={"User-Agent": UA})
+        r.raise_for_status()
+        Path(out_mp4).write_bytes(r.content)
+        return out_mp4
+    except ImportError:
+        pass
+    # HTTP fallback using fal queue
+    headers = {"Authorization": f"Key {KLING_API_KEY}", "Content-Type": "application/json"}
+    payload = {
+        "prompt": prompt[:2500],
+        "image_url": image_uri,
+        "duration": str(min(10, max(5, int(duration)))),
+        "negative_prompt": KLING_NEG,
+    }
+    sub = requests.post(
+        f"https://queue.fal.run/{model}",
+        headers=headers, json=payload, timeout=60,
+    )
+    if not sub.ok:
+        raise RuntimeError(f"fal submit HTTP {sub.status_code}: {(sub.text or '')[:300]}")
+    data = sub.json()
+    req_id = data.get("request_id") or data.get("requestId")
+    status_url = data.get("status_url") or (f"https://queue.fal.run/{model}/requests/{req_id}/status" if req_id else None)
+    result_url = data.get("response_url") or (f"https://queue.fal.run/{model}/requests/{req_id}" if req_id else None)
+    if not status_url:
+        raise RuntimeError(f"fal submit missing status: {str(data)[:300]}")
+    for _ in range(90):
+        time.sleep(3)
+        st = requests.get(status_url, headers=headers, timeout=30)
+        if not st.ok:
+            continue
+        body = st.json()
+        status = (body.get("status") or "").upper()
+        if status in ("COMPLETED", "OK", "SUCCESS"):
+            res = requests.get(result_url, headers=headers, timeout=60) if result_url else st
+            res.raise_for_status()
+            result = res.json()
+            url = (result.get("video") or {}).get("url") or result.get("video_url")
+            if not url:
+                raise RuntimeError(f"fal done but no url: {str(result)[:300]}")
+            r = requests.get(url, timeout=180, headers={"User-Agent": UA})
+            r.raise_for_status()
+            Path(out_mp4).write_bytes(r.content)
+            return out_mp4
+        if status in ("FAILED", "ERROR", "CANCELLED"):
+            raise RuntimeError(f"fal failed: {str(body)[:400]}")
+    raise RuntimeError("fal timed out waiting for Kling video")
+
+
+def _kling_piapi(image_uri, prompt, duration, out_mp4):
+    """PiAPI Kling image-to-video task + poll."""
+    headers = {"x-api-key": KLING_API_KEY, "Content-Type": "application/json"}
+    version = KLING_MODEL or "2.6"
+    payload = {
+        "model": "kling",
+        "task_type": "video_generation",
+        "input": {
+            "prompt": prompt[:2500],
+            "negative_prompt": KLING_NEG,
+            "image_url": image_uri,
+            "duration": int(min(10, max(5, duration))),
+            "aspect_ratio": "16:9",
+            "mode": "std",
+            "version": version,
+        },
+    }
+    sub = requests.post("https://api.piapi.ai/api/v1/task", headers=headers, json=payload, timeout=60)
+    if not sub.ok:
+        raise RuntimeError(f"piapi submit HTTP {sub.status_code}: {(sub.text or '')[:300]}")
+    data = sub.json()
+    task_id = (data.get("data") or {}).get("task_id") or data.get("task_id")
+    if not task_id:
+        raise RuntimeError(f"piapi no task_id: {str(data)[:300]}")
+    for _ in range(90):
+        time.sleep(3)
+        st = requests.get(f"https://api.piapi.ai/api/v1/task/{task_id}", headers=headers, timeout=30)
+        if not st.ok:
+            continue
+        body = st.json()
+        info = body.get("data") or body
+        status = (info.get("status") or "").lower()
+        if status in ("completed", "success", "succeeded"):
+            out = info.get("output") or info.get("result") or {}
+            if isinstance(out, dict):
+                url = out.get("video_url") or out.get("url") or (out.get("works") or [{}])[0].get("video") or (out.get("works") or [{}])[0].get("url")
+            else:
+                url = None
+            if not url and isinstance(info.get("output"), str):
+                url = info["output"]
+            if not url:
+                raise RuntimeError(f"piapi done but no url: {str(info)[:400]}")
+            r = requests.get(url, timeout=180, headers={"User-Agent": UA})
+            r.raise_for_status()
+            Path(out_mp4).write_bytes(r.content)
+            return out_mp4
+        if status in ("failed", "error", "cancelled"):
+            raise RuntimeError(f"piapi failed: {str(info)[:400]}")
+    raise RuntimeError("piapi timed out waiting for Kling video")
+
+
+def _kling_aimlapi(image_uri, prompt, duration, out_mp4):
+    """AIMLAPI Kling 4.0 image-to-video."""
+    headers = {"Authorization": f"Bearer {KLING_API_KEY}", "Content-Type": "application/json"}
+    model = KLING_MODEL or "kling-video/v4/image-to-video"
+    payload = {
+        "model": model,
+        "prompt": prompt[:2500],
+        "image_url": image_uri,
+        "duration": int(min(15, max(3, duration))),
+    }
+    sub = requests.post("https://api.aimlapi.com/v2/video/generations", headers=headers, json=payload, timeout=60)
+    if not sub.ok:
+        raise RuntimeError(f"aimlapi submit HTTP {sub.status_code}: {(sub.text or '')[:300]}")
+    data = sub.json()
+    # Some responses are sync with URL; others return an id to poll
+    url = None
+    if isinstance(data.get("video"), dict):
+        url = data["video"].get("url")
+    url = url or data.get("video_url") or data.get("url")
+    gen_id = data.get("id") or data.get("generation_id")
+    if not url and gen_id:
+        for _ in range(90):
+            time.sleep(3)
+            st = requests.get(f"https://api.aimlapi.com/v2/video/generations/{gen_id}", headers=headers, timeout=30)
+            if not st.ok:
+                continue
+            body = st.json()
+            status = (body.get("status") or "").lower()
+            if status in ("completed", "succeeded", "success"):
+                url = (body.get("video") or {}).get("url") or body.get("video_url") or body.get("url")
+                break
+            if status in ("failed", "error"):
+                raise RuntimeError(f"aimlapi failed: {str(body)[:400]}")
+    if not url:
+        raise RuntimeError(f"aimlapi no video url: {str(data)[:400]}")
+    r = requests.get(url, timeout=180, headers={"User-Agent": UA})
+    r.raise_for_status()
+    Path(out_mp4).write_bytes(r.content)
+    return out_mp4
+
+
+def gen_kling_clip(img, prompt, duration, out_mp4):
+    """Animate a still with Kling image-to-video. Returns out_mp4 path or None on failure."""
+    if not KLING_ENABLED or not KLING_API_KEY:
+        return None
+    if img is None:
+        return None
+    duration = int(min(10, max(3, duration or KLING_DURATION)))
+    image_uri = _image_to_data_uri(img)
+    providers = {
+        "fal": _kling_fal,
+        "piapi": _kling_piapi,
+        "aimlapi": _kling_aimlapi,
+    }
+    fn = providers.get(KLING_PROVIDER)
+    if not fn:
+        LAST_KLING_ERROR[0] = f"unknown KLING_PROVIDER={KLING_PROVIDER!r} (use fal|piapi|aimlapi)"
+        log(f"  Kling skipped: {LAST_KLING_ERROR[0]}")
+        return None
+    try:
+        return fn(image_uri, prompt, duration, str(out_mp4))
+    except Exception as e:
+        LAST_KLING_ERROR[0] = str(e)[:400]
+        log(f"  Kling failed ({KLING_PROVIDER}): {LAST_KLING_ERROR[0][:160]}")
+        return None
+
+
+def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
+    """Composite a Kling (or other) video under the caption band + TTS narration."""
+    spoken = probe_duration(mp3)
+    dur = spoken + pad
+    vid_dur = probe_duration(video_mp4)
+    ow, oh = (960, 540) if vkbps < 450 else (W, H)
+    # Scale video into the picture area (W x IMGH), pad black band for captions
+    # Loop or slow last frame if Kling clip is shorter than narration
+    if vid_dur + 0.05 < dur:
+        # tpad clones last frame to fill remaining time
+        extra = dur - vid_dur
+        vchain = (
+            f"[0:v]scale={W}:{IMGH}:force_original_aspect_ratio=increase,"
+            f"crop={W}:{IMGH},fps={FPS},tpad=stop_mode=clone:stop_duration={extra:.2f},"
+            f"fade=t=in:st=0:d=0.4,fade=t=out:st={max(dur - 0.4, 0):.2f}:d=0.4,"
+            f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
+        )
+    else:
+        vchain = (
+            f"[0:v]scale={W}:{IMGH}:force_original_aspect_ratio=increase,"
+            f"crop={W}:{IMGH},fps={FPS},trim=duration={dur:.2f},"
+            f"fade=t=in:st=0:d=0.4,fade=t=out:st={max(dur - 0.4, 0):.2f}:d=0.4,"
+            f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
+        )
+    if VIGNETTE:
+        # vignette only on the picture region is hard after pad; light whole-frame is ok
+        pass
+    fc = vchain + "[v0][1:v]overlay=format=auto[v1];"
+    last = "v1"
+    for k, (_, t0, t1) in enumerate(caps):
+        t1 = dur + 1 if k == len(caps) - 1 else t1
+        nxt = f"v{k + 2}"
+        fc += (
+            f"[{last}][{k + 3}:v]overlay=format=auto:"
+            f"enable='between(t,{t0:.2f},{t1:.2f})'[{nxt}];"
+        )
+        last = nxt
+    fc += f"[{last}]scale={ow}:{oh}:flags=bicubic,format=yuv420p[v]"
+    cmd = [
+        "ffmpeg", "-y",
+        "-i", str(video_mp4),
+        "-loop", "1", "-framerate", str(FPS), "-i", str(ov_png),
+        "-i", str(mp3),
+    ]
+    for png, _, _ in caps:
+        cmd += ["-loop", "1", "-framerate", str(FPS), "-i", str(png)]
+    cmd += [
+        "-filter_complex", fc,
+        "-map", "[v]", "-map", "2:a",
+        "-t", f"{dur:.2f}",
+        "-af", f"apad=pad_dur={pad}",
+        "-c:v", "libx264", "-preset", "veryfast", "-b:v", f"{vkbps}k",
+        "-maxrate", f"{int(vkbps * 1.25)}k", "-bufsize", f"{vkbps * 2}k", "-r", str(FPS),
+        "-c:a", "aac", "-b:a", "40k", "-ar", "24000", "-ac", "1",
+        str(out),
+    ]
+    run(cmd)
+    return dur
+
 
 
 def build_video(job):
@@ -691,33 +1124,80 @@ def build_video(job):
     log(f"  narration {est:.0f}s; video bitrate {vkbps} kbps to stay near {MAX_MB:.0f} MB")
 
     clips, total_dur, body_seen, ai_used = [], 0.0, 0, {}
+    kling_used, kling_t0 = 0, time.time()
+    if KLING_ENABLED:
+        if not KLING_API_KEY:
+            log("  KLING_ENABLED but no KLING_API_KEY / FAL_KEY / PIAPI_API_KEY — using still motion only")
+        else:
+            log(f"  Kling image-to-video on ({KLING_PROVIDER}), max {KLING_MAX_CLIPS} clips")
+
     for i, seg in enumerate(segs):
         bgp, ovp, clip = tmp / f"b{i}.png", tmp / f"o{i}.png", tmp / f"c{i}.mp4"
+        bgp2 = tmp / f"b{i}b.png"
+        kling_mp4 = tmp / f"k{i}.mp4"
         cover = framing(photos[i % len(photos)], i // len(photos)) if photos else None
         if seg["kind"] == "body":
             if ai:
                 gi = body_seen * len(ai) // max(body_total, 1)
-                pic = ai[gi]
+                pic = ai[gi] if gi < len(ai) else None
                 if pic is not None:
-                    cover = framing(pic, ai_used.get(gi, 0))
+                    cover = pic
                     ai_used[gi] = ai_used.get(gi, 0) + 1
             body_seen += 1
         elif photos:
             cover = photos[0]
-        bg_img, ov_img = render_layers(seg, i, len(segs), cover)
+
+        frame_a, frame_b = motion_pair(cover) if cover is not None else (None, None)
+        if frame_a is None and cover is not None:
+            frame_a = cover
+        bg_img, ov_img = render_layers(seg, i, len(segs), frame_a)
         bg_img.save(bgp)
         ov_img.save(ovp)
+
         spoken = probe_duration(mp3s[i])
         caps = []
         for k, (txt, t0, t1) in enumerate(caption_timings(seg["speech"], spoken)):
             cp = tmp / f"cap{i}_{k}.png"
             render_caption(txt).save(cp)
             caps.append((cp, t0, t1))
-        total_dur += make_clip(bgp, ovp, mp3s[i], clip, caps, i, vkbps=vkbps)
+
+        used_kling = False
+        if (
+            KLING_ENABLED and KLING_API_KEY
+            and seg["kind"] == "body"
+            and cover is not None
+            and kling_used < KLING_MAX_CLIPS
+            and (time.time() - kling_t0) < KLING_BUDGET
+        ):
+            mprompt = motion_prompt(seg, job)
+            # Match clip length to narration (clamped)
+            kdur = int(min(10, max(3, round(spoken) or KLING_DURATION)))
+            got = gen_kling_clip(cover, mprompt, kdur, kling_mp4)
+            if got and Path(got).exists() and Path(got).stat().st_size > 5000:
+                total_dur += make_clip_from_video(got, ovp, mp3s[i], clip, caps, vkbps=vkbps)
+                used_kling = True
+                kling_used += 1
+                Path(got).unlink(missing_ok=True)
+
+        if not used_kling:
+            bg2_path = None
+            if frame_b is not None and frame_a is not frame_b:
+                bg2 = ImageOps.fit(frame_b, (BGW, BGH), Image.LANCZOS) if frame_b else None
+                if bg2 is not None:
+                    bg2.save(bgp2)
+                    bg2_path = bgp2
+            total_dur += make_clip(bgp, ovp, mp3s[i], clip, caps, i, vkbps=vkbps, bg2_png=bg2_path)
+            if bg2_path and Path(bg2_path).exists():
+                Path(bg2_path).unlink(missing_ok=True)
+
         clips.append(clip)
-        bgp.unlink()
+        bgp.unlink(missing_ok=True)
         if (i + 1) % 10 == 0 or i + 1 == len(segs):
-            log(f"  slide {i + 1}/{len(segs)} ready")
+            log(f"  slide {i + 1}/{len(segs)} ready"
+                + (f" (Kling clips so far: {kling_used})" if kling_used else ""))
+
+    if kling_used:
+        log(f"  Kling animated {kling_used} slide(s)")
 
     listing = tmp / "list.txt"
     listing.write_text("".join(f"file '{c}'\n" for c in clips), encoding="utf-8")
@@ -881,8 +1361,7 @@ def existing_video(row):
 def attach_video(row, video_url):
     tags = row.get("tags") or []
     if isinstance(tags, str):
-        try:
-            tags = json.loads(tags)
+        try:tags = json.loads(tags)
         except Exception:
             tags = [t.strip() for t in tags.split(",") if t.strip()]
     body = row.get("content")
@@ -937,7 +1416,7 @@ def process_job(path):
     job = json.loads(path.read_text(encoding="utf-8"))
     marker = read_marker(name)
     if not DRY_RUN and not needs_work(job, marker):
-           return None
+        return None
 
     title = job.get("title", name)
     log(f"\n=== {title} ({name})")
