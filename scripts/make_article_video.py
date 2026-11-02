@@ -15,7 +15,7 @@ from pathlib import Path
 import requests
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
-SCRIPT_VERSION = "2026-11-02-e"
+SCRIPT_VERSION = "2026-11-03-a"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -38,8 +38,10 @@ UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/up
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 AI_IMAGES = os.environ.get("AI_IMAGES", "1") != "0"
 AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "16"))  # each picture covers a stretch of narration; lower to save free quota
-CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID") or os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
-CF_API_TOKEN = os.environ.get("CF_API_TOKEN") or os.environ.get("CLOUDFLARE_API_TOKEN", "")
+# Names match your GitHub secrets (CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN); the short CF_* names still work.
+# strip() removes a stray space or newline pasted along with the secret.
+CF_ACCOUNT_ID = (os.environ.get("CLOUDFLARE_ACCOUNT_ID") or os.environ.get("CF_ACCOUNT_ID") or "").strip()
+CF_API_TOKEN = (os.environ.get("CLOUDFLARE_API_TOKEN") or os.environ.get("CF_API_TOKEN") or "").strip()
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
 RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
