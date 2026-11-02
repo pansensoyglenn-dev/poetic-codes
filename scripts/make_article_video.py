@@ -15,6 +15,7 @@ from pathlib import Path
 import requests
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
+SCRIPT_VERSION = "2026-11-02-c"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -58,6 +59,7 @@ CREDIT_ROWS = []
 QUOTA_HIT = [False]
 IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
+FORCE_REDO = os.environ.get("FORCE_REDO") == "1"  # ignore finished-job markers and the "article already has a video" check
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
 
 # Kling image-to-video (real character motion). Off by default — needs API key + budget.
@@ -1451,6 +1453,8 @@ def write_marker(name, data):
 
 
 def needs_work(job, marker):
+    if FORCE_REDO:
+        return True
     if not marker:
         return True
     if marker.get("jobId") != job.get("jobId"):
@@ -1475,7 +1479,7 @@ def process_job(path):
             row = find_article(job, fetch_articles())
             if row is None:
                 log("  article not found on The Commonplace; the video will be made but not attached")
-            elif existing_video(row) and not job.get("force"):
+            elif existing_video(row) and not (job.get("force") or FORCE_REDO):
                 log("  article already has a video; leaving it alone")
                 write_marker(name, {"jobId": job.get("jobId"), "status": "skipped",
                                     "reason": "article already has a video", "title": title})
@@ -1522,6 +1526,8 @@ def process_job(path):
 
 
 def main():
+    log(f"article_video.py {SCRIPT_VERSION} | INTRO_TITLE={int(INTRO_TITLE)} SPEAK_HEADINGS={int(SPEAK_HEADINGS)} "
+        f"SLIDE_WORDS={SLIDE_WORDS} AI_IMAGE_MAX={AI_IMAGE_MAX} FORCE_REDO={int(FORCE_REDO)}")
     if not DRY_RUN and not ADMIN_KEY:
         log("ADMIN_KEY is not set. Add it under Settings > Secrets and variables > Actions.")
         return 1
