@@ -15,7 +15,7 @@ from pathlib import Path
 import requests
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
-SCRIPT_VERSION = "2026-11-02-c"
+SCRIPT_VERSION = "2026-11-02-d"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -1402,6 +1402,30 @@ def find_article(job, rows):
     return cands[0] if cands else None
 
 
+def article_slug(title):
+    # Must match slugify() in functions/_lib/articles.js
+    s = re.sub(r"[^a-z0-9]+", "-", (title or "").lower()).strip("-")[:80].rstrip("-")
+    return s or "article"
+
+
+def article_page_url(row):
+    if not row or row.get("id") in (None, ""):
+        return ""
+    return f"{SITE_URL.rstrip('/')}/article/{row['id']}-{article_slug(row.get('title'))}"
+
+
+def add_to_index_list(article_url):
+    """Keep a plain list of article URLs to paste into Search Console > URL Inspection > Request indexing."""
+    if not article_url:
+        return
+    JOBS_DIR.mkdir(parents=True, exist_ok=True)
+    f = JOBS_DIR / "to-index.txt"
+    have = f.read_text(encoding="utf-8").split() if f.exists() else []
+    if article_url not in have:
+        with open(f, "a", encoding="utf-8") as fh:
+            fh.write(article_url + "\n")
+
+
 def existing_video(row):
     return row.get("video_url") or row.get("videoUrl") or ""
 
@@ -1501,7 +1525,9 @@ def process_job(path):
         shutil.copy(final, Path("out") / fname)
         if CREDITS:
             (Path("out") / (fname + ".credits.txt")).write_text("\n".join(CREDITS), encoding="utf-8")
-        desc = f"Read the full essay on The Commonplace: {SITE_URL.rstrip('/')}"
+        article_url = article_page_url(row)
+        desc = (f"Read the full essay: {article_url}\n" if article_url else "") + \
+               f"More on The Commonplace: {SITE_URL.rstrip('/')}"
         if CREDITS:
             desc += "\n\nPhoto credits (Wikimedia Commons):\n" + "\n".join(CREDITS)
         (Path("out") / (fname + ".description.txt")).write_text(desc, encoding="utf-8")
@@ -1512,8 +1538,10 @@ def process_job(path):
             attach_video(row, url)
             attached = True
             log(f"  attached to article #{row['id']}")
+            add_to_index_list(article_url)
+            log(f"  article page (request indexing in Search Console): {article_url}")
         write_marker(name, {"jobId": job.get("jobId"), "status": "done", "title": title,
-                            "videoUrl": url, "attached": attached, "engine": engine, "credits": CREDITS[:30],
+                            "videoUrl": url, "articleUrl": article_url, "attached": attached, "engine": engine, "credits": CREDITS[:30],
                             "seconds": round(dur)})
         return "done"
 
