@@ -15,7 +15,7 @@ from pathlib import Path
 import requests
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
-SCRIPT_VERSION = "2026-11-02-d"
+SCRIPT_VERSION = "2026-11-02-e"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -180,6 +180,23 @@ def build_chunks(sentences, budget, target=None):
     return chunks, total
 
 
+def strip_flat_page_chrome(text, title, author):
+    """If a whole web page was flattened to plain text, drop the title + byline at the start and the
+    copyright footer at the end, so narration begins with the story itself."""
+    t = " ".join((text or "").split())
+    if title and t.lower().startswith(title.lower()):
+        t = t[len(title):].lstrip(" :-\u2013\u2014")
+    if author:
+        email = r"[\w.+-]+@[\w-]+\.[\w.]*\w"
+        m = re.match(r"By\s+" + re.escape(author) + r"\b.{0,260}?" + email + r"\s*", t, re.I)
+        if m:
+            t = t[m.end():]
+        k = t.rfind("\u00a9")
+        if k != -1 and len(t) - k < 400:
+            t = t[:k]
+    return t.strip()
+
+
 def build_segments(job):
     title = clean_text(job.get("title")) or "Untitled"
     excerpt = clean_text(job.get("excerpt"))
@@ -192,7 +209,10 @@ def build_segments(job):
         speech += " " + excerpt
     segs = [{"kind": "title", "title": title, "sub": sub, "speech": speech}]
 
-    main_html = extract_main(job.get("body"))
+    raw_body = job.get("body") or ""
+    if not re.search(r"<[a-zA-Z/!][^>]*>", raw_body):  # plain text from the portal
+        raw_body = strip_flat_page_chrome(raw_body, title, author)
+    main_html = extract_main(raw_body)
     parts = re.split(r"(?is)(<h[1-3]\b[^>]*>.*?</h[1-3]>)", main_html)
     budget, heading, first = MAX_WORDS, "", True
     for part in parts:
@@ -1403,15 +1423,14 @@ def find_article(job, rows):
 
 
 def article_slug(title):
-    # Must match slugify() in functions/_lib/articles.js
-    s = re.sub(r"[^a-z0-9]+", "-", (title or "").lower()).strip("-")[:80].rstrip("-")
-    return s or "article"
+    # Same as slugify() in the portal
+    return re.sub(r"[^a-z0-9]+", "-", (title or "").lower()).strip("-")
 
 
-def article_page_url(row):
-    if not row or row.get("id") in (None, ""):
-        return ""
-    return f"{SITE_URL.rstrip('/')}/article/{row['id']}-{article_slug(row.get('title'))}"
+def article_page_url(job, row=None):
+    """The public static page the portal publishes: https://poetic-codes.pages.dev/articles/<slug>.html"""
+    slug = (job.get("slug") or "").strip() or article_slug((row or {}).get("title") or job.get("title"))
+    return f"{SITE_URL.rstrip('/')}/articles/{slug}.html" if slug else ""
 
 
 def add_to_index_list(article_url):
@@ -1525,7 +1544,7 @@ def process_job(path):
         shutil.copy(final, Path("out") / fname)
         if CREDITS:
             (Path("out") / (fname + ".credits.txt")).write_text("\n".join(CREDITS), encoding="utf-8")
-        article_url = article_page_url(row)
+        article_url = article_page_url(job, row)
         desc = (f"Read the full essay: {article_url}\n" if article_url else "") + \
                f"More on The Commonplace: {SITE_URL.rstrip('/')}"
         if CREDITS:
