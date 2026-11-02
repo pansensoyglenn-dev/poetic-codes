@@ -36,14 +36,15 @@ VIDEO_URL_API = os.environ.get("VIDEO_URL_API", "https://poetic-codes.vercel.app
 UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/upload")
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 AI_IMAGES = os.environ.get("AI_IMAGES", "1") != "0"
-AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "12"))  # keeps a video inside Cloudflare's free daily allowance
+AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "16"))  # each picture covers a stretch of narration; lower to save free quota
 CF_ACCOUNT_ID = os.environ.get("CF_ACCOUNT_ID") or os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
 CF_API_TOKEN = os.environ.get("CF_API_TOKEN") or os.environ.get("CLOUDFLARE_API_TOKEN", "")
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
 RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
-SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "30"))
-INTRO_TITLE = os.environ.get("INTRO_TITLE", "1") != "0"
+SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "60"))  # longer slides = fewer, better-matched pictures
+INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"  # off: video starts straight on the content
+SPEAK_HEADINGS = os.environ.get("SPEAK_HEADINGS", "0") != "0"  # off: section headings are not read or shown
 ONLY_JOB = os.environ.get("ONLY_JOB", "").strip().lower()
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
 RUN_START = time.time()
@@ -200,7 +201,7 @@ def build_segments(job):
             if h and h.lower().rstrip(".!?") != title.lower().rstrip(".!?"):
                 heading = h
                 n = len(h.split())
-                if n >= 2 and n <= budget:
+                if SPEAK_HEADINGS and n >= 2 and n <= budget:
                     segs.append({"kind": "body", "text": h, "speech": h.rstrip(".!?:;,") + ".",
                                  "heading": h, "is_heading": True})
                     budget -= n
@@ -223,8 +224,9 @@ def build_segments(job):
         "kind": "end",
         "title": "Read the full essay",
         "sub": "The Commonplace",
-        "url": SITE_URL.replace("https://", "").replace("http://", "").rstrip("/"),
-        "speech": "Read the full essay on The Commonplace.",
+        "url": SITE_URL.rstrip("/"),
+        "speech": "Read the full essay on The Commonplace, at poetic codes dot pages dot dev.",
+        "caption": "Read the full essay on The Commonplace: " + SITE_URL.rstrip("/"),
     })
     return segs
 
@@ -296,6 +298,21 @@ def render_layers(seg, idx, total, cover):
     d.rectangle([0, IMGH, W, H], fill=(6, 10, 18, 255))
     d.rectangle([0, IMGH, W, IMGH + 3], fill=ACCENT + (255,))
     d.rectangle([0, H - 8, int(W * (idx + 1) / total), H], fill=ACCENT + (255,))
+    if seg.get("kind") == "end":
+        # End card: darken the picture and show the link on screen.
+        d.rectangle([0, 0, W, IMGH], fill=(6, 10, 18, 175))
+        rows = [(seg.get("title", ""), load_font(54, True), TEXT),
+                (seg.get("sub", ""), load_font(34), ACCENT),
+                (seg.get("url", ""), load_font(40, True), TEXT)]
+        gap = 26
+        heights = [int(f.size * 1.3) for _, f, _ in rows]
+        y = (IMGH - (sum(heights) + gap * (len(rows) - 1))) // 2
+        for (txt, f, col), hh in zip(rows, heights):
+            if txt:
+                w = d.textlength(txt, font=f)
+                d.text(((W - w) / 2 + 2, y + 2), txt, font=f, fill=(0, 0, 0, 255))
+                d.text(((W - w) / 2, y), txt, font=f, fill=col + (255,))
+            y += hh + gap
     return bg, ov
 
 
@@ -449,8 +466,7 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_
             pic_chain(0, "p0") + ";" +
             pic_chain(1, "p1") + ";" +
             f"[p0][p1]xfade=transition=fade:duration={fade_dur:.2f}:"
-            f"offset={fade_off:.2f},fade=t=in:st=0:d=0.5,"
-            f"fade=t=out:st={max(dur - 0.5, 0):.2f}:d=0.5,"
+            f"offset={fade_off:.2f},"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
     else:
@@ -459,7 +475,7 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_
         cap_base = 3
         fc = (
             pic_chain(0, "p0") + ";" +
-            f"[p0]fade=t=in:st=0:d=0.5,fade=t=out:st={max(dur - 0.5, 0):.2f}:d=0.5,"
+            f"[p0]"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
 
@@ -630,13 +646,18 @@ def make_variants(img, n=5):
     return out
 
 
-STYLE = (
+STYLE_BASE = (
     "photorealistic documentary still from a cinematic film, 35mm lens, natural light, "
-    "realistic skin and fabric textures, sharp focus, high detail, people in mid-action, "
-    "bodies and hands clearly moving through a real moment, not posed studio portrait, "
-    "not an illustration, not a painting, not a cartoon, no text, no letters, no watermark, "
-    "no logos"
+    "realistic textures, sharp focus, high detail, not an illustration, not a painting, "
+    "not a cartoon, no text, no letters, no watermark, no logos"
 )
+STYLE_PEOPLE = (
+    "people in mid-action, hands and bodies in natural motion, not a posed studio portrait"
+)
+_PEOPLE_RE = re.compile(
+    r"\b(he|she|they|people|man|men|woman|women|worker|workers|farmer|farmers|child|children|family|crowd|"
+    r"villager|villagers|trader|traders|soldier|soldiers|fisherman|fishermen|sailor|sailors|"
+    r"laborer|laborers|owner|owners|settler|settlers)\b", re.I)
 
 MOTION_HINTS = (
     "walking", "working", "carrying", "reaching", "talking", "gesturing", "looking",
@@ -669,30 +690,34 @@ def visual_focus(text):
 
 
 def scene_prompt(seg, job):
-    """Build a prompt that depicts the words being spoken, with moving people."""
+    """Build a prompt from the whole stretch of narration this picture will sit under.
+    Samples up to three sentences (start, middle, end) so the image reflects all of it."""
     title = clean_text(job.get("title")) or ""
     category = clean_text(job.get("category")) or ""
     heading = clean_text(seg.get("heading") or "")
     speech = clean_text(seg.get("speech") or seg.get("text") or "")
-    focus = visual_focus(speech)
+    sents = [x.strip() for x in re.split(r"(?<=[.!?])\s+", speech) if len(x.split()) >= 4]
+    if len(sents) > 3:
+        sents = [sents[0], sents[len(sents) // 2], sents[-1]]
+    parts_focus = []
+    for x in sents or [speech]:
+        f = visual_focus(x)
+        parts_focus.append(" ".join(f.split()[:24]).rstrip(" ,.;:"))
+    focus = "; ".join(p for p in parts_focus if p)
     place = heading or title
-    # Force human presence + motion when the text allows it
-    people = ""
-    if re.search(
-        r"\b(he|she|they|people|man|men|woman|women|worker|farmer|child|family|crowd|"
-        r"villager|trader|soldier|fisherman|sailor)\b",
-        focus,
-        re.I,
-    ):
-        people = "people actively moving through the scene, natural body language, "
+    has_people = bool(_PEOPLE_RE.search(focus))
+    if has_people:
+        scene = "people actively moving through the scene, natural body language, documentary moment caught mid-movement."
+        style = STYLE_BASE + ", " + STYLE_PEOPLE
     else:
-        people = "figures of people present and in motion in the background or foreground, "
+        scene = "the places, objects and landscape being described, atmospheric documentary photograph, people only if they fit naturally."
+        style = STYLE_BASE
     parts = [
         f"{place}." if place else "",
         focus + ".",
-        people + "documentary moment caught mid-movement.",
+        scene,
         f"Setting and era: {title}" + (f", {category}" if category else "") + ".",
-        STYLE,
+        style,
     ]
     prompt = " ".join(p for p in parts if p).strip()
     return prompt[:1900]
@@ -779,14 +804,15 @@ def make_ai_images(segs, job):
     k = min(len(body_idx), AI_IMAGE_MAX)
     out, fails, t_start = [], 0, time.time()
     for j in range(k):
-        # Map evenly across body slides so later narration still gets matching pictures
-        bi = body_idx[j * len(body_idx) // k]
-        seg = segs[bi]
-        if seg.get("is_heading") and j + 1 < k:
-            # Prefer the following narrative chunk when this slot landed on a heading
-            nxt = body_idx[min(j * len(body_idx) // k + 1, len(body_idx) - 1)]
-            if not segs[nxt].get("is_heading"):
-                seg = segs[nxt]
+        # Same mapping build_video uses: picture j sits under every body slide n with n*k//total == j.
+        # Build its prompt from ALL of that narration, not just one slide.
+        total_body = len(body_idx)
+        members = [segs[body_idx[n]] for n in range(total_body) if n * k // total_body == j] or [segs[body_idx[j * total_body // k]]]
+        narr = [m for m in members if not m.get("is_heading")] or members
+        seg = {
+            "heading": next((m.get("heading") for m in members if m.get("heading")), ""),
+            "speech": " ".join(m["speech"] for m in narr),
+        }
         prompt = scene_prompt(seg, job)
         if QUOTA_HIT[0]:
             log(f"  Cloudflare free quota reached at {j}/{k}; using photos for the rest (no further calls)")
@@ -1062,14 +1088,12 @@ def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
         vchain = (
             f"[0:v]scale={W}:{IMGH}:force_original_aspect_ratio=increase,"
             f"crop={W}:{IMGH},fps={FPS},tpad=stop_mode=clone:stop_duration={extra:.2f},"
-            f"fade=t=in:st=0:d=0.4,fade=t=out:st={max(dur - 0.4, 0):.2f}:d=0.4,"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
     else:
         vchain = (
             f"[0:v]scale={W}:{IMGH}:force_original_aspect_ratio=increase,"
             f"crop={W}:{IMGH},fps={FPS},trim=duration={dur:.2f},"
-            f"fade=t=in:st=0:d=0.4,fade=t=out:st={max(dur - 0.4, 0):.2f}:d=0.4,"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
     fc = vchain + "[v0][1:v]overlay=format=auto[v1];"
@@ -1179,7 +1203,7 @@ def build_video(job):
 
         spoken = probe_duration(mp3s[i])
         caps = []
-        for k, (txt, t0, t1) in enumerate(caption_timings(seg["speech"], spoken)):
+        for k, (txt, t0, t1) in enumerate(caption_timings(seg.get("caption") or seg["speech"], spoken)):
             cp = tmp / f"cap{i}_{k}.png"
             render_caption(txt).save(cp)
             caps.append((cp, t0, t1))
@@ -1473,6 +1497,10 @@ def process_job(path):
         shutil.copy(final, Path("out") / fname)
         if CREDITS:
             (Path("out") / (fname + ".credits.txt")).write_text("\n".join(CREDITS), encoding="utf-8")
+        desc = f"Read the full essay on The Commonplace: {SITE_URL.rstrip('/')}"
+        if CREDITS:
+            desc += "\n\nPhoto credits (Wikimedia Commons):\n" + "\n".join(CREDITS)
+        (Path("out") / (fname + ".description.txt")).write_text(desc, encoding="utf-8")
         url = upload_video(final, fname)
         log(f"  uploaded: {url}")
         attached = False
