@@ -1,6 +1,6 @@
 {
-  "jobId": "1793604579758",
-  "createdAt": "2026-11-02T07:29:39.758Z",
+  "jobId": "1793604611057",
+  "createdAt": "2026-11-02T07:30:11.057Z",
   "title": "When the Left Forgot How to Think: Pro-Hamas Propaganda and the Filipino Left",
   "author": "Glenn Junsay Pansensoy",
   "category": "Local Politics",
@@ -21,5 +21,5 @@
   "slug": "when-the-left-forgot-how-to-think-pro-hamas-propaganda-and-the-filipino-left",
   "articleId": 31,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793604574945.jpg",
-  "force": false
+  "force": true
 }
