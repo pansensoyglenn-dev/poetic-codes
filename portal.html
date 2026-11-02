@@ -1857,6 +1857,10 @@ function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, cover
   const canonicalURL = `${SITE_URL}/${GH_ARTICLES_DIR}/${slug}.html`;
   const ogImage  = coverImageUrl || `${SITE_URL}/og-default.png`;
   const safeDesc = excerpt.replace(/\s+/g,' ').slice(0, 160);
+  const adLoader = /adsbygoogle\.js/i.test(bodyHTML) ? '' :
+    '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6428799122405621" crossorigin="anonymous"><\/script>';
+  const adUnit = /adsbygoogle/i.test(bodyHTML) ? '' :
+    '<div style="margin:2rem 0;text-align:center;min-height:90px;"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6428799122405621" data-ad-slot="3735753880" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});<\/script></div>';
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1884,6 +1888,7 @@ function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, cover
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"Article","headline":${JSON.stringify(title)},"author":{"@type":"Person","name":${JSON.stringify(author)}},"datePublished":${JSON.stringify(isoDate)},"description":${JSON.stringify(safeDesc)},"articleSection":${JSON.stringify(category)},"mainEntityOfPage":${JSON.stringify(canonicalURL)},"image":${JSON.stringify(ogImage)}}
 <\/script>
+${adLoader}
 <style>
 body{background:#0b0f17;color:#eef4ff;font-family:"Crimson Pro",Georgia,serif;max-width:760px;margin:0 auto;padding:2rem 1.2rem;line-height:1.85;}
 h1{font-family:"Cinzel Decorative",serif;font-size:clamp(1rem,4vw,1.8rem);margin-bottom:1rem;}
@@ -1903,6 +1908,7 @@ footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size
 <h1>${esc(title)}</h1>
 <div class="meta">${esc(author)} · ${esc(category)} · ${pubDate}</div>
 ${bodyHTML}
+${adUnit}
 </article>
 <footer>
 <a href="${BLOGSPOT_ABOUT_URL}" target="_blank" rel="noopener">About</a> |
@@ -1916,9 +1922,17 @@ ${bodyHTML}
 }
 
 // SEO FIX: build sitemap.xml from the current article list and push to the repo
+async function refreshArticleCache() {
+  try {
+    const r = await fetchCommonplaceArticles();
+    if (r && r.articles && r.articles.length) { csArticlesCache = r.articles; return true; }
+  } catch (e) { console.warn('Article list reload failed:', e); }
+  return false;
+}
+
 async function regenerateSitemap() {
   const cfg = getGitHubConfig();
-  if (!cfg.token) return;
+  if (!cfg.token || !csArticlesCache.length) return false;
   const publicBase = SITE_URL;
   const today = new Date().toISOString().slice(0, 10);
 
@@ -1972,14 +1986,15 @@ ${entries.map(u => `  <url>
   const body = { message: 'Update sitemap', content: btoa(binary), branch: cfg.branch };
   if (sha) body.sha = sha;
   try {
-    await fetch(apiURL, { method:'PUT', headers, body:JSON.stringify(body) });
-  } catch (e) { console.warn('Sitemap push failed:', e); }
+    const put = await fetch(apiURL, { method:'PUT', headers, body:JSON.stringify(body) });
+    return put.ok;
+  } catch (e) { console.warn('Sitemap push failed:', e); return false; }
 }
 
 // SEO FIX: build feed.xml (RSS 2.0) from the current article list and push to the repo
 async function regenerateFeed() {
   const cfg = getGitHubConfig();
-  if (!cfg.token) return;
+  if (!cfg.token || !csArticlesCache.length) return false;
   const publicBase = SITE_URL;
   const sorted = [...csArticlesCache]
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
@@ -2032,8 +2047,9 @@ ${items.join('\n')}
   const body = { message: 'Update RSS feed', content: btoa(binary), branch: cfg.branch };
   if (sha) body.sha = sha;
   try {
-    await fetch(apiURL, { method:'PUT', headers, body:JSON.stringify(body) });
-  } catch (e) { console.warn('Feed push failed:', e); }
+    const put = await fetch(apiURL, { method:'PUT', headers, body:JSON.stringify(body) });
+    return put.ok;
+  } catch (e) { console.warn('Feed push failed:', e); return false; }
 }
 
 async function uploadCover(dataUrl, slug) {
@@ -2103,10 +2119,25 @@ const VIDEO_JOBS_DIR = 'video-jobs';
 
 // Plain text of an article body (no tags, scripts, players), safe to send in a job file.
 function htmlToPlainText(html) {
-  const doc = new DOMParser().parseFromString(html || '', 'text/html');
-  doc.querySelectorAll('script,style,audio,video,iframe,noscript').forEach(n => n.remove());
-  doc.querySelectorAll('p,div,br,h1,h2,h3,h4,li,blockquote').forEach(n => n.insertAdjacentText('afterend', ' '));
-  return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+  const doc = new DOMParser().parseFromString(String(html || '').replace(/^\s*```[a-z]*\s*$/gim, ''), 'text/html');
+  // A pasted full web page: read only the article itself (<main>). Title, byline, footer,
+  // ads and section headings are dropped so the video starts straight on the story.
+  const root = doc.querySelector('main') || doc.body;
+  root.querySelectorAll('script,style,audio,video,iframe,noscript,header,footer,nav,aside,ins,.ad-slot,h1,h2,h3,h4,h5,h6').forEach(n => n.remove());
+  root.querySelectorAll('p,div,br,li,blockquote').forEach(n => n.insertAdjacentText('afterend', ' '));
+  return (root.textContent || '').replace(/\s+/g, ' ').trim();
+}
+
+// If the pasted content is a whole web page, keep only the article itself (<main>);
+// anything else is returned unchanged.
+function articleOnlyHTML(html) {
+  const str = String(html || '');
+  if (!/<main[\s>]/i.test(str)) return str;
+  const doc = new DOMParser().parseFromString(str.replace(/^\s*```[a-z]*\s*$/gim, ''), 'text/html');
+  const main = doc.querySelector('main');
+  if (!main) return str;
+  main.querySelectorAll('script,style,iframe,noscript,header,footer,nav,aside,ins,.ad-slot,h1').forEach(n => n.remove());
+  return main.innerHTML;
 }
 
 async function githubPutText(path, text, message) {
@@ -2249,7 +2280,9 @@ async function submitArticle() {
 
     if (doGitHub) {
       try {
-        const ghPage = buildGitHubPage(title, author, category, excerpt, finalBodyHTML, slug, uploadedCoverUrl);
+        // SEO FIX: a pasted full web page is cut down to its <main> so the static page has one title/canonical
+        const ghBody = buildBloggerBody(title, author, category, excerpt, articleOnlyHTML(content), tags, bloggerURL);
+        const ghPage = buildGitHubPage(title, author, category, excerpt, ghBody, slug, uploadedCoverUrl);
         githubURL    = await publishToGitHub(slug, ghPage, uploadedCoverUrl);
         distLines.push('✓ GitHub: '+githubURL);
       } catch(ghErr) {
@@ -2304,9 +2337,16 @@ async function submitArticle() {
     }
     setProgress(85);
 
-    // SEO FIX: refresh sitemap.xml + feed.xml after a successful publish
-    try { await regenerateSitemap(); } catch (e) { console.warn('Sitemap:', e); }
-    try { await regenerateFeed(); }    catch (e) { console.warn('Feed:', e); }
+    // SEO FIX: refresh sitemap.xml + feed.xml after a successful publish.
+    // The article list is reloaded first so the article just published is included.
+    if (await refreshArticleCache()) {
+      let smOk = false, fdOk = false;
+      try { smOk = await regenerateSitemap(); } catch (e) { console.warn('Sitemap:', e); }
+      try { fdOk = await regenerateFeed(); }    catch (e) { console.warn('Feed:', e); }
+      distLines.push((smOk ? '✓' : '⚠') + ' Sitemap ' + (smOk ? 'updated' : 'not updated') + ' · ' + (fdOk ? '✓' : '⚠') + ' RSS feed ' + (fdOk ? 'updated' : 'not updated'));
+    } else {
+      distLines.push('⚠ Sitemap/feed not updated (could not reload the article list)');
+    }
 
     const hasAnyDist =
       document.getElementById('dist-facebook').checked ||
