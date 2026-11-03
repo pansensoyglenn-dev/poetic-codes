@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-04-k"
+SCRIPT_VERSION = "2026-11-04-l"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -89,6 +89,12 @@ PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "").strip()
 PIXABAY_API_KEY = os.environ.get("PIXABAY_API_KEY", "").strip()
 STOCK_MAX_CLIPS = int(os.environ.get("STOCK_MAX_CLIPS", "8"))
 STOCK_MAX_MB = float(os.environ.get("STOCK_MAX_MB", "25"))
+
+# Real archival footage (public domain / Creative Commons) for stories set before 2000: Wikimedia Commons + Internet Archive.
+# No key needed. Only used when the article is about a past era; falls back to the stock sites above.
+ARCHIVE_VIDEO = os.environ.get("ARCHIVE_VIDEO", "0") == "1"
+ARCHIVE_MAX_MB = float(os.environ.get("ARCHIVE_MAX_MB", "120"))
+ARCHIVE_CLIP_SEC = float(os.environ.get("ARCHIVE_CLIP_SEC", "12"))
 
 BG1, BG2 = (11, 15, 23), (22, 40, 66)
 ACCENT, TEXT, MUTED = (116, 185, 232), (238, 244, 255), (170, 196, 230)
@@ -1142,6 +1148,16 @@ def gen_kling_clip(img, prompt, duration, out_mp4):
         return None
 
 
+def probe_size(path) -> tuple[int, int]:
+    r = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+                        "-of", "csv=p=0", str(path)], capture_output=True, text=True)
+    try:
+        w, h = (int(x) for x in r.stdout.strip().split(",")[:2])
+        return max(w, 2), max(h, 2)
+    except Exception:
+        return W, IMGH
+
+
 def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
     """Composite a Kling (or other) video under the caption band + TTS narration."""
     spoken = probe_duration(mp3)
@@ -1151,7 +1167,12 @@ def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
     # Scale the clip into the picture area (W x IMGH). A Kling clip is ~5 s but a slide lasts much longer, so a
     # short clip is played forward then backward, over and over ("ping-pong"): the people keep moving the whole
     # slide instead of freezing after 5 seconds.
-    base = f"[0:v]scale={W}:{IMGH}:force_original_aspect_ratio=increase,crop={W}:{IMGH},fps={FPS}"
+    vw, vh = probe_size(video_mp4)
+    sc = max(min(W / vw, IMGH / vh), max(W / vw, IMGH / vh) * (1 - MAX_CROP))   # show the whole frame; crop at most MAX_CROP
+    fw, fh = max(2, int(vw * sc) // 2 * 2), max(2, int(vh * sc) // 2 * 2)
+    base = (f"[0:v]fps={FPS},split[va][vb];"
+            f"[va]scale={W}:{IMGH}:force_original_aspect_ratio=increase,crop={W}:{IMGH},boxblur=24:3,eq=brightness=-0.12[vbg];"
+            f"[vb]scale={fw}:{fh}[vfg];[vbg][vfg]overlay=(W-w)/2:(H-h)/2:shortest=1,crop={W}:{IMGH}")
     if vid_dur + 0.05 < dur:
         frames = max(2, int(vid_dur * FPS) * 2)
         vchain = (
@@ -1312,6 +1333,133 @@ def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None
     return None
 
 
+_YEAR_RE = re.compile(r"\b(1[5-9]\d\d)s?\b")
+_OK_LICENSE = ("publicdomain", "creativecommons.org/publicdomain", "creativecommons.org/licenses/by", "cc0")
+
+
+def is_historical(seg: Seg, job: Job) -> bool:
+    """True when the story is set before 2000 (a year or decade in the title, place details or this sentence)."""
+    loc = job.get("location") or {}
+    text = " ".join(clean_text(x) for x in (job.get("title"), loc.get("name"), loc.get("era"), loc.get("description"),
+                                             seg.get("speech") or seg.get("text") or ""))
+    return any(int(y) < 2000 for y in _YEAR_RE.findall(text))
+
+
+def archive_queries(seg: Seg, job: Job) -> list[str]:
+    """Plain search words for an archive: this slide's concrete things, with the country added."""
+    out = []
+    for q in stock_queries(seg, job):
+        q = q.replace("philippines", "").strip()
+        if q:
+            out.append(f"philippines {q}")
+            out.append(q)
+    if not out:
+        out = ["philippines"]
+    return list(dict.fromkeys(out))[:3]
+
+
+def _words_match(text: str, query: str) -> bool:
+    """The clip's own title/description must mention at least one concrete word from the query."""
+    t = clean_text(text).lower()
+    keys = [w for w in re.findall(r"[a-z]+", query.lower()) if w != "philippines" and len(w) > 3]
+    return any(k in t for k in keys) if keys else True
+
+
+def _commons_video_search(query: str) -> list[Job]:
+    r = requests.get("https://commons.wikimedia.org/w/api.php", headers={"User-Agent": UA}, timeout=30, params={
+        "action": "query", "format": "json", "generator": "search", "gsrnamespace": 6, "gsrlimit": 10,
+        "gsrsearch": f"{query} filetype:video", "prop": "imageinfo", "iiprop": "url|size|mime|extmetadata"})
+    r.raise_for_status()
+    out = []
+    for pg in ((r.json().get("query") or {}).get("pages") or {}).values():
+        ii = (pg.get("imageinfo") or [{}])[0]
+        meta = ii.get("extmetadata") or {}
+        lic = (meta.get("LicenseShortName") or {}).get("value", "")
+        if not ii.get("url") or not lic or not (lic.lower().startswith(("cc", "public domain", "pd"))):
+            continue
+        desc = (meta.get("ImageDescription") or {}).get("value", "")
+        out.append({"id": f"commons:{pg.get('pageid')}", "link": ii["url"], "size": ii.get("size") or 0,
+                    "text": f"{pg.get('title', '')} {desc}", "who": clean_text((meta.get("Artist") or {}).get("value", "")) or "unknown",
+                    "lic": lic, "page": ii.get("descriptionurl", "")})
+    return out
+
+
+def _ia_video_search(query: str) -> list[Job]:
+    q = (f'({query}) AND mediatype:movies AND (licenseurl:*publicdomain* OR licenseurl:*creativecommons* '
+         f'OR collection:prelinger)')
+    r = requests.get("https://archive.org/advancedsearch.php", headers={"User-Agent": UA}, timeout=30, params={
+        "q": q, "fl[]": ["identifier", "title", "description", "creator", "licenseurl"], "rows": 8, "output": "json"})
+    r.raise_for_status()
+    out = []
+    for d in (r.json().get("response") or {}).get("docs") or []:
+        ident = d.get("identifier")
+        if not ident:
+            continue
+        m = requests.get(f"https://archive.org/metadata/{ident}", headers={"User-Agent": UA}, timeout=30)
+        m.raise_for_status()
+        files = [f for f in (m.json().get("files") or [])
+                 if str(f.get("name", "")).lower().endswith((".mp4", ".ogv", ".webm")) and int(f.get("size") or 0) > 0]
+        if not files:
+            continue
+        f = min(files, key=lambda f: int(f["size"]))          # the smallest copy is plenty for a few seconds
+        lic = d.get("licenseurl") or "no known copyright restrictions (Prelinger Archives)"
+        if isinstance(lic, list):
+            lic = lic[0]
+        desc = d.get("description") or ""
+        out.append({"id": f"ia:{ident}", "link": f"https://archive.org/download/{ident}/{f['name']}", "size": int(f["size"]),
+                    "text": f"{d.get('title', '')} {' '.join(desc) if isinstance(desc, list) else desc}",
+                    "who": d.get("creator") if isinstance(d.get("creator"), str) else "Internet Archive",
+                    "lic": lic, "page": f"https://archive.org/details/{ident}"})
+    return out
+
+
+def _cut_clip(src: Path, out_mp4: Path) -> bool:
+    """A short, small, silent mp4 from the middle-ish of a long old film (skips title cards at the start)."""
+    total = probe_duration(src)
+    if total < 3:
+        return False
+    length = min(ARCHIVE_CLIP_SEC, total)
+    start = max(0.0, min(total * 0.15, total - length))
+    run(["ffmpeg", "-y", "-v", "error", "-ss", f"{start:.2f}", "-t", f"{length:.2f}", "-i", str(src), "-an",
+         "-vf", "scale='min(1280,iw)':-2", "-c:v", "libx264", "-preset", "veryfast", "-crf", "27", "-pix_fmt", "yuv420p",
+         str(out_mp4)])
+    return out_mp4.exists() and out_mp4.stat().st_size > 5000
+
+
+def fetch_archive_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None:
+    """A few seconds of real archival film that matches this slide, or None."""
+    if not (ARCHIVE_VIDEO and is_historical(seg, job)):
+        return None
+    for q in archive_queries(seg, job):
+        for name, search in (("Wikimedia Commons", _commons_video_search), ("Internet Archive", _ia_video_search)):
+            try:
+                for v in search(q):
+                    if v["id"] in used or not _words_match(v["text"], q):
+                        continue
+                    if v["size"] and v["size"] > ARCHIVE_MAX_MB * 1048576:
+                        continue
+                    raw = out_mp4.with_suffix(".raw")
+                    with requests.get(v["link"], stream=True, timeout=180, headers={"User-Agent": UA}) as r:
+                        r.raise_for_status()
+                        size = 0
+                        with open(raw, "wb") as fh:
+                            for chunk in r.iter_content(1 << 20):
+                                size += len(chunk)
+                                if size > ARCHIVE_MAX_MB * 1048576:
+                                    raise RuntimeError("file too large")
+                                fh.write(chunk)
+                    ok = _cut_clip(raw, out_mp4)
+                    raw.unlink(missing_ok=True)
+                    if not ok:
+                        continue
+                    used.add(v["id"])
+                    CREDITS.append(f"Archival film - {clean_text(v.get('who')) or 'unknown'} ({v.get('lic')}) via {name} {v.get('page', '')}")
+                    return str(out_mp4)
+            except Exception as e:
+                log(f"  archival film '{q}' ({name}) not used ({str(e)[:90]})")
+    return None
+
+
 def pick_kling_slides(segs: list[Seg], n: int) -> set[int]:
     """Choose up to n body slides to animate, spread across the whole video.
     Slides whose narration mentions people come first, because that is where movement shows."""
@@ -1370,12 +1518,15 @@ def build_video(job):
     kling_used, kling_t0 = 0, time.time()
     kling_slides = pick_kling_slides(segs, KLING_MAX_CLIPS) if (KLING_ENABLED and KLING_API_KEY) else set()
     stock_slides, stock_used, stock_count = set(), set(), 0
+    if ARCHIVE_VIDEO:
+        stock_slides = pick_kling_slides(segs, STOCK_MAX_CLIPS)
+        log("  archival film on (Wikimedia Commons + Internet Archive) for slides set before 2000")
     if STOCK_VIDEO:
         names = [n for n, _ in stock_sources()]
         if not names:
             log("  STOCK_VIDEO is on but there is no PEXELS_API_KEY or PIXABAY_API_KEY secret - using still pictures")
         else:
-            stock_slides = pick_kling_slides(segs, STOCK_MAX_CLIPS)
+            stock_slides = stock_slides or pick_kling_slides(segs, STOCK_MAX_CLIPS)
             log(f"  free stock footage on ({' + '.join(names)}): up to {len(stock_slides)} moving slides")
     if KLING_ENABLED:
         if not KLING_API_KEY:
@@ -1431,7 +1582,7 @@ def build_video(job):
                 Path(got).unlink(missing_ok=True)
 
         if not used_kling and i in stock_slides:
-            got = fetch_stock_clip(seg, job, stock_used, tmp / f"s{i}.mp4")
+            got = fetch_archive_clip(seg, job, stock_used, tmp / f"s{i}.mp4") or fetch_stock_clip(seg, job, stock_used, tmp / f"s{i}.mp4")
             if got and Path(got).exists() and Path(got).stat().st_size > 5000:
                 total_dur += make_clip_from_video(got, ovp, mp3s[i], clip, caps, vkbps=vkbps)
                 used_kling = True
@@ -1457,6 +1608,7 @@ def build_video(job):
     if kling_used:
         log(f"  Kling animated {kling_used} slide(s)")
     if stock_count:
+        log(f"  moving footage (archival or stock) used on {stock_count} slide(s)")
         log(f"  stock footage used on {stock_count} slide(s)")
 
     listing = tmp / "list.txt"
