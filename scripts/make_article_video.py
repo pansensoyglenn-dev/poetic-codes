@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-03-i"
+SCRIPT_VERSION = "2026-11-03-j"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -85,6 +85,7 @@ KLING_NEG = os.environ.get(
 # Free moving people: real stock footage from Pexels (free key from pexels.com/api). Off unless STOCK_VIDEO=1.
 STOCK_VIDEO = os.environ.get("STOCK_VIDEO", "0") == "1"
 PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "").strip()
+PIXABAY_API_KEY = os.environ.get("PIXABAY_API_KEY", "").strip()
 STOCK_MAX_CLIPS = int(os.environ.get("STOCK_MAX_CLIPS", "8"))
 STOCK_MAX_MB = float(os.environ.get("STOCK_MAX_MB", "25"))
 
@@ -1217,31 +1218,66 @@ def _pick_file(video: Job) -> Job | None:
     return min(files, key=lambda f: abs(int(f["width"]) - 1280)) if files else None
 
 
+def _pixabay_search(query: str) -> list[Job]:
+    r = requests.get("https://pixabay.com/api/videos/",
+                     params={"key": PIXABAY_API_KEY, "q": query, "per_page": 15, "safesearch": "true"},
+                     headers={"User-Agent": UA}, timeout=30)
+    r.raise_for_status()
+    out = []
+    for h in r.json().get("hits") or []:
+        vids = h.get("videos") or {}
+        f = next((vids[k] for k in ("medium", "large", "small") if (vids.get(k) or {}).get("url")
+                  and int(vids[k].get("width") or 0) >= int(vids[k].get("height") or 0)), None)
+        if f:
+            out.append({"id": "px%s" % h.get("id"), "duration": h.get("duration"), "link": f["url"],
+                        "who": h.get("user"), "page": h.get("pageURL", "")})
+    return out
+
+
+def _pexels_candidates(query: str) -> list[Job]:
+    out = []
+    for v in _pexels_search(query):
+        f = _pick_file(v)
+        if f:
+            out.append({"id": v.get("id"), "duration": v.get("duration"), "link": f["link"],
+                        "who": (v.get("user") or {}).get("name"), "page": v.get("url", "")})
+    return out
+
+
+def stock_sources() -> list:
+    src = []
+    if PEXELS_API_KEY:
+        src.append(("Pexels", _pexels_candidates))
+    if PIXABAY_API_KEY:
+        src.append(("Pixabay", _pixabay_search))
+    return src
+
+
 def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None:
     """Download one free stock clip that matches this slide, or None (the slide then keeps its still picture)."""
-    if not (STOCK_VIDEO and PEXELS_API_KEY):
+    if not STOCK_VIDEO:
         return None
+    sources = stock_sources()
     for q in stock_queries(seg, job):
-        try:
-            for v in _pexels_search(q):
-                f = _pick_file(v)
-                if not f or v.get("id") in used or not (3 <= float(v.get("duration") or 0) <= 60):
-                    continue
-                with requests.get(f["link"], stream=True, timeout=120, headers={"User-Agent": UA}) as r:
-                    r.raise_for_status()
-                    size = 0
-                    with open(out_mp4, "wb") as fh:
-                        for chunk in r.iter_content(1 << 20):
-                            size += len(chunk)
-                            if size > STOCK_MAX_MB * 1048576:
-                                raise RuntimeError("clip too large")
-                            fh.write(chunk)
-                used.add(v.get("id"))
-                who = (v.get("user") or {}).get("name") or "unknown"
-                CREDITS.append(f"Stock video '{q}' - {who} via Pexels {v.get('url', '')}")
-                return str(out_mp4)
-        except Exception as e:
-            log(f"  stock video '{q}' not used ({str(e)[:90]})")
+        for name, search in sources:
+            try:
+                for v in search(q):
+                    if v["id"] in used or not (3 <= float(v.get("duration") or 0) <= 60):
+                        continue
+                    with requests.get(v["link"], stream=True, timeout=120, headers={"User-Agent": UA}) as r:
+                        r.raise_for_status()
+                        size = 0
+                        with open(out_mp4, "wb") as fh:
+                            for chunk in r.iter_content(1 << 20):
+                                size += len(chunk)
+                                if size > STOCK_MAX_MB * 1048576:
+                                    raise RuntimeError("clip too large")
+                                fh.write(chunk)
+                    used.add(v["id"])
+                    CREDITS.append(f"Stock video '{q}' - {v.get('who') or 'unknown'} via {name} {v.get('page', '')}")
+                    return str(out_mp4)
+            except Exception as e:
+                log(f"  stock video '{q}' ({name}) not used ({str(e)[:90]})")
     return None
 
 
@@ -1304,11 +1340,12 @@ def build_video(job):
     kling_slides = pick_kling_slides(segs, KLING_MAX_CLIPS) if (KLING_ENABLED and KLING_API_KEY) else set()
     stock_slides, stock_used, stock_count = set(), set(), 0
     if STOCK_VIDEO:
-        if not PEXELS_API_KEY:
-            log("  STOCK_VIDEO is on but there is no PEXELS_API_KEY secret - using still pictures")
+        names = [n for n, _ in stock_sources()]
+        if not names:
+            log("  STOCK_VIDEO is on but there is no PEXELS_API_KEY or PIXABAY_API_KEY secret - using still pictures")
         else:
             stock_slides = pick_kling_slides(segs, STOCK_MAX_CLIPS)
-            log(f"  free stock footage on (Pexels): up to {len(stock_slides)} moving slides")
+            log(f"  free stock footage on ({' + '.join(names)}): up to {len(stock_slides)} moving slides")
     if KLING_ENABLED:
         if not KLING_API_KEY:
             log("  KLING_ENABLED but no KLING_API_KEY / FAL_KEY / PIAPI_API_KEY — using still motion only")
