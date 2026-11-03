@@ -1,6 +1,6 @@
 {
-  "jobId": "1793667267703",
-  "createdAt": "2026-11-03T00:54:27.703Z",
+  "jobId": "1793681764116",
+  "createdAt": "2026-11-03T04:56:04.116Z",
   "title": "From Basnigan to Bulad: The Ilonggo Journey to Zamboanga",
   "author": "Glenn Junsay Pansensoy",
   "category": "History",
@@ -19,7 +19,11 @@
     "philippine fishing history"
   ],
   "slug": "from-basnigan-to-bulad-the-ilonggo-journey-to-zamboanga",
-  "articleId": 32,
-  "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793667242645.jpg",
-  "force": true
+  "articleId": 33,
+  "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793681759033.jpg",
+  "force": false,
+  "location": {
+    "name": "Ilo-Ilo coast to Zamboanga Sibugay to Talon-Talon Loop,Zamboanga City,1970’S",
+    "description": "Basnigan,dried fish place"
+  }
 }
