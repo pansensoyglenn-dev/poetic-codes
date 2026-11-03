@@ -1,66 +1,58 @@
-name: Make article video
+name: Article video
+
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'video-jobs/*.json'
   workflow_dispatch:
     inputs:
-      title:
-        description: "Title(s) exactly as on the site. Several: separate with ;;  Every article without a video: type *"
-        required: true
-      location:
-        description: "Where the story takes place, e.g. Iloilo City, early 1990s"
+      only:
+        description: 'Only make the video whose job file name contains this word (leave empty for all)'
         required: false
-        default: ""
-      location_details:
-        description: "Visual details: nipa huts, wet market, wooden banca boats"
+        default: ''
+      redo:
+        description: 'Rebuild even if the article already has a video (type 1)'
         required: false
-        default: ""
-      max_videos:
-        description: "When the title is *, how many articles to make this run (newest first)"
-        required: false
-        default: "10"
-      characters:
-        description: "Optional. name | description | words it appears with. Separate characters with ;;"
-        required: false
-        default: ""
-        type: string
-
-permissions:
-  contents: write
+        default: ''
 
 concurrency:
   group: article-video
   cancel-in-progress: false
 
+permissions:
+  contents: write
+
 jobs:
-  make:
+  make-video:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
+        with:
+          python-version: '3.12'
+
       - name: Install tools
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
           pip install --quiet edge-tts pillow requests
-      - name: Build job file from inputs
-        env:
-          TITLE: ${{ inputs.title }}
-          LOCATION: ${{ inputs.location }}
-          LOCATION_DETAILS: ${{ inputs.location_details }}
-          CHARACTERS: ${{ inputs.characters }}
-          MAX_VIDEOS: ${{ inputs.max_videos }}
-        run: python scripts/make_job_from_inputs.py
-      - name: Make the video
+
+      - name: Make videos for pending jobs
         env:
           ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          AI_IMAGES: "1"
+          # "0" = no generated pictures (only your cover + Wikimedia photos).
+          # Set to "1" to make a picture for each stretch of narration (uses Cloudflare's free daily quota).
+          AI_IMAGES: "0"
           # FREE moving people: real stock footage from Pexels (free key at pexels.com/api, saved as a secret)
           STOCK_VIDEO: "1"
           STOCK_MAX_CLIPS: "8"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           # People that really move (paid; each clip is billed by the provider). "0" = off, nothing is spent.
           KLING_ENABLED: "0"
           KLING_PROVIDER: "fal"
@@ -68,13 +60,47 @@ jobs:
           FAL_KEY: ${{ secrets.FAL_KEY }}
           MAX_WORDS: "3000"
           TTS_RATE: "+0%"
-          MAX_JOBS_PER_RUN: "30"
+          ONLY_JOB: ${{ github.event.inputs.only }}
+          FORCE_REDO: ${{ github.event.inputs.redo }}
         run: python scripts/make_article_video.py
+
       - name: Keep a downloadable copy of the video
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: article-videos
+          # the video plus its .description.txt (link + photo credits)
           path: out/*
           if-no-files-found: ignore
           retention-days: 3
+
+      - name: Save progress markers
+        if: always()
+        run: |
+          git config user.name "article-video-bot"
+          git config user.email "article-video-bot@users.noreply.github.com"
+          mkdir -p /tmp/new-markers
+          cp -r video-jobs/done/. /tmp/new-markers/ 2>/dev/null || true
+          cp video-jobs/to-index.txt /tmp/to-index.txt 2>/dev/null || true
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p video-jobs/done
+            cp -r /tmp/new-markers/. video-jobs/done/ 2>/dev/null || true
+            if [ -f /tmp/to-index.txt ]; then
+              { cat video-jobs/to-index.txt 2>/dev/null; cat /tmp/to-index.txt; } | awk 'NF && !seen[$0]++' > /tmp/merged.txt
+              cp /tmp/merged.txt video-jobs/to-index.txt
+            fi
+            git add video-jobs/done video-jobs/to-index.txt 2>/dev/null || true
+            if git diff --cached --quiet; then
+              echo "No marker changes to save."
+              exit 0
+            fi
+            git commit -m "Article videos processed [skip ci]"
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Push rejected (attempt $attempt); trying again."
+            sleep 5
+          done
+          exit 1
