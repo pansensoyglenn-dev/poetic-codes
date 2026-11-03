@@ -1,6 +1,6 @@
 {
-  "jobId": "1793667248267",
-  "createdAt": "2026-11-03T00:54:08.267Z",
+  "jobId": "1793667267703",
+  "createdAt": "2026-11-03T00:54:27.703Z",
   "title": "From Basnigan to Bulad: The Ilonggo Journey to Zamboanga",
   "author": "Glenn Junsay Pansensoy",
   "category": "History",
@@ -21,5 +21,5 @@
   "slug": "from-basnigan-to-bulad-the-ilonggo-journey-to-zamboanga",
   "articleId": 32,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793667242645.jpg",
-  "force": false
+  "force": true
 }
