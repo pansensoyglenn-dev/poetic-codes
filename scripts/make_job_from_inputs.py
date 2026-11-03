@@ -1,22 +1,42 @@
-"""Turn the workflow-dispatch inputs into a single video-jobs/*.json file.
+"""Turn the workflow-dispatch inputs into video-jobs/*.json files (one per article).
 
-The job holds only the title plus optional location/characters. The article text, excerpt and
-category are read from the article on the site (matched by title) when the video is made."""
+TITLE can be:
+  * one article title                                  Pancit Molo
+  * several, one per line or separated by ;;           Pancit Molo ;; La Paz Batchoy ;; Kadyos Baboy at Langka
+      each may carry its own place:  Title | Location | Details
+  * * (or "all")                                       every article on the site that has no video yet,
+                                                       newest first, at most MAX_VIDEOS of them
+
+The job holds only the title plus optional location/characters. The article text, excerpt and category are
+read from the article on the site (matched by title) when the video is made.
+LOCATION / LOCATION_DETAILS / CHARACTERS are used for every job that has no place of its own. A character only
+appears in the pictures where the narration mentions its name or one of its words, so one cast is safe to share."""
 import json
 import os
 import re
 from pathlib import Path
 
-title = os.environ.get("TITLE", "").strip()
+import requests
+
+ARTICLES_API = os.environ.get("ARTICLES_API", "https://poetic-codes.vercel.app/api/articles")
+raw_title = os.environ.get("TITLE", "").strip()
 location = os.environ.get("LOCATION", "").strip()
 details = os.environ.get("LOCATION_DETAILS", "").strip()
 chars = os.environ.get("CHARACTERS", "").strip()
+try:
+    max_videos = max(1, int(os.environ.get("MAX_VIDEOS", "10") or 10))
+except ValueError:
+    max_videos = 10
 
-if not title:
-    raise SystemExit("title is required")
+if not raw_title:
+    raise SystemExit("title is required (an article title, several separated by ;;, or * for every article without a video)")
 
-# Characters: one per line, "name | description | word,word,word". A one-line field on a phone can also use ";;"
-# between characters, because GitHub's run form has no multi-line box.
+
+def slug(s):
+    return re.sub(r"[^a-z0-9]+", "-", s.lower()).strip("-") or "job"
+
+
+# Characters: "name | description | word,word,word", one per line or separated by ;;
 character_list = []
 for line in re.split(r"\n|;;", chars):
     line = line.strip()
@@ -26,24 +46,52 @@ for line in re.split(r"\n|;;", chars):
     if len(parts) < 2:
         continue
     character_list.append({
-        "id": re.sub(r"[^a-z0-9]+", "-", parts[0].lower()).strip("-"),
+        "id": slug(parts[0]),
         "name": parts[0],
         "description": parts[1],
         "appearsIn": [w.strip() for w in (parts[2].split(",") if len(parts) > 2 else []) if w.strip()],
         "referenceImages": [],
     })
 
-job = {
-    "jobId": os.environ.get("GITHUB_RUN_ID", "local"),
-    "title": title,
-    "force": True,  # you asked for this video on purpose, so rebuild even if the article already has one
-}
-if location or details:
-    job["location"] = {"name": location, "description": details}
-if character_list:
-    job["characters"] = character_list
+# Which articles?
+entries = []  # (title, location, details, force)
+if raw_title.lower() in ("*", "all"):
+    r = requests.get(ARTICLES_API, headers={"Accept": "application/json"}, timeout=60)
+    r.raise_for_status()
+    data = r.json()
+    if isinstance(data, dict):
+        data = data.get("articles") or data.get("results") or data.get("data") or []
+    todo = [a for a in data if a.get("title") and not (a.get("video_url") or a.get("videoUrl"))]
+    todo.sort(key=lambda a: int(a.get("id") or 0), reverse=True)
+    print(f"{len(todo)} article(s) have no video yet; making {min(len(todo), max_videos)}")
+    entries = [(a["title"].strip(), "", "", False) for a in todo[:max_videos]]
+else:
+    for chunk in re.split(r"\n|;;", raw_title):
+        chunk = chunk.strip()
+        if not chunk:
+            continue
+        p = [x.strip() for x in chunk.split("|")]
+        # you asked for these by name, so rebuild even if the article already has a video
+        entries.append((p[0], p[1] if len(p) > 1 else "", p[2] if len(p) > 2 else "", True))
+
+if not entries:
+    raise SystemExit("nothing to do: every article already has a video" if raw_title.lower() in ("*", "all") else "no titles found")
 
 Path("video-jobs").mkdir(exist_ok=True)
-out = Path("video-jobs") / f"{re.sub(r'[^a-z0-9]+', '-', title.lower()).strip('-')}.json"
-out.write_text(json.dumps(job, indent=2), encoding="utf-8")
-print(f"wrote {out}")
+seen = set()
+for n, (title, loc, det, force) in enumerate(entries):
+    if slug(title) in seen:
+        continue
+    seen.add(slug(title))
+    loc = loc or location
+    det = det or details
+    job = {"jobId": f"{os.environ.get('GITHUB_RUN_ID', 'local')}-{n + 1}", "title": title}
+    if force:
+        job["force"] = True
+    if loc or det:
+        job["location"] = {"name": loc, "description": det}
+    if character_list:
+        job["characters"] = character_list
+    out = Path("video-jobs") / f"{slug(title)}.json"
+    out.write_text(json.dumps(job, indent=2), encoding="utf-8")
+    print(f"wrote {out}")
