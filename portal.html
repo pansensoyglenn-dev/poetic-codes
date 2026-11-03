@@ -12,6 +12,7 @@
   <meta name="theme-color" content="#0b0f17">
   <link rel="canonical" href="https://poetic-codes.pages.dev/portal.html">
 
+  <!-- SEO FIX: point crawlers at the machine-readable indexes -->
   <link rel="sitemap" type="application/xml" href="https://poetic-codes.pages.dev/sitemap.xml">
   <link rel="alternate" type="application/rss+xml" title="The Commonplace" href="https://poetic-codes.pages.dev/feed.xml">
 
@@ -349,6 +350,17 @@
           <div class="field-group">
             <label class="field-label" for="f-excerpt">Excerpt *</label>
             <input type="text" id="f-excerpt" class="field-input" placeholder="A line or two about the piece" maxlength="160" required>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label" for="f-video-place">Video: place &amp; era (optional)</label>
+              <input type="text" id="f-video-place" class="field-input" placeholder="e.g. Iloilo coast to Zamboanga Sibugay, 1950s" maxlength="120">
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="f-video-details">Video: what the camera sees (optional)</label>
+              <input type="text" id="f-video-details" class="field-input" placeholder="e.g. basnigan boats with lamp booms, drying bulad, nipa huts" maxlength="200">
+            </div>
           </div>
 
           <div class="field-group">
@@ -939,7 +951,7 @@ function resetSubmitButton() {
 }
 
 function resetForm() {
-  ['f-title','f-excerpt','f-tags'].forEach(id => {
+  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -2191,6 +2203,8 @@ async function queueVideoJob(job) {
     coverUrl: job.coverUrl || null,
     force: !!job.force
   };
+  // Where the story takes place: the video's pictures are drawn to match (see article_video.py)
+  if (job.location && (job.location.name || job.location.description)) payload.location = job.location;
   await githubPutText(VIDEO_JOBS_DIR + '/' + slug + '.json', JSON.stringify(payload, null, 2), 'Queue video: ' + slug);
   return payload;
 }
@@ -2325,7 +2339,11 @@ async function submitArticle() {
           title, author, category, excerpt, tags, slug,
           body: htmlToPlainText(content),
           articleId: cpArticleId,
-          coverUrl: uploadedCoverUrl || videoCoverUrl
+          coverUrl: uploadedCoverUrl || videoCoverUrl,
+          location: {
+            name: ((document.getElementById('f-video-place') || {}).value || '').trim(),
+            description: ((document.getElementById('f-video-details') || {}).value || '').trim()
+          }
         });
         distLines.push('✓ Video: queued — it will appear on the article in about 1–3 minutes');
       } catch (vErr) {
