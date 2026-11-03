@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-04-l"
+SCRIPT_VERSION = "2026-11-04-n"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -607,6 +607,9 @@ def wiki_queries(job):
             counts[w] = counts.get(w, 0) + 1
     nouns = [w for w, c in sorted(counts.items(), key=lambda x: -x[1]) if c >= 3][:4]
     qs = []
+    ph = bool(re.search(r"philippin|iloilo|zamboanga|visayas|mindanao|ilonggo|cebu|manila|panay|negros|sibugay",
+                        (title + " " + body[:6000] + " " + clean_text((job.get("location") or {}).get("name"))).lower()))
+    anchor = " Philippines" if ph else ""      # a bare word like "Talon" or "Estancia" matches places all over the world
     loc_name = clean_text(((job.get("location") or {}).get("name") or "").split(",")[0])
     if loc_name:
         qs.append(loc_name)
@@ -617,9 +620,9 @@ def wiki_queries(job):
     if len(key) > 2:
         qs.append(" ".join(key[:2]) + " workers")
     for n in nouns[:3]:
-        qs.append(n)
+        qs.append(n + anchor)
     if len(nouns) >= 2:
-        qs.append(f"{nouns[0]} {nouns[1]}")
+        qs.append(f"{nouns[0]} {nouns[1]}{anchor}")
     if cat and key:
         qs.append(f"{key[0]} {cat}")
     seen, out = set(), []
@@ -1222,7 +1225,7 @@ _STOCK_STOP = {"that", "this", "with", "from", "were", "have", "been", "their", 
                "into", "than", "then", "them", "they", "these", "those", "also", "while", "when", "where", "what",
                "more", "most", "some", "many", "such", "only", "over", "under", "after", "before", "because"}
 # concrete things a stock-video site can find; people and actions come first in the query
-_STOCK_PEOPLE = ["fisherman", "fishermen", "farmer", "farmers", "workers", "children", "family", "crowd", "villagers",
+_STOCK_PEOPLE = ["fisherman", "fishermen", "fishers", "fisherfolk", "farmer", "farmers", "workers", "children", "family", "crowd", "villagers",
                  "vendor", "vendors", "women", "men", "soldiers", "priest", "students", "traders", "sailors", "cook", "chef"]
 _STOCK_THINGS = ["market", "boat", "boats", "fishing", "harvest", "rice", "sugarcane", "cooking", "street", "village",
                  "church", "procession", "festival", "sea", "ocean", "port", "harbor", "ship", "farm", "field", "mill",
@@ -1244,7 +1247,7 @@ def stock_queries(seg: Seg, job: Job) -> list[str]:
         wide = re.findall(r"[a-z]+", (place_text + " " + clean_text((job.get("location") or {}).get("description")).lower()))
         core = ([w for w in dict.fromkeys(wide) if w in _STOCK_PEOPLE][:1] + [w for w in dict.fromkeys(wide) if w in _STOCK_THINGS][:2])
     if not core:
-        return ["philippines village life"] if ph else []
+        return []          # nothing concrete to search for: keep the still picture rather than a random clip
     out = []
     if ph:
         out.append("philippines " + " ".join(core[:2]))
@@ -1270,6 +1273,21 @@ def _pick_file(video: Job) -> Job | None:
     return min(files, key=lambda f: abs(int(f["width"]) - 1280)) if files else None
 
 
+_STOCK_BLOCK = {"jet", "jets", "airplane", "aircraft", "fighter", "helicopter", "drone", "skyscraper", "laptop", "smartphone",
+                "spaceship", "rocket", "tank", "missile", "cartoon", "animation", "3d"}
+
+
+def stock_relevant(text: str, query: str) -> bool:
+    """A free stock site matches loosely, so check the clip's own tags/title: it must mention a concrete word from
+    the search and nothing that clearly does not belong in a story about people and places."""
+    t = clean_text(text).lower()
+    if not t:
+        return True
+    if any(b in re.findall(r"[a-z0-9]+", t) for b in _STOCK_BLOCK):
+        return False
+    return _words_match(t, query)
+
+
 def _pixabay_search(query: str) -> list[Job]:
     r = requests.get("https://pixabay.com/api/videos/",
                      params={"key": PIXABAY_API_KEY, "q": query, "per_page": 15, "safesearch": "true"},
@@ -1278,11 +1296,13 @@ def _pixabay_search(query: str) -> list[Job]:
     out = []
     for h in r.json().get("hits") or []:
         vids = h.get("videos") or {}
-        f = next((vids[k] for k in ("medium", "large", "small") if (vids.get(k) or {}).get("url")
+        # small = ~1280x720 (plenty); medium/large are 1080p/4K files that are far too big
+        f = next((vids[k] for k in ("small", "tiny", "medium") if (vids.get(k) or {}).get("url")
                   and int(vids[k].get("width") or 0) >= int(vids[k].get("height") or 0)), None)
         if f:
-            out.append({"id": "px%s" % h.get("id"), "duration": h.get("duration"), "link": f["url"],
-                        "who": h.get("user"), "page": h.get("pageURL", "")})
+            out.append({"id": "px%s" % h.get("id"), "duration": h.get("duration"), "link": f["url"], "size": int(f.get("size") or 0),
+                        "who": h.get("user"), "page": h.get("pageURL", ""),
+                        "text": f"{h.get('tags', '')} {(h.get('pageURL') or '').rstrip('/').rsplit('/', 1)[-1].replace('-', ' ')}"})
     return out
 
 
@@ -1292,7 +1312,8 @@ def _pexels_candidates(query: str) -> list[Job]:
         f = _pick_file(v)
         if f:
             out.append({"id": v.get("id"), "duration": v.get("duration"), "link": f["link"],
-                        "who": (v.get("user") or {}).get("name"), "page": v.get("url", "")})
+                        "who": (v.get("user") or {}).get("name"), "page": v.get("url", ""),
+                        "text": (v.get("url") or "").rstrip("/").rsplit("/", 1)[-1].replace("-", " ")})
     return out
 
 
@@ -1316,6 +1337,10 @@ def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None
                 for v in search(q):
                     if v["id"] in used or not (3 <= float(v.get("duration") or 0) <= 60):
                         continue
+                    if not stock_relevant(v.get("text", ""), q):
+                        continue
+                    if v.get("size") and v["size"] > STOCK_MAX_MB * 1048576:
+                        continue              # too big: skip before downloading anything
                     with requests.get(v["link"], stream=True, timeout=120, headers={"User-Agent": UA}) as r:
                         r.raise_for_status()
                         size = 0
