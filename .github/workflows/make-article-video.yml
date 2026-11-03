@@ -59,7 +59,7 @@ jobs:
           AI_IMAGES: "1"
           # FREE moving people: real stock footage from Pexels (free key at pexels.com/api, saved as a secret)
           STOCK_VIDEO: "1"
-          STOCK_MAX_CLIPS: "8"
+          STOCK_MAX_CLIPS: "20"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           # People that really move (paid; each clip is billed by the provider). "0" = off, nothing is spent.
