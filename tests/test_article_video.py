@@ -148,3 +148,147 @@ def test_a_video_is_built_and_starts_on_the_picture_not_black(tmp_path):
         assert Path(final).stat().st_size > 10_000 and dur > 5 and engine == "fake"
     finally:
         shutil.rmtree(Path(final).parent, ignore_errors=True)
+
+
+# ---------- location / characters / look from the job file
+STORY = "Nanay Rosa carried the dumplings to the wet market while the sun rose over the nipa huts."
+
+
+def test_characters_appear_only_where_the_narration_mentions_them():
+    j = job(characters=[{"name": "Nanay Rosa", "description": "elderly woman, grey bun, faded floral blouse", "appearsIn": ["rosa", "dumplings"]},
+                        {"name": "Tomas", "description": "young fisherman", "appearsIn": ["banca"]}])
+    pr = av.scene_prompt({"speech": STORY}, j)
+    assert "elderly woman, grey bun" in pr and "young fisherman" not in pr
+    assert "faded floral" not in av.scene_prompt({"speech": "The harbour was quiet that night."}, j)
+
+
+def test_place_era_palette_and_look_reach_the_prompt():
+    j = job(location={"name": "Iloilo City", "era": "early 1990s", "description": "nipa huts, wooden banca boats", "palette": "warm ochre"},
+            style={"look": "35mm Kodak film"})
+    pr = av.scene_prompt({"speech": STORY}, j)
+    assert pr.startswith("35mm Kodak film") and "Iloilo City, early 1990s" in pr and "nipa huts" in pr and "warm ochre" in pr
+    assert len(pr.split()) < 260
+
+
+def test_a_title_only_job_gets_its_text_from_the_article_on_the_site():
+    j = {"title": TITLE}
+    av.fill_job_from_article(j, {"id": 7, "content": "<main><p>Body.</p></main>", "excerpt": "Ex", "category": "culture"})
+    assert j["body"].startswith("<main>") and j["excerpt"] == "Ex" and j["category"] == "culture" and j["articleId"] == 7
+    keep = {"title": TITLE, "body": "mine"}
+    av.fill_job_from_article(keep, {"id": 7, "content": "site"})
+    assert keep["body"] == "mine"
+
+
+# ---------- moving people (Kling clips)
+def test_animated_slides_are_spread_out_and_prefer_people():
+    segs = [{"kind": "body", "speech": "The workers carried cane." if i % 3 == 0 else "The mill is a ruin."} for i in range(30)]
+    segs.append({"kind": "end", "speech": "x"})
+    picked = sorted(av.pick_kling_slides(segs, 6))
+    assert len(picked) == 6 and picked[0] <= 3 and picked[-1] >= 26          # first to last part of the video
+    assert sum(1 for i in picked if i % 3 == 0) >= 5                          # mostly slides that mention people
+    assert av.pick_kling_slides(segs, 0) == set()
+
+
+def test_a_short_clip_keeps_moving_for_the_whole_slide(tmp_path):
+    import subprocess
+    if not shutil.which("ffmpeg"):
+        pytest.skip("ffmpeg not installed")
+    from PIL import Image, ImageChops, ImageStat
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", "testsrc2=size=1280x720:rate=24:duration=5", "-pix_fmt", "yuv420p", str(tmp_path / "k.mp4")], check=True)
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", "18", "-c:a", "libmp3lame", str(tmp_path / "a.mp3")], check=True)
+    av.render_caption("c").save(tmp_path / "c.png")
+    Image.new("RGBA", (av.W, av.H), (0, 0, 0, 0)).save(tmp_path / "o.png")
+    av.make_clip_from_video(tmp_path / "k.mp4", tmp_path / "o.png", tmp_path / "a.mp3", tmp_path / "out.mp4", [(tmp_path / "c.png", 0, 18)])
+
+    def grab(t, name):
+        subprocess.run(["ffmpeg", "-y", "-v", "error", "-ss", str(t), "-i", str(tmp_path / "out.mp4"), "-frames:v", "1", str(tmp_path / name)], check=True)
+        return Image.open(tmp_path / name).convert("L").crop((0, 0, av.W, av.IMGH))
+
+    late = ImageStat.Stat(ImageChops.difference(grab(16.0, "x.png"), grab(16.4, "y.png"))).mean[0]
+    assert late > 0.3, "the picture froze after the clip ended"
+
+
+# ---------- free moving people: Pexels stock footage (network faked)
+class _Resp:
+    def __init__(self, data=b"", js=None):
+        self._data, self._js = data, js
+
+    def raise_for_status(self):
+        pass
+
+    def json(self):
+        return self._js
+
+    def iter_content(self, n):
+        for i in range(0, len(self._data), n):
+            yield self._data[i:i + n]
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        pass
+
+
+def _fake_pexels(monkeypatch, mp4_bytes, videos=None, fail=False):
+    calls = []
+    vids = videos if videos is not None else [{"id": 1, "duration": 8, "url": "https://pexels.com/video/1", "user": {"name": "Jane"},
+             "video_files": [{"file_type": "video/mp4", "width": 1280, "height": 720, "link": "https://cdn/clip.mp4"},
+                             {"file_type": "video/mp4", "width": 3840, "height": 2160, "link": "https://cdn/huge.mp4"}]}]
+
+    def get(url, **kw):
+        calls.append(url)
+        if fail:
+            raise RuntimeError("network down")
+        return _Resp(js={"videos": vids}) if "api.pexels.com" in url else _Resp(data=mp4_bytes)
+    monkeypatch.setattr(av.requests, "get", get)
+    return calls
+
+
+def test_stock_queries_use_the_people_and_things_in_the_narration():
+    q = av.stock_queries({"speech": "The fishermen pushed their boat into the sea at dawn."}, {"title": "Iloilo fishing"})
+    assert q[0] == "philippines fisherman boat" or q[0].startswith("philippines fishermen")
+    assert av.stock_queries({"speech": "It was a quiet and thoughtful year."}, {"title": "x"}) == []
+
+
+def test_stock_clip_is_downloaded_credited_and_not_reused(monkeypatch, tmp_path):
+    import subprocess
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", "testsrc2=size=640x360:rate=24:duration=2", "-pix_fmt", "yuv420p", str(tmp_path / "s.mp4")], check=True)
+    calls = _fake_pexels(monkeypatch, (tmp_path / "s.mp4").read_bytes())
+    monkeypatch.setattr(av, "STOCK_VIDEO", True)
+    monkeypatch.setattr(av, "PEXELS_API_KEY", "key")
+    av.CREDITS.clear()
+    used = set()
+    seg = {"speech": "The fishermen pushed their boat into the sea."}
+    got = av.fetch_stock_clip(seg, {"title": "t"}, used, tmp_path / "o.mp4")
+    assert got and (tmp_path / "o.mp4").stat().st_size > 1000 and 1 in used
+    assert "https://cdn/clip.mp4" in calls and "https://cdn/huge.mp4" not in calls   # the 1280-wide file, not the 4K one
+    assert av.CREDITS and "Jane" in av.CREDITS[0] and "Pexels" in av.CREDITS[0]
+    assert av.fetch_stock_clip(seg, {"title": "t"}, used, tmp_path / "o2.mp4") is None   # same clip is never used twice
+    av.CREDITS.clear()
+
+
+def test_stock_footage_failure_or_missing_key_keeps_the_still_picture(monkeypatch, tmp_path):
+    seg = {"speech": "The fishermen pushed their boat into the sea."}
+    monkeypatch.setattr(av, "STOCK_VIDEO", True)
+    monkeypatch.setattr(av, "PEXELS_API_KEY", "")
+    assert av.fetch_stock_clip(seg, {"title": "t"}, set(), tmp_path / "o.mp4") is None
+    monkeypatch.setattr(av, "PEXELS_API_KEY", "key")
+    _fake_pexels(monkeypatch, b"", fail=True)
+    assert av.fetch_stock_clip(seg, {"title": "t"}, set(), tmp_path / "o.mp4") is None
+
+
+@pytest.mark.skipif(not shutil.which("ffmpeg"), reason="ffmpeg not installed")
+def test_a_video_with_stock_footage_builds(monkeypatch, tmp_path):
+    import subprocess
+    subprocess.run(["ffmpeg", "-y", "-v", "error", "-f", "lavfi", "-i", "testsrc2=size=1280x720:rate=24:duration=3", "-pix_fmt", "yuv420p", str(tmp_path / "s.mp4")], check=True)
+    _fake_pexels(monkeypatch, (tmp_path / "s.mp4").read_bytes())
+    monkeypatch.setattr(av, "STOCK_VIDEO", True)
+    monkeypatch.setattr(av, "PEXELS_API_KEY", "key")
+    body = "<main><p>The fishermen pushed their boat into the sea at dawn. Workers carried the nets to the market along the road.</p></main>"
+    final, dur, _ = av.build_video(job(body=body))
+    try:
+        assert Path(final).stat().st_size > 10_000 and any("Pexels" in c for c in av.CREDITS)
+    finally:
+        shutil.rmtree(Path(final).parent, ignore_errors=True)
+        av.CREDITS.clear()
