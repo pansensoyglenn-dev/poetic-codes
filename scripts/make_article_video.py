@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-03-j"
+SCRIPT_VERSION = "2026-11-04-k"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -47,7 +47,8 @@ AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "16"))  # each picture covers 
 # strip() removes a stray space or newline pasted along with the secret.
 CLOUDFLARE_ACCOUNT_ID = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
 CLOUDFLARE_API_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
-VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
+VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")   # Philippine English; en-PH-RosaNeural is the female voice
+VOICE_FALLBACKS = ["en-PH-RosaNeural", "en-US-ChristopherNeural"]
 RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
 SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "60"))  # longer slides = fewer, better-matched pictures
@@ -309,9 +310,33 @@ def fit_text(draw, text, max_w, max_h, sizes, bold=False):
     return font, lines, lh
 
 
+BAND_H = int(BGW * IMGH / W) // 2 * 2      # the part of the 2560x1440 canvas that is actually shown (2560x1080)
+MAX_CROP = 0.18                            # a photo may lose at most this much to fill the picture area
+
+
+def fit_band(img):
+    """Put the WHOLE photo in the picture area. If its shape is close, it is cropped by at most MAX_CROP;
+    otherwise it is shown complete with a soft blurred copy of itself on the sides (never a hard crop)."""
+    from PIL import ImageFilter
+    w, h = img.size
+    s_cover = max(BGW / w, BAND_H / h)
+    s_contain = min(BGW / w, BAND_H / h)
+    sc = max(s_contain, s_cover * (1 - MAX_CROP))
+    nw, nh = max(1, int(w * sc)), max(1, int(h * sc))
+    canvas = ImageOps.fit(img, (BGW, BGH), Image.LANCZOS)
+    if nw >= BGW and nh >= BAND_H:
+        pass
+    else:
+        canvas = canvas.resize((BGW // 8, BGH // 8), Image.BILINEAR).filter(ImageFilter.GaussianBlur(6)).resize((BGW, BGH), Image.BICUBIC)
+        canvas = Image.eval(canvas, lambda v: int(v * 0.7))
+    pic = img.resize((nw, nh), Image.LANCZOS)
+    canvas.paste(pic, ((BGW - nw) // 2, (BGH - nh) // 2))
+    return canvas
+
+
 def render_layers(seg, idx, total, cover):
     if cover is not None:
-        bg = ImageOps.fit(cover, (BGW, BGH), Image.LANCZOS)
+        bg = fit_band(cover.convert("RGB"))
     else:
         bg = gradient_bg().resize((BGW, BGH), Image.BICUBIC)
     ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -383,9 +408,9 @@ def caption_timings(speech: str, dur: float) -> list[tuple[str, float, float]]:
     return out
 
 
-async def _edge_synth(text, out):
+async def _edge_synth(text, out, voice=None):
     import edge_tts
-    await edge_tts.Communicate(text, VOICE, rate=RATE).save(out)
+    await edge_tts.Communicate(text, voice or VOICE, rate=RATE).save(out)
 
 
 def pick_rate(segs: list[Seg]) -> str:
@@ -409,9 +434,11 @@ def synth(text, out_mp3):
         return "fake"
 
     last = None
-    for attempt in range(3):
+    voices = [VOICE] + [v for v in VOICE_FALLBACKS if v != VOICE]
+    for attempt in range(4):
+        v = voices[min(attempt // 2, len(voices) - 1)]    # two tries per voice, then the next voice
         try:
-            asyncio.run(_edge_synth(text, out_mp3))
+            asyncio.run(_edge_synth(text, out_mp3, v))
             if os.path.exists(out_mp3) and os.path.getsize(out_mp3) > 1000:
                 return "edge-tts"
         except Exception as e:
@@ -456,7 +483,7 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_
     px = f"on/{nfr}" if x1 > x0 else f"(1-on/{nfr})"
     wide_h = int(BGW * IMGH / W) // 2 * 2
     vr = BGH - wide_h
-    ye2 = f"{y0 * vr:.1f}+({(y1 - y0) * vr:.1f})*t/{dur:.2f}"
+    ye2 = f"{0.5 * vr:.1f}"      # always the middle band: the whole photo is placed there, so no vertical panning
 
     def pic_chain(inp, label):
         chain = (
@@ -657,10 +684,10 @@ def load_wiki_photos(job, have):
 def make_variants(img, n=5):
     w, h = img.size
     out = []
-    spots = [(0.0, 0.0), (1.0, 0.0), (0.0, 1.0), (1.0, 1.0), (0.5, 0.5), (0.5, 0.0), (0.5, 1.0)]
+    spots = _SPOTS
     for i in range(n):
         fx, fy = spots[i % len(spots)]
-        cw, ch = int(w * 0.62), int(h * 0.62)
+        cw, ch = int(w * 0.84), int(h * 0.84)
         x0, y0 = int((w - cw) * fx), int((h - ch) * fy)
         crop = img.crop((x0, y0, x0 + cw, y0 + ch)).resize((w, h), Image.LANCZOS)
         out.append(crop)
@@ -818,14 +845,14 @@ def gen_image(prompt):
     return None
 
 
-_SPOTS = [(0.0, 0.0), (1.0, 0.0), (0.0, 1.0), (1.0, 1.0), (0.5, 0.5), (0.5, 0.0), (0.5, 1.0)]
+_SPOTS = [(0.5, 0.5), (0.25, 0.5), (0.75, 0.5), (0.5, 0.3), (0.5, 0.7)]
 
 
 def framing(img, k):
     if k <= 0 or img is None:
         return img
     w, h = img.size
-    frac = 0.78 if k % 2 else 0.64
+    frac = 0.90 if k % 2 else 0.82
     cw, ch = int(w * frac), int(h * frac)
     fx, fy = _SPOTS[(k - 1) % len(_SPOTS)]
     x0, y0 = int((w - cw) * fx), int((h - ch) * fy)
@@ -1192,7 +1219,11 @@ def stock_queries(seg: Seg, job: Job) -> list[str]:
     ph = any(k in place_text or k in speech for k in ("philippin", "iloilo", "zamboanga", "visayas", "mindanao", "ilonggo", "panay", "manila", "cebu"))
     core = (people[:1] + things[:2]) or things[:2] or people[:2]
     if not core:
-        return []
+        # nothing concrete in this sentence: use what the whole article is about
+        wide = re.findall(r"[a-z]+", (place_text + " " + clean_text((job.get("location") or {}).get("description")).lower()))
+        core = ([w for w in dict.fromkeys(wide) if w in _STOCK_PEOPLE][:1] + [w for w in dict.fromkeys(wide) if w in _STOCK_THINGS][:2])
+    if not core:
+        return ["philippines village life"] if ph else []
     out = []
     if ph:
         out.append("philippines " + " ".join(core[:2]))
@@ -1410,7 +1441,7 @@ def build_video(job):
         if not used_kling:
             bg2_path = None
             if frame_b is not None and frame_a is not frame_b:
-                bg2 = ImageOps.fit(frame_b, (BGW, BGH), Image.LANCZOS)
+                bg2 = fit_band(frame_b.convert("RGB"))
                 bg2.save(bgp2)
                 bg2_path = bgp2
             total_dur += make_clip(bgp, ovp, mp3s[i], clip, caps, i, vkbps=vkbps, bg2_png=bg2_path)
