@@ -19,7 +19,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-03-f"
+SCRIPT_VERSION = "2026-11-03-g"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -556,6 +556,9 @@ def wiki_queries(job):
             counts[w] = counts.get(w, 0) + 1
     nouns = [w for w, c in sorted(counts.items(), key=lambda x: -x[1]) if c >= 3][:4]
     qs = []
+    loc_name = clean_text(((job.get("location") or {}).get("name") or "").split(",")[0])
+    if loc_name:
+        qs.append(loc_name)
     if key:
         qs.append(" ".join(key[:4]) + " people")
         qs.append(" ".join(key[:3]))
@@ -688,12 +691,32 @@ def visual_focus(text: str | None) -> str:
 PROMPT_WORDS = int(os.environ.get("PROMPT_WORDS", "115"))
 
 
+def _words(text: str, n: int) -> str:
+    return " ".join(str(text or "").split()[:n]).rstrip(" ,.;:")
+
+
+def story_context(job: Job, speech: str) -> tuple[str, str, str]:
+    loc = job.get("location") or {}
+    place = ", ".join(x for x in (_words(loc.get("name"), 10), _words(loc.get("era"), 6)) if x)
+    details = _words(loc.get("description") or loc.get("details"), 28)
+    palette = _words(loc.get("palette"), 12)
+    setting = "; ".join(x for x in (place, details, palette and f"palette {palette}") if x)
+    cast = []
+    for c in job.get("characters") or []:
+        keys = [c.get("name", "")] + list(c.get("appearsIn") or [])
+        if any(k and re.search(r"\b" + re.escape(k) + r"\b", speech, re.I) for k in keys):
+            cast.append(f"{c.get('name', '')}: {_words(c.get('description'), 24)}")
+    look = _words((job.get("style") or {}).get("look"), 18)
+    return "; ".join(cast[:2]), setting, look
+
+
 def scene_prompt(seg: Seg, job: Job) -> str:
     title = clean_text(job.get("title")) or ""
     category = clean_text(job.get("category")) or ""
     heading = clean_text(seg.get("heading") or "")
     speech = clean_text(seg.get("speech") or seg.get("text") or "")
-    sents = [x.strip() for x in re.split(r"(?<=[.!?])\s+", speech) if len(x.split()) >= 4] or [speech]
+    cast, setting, look = story_context(job, speech)
+
     def short(x, n=16):
         w = re.sub(r"\s+([,.;:])", r"\1", visual_focus(x)).split()
         if len(w) > n:
@@ -703,21 +726,22 @@ def scene_prompt(seg: Seg, job: Job) -> str:
                     w = w[:k + 1]
                     break
         return " ".join(w).rstrip(" ,.;:")
-    per = [short(x) for x in sents]
-    per = [x for x in per if x]
-    while per and sum(len(x.split()) for x in per) > PROMPT_WORDS and len(per) > 1:
+
+    sents = [x.strip() for x in re.split(r"(?<=[.!?])\s+", speech) if len(x.split()) >= 4] or [speech]
+    per = [x for x in (short(x) for x in sents) if x]
+    extra = len((cast + " " + setting).split())
+    budget = max(45, PROMPT_WORDS - extra)
+    while per and sum(len(x.split()) for x in per) > budget and len(per) > 1:
         per.pop(len(per) // 2)
     focus = "; ".join(per)
-    has_people = bool(_PEOPLE_RE.search(focus))
-    if has_people:
-        style = STYLE_BASE + ", " + STYLE_PEOPLE
-        scene = "people actively moving through the scene, caught mid-movement."
-    else:
-        style = STYLE_BASE
-        scene = "the places, objects and landscape described, people only if they fit naturally."
-    place = heading or title
+    has_people = bool(_PEOPLE_RE.search(focus)) or bool(cast)
+    style = (look + ", " if look else "") + STYLE_BASE + (", " + STYLE_PEOPLE if has_people else "")
+    scene = ("people actively moving through the scene, caught mid-movement." if has_people
+             else "the places, objects and landscape described, people only if they fit naturally.")
+    where = heading or title
     ctx = f"Setting: {title}" + (f", {category}" if category else "") + "."
-    parts = [style + ".", f"{place}." if place else "", "Show: " + focus + ".", scene, ctx]
+    parts = [style + ".", f"{where}." if where else "", "Show: " + focus + ".",
+             f"Characters: {cast}." if cast else "", f"Place: {setting}." if setting else "", scene, ctx]
     return " ".join(p for p in parts if p).strip()[:1900]
 
 
@@ -1397,6 +1421,17 @@ def add_to_index_list(article_url):
             fh.write(article_url + "\n")
 
 
+def fill_job_from_article(job: Job, row: Job) -> None:
+    for key, names in (("body", ("content", "body")), ("excerpt", ("excerpt", "summary")), ("category", ("category",))):
+        if not str(job.get(key) or "").strip():
+            for n in names:
+                if str(row.get(n) or "").strip():
+                    job[key] = row[n]
+                    break
+    if job.get("articleId") in (None, "") and row.get("id") is not None:
+        job["articleId"] = row["id"]
+
+
 def existing_video(row):
     return row.get("video_url") or row.get("videoUrl") or ""
 
@@ -1464,6 +1499,8 @@ def process_job(path):
     if not DRY_RUN and not needs_work(job, marker):
         return None
 
+    if not job.get("jobId"):
+        job["jobId"] = str(int(path.stat().st_mtime))
     title = job.get("title", name)
     log(f"\n=== {title} ({name})")
     attempts = (marker.get("attempts", 0) if marker and marker.get("jobId") == job.get("jobId") else 0) + 1
@@ -1481,6 +1518,11 @@ def process_job(path):
                                     "reason": "article already has a video", "title": title})
                 return "skipped"
 
+        if row is not None:
+            fill_job_from_article(job, row)
+        if not clean_text(job.get("body")):
+            raise RuntimeError("this job has no article text and the article was not found on the site "
+                               "(the title must match exactly), so there is nothing to narrate")
         final, dur, engine = build_video(job)
         log(f"  video built: {dur:.0f}s, voice engine: {engine}")
 
