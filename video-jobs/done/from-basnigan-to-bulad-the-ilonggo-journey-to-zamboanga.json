@@ -1,14 +1,14 @@
 {
-  "jobId": "1793682112300",
+  "jobId": "1793739561634",
   "status": "done",
   "title": "From Basnigan to Bulad: The Ilonggo Journey to Zamboanga",
-  "videoUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/videos/video-1793691679094-from-basnigan-to-bulad-the-ilonggo-journey-to-zamboanga-video-112300.mp4",
+  "videoUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/videos/video-1793741235135-from-basnigan-to-bulad-the-ilonggo-journey-to-zamboanga-video-561634.mp4",
   "articleUrl": "https://poetic-codes.pages.dev/articles/from-basnigan-to-bulad-the-ilonggo-journey-to-zamboanga.html",
-  "attached": false,
+  "attached": true,
   "engine": "edge-tts",
   "credits": [
-    "20141025 T-38 Talon Alliance Air Show 2014-5.jpg - Balon Greyjoy (CC0) https://commons.wikimedia.org/wiki/File:20141025_T-38_Talon_Alliance_Air_Show_2014-5.jpg",
     "20141026 T-38 Talon Alliance Air Show 2014-2.jpg - Balon Greyjoy (CC0) https://commons.wikimedia.org/wiki/File:20141026_T-38_Talon_Alliance_Air_Show_2014-2.jpg",
+    "20141025 T-38 Talon Alliance Air Show 2014-5.jpg - Balon Greyjoy (CC0) https://commons.wikimedia.org/wiki/File:20141025_T-38_Talon_Alliance_Air_Show_2014-5.jpg",
     "Talon (Final Turn).JPG - Coasterman1234 ( talk ) (CC BY-SA 3.0) https://commons.wikimedia.org/wiki/File:Talon_(Final_Turn).JPG",
     "20180512 T-38 Talon Dyess AFB Air Show 2018 1.jpg - Balon Greyjoy (CC0) https://commons.wikimedia.org/wiki/File:20180512_T-38_Talon_Dyess_AFB_Air_Show_2018_1.jpg",
     "20141026 T-38 Talon Alliance Air Show 2014-9.jpg - Balon Greyjoy (CC0) https://commons.wikimedia.org/wiki/File:20141026_T-38_Talon_Alliance_Air_Show_2014-9.jpg",
@@ -19,11 +19,22 @@
     "20141025 T-38 Talon Alliance Air Show 2014-9.jpg - Balon Greyjoy (CC0) https://commons.wikimedia.org/wiki/File:20141025_T-38_Talon_Alliance_Air_Show_2014-9.jpg",
     "20141026 T-38 Talon Alliance Air Show 2014-3.jpg - Balon Greyjoy (CC0) https://commons.wikimedia.org/wiki/File:20141026_T-38_Talon_Alliance_Air_Show_2014-3.jpg",
     "20141025 T-38 Talon Alliance Air Show 2014-8.jpg - Balon Greyjoy (CC0) https://commons.wikimedia.org/wiki/File:20141025_T-38_Talon_Alliance_Air_Show_2014-8.jpg",
+    "Stock video 'fishing boat' - HieuNghiaMini via Pixabay https://pixabay.com/videos/id-182082/",
     "Stock video 'sea boat' - u_zwlh4zbli2 via Pixabay https://pixabay.com/videos/id-132932/",
+    "Stock video 'traders fishing' - Josh_Malic via Pixabay https://pixabay.com/videos/id-44534/",
     "Stock video 'traders' - xtrovarts via Pixabay https://pixabay.com/videos/id-275172/",
+    "Stock video 'fish' - ChristianBodhi via Pixabay https://pixabay.com/videos/id-110879/",
+    "Stock video 'fish' - anncapictures via Pixabay https://pixabay.com/videos/id-16166/",
+    "Stock video 'traders' - RafterJr72 via Pixabay https://pixabay.com/videos/id-24602/",
     "Stock video 'workers fishing' - MingMedia via Pixabay https://pixabay.com/videos/id-216116/",
-    "Stock video 'women fish' - anncapictures via Pixabay https://pixabay.com/videos/id-16166/",
-    "Stock video 'fishing sea' - HieuNghiaMini via Pixabay https://pixabay.com/videos/id-182082/"
+    "Stock video 'philippines fishing city' - DaniloAcosta via Pixabay https://pixabay.com/videos/id-288045/",
+    "Stock video 'philippines fishing city' - DaniloAcosta via Pixabay https://pixabay.com/videos/id-288051/",
+    "Stock video 'women fish' - DavidClode via Pixabay https://pixabay.com/videos/id-207990/",
+    "Stock video 'family fish' - AVISOtaON via Pixabay https://pixabay.com/videos/id-286753/",
+    "Stock video 'family fish' - AVISOtaON via Pixabay https://pixabay.com/videos/id-286749/",
+    "Stock video 'traders' - MuhammadAhmad10 via Pixabay https://pixabay.com/videos/id-349089/",
+    "Stock video 'family fishing' - mycuppatea via Pixabay https://pixabay.com/videos/id-381358/",
+    "Stock video 'fishing sea' - sadekhusein via Pixabay https://pixabay.com/videos/id-236316/"
   ],
-  "seconds": 1232
+  "seconds": 1207
 }
