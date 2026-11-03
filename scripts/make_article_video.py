@@ -16,10 +16,11 @@ from typing import Any
 import requests
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
+# Shapes used throughout: a job file / article row, and one slide of the video.
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-03-g"
+SCRIPT_VERSION = "2026-11-03-i"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -41,15 +42,17 @@ VIDEO_URL_API = os.environ.get("VIDEO_URL_API", "https://poetic-codes.vercel.app
 UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/upload")
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 AI_IMAGES = os.environ.get("AI_IMAGES", "1") != "0"
-AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "16"))
+AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "16"))  # each picture covers a stretch of narration; lower to save free quota
+# Same names as your GitHub secrets. strip() removes a stray space or newline pasted along with a secret.
+# strip() removes a stray space or newline pasted along with the secret.
 CLOUDFLARE_ACCOUNT_ID = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
 CLOUDFLARE_API_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
 VOICE = os.environ.get("TTS_VOICE", "en-US-ChristopherNeural")
 RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
-SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "60"))
-INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"
-SPEAK_HEADINGS = os.environ.get("SPEAK_HEADINGS", "0") != "0"
+SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "60"))  # longer slides = fewer, better-matched pictures
+INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"  # off: video starts straight on the content
+SPEAK_HEADINGS = os.environ.get("SPEAK_HEADINGS", "0") != "0"  # off: section headings are not read or shown
 ONLY_JOB = os.environ.get("ONLY_JOB", "").strip().lower()
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
 RUN_START = time.time()
@@ -63,20 +66,27 @@ CREDIT_ROWS = []
 QUOTA_HIT = [False]
 IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
-FORCE_REDO = os.environ.get("FORCE_REDO") == "1"
+FORCE_REDO = os.environ.get("FORCE_REDO") == "1"  # ignore finished-job markers and the "article already has a video" check
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
 
+# Kling image-to-video (real character motion). Off by default — needs API key + budget.
 KLING_ENABLED = os.environ.get("KLING_ENABLED", "0") == "1"
 KLING_API_KEY = os.environ.get("KLING_API_KEY", "") or os.environ.get("FAL_KEY", "") or os.environ.get("PIAPI_API_KEY", "")
-KLING_PROVIDER = os.environ.get("KLING_PROVIDER", "fal").strip().lower()
+KLING_PROVIDER = os.environ.get("KLING_PROVIDER", "fal").strip().lower()  # fal | piapi | aimlapi
 KLING_MAX_CLIPS = int(os.environ.get("KLING_MAX_CLIPS", "12"))
-KLING_DURATION = int(os.environ.get("KLING_DURATION", "5"))
-KLING_MODEL = os.environ.get("KLING_MODEL", "")
-KLING_BUDGET = float(os.environ.get("KLING_BUDGET_SECONDS", "600"))
+KLING_DURATION = int(os.environ.get("KLING_DURATION", "5"))  # 5-10 typical
+KLING_MODEL = os.environ.get("KLING_MODEL", "")  # provider-specific override
+KLING_BUDGET = float(os.environ.get("KLING_BUDGET_SECONDS", "600"))  # max wall time on Kling calls
 KLING_NEG = os.environ.get(
     "KLING_NEG",
     "still photo, frozen pose, static image, text, watermark, logo, cartoon, illustration, low quality",
 )
+
+# Free moving people: real stock footage from Pexels (free key from pexels.com/api). Off unless STOCK_VIDEO=1.
+STOCK_VIDEO = os.environ.get("STOCK_VIDEO", "0") == "1"
+PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "").strip()
+STOCK_MAX_CLIPS = int(os.environ.get("STOCK_MAX_CLIPS", "8"))
+STOCK_MAX_MB = float(os.environ.get("STOCK_MAX_MB", "25"))
 
 BG1, BG2 = (11, 15, 23), (22, 40, 66)
 ACCENT, TEXT, MUTED = (116, 185, 232), (238, 244, 255), (170, 196, 230)
@@ -184,6 +194,8 @@ def build_chunks(sentences: list[str], budget: int, target: int | None = None) -
 
 
 def strip_flat_page_chrome(text: str, title: str, author: str) -> str:
+    """If a whole web page was flattened to plain text, drop the title + byline at the start and the
+    copyright footer at the end, so narration begins with the story itself."""
     t = " ".join((text or "").split())
     if title and t.lower().startswith(title.lower()):
         t = t[len(title):].lstrip(" :-\u2013\u2014")
@@ -211,7 +223,7 @@ def build_segments(job: Job) -> list[Seg]:
     segs = [{"kind": "title", "title": title, "sub": sub, "speech": speech}]
 
     raw_body = job.get("body") or ""
-    if not re.search(r"<[a-zA-Z/!][^>]*>", raw_body):
+    if not re.search(r"<[a-zA-Z/!][^>]*>", raw_body):  # plain text from the portal
         raw_body = strip_flat_page_chrome(raw_body, title, author)
     main_html = extract_main(raw_body)
     parts = re.split(r"(?is)(<h[1-3]\b[^>]*>.*?</h[1-3]>)", main_html)
@@ -307,6 +319,7 @@ def render_layers(seg, idx, total, cover):
     d.rectangle([0, IMGH, W, IMGH + 3], fill=ACCENT + (255,))
     d.rectangle([0, H - 8, int(W * (idx + 1) / total), H], fill=ACCENT + (255,))
     if seg.get("kind") == "end":
+        # End card: darken the picture and show the link on screen.
         d.rectangle([0, 0, W, IMGH], fill=(6, 10, 18, 175))
         rows = [(seg.get("title", ""), load_font(54, True), TEXT),
                 (seg.get("sub", ""), load_font(34), ACCENT),
@@ -430,6 +443,8 @@ MOTIONS = [
 
 
 def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_png=None):
+    """Animate a still (or pair of stills) so the picture feels alive while narration plays.
+    When bg2_png is set, crossfade between two related frames to imply character movement."""
     dur = probe_duration(mp3) + pad
     x0, x1, y0, y1 = MOTIONS[motion % len(MOTIONS)]
     ow, oh = (960, 540) if vkbps < 450 else (W, H)
@@ -460,6 +475,8 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_
         ov_idx = 2
         mp3_idx = 3
         cap_base = 4
+        # Crossfade in the middle third so characters appear to shift/move.
+        # Clamp so offset + fade length always fits inside the clip (short clips).
         fade_dur = min(1.2, max(0.6, dur * 0.28), dur * 0.5)
         fade_off = max(0.0, min(dur * 0.32, dur - fade_dur - 0.1))
         fc = (
@@ -559,6 +576,7 @@ def wiki_queries(job):
     loc_name = clean_text(((job.get("location") or {}).get("name") or "").split(",")[0])
     if loc_name:
         qs.append(loc_name)
+    # Prefer searches that return people in action, not maps/flags
     if key:
         qs.append(" ".join(key[:4]) + " people")
         qs.append(" ".join(key[:3]))
@@ -669,9 +687,11 @@ MOTION_HINTS = (
 
 
 def visual_focus(text: str | None) -> str:
+    """Pull the concrete people, places and actions the narrator is describing."""
     t = (text or "").strip()
     if not t:
         return "people in a real historical scene, mid-action"
+    # Prefer clauses with people/action verbs
     sentences = re.split(r"(?<=[.!?])\s+", t)
     best = sentences[0] if sentences else t
     for s in sentences:
@@ -682,13 +702,14 @@ def visual_focus(text: str | None) -> str:
         ):
             best = s
             break
+    # Keep it short and visual
     words = best.split()
     if len(words) > 36:
         best = " ".join(words[:36])
     return best.rstrip(" ,.;:")
 
 
-PROMPT_WORDS = int(os.environ.get("PROMPT_WORDS", "115"))
+PROMPT_WORDS = int(os.environ.get("PROMPT_WORDS", "115"))  # scene words; with style + setting the whole prompt stays near 170 words
 
 
 def _words(text: str, n: int) -> str:
@@ -696,6 +717,8 @@ def _words(text: str, n: int) -> str:
 
 
 def story_context(job: Job, speech: str) -> tuple[str, str, str]:
+    """From the job file: the characters in this stretch of narration, the place/era/palette, and the look.
+    A character is included when its name or one of its 'appearsIn' words is in the narration."""
     loc = job.get("location") or {}
     place = ", ".join(x for x in (_words(loc.get("name"), 10), _words(loc.get("era"), 6)) if x)
     details = _words(loc.get("description") or loc.get("details"), 28)
@@ -711,6 +734,10 @@ def story_context(job: Job, speech: str) -> tuple[str, str, str]:
 
 
 def scene_prompt(seg: Seg, job: Job) -> str:
+    """Describe EVERY sentence the picture sits under, shortened to its concrete part.
+    The image model ignores the end of a long prompt, so the style words go first and the
+    scene follows; if there are too many sentences they are thinned evenly, never cut off.
+    Characters, place, era and look come from the job file when it has them."""
     title = clean_text(job.get("title")) or ""
     category = clean_text(job.get("category")) or ""
     heading = clean_text(seg.get("heading") or "")
@@ -721,7 +748,7 @@ def scene_prompt(seg: Seg, job: Job) -> str:
         w = re.sub(r"\s+([,.;:])", r"\1", visual_focus(x)).split()
         if len(w) > n:
             w = w[:n]
-            for k in range(len(w) - 1, 7, -1):
+            for k in range(len(w) - 1, 7, -1):  # cut at a comma instead of mid-phrase
                 if w[k].endswith(","):
                     w = w[:k + 1]
                     break
@@ -729,6 +756,7 @@ def scene_prompt(seg: Seg, job: Job) -> str:
 
     sents = [x.strip() for x in re.split(r"(?<=[.!?])\s+", speech) if len(x.split()) >= 4] or [speech]
     per = [x for x in (short(x) for x in sents) if x]
+    # characters/setting use part of the word budget, so the scene sentences are thinned to fit
     extra = len((cast + " " + setting).split())
     budget = max(45, PROMPT_WORDS - extra)
     while per and sum(len(x.split()) for x in per) > budget and len(per) > 1:
@@ -804,6 +832,7 @@ def framing(img, k):
 
 
 def motion_pair(img):
+    """Two slightly different crops of the same scene so a crossfade feels like movement."""
     if img is None:
         return None, None
     a = framing(img, 0)
@@ -812,6 +841,7 @@ def motion_pair(img):
 
 
 def make_ai_images(segs, job):
+    """One image per body slide, prompt locked to that slide's spoken words."""
     if not AI_IMAGES:
         return []
     if not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN):
@@ -820,9 +850,12 @@ def make_ai_images(segs, job):
     body_idx = [i for i, g in enumerate(segs) if g["kind"] == "body"]
     if not body_idx:
         return []
+    # Prefer 1:1 with body slides; cap by AI_IMAGE_MAX
     k = min(len(body_idx), AI_IMAGE_MAX)
     out, fails, t_start = [], 0, time.time()
     for j in range(k):
+        # Same mapping build_video uses: picture j sits under every body slide n with n*k//total == j.
+        # Build its prompt from ALL of that narration, not just one slide.
         total_body = len(body_idx)
         members = [segs[body_idx[n]] for n in range(total_body) if n * k // total_body == j] or [segs[body_idx[j * total_body // k]]]
         narr = [m for m in members if not m.get("is_heading")] or members
@@ -858,11 +891,13 @@ def pick_bitrate(total_dur: float) -> int:
 
 
 def motion_prompt(seg, job):
+    """Short physical action line for Kling image-to-video, derived from narration."""
     speech = clean_text(seg.get("speech") or seg.get("text") or "")
     focus = visual_focus(speech)
     title = clean_text(job.get("title") or "")
     heading = clean_text(seg.get("heading") or "")
     place = heading or title
+    # Prefer action verbs; keep under ~80 words for Kling
     line = focus
     if place and place.lower() not in line.lower():
         line = f"{place}: {line}"
@@ -878,6 +913,7 @@ def motion_prompt(seg, job):
 
 
 def _image_to_data_uri(img, max_side=1280):
+    """Encode a PIL image as a JPEG data URI for APIs that accept base64."""
     import base64
     from io import BytesIO as _B
     im = img.convert("RGB")
@@ -895,7 +931,9 @@ LAST_KLING_ERROR = [""]
 
 
 def _kling_fal(image_uri, prompt, duration, out_mp4):
+    """fal.ai Kling image-to-video (v2.1 / v3 standard)."""
     model = KLING_MODEL or "fal-ai/kling-video/v2.1/standard/image-to-video"
+    # Prefer official fal client when installed; otherwise HTTP queue API
     try:
         import fal_client
         args = {
@@ -914,6 +952,7 @@ def _kling_fal(image_uri, prompt, duration, out_mp4):
         return out_mp4
     except ImportError:
         pass
+    # HTTP fallback using fal queue
     headers = {"Authorization": f"Key {KLING_API_KEY}", "Content-Type": "application/json"}
     payload = {
         "prompt": prompt[:2500],
@@ -957,6 +996,7 @@ def _kling_fal(image_uri, prompt, duration, out_mp4):
 
 
 def _kling_piapi(image_uri, prompt, duration, out_mp4):
+    """PiAPI Kling image-to-video task + poll."""
     headers = {"x-api-key": KLING_API_KEY, "Content-Type": "application/json"}
     version = KLING_MODEL or "2.6"
     payload = {
@@ -1007,6 +1047,7 @@ def _kling_piapi(image_uri, prompt, duration, out_mp4):
 
 
 def _kling_aimlapi(image_uri, prompt, duration, out_mp4):
+    """AIMLAPI Kling image-to-video."""
     headers = {"Authorization": f"Bearer {KLING_API_KEY}", "Content-Type": "application/json"}
     model = KLING_MODEL or "kling-video/v4/image-to-video"
     payload = {
@@ -1019,6 +1060,7 @@ def _kling_aimlapi(image_uri, prompt, duration, out_mp4):
     if not sub.ok:
         raise RuntimeError(f"aimlapi submit HTTP {sub.status_code}: {(sub.text or '')[:300]}")
     data = sub.json()
+    # Some responses are sync with URL; others return an id to poll
     url = None
     if isinstance(data.get("video"), dict):
         url = data["video"].get("url")
@@ -1046,10 +1088,12 @@ def _kling_aimlapi(image_uri, prompt, duration, out_mp4):
 
 
 def gen_kling_clip(img, prompt, duration, out_mp4):
+    """Animate a still with Kling image-to-video. Returns out_mp4 path or None on failure."""
     if not KLING_ENABLED or not KLING_API_KEY:
         return None
     if img is None:
         return None
+    # fal and piapi both need at least 5s, so clamp here to match what you'll be billed for
     duration = int(min(10, max(5, duration or KLING_DURATION)))
     image_uri = _image_to_data_uri(img)
     providers = {
@@ -1071,21 +1115,25 @@ def gen_kling_clip(img, prompt, duration, out_mp4):
 
 
 def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
+    """Composite a Kling (or other) video under the caption band + TTS narration."""
     spoken = probe_duration(mp3)
     dur = spoken + pad
     vid_dur = probe_duration(video_mp4)
     ow, oh = (960, 540) if vkbps < 450 else (W, H)
+    # Scale the clip into the picture area (W x IMGH). A Kling clip is ~5 s but a slide lasts much longer, so a
+    # short clip is played forward then backward, over and over ("ping-pong"): the people keep moving the whole
+    # slide instead of freezing after 5 seconds.
+    base = f"[0:v]scale={W}:{IMGH}:force_original_aspect_ratio=increase,crop={W}:{IMGH},fps={FPS}"
     if vid_dur + 0.05 < dur:
-        extra = dur - vid_dur
+        frames = max(2, int(vid_dur * FPS) * 2)
         vchain = (
-            f"[0:v]scale={W}:{IMGH}:force_original_aspect_ratio=increase,"
-            f"crop={W}:{IMGH},fps={FPS},tpad=stop_mode=clone:stop_duration={extra:.2f},"
+            f"{base},split[fw][bw];[bw]reverse[rv];[fw][rv]concat=n=2:v=1[pp];"
+            f"[pp]loop=loop=-1:size={frames}:start=0,trim=duration={dur:.2f},setpts=PTS-STARTPTS,"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
     else:
         vchain = (
-            f"[0:v]scale={W}:{IMGH}:force_original_aspect_ratio=increase,"
-            f"crop={W}:{IMGH},fps={FPS},trim=duration={dur:.2f},"
+            f"{base},trim=duration={dur:.2f},"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
     fc = vchain + "[v0][1:v]overlay=format=auto[v1];"
@@ -1121,6 +1169,95 @@ def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
     return dur
 
 
+_STOCK_STOP = {"that", "this", "with", "from", "were", "have", "been", "their", "there", "which", "would", "about",
+               "into", "than", "then", "them", "they", "these", "those", "also", "while", "when", "where", "what",
+               "more", "most", "some", "many", "such", "only", "over", "under", "after", "before", "because"}
+# concrete things a stock-video site can find; people and actions come first in the query
+_STOCK_PEOPLE = ["fisherman", "fishermen", "farmer", "farmers", "workers", "children", "family", "crowd", "villagers",
+                 "vendor", "vendors", "women", "men", "soldiers", "priest", "students", "traders", "sailors", "cook", "chef"]
+_STOCK_THINGS = ["market", "boat", "boats", "fishing", "harvest", "rice", "sugarcane", "cooking", "street", "village",
+                 "church", "procession", "festival", "sea", "ocean", "port", "harbor", "ship", "farm", "field", "mill",
+                 "noodles", "soup", "dumplings", "kitchen", "fish", "river", "island", "city", "school", "road", "mountain",
+                 "coconut", "mango", "tractor", "factory", "bridge", "beach", "storm", "rain", "wedding", "dance", "music"]
+
+
+def stock_queries(seg: Seg, job: Job) -> list[str]:
+    """Search phrases for a stock-video site, most specific first, built from this slide's narration."""
+    speech = clean_text(seg.get("speech") or seg.get("text") or "").lower()
+    words = re.findall(r"[a-z]+", speech)
+    people = [w for w in dict.fromkeys(words) if w in _STOCK_PEOPLE]
+    things = [w for w in dict.fromkeys(words) if w in _STOCK_THINGS]
+    place_text = (clean_text(job.get("title")) + " " + clean_text((job.get("location") or {}).get("name"))).lower()
+    ph = any(k in place_text or k in speech for k in ("philippin", "iloilo", "zamboanga", "visayas", "mindanao", "ilonggo", "panay", "manila", "cebu"))
+    core = (people[:1] + things[:2]) or things[:2] or people[:2]
+    if not core:
+        return []
+    out = []
+    if ph:
+        out.append("philippines " + " ".join(core[:2]))
+    out.append(" ".join(core[:2]))
+    if len(core) > 1:
+        out.append(core[0])
+    return list(dict.fromkeys(out))
+
+
+def _pexels_search(query: str) -> list[Job]:
+    r = requests.get("https://api.pexels.com/videos/search",
+                     params={"query": query, "per_page": 15, "orientation": "landscape", "size": "medium"},
+                     headers={"Authorization": PEXELS_API_KEY, "User-Agent": UA}, timeout=30)
+    r.raise_for_status()
+    return r.json().get("videos") or []
+
+
+def _pick_file(video: Job) -> Job | None:
+    """The mp4 closest to 1280 px wide (sharp enough, not huge)."""
+    files = [f for f in video.get("video_files") or []
+             if f.get("file_type") == "video/mp4" and f.get("link") and 800 <= int(f.get("width") or 0) <= 1920
+             and int(f.get("width") or 0) >= int(f.get("height") or 0)]
+    return min(files, key=lambda f: abs(int(f["width"]) - 1280)) if files else None
+
+
+def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None:
+    """Download one free stock clip that matches this slide, or None (the slide then keeps its still picture)."""
+    if not (STOCK_VIDEO and PEXELS_API_KEY):
+        return None
+    for q in stock_queries(seg, job):
+        try:
+            for v in _pexels_search(q):
+                f = _pick_file(v)
+                if not f or v.get("id") in used or not (3 <= float(v.get("duration") or 0) <= 60):
+                    continue
+                with requests.get(f["link"], stream=True, timeout=120, headers={"User-Agent": UA}) as r:
+                    r.raise_for_status()
+                    size = 0
+                    with open(out_mp4, "wb") as fh:
+                        for chunk in r.iter_content(1 << 20):
+                            size += len(chunk)
+                            if size > STOCK_MAX_MB * 1048576:
+                                raise RuntimeError("clip too large")
+                            fh.write(chunk)
+                used.add(v.get("id"))
+                who = (v.get("user") or {}).get("name") or "unknown"
+                CREDITS.append(f"Stock video '{q}' - {who} via Pexels {v.get('url', '')}")
+                return str(out_mp4)
+        except Exception as e:
+            log(f"  stock video '{q}' not used ({str(e)[:90]})")
+    return None
+
+
+def pick_kling_slides(segs: list[Seg], n: int) -> set[int]:
+    """Choose up to n body slides to animate, spread across the whole video.
+    Slides whose narration mentions people come first, because that is where movement shows."""
+    body = [i for i, g in enumerate(segs) if g["kind"] == "body" and not g.get("is_heading")]
+    if n <= 0 or not body:
+        return set()
+    people = [i for i in body if _PEOPLE_RE.search(segs[i].get("speech", ""))]
+    pool = sorted(people if len(people) >= n else people + [i for i in body if i not in people][: n - len(people)])
+    if len(pool) <= n:
+        return set(pool)
+    return {pool[round(k * (len(pool) - 1) / (n - 1))] if n > 1 else pool[len(pool) // 2] for k in range(n)}
+
+
 def build_video(job):
     global RATE
     segs = build_segments(job)
@@ -1133,6 +1270,7 @@ def build_video(job):
     photos = load_photos(job)
     photos += load_wiki_photos(job, len(photos))
     if CREDIT_ROWS:
+        # Visible attribution for CC-BY / CC-BY-SA images: a short spoken and captioned card before the end card.
         seen, bits = set(), []
         for artist, lic in CREDIT_ROWS:
             who = re.sub(r"\s+", " ", artist or "").strip()[:40] or "unknown author"
@@ -1163,6 +1301,14 @@ def build_video(job):
 
     clips, total_dur, body_seen, ai_used = [], 0.0, 0, {}
     kling_used, kling_t0 = 0, time.time()
+    kling_slides = pick_kling_slides(segs, KLING_MAX_CLIPS) if (KLING_ENABLED and KLING_API_KEY) else set()
+    stock_slides, stock_used, stock_count = set(), set(), 0
+    if STOCK_VIDEO:
+        if not PEXELS_API_KEY:
+            log("  STOCK_VIDEO is on but there is no PEXELS_API_KEY secret - using still pictures")
+        else:
+            stock_slides = pick_kling_slides(segs, STOCK_MAX_CLIPS)
+            log(f"  free stock footage on (Pexels): up to {len(stock_slides)} moving slides")
     if KLING_ENABLED:
         if not KLING_API_KEY:
             log("  KLING_ENABLED but no KLING_API_KEY / FAL_KEY / PIAPI_API_KEY — using still motion only")
@@ -1202,18 +1348,26 @@ def build_video(job):
         used_kling = False
         if (
             KLING_ENABLED and KLING_API_KEY
-            and seg["kind"] == "body"
+            and i in kling_slides
             and cover is not None
-            and kling_used < KLING_MAX_CLIPS
             and (time.time() - kling_t0) < KLING_BUDGET
         ):
             mprompt = motion_prompt(seg, job)
+            # Match clip length to narration (clamped)
             kdur = int(min(10, max(5, round(spoken) or KLING_DURATION)))
             got = gen_kling_clip(cover, mprompt, kdur, kling_mp4)
             if got and Path(got).exists() and Path(got).stat().st_size > 5000:
                 total_dur += make_clip_from_video(got, ovp, mp3s[i], clip, caps, vkbps=vkbps)
                 used_kling = True
                 kling_used += 1
+                Path(got).unlink(missing_ok=True)
+
+        if not used_kling and i in stock_slides:
+            got = fetch_stock_clip(seg, job, stock_used, tmp / f"s{i}.mp4")
+            if got and Path(got).exists() and Path(got).stat().st_size > 5000:
+                total_dur += make_clip_from_video(got, ovp, mp3s[i], clip, caps, vkbps=vkbps)
+                used_kling = True
+                stock_count += 1
                 Path(got).unlink(missing_ok=True)
 
         if not used_kling:
@@ -1234,6 +1388,8 @@ def build_video(job):
 
     if kling_used:
         log(f"  Kling animated {kling_used} slide(s)")
+    if stock_count:
+        log(f"  stock footage used on {stock_count} slide(s)")
 
     listing = tmp / "list.txt"
     listing.write_text("".join(f"file '{c}'\n" for c in clips), encoding="utf-8")
@@ -1246,6 +1402,7 @@ def build_video(job):
 
 def _upload_endpoints():
     out = [UPLOAD_API]
+    # Extra fallbacks: UPLOAD_FALLBACKS="https://a/api/upload,https://b/api/upload" replaces the built-in list.
     env = [u.strip() for u in os.environ.get("UPLOAD_FALLBACKS", "").split(",") if u.strip()]
     extras = env or [
         "https://poetic-codes.pages.dev/api/upload",
@@ -1368,6 +1525,7 @@ _ARTICLES_CACHE = []
 
 
 def fetch_articles():
+    """The article list, fetched once per run (not once per job)."""
     if not _ARTICLES_CACHE:
         _ARTICLES_CACHE.append(_fetch_articles_uncached())
     return _ARTICLES_CACHE[0]
@@ -1402,15 +1560,18 @@ def find_article(job: Job, rows: list[Job]) -> Job | None:
 
 
 def article_slug(title: str | None) -> str:
+    # Same as slugify() in the portal
     return re.sub(r"[^a-z0-9]+", "-", (title or "").lower()).strip("-")
 
 
 def article_page_url(job: Job, row: Job | None = None) -> str:
+    """The public static page the portal publishes: https://poetic-codes.pages.dev/articles/<slug>.html"""
     slug = (job.get("slug") or "").strip() or article_slug((row or {}).get("title") or job.get("title"))
     return f"{SITE_URL.rstrip('/')}/articles/{slug}.html" if slug else ""
 
 
 def add_to_index_list(article_url):
+    """Keep a plain list of article URLs to paste into Search Console > URL Inspection > Request indexing."""
     if not article_url:
         return
     JOBS_DIR.mkdir(parents=True, exist_ok=True)
@@ -1422,6 +1583,7 @@ def add_to_index_list(article_url):
 
 
 def fill_job_from_article(job: Job, row: Job) -> None:
+    """A job file may hold only a title (+ location/characters). Take the text from the article on the site."""
     for key, names in (("body", ("content", "body")), ("excerpt", ("excerpt", "summary")), ("category", ("category",))):
         if not str(job.get(key) or "").strip():
             for n in names:
@@ -1499,7 +1661,7 @@ def process_job(path):
     if not DRY_RUN and not needs_work(job, marker):
         return None
 
-    if not job.get("jobId"):
+    if not job.get("jobId"):  # forms that leave it empty would otherwise be "done" forever after the first run
         job["jobId"] = str(int(path.stat().st_mtime))
     title = job.get("title", name)
     log(f"\n=== {title} ({name})")
@@ -1543,7 +1705,7 @@ def process_job(path):
         desc = (f"Read the full essay: {article_url}\n" if article_url else "") + \
                f"More on The Commonplace: {SITE_URL.rstrip('/')}"
         if CREDITS:
-            desc += "\n\nPhoto credits (Wikimedia Commons):\n" + "\n".join(CREDITS)
+            desc += "\n\nCredits (Wikimedia Commons photos, Pexels stock video):\n" + "\n".join(CREDITS)
         (Path("out") / (fname + ".description.txt")).write_text(desc, encoding="utf-8")
         url = upload_video(final, fname)
         log(f"  uploaded: {url}")
@@ -1567,6 +1729,7 @@ def process_job(path):
         return "failed"
 
     finally:
+        # free the scratch folder (pictures, audio, clips) so many jobs don't fill the runner's disk
         if final is not None and Path(final).parent.name.startswith("vid_"):
             shutil.rmtree(Path(final).parent, ignore_errors=True)
 
