@@ -52,6 +52,7 @@ jobs:
           STOCK_VIDEO: "1"
           STOCK_MAX_CLIPS: "8"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           # People that really move (paid; each clip is billed by the provider). "0" = off, nothing is spent.
           KLING_ENABLED: "0"
           KLING_PROVIDER: "fal"
