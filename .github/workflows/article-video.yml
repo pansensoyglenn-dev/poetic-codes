@@ -49,6 +49,8 @@ jobs:
           # Set to "1" to make a picture for each stretch of narration (uses Cloudflare's free daily quota).
           AI_IMAGES: "0"
           # FREE moving people: real stock footage from Pexels (free key at pexels.com/api, saved as a secret)
+          # Real old film (public domain) for stories set before 2000, from Wikimedia Commons + Internet Archive (no key needed)
+          ARCHIVE_VIDEO: "1"
           STOCK_VIDEO: "1"
           STOCK_MAX_CLIPS: "20"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
