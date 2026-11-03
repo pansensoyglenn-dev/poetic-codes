@@ -57,6 +57,15 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           AI_IMAGES: "1"
+          # FREE moving people: real stock footage from Pexels (free key at pexels.com/api, saved as a secret)
+          STOCK_VIDEO: "1"
+          STOCK_MAX_CLIPS: "8"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          # People that really move (paid; each clip is billed by the provider). "0" = off, nothing is spent.
+          KLING_ENABLED: "0"
+          KLING_PROVIDER: "fal"
+          KLING_MAX_CLIPS: "6"
+          FAL_KEY: ${{ secrets.FAL_KEY }}
           MAX_WORDS: "3000"
           TTS_RATE: "+0%"
           MAX_JOBS_PER_RUN: "30"
