@@ -1,6 +1,6 @@
 {
-  "jobId": "1793692437633",
-  "createdAt": "2026-11-03T07:53:57.633Z",
+  "jobId": "1793692458012",
+  "createdAt": "2026-11-03T07:54:18.012Z",
   "title": "From Basnigan to Bulad: The Ilonggo Journey to Zamboanga",
   "author": "Glenn Junsay Pansensoy",
   "category": "History",
@@ -21,9 +21,5 @@
   "slug": "from-basnigan-to-bulad-the-ilonggo-journey-to-zamboanga",
   "articleId": 34,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793692432696.jpg",
-  "force": false,
-  "location": {
-    "name": "Iloilo coast to Zamboanga Sibugay, 1950s",
-    "description": "basnigan boats with lamp booms, drying bulad, nipa huts"
-  }
+  "force": true
 }
