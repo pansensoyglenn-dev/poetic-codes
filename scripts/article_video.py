@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-04-w"
+SCRIPT_VERSION = "2026-11-05-x"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -106,6 +106,9 @@ PHOTO_MAX_SEARCHES = int(os.environ.get("PHOTO_MAX_SEARCHES", "30"))   # per vid
 LLM_PLAN = os.environ.get("LLM_PLAN", "1") != "0"
 LLM_MODEL = os.environ.get("LLM_MODEL", "@cf/meta/llama-3.1-8b-instruct")
 LLM_MAX_CALLS = int(os.environ.get("LLM_MAX_CALLS", "160"))
+# Strict matching: a body slide shows only a picture that matched ITS narration (or an AI image of it). Never a loosely related photo.
+STRICT_MATCH = os.environ.get("STRICT_MATCH", "1") != "0"
+WIKI_GENERIC = os.environ.get("WIKI_GENERIC", "0") == "1"   # 1 = also pull photos by the article title alone (they often do not match a slide)
 CREDITS_CARD = os.environ.get("CREDITS_CARD", "0") == "1"   # 1 = also speak/show a credits card in the video (credits are always in the description)
 STOCK_REQUIRE_REGION = os.environ.get("STOCK_REQUIRE_REGION", "1") != "0"
 
@@ -608,7 +611,7 @@ def load_photos(job):
     return photos
 
 
-_SKIP_TITLE = re.compile(r"logo|flag|coat of arms|icon|signature|seal of|locator|stub|banner|diagram|chart|graph|screenshot", re.I)
+_SKIP_TITLE = re.compile(r"logo|flag|coat of arms|icon|signature|seal of|locator|stub|banner|diagram|chart|graph|screenshot|thumbnail|youtube|poster|cover|meme|infographic|slide|presentation|committee|hearing|congress|senate|session|conference|press|portrait|headshot|official", re.I)
 
 
 _CAP_STOP = {"The", "This", "That", "These", "Those", "When", "Where", "While", "With", "Without", "Many", "Some",
@@ -1404,7 +1407,11 @@ _OK_LICENSE = ("publicdomain", "creativecommons.org/publicdomain", "creativecomm
 
 _CONFLICT_WORDS = {"coast", "guard", "navy", "naval", "military", "army", "shoal", "collision", "cannon", "attack", "clash", "clashes",
                    "standoff", "blockade", "warship", "troops", "protest", "riot", "china", "chinese", "pla", "resupply", "mission",
-                   "disaster", "typhoon", "earthquake", "fire"}
+                   "disaster", "typhoon", "earthquake", "fire",
+                   "committee", "congress", "senate", "hearing", "session", "representatives", "politician", "president", "mayor",
+                   "election", "campaign", "conference", "interview", "news", "broadcast", "youtube", "thumbnail", "screenshot",
+                   "poster", "logo", "text", "cartoon", "meme", "infographic", "slide", "diagram", "map", "flag", "religion",
+                   "bible", "symbol", "doctrine", "church", "ceremony"}
 
 
 def conflict_mismatch(text: str, speech: str, job: Job | None = None) -> bool:
@@ -1498,7 +1505,9 @@ def plan_rejects(text: str, seg: Seg, job: Job) -> bool:
                    f"Candidate picture description: {clean_text(text)[:300]}\n"
                    "Would this picture plausibly illustrate the narration, in the right place and era, without showing unrelated things?",
                    max_tokens=4)
-    return bool(ans) and ans.strip().upper().startswith("NO")
+    if ans is None:
+        return False            # judge unavailable: the stricter word match above has already decided
+    return ans.strip().upper().startswith("NO")
 
 
 def is_historical(seg: Seg, job: Job) -> bool:
@@ -1538,7 +1547,10 @@ def _words_match(text: str, query: str) -> bool:
     """The clip's own title/description must mention at least one concrete word from the query."""
     t = clean_text(text).lower()
     keys = [w for w in re.findall(r"[a-z]+", query.lower()) if w != "philippines" and len(w) > 3]
-    return any(k in t for k in keys) if keys else True
+    if not keys:
+        return True
+    hits = sum(1 for k in keys if k[:4] in t)   # 4-letter stems: fisher/fishing, boat/boats
+    return hits >= (2 if (STRICT_MATCH and len(keys) >= 2) else 1)
 
 
 def _commons_video_search(query: str) -> list[Job]:
@@ -1777,7 +1789,8 @@ def build_video(job):
     CREDIT_ROWS.clear()
     QUOTA_HIT[0] = False
     photos = load_photos(job)
-    photos += load_wiki_photos(job, len(photos))
+    if WIKI_GENERIC:
+        photos += load_wiki_photos(job, len(photos))
     if CREDIT_ROWS and CREDITS_CARD:
         # Visible attribution for CC-BY / CC-BY-SA images: a short spoken and captioned card before the end card.
         seen, bits = set(), []
@@ -1840,6 +1853,8 @@ def build_video(job):
         kling_mp4 = tmp / f"k{i}.mp4"
         cover = framing(photos[i % len(photos)], i // len(photos)) if photos else None
         if seg["kind"] == "body":
+            if STRICT_MATCH:
+                cover = None          # no loosely related photo: only an AI image of this slide or a photo that matched it
             if ai:
                 gi = body_seen * len(ai) // max(body_total, 1)
                 pic = ai[gi] if gi < len(ai) else None
@@ -1847,7 +1862,7 @@ def build_video(job):
                     cover = pic
                     ai_used[gi] = ai_used.get(gi, 0) + 1
             body_seen += 1
-            src_note = "AI image" if (ai and cover is not None) else "generic photo"
+            src_note = "AI image" if (ai and cover is not None) else ("generic photo" if cover is not None else "no picture matched: text card")
             sp = fetch_slide_photo(seg, job, photo_used)
             if sp:
                 cover, src_note = sp
