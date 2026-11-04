@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-04-t"
+SCRIPT_VERSION = "2026-11-04-u"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -102,6 +102,7 @@ SLIDE_PHOTOS = os.environ.get("SLIDE_PHOTOS", "1") != "0"
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "").strip()
 PHOTO_MAX_SEARCHES = int(os.environ.get("PHOTO_MAX_SEARCHES", "30"))   # per video; Unsplash demo keys allow 50 requests/hour
 # On Philippine stories a stock clip must itself mention the Philippines/a Philippine place, else the slide keeps a better-matched photo.
+CREDITS_CARD = os.environ.get("CREDITS_CARD", "0") == "1"   # 1 = also speak/show a credits card in the video (credits are always in the description)
 STOCK_REQUIRE_REGION = os.environ.get("STOCK_REQUIRE_REGION", "1") != "0"
 
 BG1, BG2 = (11, 15, 23), (22, 40, 66)
@@ -1370,6 +1371,8 @@ def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None
                         continue
                     if not stock_relevant(v.get("text", ""), q):
                         continue
+                    if conflict_mismatch(v.get("text", ""), seg.get("speech") or "", job):
+                        continue
                     if STOCK_REQUIRE_REGION and _is_ph_job(job) and not _mentions_ph(v.get("text", "")):
                         continue              # generic non-Filipino footage would contradict the narration
                     if v.get("size") and v["size"] > STOCK_MAX_MB * 1048576:
@@ -1393,6 +1396,28 @@ def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None
 
 _YEAR_RE = re.compile(r"\b(1[5-9]\d\d)s?\b")
 _OK_LICENSE = ("publicdomain", "creativecommons.org/publicdomain", "creativecommons.org/licenses/by", "cc0")
+
+
+_CONFLICT_WORDS = {"coast", "guard", "navy", "naval", "military", "army", "shoal", "collision", "cannon", "attack", "clash", "clashes",
+                   "standoff", "blockade", "warship", "troops", "protest", "riot", "china", "chinese", "pla", "resupply", "mission",
+                   "disaster", "typhoon", "earthquake", "fire"}
+
+
+def conflict_mismatch(text: str, speech: str, job: Job | None = None) -> bool:
+    """True when a clip/photo's own description is about a confrontation, military or disaster event that the narration
+    and article are not about (e.g. a modern coast-guard clash shown under a sentence about crew size), or is dated after
+    the era of a historical story."""
+    t = set(re.findall(r"[a-z]+", clean_text(text).lower()))
+    ctx = set(re.findall(r"[a-z]+", clean_text(speech).lower()))
+    if job is not None:
+        ctx |= set(re.findall(r"[a-z]+", clean_text((job.get("title") or "") + " " + (job.get("body") or "")[:3000]).lower()))
+    if (t & _CONFLICT_WORDS) - ctx:
+        return True
+    if job is not None and is_historical({}, job):
+        years = [int(y) for y in re.findall(r"\b(20\d\d)\b", clean_text(text))]
+        if years:
+            return True
+    return False
 
 
 def is_historical(seg: Seg, job: Job) -> bool:
@@ -1506,6 +1531,8 @@ def fetch_archive_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | No
             try:
                 for v in search(q):
                     if v["id"] in used or not stock_relevant(v["text"], q):
+                        continue
+                    if conflict_mismatch(v["text"], seg.get("speech") or "", job):
                         continue
                     if ph_job and not _mentions_ph(v["text"]):
                         continue          # a Philippine story needs footage that says it is from the Philippines
@@ -1628,7 +1655,7 @@ def fetch_slide_photo(seg: Seg, job: Job, used: set):
                     log(f"  photo search '{q}' ({fn.__name__.strip('_')}) failed ({str(e)[:80]})")
                     _PHOTO_CACHE[key] = []
             for c in _PHOTO_CACHE[key]:
-                if c["id"] in used or not stock_relevant(c["text"], q):
+                if c["id"] in used or not stock_relevant(c["text"], q) or conflict_mismatch(c["text"], seg.get("speech") or "", job):
                     continue
                 if ph and c["src"] == "Wikimedia Commons" and not _mentions_ph(c["text"] + " " + c["page"]):
                     continue
@@ -1670,7 +1697,7 @@ def build_video(job):
     QUOTA_HIT[0] = False
     photos = load_photos(job)
     photos += load_wiki_photos(job, len(photos))
-    if CREDIT_ROWS:
+    if CREDIT_ROWS and CREDITS_CARD:
         # Visible attribution for CC-BY / CC-BY-SA images: a short spoken and captioned card before the end card.
         seen, bits = set(), []
         for artist, lic in CREDIT_ROWS:
