@@ -1,6 +1,6 @@
 {
-  "jobId": "1793783126800",
-  "createdAt": "2026-11-04T09:05:26.800Z",
+  "jobId": "1793783147431",
+  "createdAt": "2026-11-04T09:05:47.431Z",
   "title": "From Basnigan Fishing Boats to Bulad: The Ilonggo Journey to Zamboanga",
   "author": "Glenn Junsay Pansensoy",
   "category": "History",
@@ -19,5 +19,5 @@
   "slug": "from-basnigan-fishing-boats-to-bulad-the-ilonggo-journey-to-zamboanga",
   "articleId": 36,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793783122340.jpg",
-  "force": false
+  "force": true
 }
