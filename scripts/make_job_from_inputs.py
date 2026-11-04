@@ -74,8 +74,21 @@ else:
         # you asked for these by name, so rebuild even if the article already has a video
         entries.append((p[0], p[1] if len(p) > 1 else "", p[2] if len(p) > 2 else "", True))
 
+def _flag(found):
+    out = os.environ.get("GITHUB_OUTPUT")
+    if out:
+        with open(out, "a") as fh:
+            fh.write(f"found={found}\n")
+
+
 if not entries:
-    raise SystemExit("nothing to do: every article already has a video" if raw_title.lower() in ("*", "all") else "no titles found")
+    msg = "nothing to do: every article already has a video" if raw_title.lower() in ("*", "all") else "no titles found"
+    if os.environ.get("QUIET_WHEN_EMPTY") == "1":      # the scheduled run: nothing to do is a normal, green result
+        print(msg)
+        _flag(0)
+        raise SystemExit(0)
+    raise SystemExit(msg)
+_flag(1)
 
 Path("video-jobs").mkdir(exist_ok=True)
 seen = set()
