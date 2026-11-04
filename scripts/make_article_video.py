@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-04-s"
+SCRIPT_VERSION = "2026-11-04-t"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -96,6 +96,13 @@ ARCHIVE_VIDEO = os.environ.get("ARCHIVE_VIDEO", "0") == "1"
 ARCHIVE_ANY_ERA = os.environ.get("ARCHIVE_ANY_ERA", "0") == "1"   # 1 = real archive footage for every article, not only pre-2000 stories
 ARCHIVE_MAX_MB = float(os.environ.get("ARCHIVE_MAX_MB", "120"))
 ARCHIVE_CLIP_SEC = float(os.environ.get("ARCHIVE_CLIP_SEC", "12"))
+
+# Real photographs matched to each slide's own narration (Unsplash + Pixabay photos + Wikimedia Commons).
+SLIDE_PHOTOS = os.environ.get("SLIDE_PHOTOS", "1") != "0"
+UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "").strip()
+PHOTO_MAX_SEARCHES = int(os.environ.get("PHOTO_MAX_SEARCHES", "30"))   # per video; Unsplash demo keys allow 50 requests/hour
+# On Philippine stories a stock clip must itself mention the Philippines/a Philippine place, else the slide keeps a better-matched photo.
+STOCK_REQUIRE_REGION = os.environ.get("STOCK_REQUIRE_REGION", "1") != "0"
 
 BG1, BG2 = (11, 15, 23), (22, 40, 66)
 ACCENT, TEXT, MUTED = (116, 185, 232), (238, 244, 255), (170, 196, 230)
@@ -1363,6 +1370,8 @@ def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None
                         continue
                     if not stock_relevant(v.get("text", ""), q):
                         continue
+                    if STOCK_REQUIRE_REGION and _is_ph_job(job) and not _mentions_ph(v.get("text", "")):
+                        continue              # generic non-Filipino footage would contradict the narration
                     if v.get("size") and v["size"] > STOCK_MAX_MB * 1048576:
                         continue              # too big: skip before downloading anything
                     with requests.get(v["link"], stream=True, timeout=120, headers={"User-Agent": UA}) as r:
@@ -1524,6 +1533,119 @@ def fetch_archive_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | No
     return None
 
 
+# ---------- per-slide real photographs ----------
+_PH_TERMS = {"fisherman": "filipino fisherman", "fishermen": "filipino fishermen", "fishers": "filipino fishermen",
+             "fisherfolk": "filipino fishermen", "boat": "bangka outrigger boat", "boats": "bangka outrigger boats",
+             "fishing": "filipino fishing boat", "village": "coastal fishing village", "farmer": "filipino farmer",
+             "farmers": "filipino farmers", "market": "filipino market", "church": "filipino church",
+             "festival": "filipino festival", "children": "filipino children", "vendor": "filipino vendor",
+             "vendors": "filipino vendors", "harbor": "philippine port", "port": "philippine port", "sea": "philippine sea coast",
+             "island": "philippine island", "rice": "philippine rice field", "sugarcane": "philippine sugarcane"}
+_PHOTO_CACHE: dict = {}
+_PHOTO_CALLS = [0]
+STORYBOARD: list = []
+
+
+def photo_queries(seg: Seg, job: Job) -> list[str]:
+    base = stock_queries(seg, job)
+    if not base:
+        return []
+    out = []
+    if _is_ph_job(job):
+        speech = clean_text(seg.get("speech") or seg.get("text") or "").lower()
+        words = re.findall(r"[a-z]+", speech)
+        for w in dict.fromkeys(words):
+            if w in _PH_TERMS:
+                out.append(_PH_TERMS[w])
+            if len(out) >= 2:
+                break
+    out += [q for q in base if q]
+    return list(dict.fromkeys(out))[:4]
+
+
+def _unsplash_photos(query: str) -> list[Job]:
+    if not UNSPLASH_ACCESS_KEY:
+        return []
+    r = requests.get("https://api.unsplash.com/search/photos",
+                     params={"query": query, "per_page": 10, "orientation": "landscape", "content_filter": "high"},
+                     headers={"Authorization": f"Client-ID {UNSPLASH_ACCESS_KEY}", "Accept-Version": "v1", "User-Agent": UA}, timeout=30)
+    r.raise_for_status()
+    out = []
+    for h in r.json().get("results") or []:
+        u = (h.get("urls") or {}).get("regular")
+        if not u:
+            continue
+        tags = " ".join(t.get("title", "") for t in (h.get("tags") or []) if isinstance(t, dict))
+        out.append({"id": "us" + str(h.get("id")), "url": u,
+                    "text": f"{h.get('description') or ''} {h.get('alt_description') or ''} {tags}",
+                    "who": (h.get("user") or {}).get("name") or "unknown", "src": "Unsplash",
+                    "page": (h.get("links") or {}).get("html", ""),
+                    "track": (h.get("links") or {}).get("download_location", "")})
+    return out
+
+
+def _pixabay_photos(query: str) -> list[Job]:
+    if not PIXABAY_API_KEY:
+        return []
+    r = requests.get("https://pixabay.com/api/",
+                     params={"key": PIXABAY_API_KEY, "q": query, "per_page": 12, "image_type": "photo",
+                             "orientation": "horizontal", "safesearch": "true", "min_width": 1000},
+                     headers={"User-Agent": UA}, timeout=30)
+    r.raise_for_status()
+    out = []
+    for h in r.json().get("hits") or []:
+        u = h.get("largeImageURL") or h.get("webformatURL")
+        if u:
+            out.append({"id": "pp%s" % h.get("id"), "url": u, "who": h.get("user") or "unknown", "src": "Pixabay",
+                        "page": h.get("pageURL", ""), "track": "",
+                        "text": f"{h.get('tags', '')} {(h.get('pageURL') or '').rstrip('/').rsplit('/', 1)[-1].replace('-', ' ')}"})
+    return out
+
+
+def _commons_photos(query: str) -> list[Job]:
+    out = []
+    for it in wiki_search(query, 10):
+        out.append({"id": "wc" + it["url"], "url": it["url"], "who": it["artist"] or "unknown", "src": "Wikimedia Commons",
+                    "page": it["page"], "track": "", "text": it["title"].replace("File:", "").replace("_", " ")})
+    return out
+
+
+def fetch_slide_photo(seg: Seg, job: Job, used: set):
+    """A real photograph whose own title/tags mention what THIS slide's narration describes, or None."""
+    if not SLIDE_PHOTOS:
+        return None
+    ph = _is_ph_job(job)
+    for q in photo_queries(seg, job):
+        for fn in (_unsplash_photos, _pixabay_photos, _commons_photos):
+            key = (fn.__name__, q)
+            if key not in _PHOTO_CACHE:
+                if _PHOTO_CALLS[0] >= PHOTO_MAX_SEARCHES:
+                    continue
+                _PHOTO_CALLS[0] += 1
+                try:
+                    _PHOTO_CACHE[key] = fn(q)
+                except Exception as e:
+                    log(f"  photo search '{q}' ({fn.__name__.strip('_')}) failed ({str(e)[:80]})")
+                    _PHOTO_CACHE[key] = []
+            for c in _PHOTO_CACHE[key]:
+                if c["id"] in used or not stock_relevant(c["text"], q):
+                    continue
+                if ph and c["src"] == "Wikimedia Commons" and not _mentions_ph(c["text"] + " " + c["page"]):
+                    continue
+                img = load_cover(c["url"])
+                if img is None or img.width < 800 or img.height < 450:
+                    continue
+                if c.get("track"):
+                    try:       # Unsplash guideline: register the download
+                        requests.get(c["track"], headers={"Authorization": f"Client-ID {UNSPLASH_ACCESS_KEY}", "User-Agent": UA}, timeout=20)
+                    except Exception:
+                        pass
+                used.add(c["id"])
+                CREDITS.append(f"Photo by {c['who']} via {c['src']} {c['page']}")
+                return img, f"{c['src']}: {q}"
+    return None
+
+
 def pick_kling_slides(segs: list[Seg], n: int) -> set[int]:
     """Choose up to n body slides to animate, spread across the whole video.
     Slides whose narration mentions people come first, because that is where movement shows."""
@@ -1578,6 +1700,10 @@ def build_video(job):
     vkbps = pick_bitrate(est)
     log(f"  narration {est:.0f}s; video bitrate {vkbps} kbps to stay near {MAX_MB:.0f} MB")
 
+    photo_used = set()
+    if SLIDE_PHOTOS:
+        log("  slide photos on (" + " + ".join(n for n, k in (("Unsplash", UNSPLASH_ACCESS_KEY), ("Pixabay", PIXABAY_API_KEY), ("Wikimedia", True)) if k)
+            + f"), up to {PHOTO_MAX_SEARCHES} searches")
     clips, total_dur, body_seen, ai_used = [], 0.0, 0, {}
     kling_used, kling_t0 = 0, time.time()
     kling_slides = pick_kling_slides(segs, KLING_MAX_CLIPS) if (KLING_ENABLED and KLING_API_KEY) else set()
@@ -1611,6 +1737,12 @@ def build_video(job):
                     cover = pic
                     ai_used[gi] = ai_used.get(gi, 0) + 1
             body_seen += 1
+            src_note = "AI image" if (ai and cover is not None) else "generic photo"
+            sp = fetch_slide_photo(seg, job, photo_used)
+            if sp:
+                cover, src_note = sp
+            STORYBOARD.append((i, src_note, clean_text(seg.get("speech") or "")[:90]))
+            log(f"  storyboard slide {i}: [{src_note}] {clean_text(seg.get('speech') or '')[:90]}")
         elif photos:
             cover = photos[0]
 
