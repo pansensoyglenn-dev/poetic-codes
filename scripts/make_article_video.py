@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-04-o"
+SCRIPT_VERSION = "2026-11-04-p"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -1840,6 +1840,59 @@ def add_to_index_list(article_url):
             fh.write(article_url + "\n")
 
 
+_PH_PLACES = ["Iloilo", "Zamboanga", "Sibugay", "Talon-Talon", "Naga", "Estancia", "Panay", "Negros", "Guimaras", "Cebu",
+              "Manila", "Mindanao", "Visayas", "Luzon", "Davao", "Bacolod", "Antique", "Capiz", "Aklan", "Cotabato", "Sulu",
+              "Basilan", "Dumaguete", "Bohol", "Leyte", "Samar", "Palawan", "Batangas", "Pampanga", "Bicol", "Cagayan",
+              "Dipolog", "Pagadian", "Ipil", "Diplahan", "Roxas", "Jaro", "Molo", "Arevalo", "Lapuz", "Kalibo", "Tacloban",
+              "Ormoc", "Iligan", "Marawi", "Sipalay", "Guimbal", "Miagao", "Oton"]
+_VISUALS = [
+    (r"basnigan", "wooden basnigan fishing boats with lamps at night"),
+    (r"bulad|dried fish|daing|tuyo", "fish drying on racks in the sun"),
+    (r"fisher|fishing|fisherfolk|\bcatch\b", "fishermen with nets by the sea"),
+    (r"\bnipa\b", "nipa huts"),
+    (r"market|palengke|vendor", "busy wet market stalls"),
+    (r"sugarcane|sugar cane|\bcane\b|\bmill\b", "sugarcane fields and a sugar mill"),
+    (r"\brice\b|palay|paddy", "rice paddies and farmers"),
+    (r"coconut|copra", "coconut groves"),
+    (r"church|cathedral|simbahan", "an old stone church"),
+    (r"fiesta|festival|procession", "a festival procession"),
+    (r"jeepney", "colorful jeepneys on a street"),
+    (r"\bport\b|\bpier\b|wharf|harbou?r|steamer|\bship", "a wooden pier and ships in the harbor"),
+    (r"river|creek", "a river and its banks"),
+    (r"school|classroom|students", "school children in a classroom"),
+    (r"kitchen|noodle|soup|pancit|dumpling|\bcook", "a home kitchen with cooking"),
+    (r"weaving|\bloom\b|hablon|textile", "a hand weaving loom"),
+    (r"migrat|voyage|sailed|sailing|\bjourney", "families travelling on a wooden boat"),
+]
+
+
+def infer_location(job: Job) -> Job:
+    """Work out place, era and visual details from the article itself, so no form needs filling in.
+    Anything the job already has (e.g. typed in the portal or the Actions form) is kept as it is."""
+    title = clean_text(job.get("title"))
+    body = clean_text(extract_main(job.get("body"))) if job.get("body") else ""
+    text = f"{title}. {title}. {title}. {body}"
+    counts = {p: len(re.findall(r"(?<![A-Za-z])" + re.escape(p) + r"(?![A-Za-z])", text)) for p in _PH_PLACES}
+    top = [p for p, c in sorted(counts.items(), key=lambda x: -x[1]) if c > 0][:3]
+    name = (", ".join(top) + ", Philippines") if top else ""
+
+    years = [int(y) for y in re.findall(r"\b(1[5-9]\d\d|20[0-2]\d)\b", text)]
+    old = [y for y in years if y < 2000]
+    era = ""
+    if old and len(old) >= max(2, 0.4 * len(years)):
+        decs = sorted({d for d, _ in __import__("collections").Counter(y // 10 * 10 for y in old).most_common(2)})
+        era = f"{decs[0]}s" if len(decs) == 1 else f"{decs[0]}s to {decs[-1]}s"
+
+    low = text.lower()
+    scored = sorted(((len(re.findall(rx, low)), phrase) for rx, phrase in _VISUALS), reverse=True)
+    phrases = [ph for c, ph in scored if c > 0][:6]
+    if top and phrases:
+        phrases.append("tropical Philippine setting")
+    out = {"name": name, "era": era, "description": ", ".join(phrases)}
+    have = {k: v for k, v in (job.get("location") or {}).items() if clean_text(str(v))}
+    return {**{k: v for k, v in out.items() if v}, **have}
+
+
 def fill_job_from_article(job: Job, row: Job) -> None:
     """A job file may hold only a title (+ location/characters). Take the text from the article on the site."""
     for key, names in (("body", ("content", "body")), ("excerpt", ("excerpt", "summary")), ("category", ("category",))):
@@ -1943,6 +1996,11 @@ def process_job(path):
         if not clean_text(job.get("body")):
             raise RuntimeError("this job has no article text and the article was not found on the site "
                                "(the title must match exactly), so there is nothing to narrate")
+        loc0 = dict(job.get("location") or {})
+        job["location"] = infer_location(job)
+        auto = {k: v for k, v in job["location"].items() if k not in loc0}
+        if auto:
+            log(f"  worked out from the article: {auto}")
         final, dur, engine = build_video(job)
         log(f"  video built: {dur:.0f}s, voice engine: {engine}")
 
