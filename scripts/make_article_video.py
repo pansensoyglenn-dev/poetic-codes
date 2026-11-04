@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-04-u"
+SCRIPT_VERSION = "2026-11-04-v"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -102,6 +102,10 @@ SLIDE_PHOTOS = os.environ.get("SLIDE_PHOTOS", "1") != "0"
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "").strip()
 PHOTO_MAX_SEARCHES = int(os.environ.get("PHOTO_MAX_SEARCHES", "30"))   # per video; Unsplash demo keys allow 50 requests/hour
 # On Philippine stories a stock clip must itself mention the Philippines/a Philippine place, else the slide keeps a better-matched photo.
+# A small free AI text model (Cloudflare Workers AI) writes each slide's search words + "must not show" words and judges candidates.
+LLM_PLAN = os.environ.get("LLM_PLAN", "1") != "0"
+LLM_MODEL = os.environ.get("LLM_MODEL", "@cf/meta/llama-3.1-8b-instruct")
+LLM_MAX_CALLS = int(os.environ.get("LLM_MAX_CALLS", "160"))
 CREDITS_CARD = os.environ.get("CREDITS_CARD", "0") == "1"   # 1 = also speak/show a credits card in the video (credits are always in the description)
 STOCK_REQUIRE_REGION = os.environ.get("STOCK_REQUIRE_REGION", "1") != "0"
 
@@ -1363,7 +1367,7 @@ def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None
     if not STOCK_VIDEO:
         return None
     sources = stock_sources()
-    for q in stock_queries(seg, job):
+    for q in plan_queries(seg, job, stock_queries(seg, job)):
         for name, search in sources:
             try:
                 for v in search(q):
@@ -1371,7 +1375,7 @@ def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None
                         continue
                     if not stock_relevant(v.get("text", ""), q):
                         continue
-                    if conflict_mismatch(v.get("text", ""), seg.get("speech") or "", job):
+                    if conflict_mismatch(v.get("text", ""), seg.get("speech") or "", job) or plan_rejects(v.get("text", ""), seg, job):
                         continue
                     if STOCK_REQUIRE_REGION and _is_ph_job(job) and not _mentions_ph(v.get("text", "")):
                         continue              # generic non-Filipino footage would contradict the narration
@@ -1420,6 +1424,83 @@ def conflict_mismatch(text: str, speech: str, job: Job | None = None) -> bool:
     return False
 
 
+# ---------- AI planner / judge (free Cloudflare text model) ----------
+_LLM_CALLS = [0]
+_LLM_DEAD = [False]
+_PLAN_CACHE: dict = {}
+
+
+def llm_text(system: str, user: str, max_tokens: int = 160) -> str | None:
+    if not LLM_PLAN or _LLM_DEAD[0] or not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) or _LLM_CALLS[0] >= LLM_MAX_CALLS:
+        return None
+    _LLM_CALLS[0] += 1
+    try:
+        r = requests.post(
+            f"https://api.cloudflare.com/client/v4/accounts/{CLOUDFLARE_ACCOUNT_ID}/ai/run/{LLM_MODEL}",
+            headers={"Authorization": f"Bearer {CLOUDFLARE_API_TOKEN}"},
+            json={"messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+                  "max_tokens": max_tokens, "temperature": 0.1}, timeout=45)
+        if not r.ok:
+            low = (r.text or "").lower()
+            if r.status_code != 429 or any(k in low for k in ("neurons", "quota", "daily", "4006")):
+                _LLM_DEAD[0] = True
+                log(f"  AI planner off for this run (HTTP {r.status_code}); using built-in rules")
+            return None
+        return str((r.json().get("result") or {}).get("response") or "")
+    except Exception as e:
+        log(f"  AI planner call failed ({str(e)[:80]})")
+        return None
+
+
+def slide_plan(seg: Seg, job: Job) -> Job:
+    """{'queries': [...], 'avoid': [...]} for this slide's narration, or {} when the AI planner is unavailable."""
+    speech = clean_text(seg.get("speech") or seg.get("text") or "")
+    if speech in _PLAN_CACHE:
+        return _PLAN_CACHE[speech]
+    loc = job.get("location") or {}
+    ctx = f"Article: {clean_text(job.get('title'))}. Place: {clean_text(loc.get('name'))}. Era: {clean_text(loc.get('era'))}."
+    out = llm_text(
+        "You choose stock photo/video search terms for a narrated documentary. Reply with JSON only: "
+        '{"queries": [2 to 3 short searches of 2-5 plain words describing exactly what the camera should show, '
+        'naming the people (e.g. Filipino fishermen) and place when relevant], '
+        '"avoid": [up to 8 single words for things that must NOT appear, e.g. military, jet, skyline, cartoon]}. '
+        "If the sentence is abstract, describe the article's everyday scene instead.",
+        f"{ctx}\nNarration: {speech[:400]}")
+    plan: Job = {}
+    if out:
+        m = re.search(r"\{.*\}", out, re.S)
+        try:
+            d = json.loads(m.group(0)) if m else {}
+            qs = [clean_text(q).lower() for q in (d.get("queries") or []) if isinstance(q, str) and 2 <= len(q.split()) <= 7][:3]
+            av = [w for a in (d.get("avoid") or []) if isinstance(a, str) for w in re.findall(r"[a-z]{3,}", a.lower())][:10]
+            if qs:
+                plan = {"queries": qs, "avoid": av}
+        except Exception:
+            plan = {}
+    _PLAN_CACHE[speech] = plan
+    return plan
+
+
+def plan_queries(seg: Seg, job: Job, rules: list[str]) -> list[str]:
+    return list(dict.fromkeys(slide_plan(seg, job).get("queries", []) + rules))[:5]
+
+
+def plan_rejects(text: str, seg: Seg, job: Job) -> bool:
+    """True when the candidate's own words hit this slide's 'avoid' list, or the AI judge says it does not fit."""
+    plan = slide_plan(seg, job)
+    words = set(re.findall(r"[a-z]+", clean_text(text).lower()))
+    if words & set(plan.get("avoid", [])):
+        return True
+    if not plan or not clean_text(text):
+        return False
+    ans = llm_text("Answer only YES or NO.",
+                   f"Narration: {clean_text(seg.get('speech') or '')[:300]}\nArticle: {clean_text(job.get('title'))}\n"
+                   f"Candidate picture description: {clean_text(text)[:300]}\n"
+                   "Would this picture plausibly illustrate the narration, in the right place and era, without showing unrelated things?",
+                   max_tokens=4)
+    return bool(ans) and ans.strip().upper().startswith("NO")
+
+
 def is_historical(seg: Seg, job: Job) -> bool:
     """True when the story is set before 2000 (a year or decade in the title, place details or this sentence)."""
     loc = job.get("location") or {}
@@ -1442,7 +1523,7 @@ def archive_queries(seg: Seg, job: Job) -> list[str]:
     """Plain search words for an archive: this slide's concrete things, with the country added for Philippine stories."""
     ph = _is_ph_job(job)
     out = []
-    for q in stock_queries(seg, job):
+    for q in plan_queries(seg, job, stock_queries(seg, job)):
         q = q.replace("philippines", "").strip()
         if q:
             if ph:
@@ -1532,7 +1613,7 @@ def fetch_archive_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | No
                 for v in search(q):
                     if v["id"] in used or not stock_relevant(v["text"], q):
                         continue
-                    if conflict_mismatch(v["text"], seg.get("speech") or "", job):
+                    if conflict_mismatch(v["text"], seg.get("speech") or "", job) or plan_rejects(v["text"], seg, job):
                         continue
                     if ph_job and not _mentions_ph(v["text"]):
                         continue          # a Philippine story needs footage that says it is from the Philippines
@@ -1642,7 +1723,7 @@ def fetch_slide_photo(seg: Seg, job: Job, used: set):
     if not SLIDE_PHOTOS:
         return None
     ph = _is_ph_job(job)
-    for q in photo_queries(seg, job):
+    for q in plan_queries(seg, job, photo_queries(seg, job)):
         for fn in (_unsplash_photos, _pixabay_photos, _commons_photos):
             key = (fn.__name__, q)
             if key not in _PHOTO_CACHE:
@@ -1655,7 +1736,7 @@ def fetch_slide_photo(seg: Seg, job: Job, used: set):
                     log(f"  photo search '{q}' ({fn.__name__.strip('_')}) failed ({str(e)[:80]})")
                     _PHOTO_CACHE[key] = []
             for c in _PHOTO_CACHE[key]:
-                if c["id"] in used or not stock_relevant(c["text"], q) or conflict_mismatch(c["text"], seg.get("speech") or "", job):
+                if c["id"] in used or not stock_relevant(c["text"], q) or conflict_mismatch(c["text"], seg.get("speech") or "", job) or plan_rejects(c["text"], seg, job):
                     continue
                 if ph and c["src"] == "Wikimedia Commons" and not _mentions_ph(c["text"] + " " + c["page"]):
                     continue
@@ -1727,6 +1808,8 @@ def build_video(job):
     vkbps = pick_bitrate(est)
     log(f"  narration {est:.0f}s; video bitrate {vkbps} kbps to stay near {MAX_MB:.0f} MB")
 
+    if LLM_PLAN:
+        log("  AI planner on (" + LLM_MODEL + ")" if (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) else "  AI planner off: no Cloudflare secrets")
     photo_used = set()
     if SLIDE_PHOTOS:
         log("  slide photos on (" + " + ".join(n for n, k in (("Unsplash", UNSPLASH_ACCESS_KEY), ("Pixabay", PIXABAY_API_KEY), ("Wikimedia", True)) if k)
@@ -1769,7 +1852,9 @@ def build_video(job):
             if sp:
                 cover, src_note = sp
             STORYBOARD.append((i, src_note, clean_text(seg.get("speech") or "")[:90]))
-            log(f"  storyboard slide {i}: [{src_note}] {clean_text(seg.get('speech') or '')[:90]}")
+            _pl = slide_plan(seg, job)
+            log(f"  storyboard slide {i}: [{src_note}] {clean_text(seg.get('speech') or '')[:90]}"
+                + (f" | AI search: {', '.join(_pl.get('queries', [])[:2])} | avoid: {', '.join(_pl.get('avoid', [])[:5])}" if _pl else ""))
         elif photos:
             cover = photos[0]
 
