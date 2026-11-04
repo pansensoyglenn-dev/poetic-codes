@@ -51,10 +51,12 @@ jobs:
           # FREE moving people: real stock footage from Pexels (free key at pexels.com/api, saved as a secret)
           # Real old film (public domain) for stories set before 2000, from Wikimedia Commons + Internet Archive (no key needed)
           ARCHIVE_VIDEO: "1"
+          ARCHIVE_ANY_ERA: "1"
           STOCK_VIDEO: "1"
           STOCK_MAX_CLIPS: "20"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
           # People that really move (paid; each clip is billed by the provider). "0" = off, nothing is spent.
           KLING_ENABLED: "0"
           KLING_PROVIDER: "fal"
