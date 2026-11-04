@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-04-n"
+SCRIPT_VERSION = "2026-11-04-o"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -827,9 +827,12 @@ def gen_image_cloudflare(prompt):
     )
     if not r.ok:
         low = (r.text or "").lower()
-        if r.status_code == 429 or "neurons" in low or "quota" in low or "daily" in low:
+        # Only a message about the daily allowance means "out of quota". A bare 429 is a short rate limit: retry it.
+        if any(k in low for k in ("neurons", "quota", "daily", "used up", "4006")):
             QUOTA_HIT[0] = True
-        raise RuntimeError(f"Cloudflare HTTP {r.status_code}: {(r.text or '')[:250]}")
+        err = RuntimeError(f"Cloudflare HTTP {r.status_code}: {(r.text or '')[:250]}")
+        err.rate_limited = r.status_code == 429
+        raise err
     import base64
     data = r.json()
     if not data.get("success", True) or not (data.get("result") or {}).get("image"):
@@ -841,17 +844,25 @@ LAST_IMG_ERROR = [""]
 
 
 def gen_image(prompt):
-    for attempt in range(2):
+    waits = [2, 4]                       # ordinary errors: two quick retries
+    attempt = 0
+    while True:
         if QUOTA_HIT[0]:
             return None
+        rate_limited = False
         try:
             img = gen_image_cloudflare(prompt)
             if img is not None:
                 return img
         except Exception as e:
             LAST_IMG_ERROR[0] = str(e)[:300]
-        time.sleep(2 * (attempt + 1))
-    return None
+            rate_limited = bool(getattr(e, "rate_limited", False))
+        if rate_limited:
+            waits = [8, 20, 40]          # a rate limit passes after a short wait
+        if attempt >= len(waits):
+            return None
+        time.sleep(waits[attempt])
+        attempt += 1
 
 
 _SPOTS = [(0.5, 0.5), (0.25, 0.5), (0.75, 0.5), (0.5, 0.3), (0.5, 0.7)]
@@ -903,6 +914,8 @@ def make_ai_images(segs, job):
         prompt = scene_prompt(seg, job)
         if QUOTA_HIT[0]:
             log(f"  Cloudflare free quota reached at {j}/{k}; using photos for the rest (no further calls)")
+            if LAST_IMG_ERROR[0]:
+                log(f"  Cloudflare said: {LAST_IMG_ERROR[0]}")
             out.extend([None] * (k - j))
             break
         if time.time() - t_start > IMG_BUDGET or fails >= IMG_FAIL_LIMIT:
