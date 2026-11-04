@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-04-v"
+SCRIPT_VERSION = "2026-11-04-w"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -2172,6 +2172,28 @@ def infer_location(job: Job) -> Job:
     if in_ph and phrases:
         phrases.append("tropical Philippine setting")
     out = {"name": name, "era": era, "description": ", ".join(phrases)}
+    ai = llm_text(
+        "You prepare a documentary video from an article. Reply with JSON only: "
+        '{"name": "main place, region, country", "era": "time period such as 1950s or present day", '
+        '"description": "6-10 concrete visual details of the scenes the article describes, comma-separated, '
+        'e.g. wooden outrigger fishing boats, nipa huts, wet market stalls", '
+        '"palette": "3-5 colour words", "characters": [{"name": "...", "description": "age, clothing, look", '
+        '"appearsIn": ["words in the text where they appear"]}]} . Use only what the article says. Max 3 characters.',
+        f"Title: {title}\nText: {body[:3500]}", max_tokens=420)
+    if ai:
+        m = re.search(r"\{.*\}", ai, re.S)
+        try:
+            d = json.loads(m.group(0)) if m else {}
+            for k in ("name", "era", "description", "palette"):
+                if isinstance(d.get(k), str) and len(d[k].strip()) > 2:
+                    out[k] = d[k].strip()[:300]
+            chars = [{"name": clean_text(c.get("name")), "description": clean_text(c.get("description")),
+                      "appearsIn": [clean_text(a) for a in (c.get("appearsIn") or []) if isinstance(a, str)][:4]}
+                     for c in (d.get("characters") or []) if isinstance(c, dict) and clean_text(c.get("name"))][:3]
+            if chars and not job.get("characters"):
+                job["characters"] = chars
+        except Exception:
+            pass
     have = {k: v for k, v in (job.get("location") or {}).items() if clean_text(str(v))}
     return {**{k: v for k, v in out.items() if v}, **have}
 
