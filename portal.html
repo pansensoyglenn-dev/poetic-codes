@@ -354,13 +354,26 @@
 
           <div class="field-row">
             <div class="field-group">
-              <label class="field-label" for="f-video-place">Video: place &amp; era (optional)</label>
+              <label class="field-label" for="f-video-place">Video: place &amp; era (optional, empty = worked out from the article)</label>
               <input type="text" id="f-video-place" class="field-input" placeholder="e.g. Iloilo coast to Zamboanga Sibugay, 1950s" maxlength="120">
             </div>
             <div class="field-group">
-              <label class="field-label" for="f-video-details">Video: what the camera sees (optional)</label>
+              <label class="field-label" for="f-video-details">Video: what the camera sees (optional, empty = worked out from the article)</label>
               <input type="text" id="f-video-details" class="field-input" placeholder="e.g. basnigan boats with lamp booms, drying bulad, nipa huts" maxlength="200">
             </div>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="f-video-voice">Video: narration voice (optional)</label>
+            <select id="f-video-voice" class="field-input">
+              <option value="">Auto (Philippine English, male)</option>
+              <option value="en-PH-RosaNeural">Philippine English, female</option>
+              <option value="en-GB-RyanNeural">British English, male</option>
+              <option value="en-GB-SoniaNeural">British English, female</option>
+              <option value="en-US-ChristopherNeural">American English, male</option>
+              <option value="en-US-AriaNeural">American English, female</option>
+              <option value="en-AU-WilliamNeural">Australian English, male</option>
+            </select>
           </div>
 
           <div class="field-group">
@@ -951,7 +964,7 @@ function resetSubmitButton() {
 }
 
 function resetForm() {
-  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details'].forEach(id => {
+  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details','f-video-voice'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -2203,6 +2216,8 @@ async function queueVideoJob(job) {
     coverUrl: job.coverUrl || null,
     force: !!job.force
   };
+  // Optional narration voice (an edge-tts neural voice name); empty = the default voice in the video script.
+  if (job.voice && /^[a-z]{2,3}-[A-Z]{2}-[A-Za-z]+Neural$/.test(job.voice)) payload.voice = job.voice;
   // Where the story takes place: the video's pictures are drawn to match (see article_video.py)
   if (job.location && (job.location.name || job.location.description)) payload.location = job.location;
   await githubPutText(VIDEO_JOBS_DIR + '/' + slug + '.json', JSON.stringify(payload, null, 2), 'Queue video: ' + slug);
@@ -2343,7 +2358,8 @@ async function submitArticle() {
           location: {
             name: ((document.getElementById('f-video-place') || {}).value || '').trim(),
             description: ((document.getElementById('f-video-details') || {}).value || '').trim()
-          }
+          },
+          voice: ((document.getElementById('f-video-voice') || {}).value || '').trim()
         });
         distLines.push('✓ Video: queued — it will appear on the article in about 1–3 minutes');
       } catch (vErr) {
