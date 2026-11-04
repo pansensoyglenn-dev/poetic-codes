@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-04-p"
+SCRIPT_VERSION = "2026-11-04-s"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -93,6 +93,7 @@ STOCK_MAX_MB = float(os.environ.get("STOCK_MAX_MB", "25"))
 # Real archival footage (public domain / Creative Commons) for stories set before 2000: Wikimedia Commons + Internet Archive.
 # No key needed. Only used when the article is about a past era; falls back to the stock sites above.
 ARCHIVE_VIDEO = os.environ.get("ARCHIVE_VIDEO", "0") == "1"
+ARCHIVE_ANY_ERA = os.environ.get("ARCHIVE_ANY_ERA", "0") == "1"   # 1 = real archive footage for every article, not only pre-2000 stories
 ARCHIVE_MAX_MB = float(os.environ.get("ARCHIVE_MAX_MB", "120"))
 ARCHIVE_CLIP_SEC = float(os.environ.get("ARCHIVE_CLIP_SEC", "12"))
 
@@ -414,9 +415,18 @@ def caption_timings(speech: str, dur: float) -> list[tuple[str, float, float]]:
     return out
 
 
+ACTIVE_VOICE = [None]      # set per article from the job file (portal "Narration voice"); None = the default VOICE
+_VOICE_RE = re.compile(r"^[a-z]{2,3}-[A-Z]{2}-[A-Za-z]+Neural$")
+
+
+def set_job_voice(job: Job) -> None:
+    v = clean_text(job.get("voice"))
+    ACTIVE_VOICE[0] = v if _VOICE_RE.match(v or "") else None
+
+
 async def _edge_synth(text, out, voice=None):
     import edge_tts
-    await edge_tts.Communicate(text, voice or VOICE, rate=RATE).save(out)
+    await edge_tts.Communicate(text, voice or ACTIVE_VOICE[0] or VOICE, rate=RATE).save(out)
 
 
 def pick_rate(segs: list[Seg]) -> str:
@@ -440,7 +450,8 @@ def synth(text, out_mp3):
         return "fake"
 
     last = None
-    voices = [VOICE] + [v for v in VOICE_FALLBACKS if v != VOICE]
+    first = ACTIVE_VOICE[0] or VOICE
+    voices = [first] + [v for v in [VOICE] + VOICE_FALLBACKS if v != first]
     for attempt in range(4):
         v = voices[min(attempt // 2, len(voices) - 1)]    # two tries per voice, then the next voice
         try:
@@ -1383,15 +1394,27 @@ def is_historical(seg: Seg, job: Job) -> bool:
     return any(int(y) < 2000 for y in _YEAR_RE.findall(text))
 
 
+def _mentions_ph(text: str) -> bool:
+    places = "|".join(re.escape(p) for p in _PH_PLACES)
+    return bool(re.search(r"philippin|filipino|pilipin|\b(" + places + r")\b", clean_text(text), re.I))
+
+
+def _is_ph_job(job: Job) -> bool:
+    loc = job.get("location") or {}
+    return _mentions_ph(" ".join(clean_text(x) for x in (job.get("title"), loc.get("name"), (job.get("body") or "")[:4000])))
+
+
 def archive_queries(seg: Seg, job: Job) -> list[str]:
-    """Plain search words for an archive: this slide's concrete things, with the country added."""
+    """Plain search words for an archive: this slide's concrete things, with the country added for Philippine stories."""
+    ph = _is_ph_job(job)
     out = []
     for q in stock_queries(seg, job):
         q = q.replace("philippines", "").strip()
         if q:
-            out.append(f"philippines {q}")
+            if ph:
+                out.append(f"philippines {q}")
             out.append(q)
-    if not out:
+    if not out and ph:
         out = ["philippines"]
     return list(dict.fromkeys(out))[:3]
 
@@ -1466,14 +1489,17 @@ def _cut_clip(src: Path, out_mp4: Path) -> bool:
 
 def fetch_archive_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None:
     """A few seconds of real archival film that matches this slide, or None."""
-    if not (ARCHIVE_VIDEO and is_historical(seg, job)):
+    if not (ARCHIVE_VIDEO and (ARCHIVE_ANY_ERA or is_historical(seg, job))):
         return None
+    ph_job = _is_ph_job(job)
     for q in archive_queries(seg, job):
         for name, search in (("Wikimedia Commons", _commons_video_search), ("Internet Archive", _ia_video_search)):
             try:
                 for v in search(q):
-                    if v["id"] in used or not _words_match(v["text"], q):
+                    if v["id"] in used or not stock_relevant(v["text"], q):
                         continue
+                    if ph_job and not _mentions_ph(v["text"]):
+                        continue          # a Philippine story needs footage that says it is from the Philippines
                     if v["size"] and v["size"] > ARCHIVE_MAX_MB * 1048576:
                         continue
                     raw = out_mp4.with_suffix(".raw")
@@ -1845,6 +1871,18 @@ _PH_PLACES = ["Iloilo", "Zamboanga", "Sibugay", "Talon-Talon", "Naga", "Estancia
               "Basilan", "Dumaguete", "Bohol", "Leyte", "Samar", "Palawan", "Batangas", "Pampanga", "Bicol", "Cagayan",
               "Dipolog", "Pagadian", "Ipil", "Diplahan", "Roxas", "Jaro", "Molo", "Arevalo", "Lapuz", "Kalibo", "Tacloban",
               "Ormoc", "Iligan", "Marawi", "Sipalay", "Guimbal", "Miagao", "Oton"]
+_WORLD_PLACES = [
+    # Europe
+    "Europe", "France", "Paris", "Brittany", "Normandy", "Provence", "Italy", "Rome", "Venice", "Florence", "Naples", "Sicily",
+    "Tuscany", "Spain", "Madrid", "Barcelona", "Seville", "Portugal", "Lisbon", "Germany", "Berlin", "Bavaria", "Austria", "Vienna",
+    "Switzerland", "Netherlands", "Amsterdam", "Belgium", "Britain", "England", "London", "Scotland", "Wales", "Ireland", "Dublin",
+    "Greece", "Athens", "Poland", "Prague", "Hungary", "Budapest", "Sweden", "Norway", "Denmark", "Finland", "Iceland", "Russia", "Moscow",
+    # Asia, Middle East, Africa, Americas, Oceania
+    "Japan", "Tokyo", "Kyoto", "China", "Beijing", "Shanghai", "Hong Kong", "Korea", "Seoul", "India", "Delhi", "Mumbai", "Vietnam", "Hanoi",
+    "Thailand", "Bangkok", "Indonesia", "Java", "Bali", "Malaysia", "Singapore", "Turkey", "Istanbul", "Egypt", "Cairo", "Israel", "Jerusalem",
+    "Africa", "Nigeria", "Kenya", "Morocco", "South Africa", "Mexico", "Brazil", "Peru", "Argentina", "Cuba", "Canada", "America",
+    "United States", "New York", "California", "Texas", "Hawaii", "Australia", "Sydney", "New Zealand",
+]
 _VISUALS = [
     (r"basnigan", "wooden basnigan fishing boats with lamps at night"),
     (r"bulad|dried fish|daing|tuyo", "fish drying on racks in the sun"),
@@ -1872,9 +1910,10 @@ def infer_location(job: Job) -> Job:
     title = clean_text(job.get("title"))
     body = clean_text(extract_main(job.get("body"))) if job.get("body") else ""
     text = f"{title}. {title}. {title}. {body}"
-    counts = {p: len(re.findall(r"(?<![A-Za-z])" + re.escape(p) + r"(?![A-Za-z])", text)) for p in _PH_PLACES}
+    counts = {p: len(re.findall(r"(?<![A-Za-z])" + re.escape(p) + r"(?![A-Za-z])", text)) for p in _PH_PLACES + _WORLD_PLACES}
     top = [p for p, c in sorted(counts.items(), key=lambda x: -x[1]) if c > 0][:3]
-    name = (", ".join(top) + ", Philippines") if top else ""
+    in_ph = any(p in _PH_PLACES for p in top)
+    name = (", ".join(top) + (", Philippines" if in_ph else "")) if top else ""
 
     years = [int(y) for y in re.findall(r"\b(1[5-9]\d\d|20[0-2]\d)\b", text)]
     old = [y for y in years if y < 2000]
@@ -1886,7 +1925,7 @@ def infer_location(job: Job) -> Job:
     low = text.lower()
     scored = sorted(((len(re.findall(rx, low)), phrase) for rx, phrase in _VISUALS), reverse=True)
     phrases = [ph for c, ph in scored if c > 0][:6]
-    if top and phrases:
+    if in_ph and phrases:
         phrases.append("tropical Philippine setting")
     out = {"name": name, "era": era, "description": ", ".join(phrases)}
     have = {k: v for k, v in (job.get("location") or {}).items() if clean_text(str(v))}
@@ -1996,6 +2035,7 @@ def process_job(path):
         if not clean_text(job.get("body")):
             raise RuntimeError("this job has no article text and the article was not found on the site "
                                "(the title must match exactly), so there is nothing to narrate")
+        set_job_voice(job)
         loc0 = dict(job.get("location") or {})
         job["location"] = infer_location(job)
         auto = {k: v for k, v in job["location"].items() if k not in loc0}
