@@ -1,0 +1,73 @@
+name: Auto-make videos for new articles
+# Safety net: every few hours, find articles on the site that still have no video and make one.
+# Articles published from the portal are already handled the moment you publish; this catches everything else
+# (articles written in the Commonplace app, edited later, or whose video failed). Place, era and visual details are
+# worked out from each article. Start it by hand any time from Actions -> Run workflow.
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: article-video
+  cancel-in-progress: false
+
+jobs:
+  make:
+    # a run that finds no article without a video ends in seconds and costs nothing
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Install tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
+          pip install --quiet edge-tts pillow requests
+      - name: Build job file from inputs
+        env:
+          TITLE: "*"
+          LOCATION: ""
+          LOCATION_DETAILS: ""
+          CHARACTERS: ""
+          MAX_VIDEOS: "1"
+          QUIET_WHEN_EMPTY: "1"
+        id: build
+        run: python scripts/make_job_from_inputs.py
+      - name: Make the video
+        if: steps.build.outputs.found != '0'
+        env:
+          ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          AI_IMAGES: "1"
+          # FREE moving people: real stock footage from Pexels (free key at pexels.com/api, saved as a secret)
+          # Real old film (public domain) for stories set before 2000, from Wikimedia Commons + Internet Archive (no key needed)
+          ARCHIVE_VIDEO: "1"
+          ARCHIVE_ANY_ERA: "1"
+          STOCK_VIDEO: "1"
+          STOCK_MAX_CLIPS: "20"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          # People that really move (paid; each clip is billed by the provider). "0" = off, nothing is spent.
+          KLING_ENABLED: "0"
+          KLING_PROVIDER: "fal"
+          KLING_MAX_CLIPS: "6"
+          FAL_KEY: ${{ secrets.FAL_KEY }}
+          MAX_WORDS: "3000"
+          TTS_RATE: "+0%"
+          MAX_JOBS_PER_RUN: "30"
+        run: python scripts/make_article_video.py
+      - name: Keep a downloadable copy of the video
+        if: always() && steps.build.outputs.found != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: article-videos
+          path: out/*
+          if-no-files-found: ignore
+          retention-days: 3
