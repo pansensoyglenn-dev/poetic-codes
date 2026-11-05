@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-05-x"
+SCRIPT_VERSION = "2026-11-05-y"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -96,6 +96,11 @@ ARCHIVE_VIDEO = os.environ.get("ARCHIVE_VIDEO", "0") == "1"
 ARCHIVE_ANY_ERA = os.environ.get("ARCHIVE_ANY_ERA", "0") == "1"   # 1 = real archive footage for every article, not only pre-2000 stories
 ARCHIVE_MAX_MB = float(os.environ.get("ARCHIVE_MAX_MB", "120"))
 ARCHIVE_CLIP_SEC = float(os.environ.get("ARCHIVE_CLIP_SEC", "12"))
+# Real footage is OPT-IN per article: STOCK_VIDEO / ARCHIVE_VIDEO only take effect for a job file that has
+# "footage": true, unless FOOTAGE_ALL=1. History/culture essays rarely have footage of their exact subject,
+# so by default every new article gets AI pictures matched to its narration instead of a guessed clip.
+FOOTAGE_ALL = os.environ.get("FOOTAGE_ALL", "0") == "1"
+_ARCHIVE_ENV, _STOCK_ENV = ARCHIVE_VIDEO, STOCK_VIDEO
 
 # Real photographs matched to each slide's own narration (Unsplash + Pixabay photos + Wikimedia Commons).
 SLIDE_PHOTOS = os.environ.get("SLIDE_PHOTOS", "1") != "0"
@@ -1318,10 +1323,11 @@ _STOCK_BLOCK = {"jet", "jets", "airplane", "aircraft", "fighter", "helicopter", 
 
 def stock_relevant(text: str, query: str) -> bool:
     """A free stock site matches loosely, so check the clip's own tags/title: it must mention a concrete word from
-    the search and nothing that clearly does not belong in a story about people and places."""
+    the search and nothing that clearly does not belong in a story about people and places.
+    A candidate with NO description is rejected under STRICT_MATCH: nothing proves it matches."""
     t = clean_text(text).lower()
     if not t:
-        return True
+        return not STRICT_MATCH
     if any(b in re.findall(r"[a-z0-9]+", t) for b in _STOCK_BLOCK):
         return False
     return _words_match(t, query)
@@ -1413,16 +1419,39 @@ _CONFLICT_WORDS = {"coast", "guard", "navy", "naval", "military", "army", "shoal
                    "poster", "logo", "text", "cartoon", "meme", "infographic", "slide", "diagram", "map", "flag", "religion",
                    "bible", "symbol", "doctrine", "church", "ceremony"}
 
+# Words that signal footage of some other migration/place (Ellis Island, Atlantic crossings, ...). A candidate that
+# mentions one of these, or any place in _WORLD_PLACES, is rejected unless the article itself mentions it.
+_FOREIGN_HINTS = ["ellis island", "ellis", "european", "europeans", "emigrants", "immigrants", "immigrant", "steerage",
+                  "atlantic", "transatlantic", "pilgrims", "pioneers", "wagon", "covered wagon", "gold rush", "prairie",
+                  "irish", "italian", "german", "polish", "jewish", "victorian", "medieval", "viking"]
+
+
+def _norm_words(text: str) -> str:
+    return " " + " ".join(re.findall(r"[a-z]+", clean_text(text).lower())) + " "
+
+
+def foreign_mismatch(text: str, job: Job) -> bool:
+    """True when the candidate's own description names a foreign place/migration the article never mentions."""
+    t = _norm_words(text)
+    article = _norm_words((job.get("title") or "") + " " + clean_text(extract_main(job.get("body")))[:30000])
+    for p in _WORLD_PLACES + _FOREIGN_HINTS:
+        key = _norm_words(p)
+        if key in t and key not in article:
+            return True
+    return False
+
 
 def conflict_mismatch(text: str, speech: str, job: Job | None = None) -> bool:
     """True when a clip/photo's own description is about a confrontation, military or disaster event that the narration
     and article are not about (e.g. a modern coast-guard clash shown under a sentence about crew size), or is dated after
-    the era of a historical story."""
+    the era of a historical story, or names a foreign place/migration the article never mentions."""
     t = set(re.findall(r"[a-z]+", clean_text(text).lower()))
     ctx = set(re.findall(r"[a-z]+", clean_text(speech).lower()))
     if job is not None:
         ctx |= set(re.findall(r"[a-z]+", clean_text((job.get("title") or "") + " " + (job.get("body") or "")[:3000]).lower()))
     if (t & _CONFLICT_WORDS) - ctx:
+        return True
+    if job is not None and foreign_mismatch(text, job):
         return True
     if job is not None and is_historical({}, job):
         years = [int(y) for y in re.findall(r"\b(20\d\d)\b", clean_text(text))]
@@ -1493,7 +1522,7 @@ def plan_queries(seg: Seg, job: Job, rules: list[str]) -> list[str]:
 
 
 def plan_rejects(text: str, seg: Seg, job: Job) -> bool:
-    """True when the candidate's own words hit this slide's 'avoid' list, or the AI judge says it does not fit."""
+    """True when the candidate's own words hit this slide's 'avoid' list, or the AI judge does not clearly say YES."""
     plan = slide_plan(seg, job)
     words = set(re.findall(r"[a-z]+", clean_text(text).lower()))
     if words & set(plan.get("avoid", [])):
@@ -1503,11 +1532,12 @@ def plan_rejects(text: str, seg: Seg, job: Job) -> bool:
     ans = llm_text("Answer only YES or NO.",
                    f"Narration: {clean_text(seg.get('speech') or '')[:300]}\nArticle: {clean_text(job.get('title'))}\n"
                    f"Candidate picture description: {clean_text(text)[:300]}\n"
-                   "Would this picture plausibly illustrate the narration, in the right place and era, without showing unrelated things?",
+                   "Does this picture clearly show what the narration describes, in the right country and era? "
+                   "Answer NO if it shows a different country, culture, era or event, or if you are unsure.",
                    max_tokens=4)
     if ans is None:
-        return False            # judge unavailable: the stricter word match above has already decided
-    return ans.strip().upper().startswith("NO")
+        return False            # judge unavailable: the stricter word and place checks above have already decided
+    return not ans.strip().upper().startswith("YES")   # only a clear YES passes
 
 
 def is_historical(seg: Seg, job: Job) -> bool:
@@ -1519,7 +1549,8 @@ def is_historical(seg: Seg, job: Job) -> bool:
 
 
 def _mentions_ph(text: str) -> bool:
-    places = "|".join(re.escape(p) for p in _PH_PLACES)
+    """Strict: only unambiguous Philippine words count (see _PH_MATCH_PLACES; no 'Antique', 'Naga', 'Roxas', ...)."""
+    places = "|".join(re.escape(p) for p in _PH_MATCH_PLACES)
     return bool(re.search(r"philippin|filipino|pilipin|\b(" + places + r")\b", clean_text(text), re.I))
 
 
@@ -1696,8 +1727,9 @@ def _unsplash_photos(query: str) -> list[Job]:
         if not u:
             continue
         tags = " ".join(t.get("title", "") for t in (h.get("tags") or []) if isinstance(t, dict))
+        loc = (h.get("location") or {}) if isinstance(h.get("location"), dict) else {}
         out.append({"id": "us" + str(h.get("id")), "url": u,
-                    "text": f"{h.get('description') or ''} {h.get('alt_description') or ''} {tags}",
+                    "text": f"{h.get('description') or ''} {h.get('alt_description') or ''} {tags} {loc.get('name') or ''}",
                     "who": (h.get("user") or {}).get("name") or "unknown", "src": "Unsplash",
                     "page": (h.get("links") or {}).get("html", ""),
                     "track": (h.get("links") or {}).get("download_location", "")})
@@ -1731,7 +1763,8 @@ def _commons_photos(query: str) -> list[Job]:
 
 
 def fetch_slide_photo(seg: Seg, job: Job, used: set):
-    """A real photograph whose own title/tags mention what THIS slide's narration describes, or None."""
+    """A real photograph whose own title/tags mention what THIS slide's narration describes, or None.
+    On Philippine stories EVERY source (Unsplash, Pixabay, Commons) must name the Philippines or a Philippine place."""
     if not SLIDE_PHOTOS:
         return None
     ph = _is_ph_job(job)
@@ -1750,7 +1783,7 @@ def fetch_slide_photo(seg: Seg, job: Job, used: set):
             for c in _PHOTO_CACHE[key]:
                 if c["id"] in used or not stock_relevant(c["text"], q) or conflict_mismatch(c["text"], seg.get("speech") or "", job) or plan_rejects(c["text"], seg, job):
                     continue
-                if ph and c["src"] == "Wikimedia Commons" and not _mentions_ph(c["text"] + " " + c["page"]):
+                if ph and not _mentions_ph(c["text"] + " " + c["page"]):
                     continue
                 img = load_cover(c["url"])
                 if img is None or img.width < 800 or img.height < 450:
@@ -1780,7 +1813,13 @@ def pick_kling_slides(segs: list[Seg], n: int) -> set[int]:
 
 
 def build_video(job):
-    global RATE
+    global RATE, ARCHIVE_VIDEO, STOCK_VIDEO
+    # Real footage is opt-in per article ("footage": true in the job file) unless FOOTAGE_ALL=1.
+    footage_ok = bool(job.get("footage")) or FOOTAGE_ALL
+    ARCHIVE_VIDEO = _ARCHIVE_ENV and footage_ok
+    STOCK_VIDEO = _STOCK_ENV and footage_ok
+    if (_ARCHIVE_ENV or _STOCK_ENV) and not footage_ok:
+        log("  real footage skipped for this article (add \"footage\": true to its job file to allow it)")
     segs = build_segments(job)
     RATE = pick_rate(segs)
     log(f"  {len(segs)} slides, narration rate {RATE}")
@@ -2130,6 +2169,13 @@ _PH_PLACES = ["Iloilo", "Zamboanga", "Sibugay", "Talon-Talon", "Naga", "Estancia
               "Basilan", "Dumaguete", "Bohol", "Leyte", "Samar", "Palawan", "Batangas", "Pampanga", "Bicol", "Cagayan",
               "Dipolog", "Pagadian", "Ipil", "Diplahan", "Roxas", "Jaro", "Molo", "Arevalo", "Lapuz", "Kalibo", "Tacloban",
               "Ormoc", "Iligan", "Marawi", "Sipalay", "Guimbal", "Miagao", "Oton"]
+# Used only to PROVE a clip/photo is Philippine. Names that also exist elsewhere (Antique, Naga, Roxas, Molo, Jaro,
+# Oton, Arevalo, Lapuz, Estancia, Sulu, Samar, Ipil, Roxas, Talon-Talon) are left out on purpose.
+_PH_MATCH_PLACES = ["Iloilo", "Zamboanga", "Sibugay", "Panay", "Negros", "Guimaras", "Cebu", "Mindanao", "Visayas", "Luzon",
+                    "Davao", "Bacolod", "Capiz", "Aklan", "Cotabato", "Basilan", "Dumaguete", "Bohol", "Leyte", "Palawan",
+                    "Batangas", "Pampanga", "Bicol", "Cagayan", "Dipolog", "Pagadian", "Diplahan", "Kalibo", "Tacloban",
+                    "Ormoc", "Iligan", "Marawi", "Sipalay", "Guimbal", "Miagao", "General Santos", "Sarangani", "Kidapawan",
+                    "Tacurong", "Sultan Kudarat", "Manila"]
 _WORLD_PLACES = [
     # Europe
     "Europe", "France", "Paris", "Brittany", "Normandy", "Provence", "Italy", "Rome", "Venice", "Florence", "Naples", "Sicily",
