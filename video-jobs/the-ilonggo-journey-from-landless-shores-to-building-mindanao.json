@@ -1,6 +1,6 @@
 {
-  "jobId": "1793841363728",
-  "createdAt": "2026-11-05T01:16:03.728Z",
+  "jobId": "1793845691893",
+  "createdAt": "2026-11-05T02:28:11.893Z",
   "title": "The Ilonggo Journey: From Landless Shores to Building Mindanao",
   "author": "Glenn Junsay Pansensoy",
   "category": "History",
@@ -19,7 +19,7 @@
     "ilonggo diaspora"
   ],
   "slug": "the-ilonggo-journey-from-landless-shores-to-building-mindanao",
-  "articleId": 38,
-  "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793841332292.jpg",
-  "force": true
+  "articleId": 39,
+  "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793845687570.jpg",
+  "force": false
 }
