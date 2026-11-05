@@ -1,0 +1,52 @@
+name: Tutorial videos (all pages)
+# Makes a narrated video for every Poetic Bytes tutorial page that does not have one yet, a few per run.
+# Videos are stored in the repo's Releases page under "Tutorial videos" (permanent download links).
+# Page list: tutorial-urls.txt in the repo root if it exists, otherwise the site's sitemap, otherwise the home page links.
+on:
+  schedule:
+    - cron: "30 20 * * *"      # every day, 4:30 am Philippine time; delete these two lines to run only by hand
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: "Optional. Only these page links (spaces or new lines between them). Leave empty for every page without a video."
+        required: false
+        default: ""
+      limit:
+        description: "How many videos to make this run"
+        required: false
+        default: "3"
+      explain:
+        description: "Type 1 to add a short AI-written spoken explanation to each code snippet (check before publishing)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tutorial-videos
+  cancel-in-progress: false
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Install tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          pip install --quiet edge-tts pillow requests beautifulsoup4 pygments
+      - name: Make the videos
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PAGES: ${{ inputs.pages }}
+          MAX_PER_RUN: ${{ inputs.limit || '3' }}
+          EXPLAIN_CODE: ${{ inputs.explain == '1' && '1' || '0' }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: python scripts/tutorial_batch.py
