@@ -1,6 +1,6 @@
 {
-  "jobId": "1793915383434",
-  "createdAt": "2026-11-05T21:49:43.434Z",
+  "jobId": "1793915406315",
+  "createdAt": "2026-11-05T21:50:06.315Z",
   "title": "Python Shopping Cart · Domain-Driven Design | Poetic Bytes",
   "author": "Glenn Junsay Pansensoy",
   "category": "Programming",
@@ -18,5 +18,5 @@
   "slug": "python-shopping-cart-domain-driven-design-poetic-bytes",
   "articleId": 42,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793915370399.jpg",
-  "force": false
+  "force": true
 }
