@@ -1,6 +1,6 @@
 {
-  "jobId": "1793857664144",
-  "createdAt": "2026-11-05T05:47:44.144Z",
+  "jobId": "1793857690828",
+  "createdAt": "2026-11-05T05:48:10.828Z",
   "title": "Socialism, Capitalist Crisis, and the Struggle for the Left's Soul",
   "author": "Glenn Junsay Pansensoy",
   "category": "Philosophy",
@@ -21,5 +21,5 @@
   "slug": "socialism-capitalist-crisis-and-the-struggle-for-the-left-s-soul",
   "articleId": 40,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793857659798.jpg",
-  "force": false
+  "force": true
 }
