@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Shopping Cart · Domain-Driven Design | Poetic Bytes – Poetic Bytes</title>
+<meta name="description" content="Learn to build a production-ready Python shopping cart using Domain-Driven Design patterns and clean architecture.">
+<meta name="keywords" content="Programming, essay, poetic bytes, glenn pansensoy">
+<meta name="author" content="Glenn Junsay Pansensoy">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://poetic-codes.pages.dev/articles/python-shopping-cart-domain-driven-design-poetic-bytes.html">
+<meta property="og:site_name" content="The Commonplace">
+<meta property="og:title" content="Python Shopping Cart · Domain-Driven Design | Poetic Bytes">
+<meta property="og:description" content="Learn to build a production-ready Python shopping cart using Domain-Driven Design patterns and clean architecture.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://poetic-codes.pages.dev/articles/python-shopping-cart-domain-driven-design-poetic-bytes.html">
+<meta property="og:image" content="https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793915370399.jpg">
+<meta property="article:section" content="Programming">
+<meta property="article:published_time" content="2026-11-05T21:49:32.016Z">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Python Shopping Cart · Domain-Driven Design | Poetic Bytes">
+<meta name="twitter:description" content="Learn to build a production-ready Python shopping cart using Domain-Driven Design patterns and clean architecture.">
+<meta name="twitter:image" content="https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793915370399.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"Python Shopping Cart · Domain-Driven Design | Poetic Bytes","author":{"@type":"Person","name":"Glenn Junsay Pansensoy"},"datePublished":"2026-11-05T21:49:32.016Z","description":"Learn to build a production-ready Python shopping cart using Domain-Driven Design patterns and clean architecture.","articleSection":"Programming","mainEntityOfPage":"https://poetic-codes.pages.dev/articles/python-shopping-cart-domain-driven-design-poetic-bytes.html","image":"https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793915370399.jpg"}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6428799122405621" crossorigin="anonymous"></script>
+<style>
+body{background:#0b0f17;color:#eef4ff;font-family:"Crimson Pro",Georgia,serif;max-width:760px;margin:0 auto;padding:2rem 1.2rem;line-height:1.85;}
+h1{font-family:"Cinzel Decorative",serif;font-size:clamp(1rem,4vw,1.8rem);margin-bottom:1rem;}
+.meta{font-size:0.78rem;color:#667fa3;margin-bottom:2rem;font-family:monospace;}
+p{text-align:justify;margin-bottom:1.4rem;}
+a{color:#74b9e8;}
+video{max-width:100%;border-radius:12px;}
+audio{width:100%;}
+iframe{max-width:100%;border-radius:12px;}
+.back{display:inline-block;margin-bottom:1rem;font-size:0.8rem;font-family:monospace;color:#74b9e8;}
+footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size:0.72rem;color:#667fa3;text-align:center;font-family:monospace;line-height:2;}
+</style>
+</head>
+<body>
+<a class="back" href="https://poetic-codes.pages.dev/">← The Commonplace</a>
+<article>
+<h1>Python Shopping Cart · Domain-Driven Design | Poetic Bytes</h1>
+<div class="meta">Glenn Junsay Pansensoy · Programming · November 6, 2026</div>
+<style>.post-body, .post-body *, .post-body p, .post-body li, .post-body blockquote, .post-body span, .post-body div { color: #2a1a0f !important; }.post-body h1, .post-body h2, .post-body h3, .post-body h4 { color: #1a0f08 !important; }.post-body a { color: #7a3e1a !important; }.post-body em, .post-body i { color: #5a4a3a !important; }.pc-article, .pc-article p, .pc-article div, .pc-article li, .pc-article blockquote { text-align: justify !important; text-justify: inter-word; hyphens: auto; }.pc-article p { line-height: 1.85 !important; margin-bottom: 1.4rem !important; }.pc-article h1, .pc-article h2, .pc-article h3, .pc-article h4 { text-align: left !important; }</style><div style="font-family:Georgia,serif;max-width:100%;margin:0 auto;line-height:1.85;color:#2a1a0f !important;background:#ffffff;padding:1rem 0;"><div style="background:linear-gradient(135deg,rgba(139,94,52,0.12),rgba(139,94,52,0.04));border-left:4px solid #8B5E34;padding:1.2rem 1.4rem;margin-bottom:2rem;border-radius:0 10px 10px 0;"><p style="margin:0 0 0.5rem;font-size:0.92rem;color:#5a4a3a;font-style:italic;text-align:justify;">Learn to build a production-ready Python shopping cart using Domain-Driven Design patterns and clean architecture.</p><div style="font-size:0.72rem;color:#8a7563;margin-top:0.4rem;">Written by <strong>Glenn Junsay Pansensoy</strong> &nbsp;·&nbsp; Programming &nbsp;·&nbsp; 14 min read</div></div><div class="pc-article" style="font-size:1rem;line-height:1.85;color:#2a1a0f;text-align:justify;">
+
+        <section class="hero" aria-label="Python Shopping Cart · Domain-Driven Design">
+            <div class="page-col">
+                <div class="hero-tag"><span class="live-dot"></span> DDD · Value Objects · Clean Architecture</div>
+                
+                <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;" class="lead">
+                    A production-grade e-commerce engine built on clean architecture — from value objects and aggregate roots
+                    to repositories and application services. Complete with <strong>live, interactive code examples</strong>
+                    you can run in your browser.
+                </p>
+                <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;" class="lead" style="margin-top:-0.6rem;">
+                    This guide walks you through every component of a real-world shopping cart system using
+                    <strong>Domain-Driven Design (DDD)</strong> principles. You'll learn how to model money safely,
+                    enforce business invariants, and build a system that's ready for a REST API or database layer.
+                </p>
+                <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.3rem;">
+                    <span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.28rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);">📅 July 15, 2026</span>
+                    <span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.28rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);">⏱ 20 min read</span>
+                    <span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.28rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);">🎓 Intermediate</span>
+                    <span style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.28rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);">🐍 Python 3.9+</span>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat"><span class="num">11</span><span class="lbl">Code Components</span></div>
+                    <div class="hero-stat"><span class="num">6</span><span class="lbl">DDD Patterns</span></div>
+                    <div class="hero-stat"><span class="num">₱</span><span class="lbl">PHP Support</span></div>
+                    <div class="hero-stat"><span class="num">▶</span><span class="lbl">Run in Browser</span></div>
+                </div>
+                <div style="margin-top:1.5rem;">
+                    <a href="abstraction.html" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back to Abstraction Guide</a>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <section id="intro" aria-labelledby="h-intro">
+            <div class="page-col">
+                <div class="section-label">01 — The Foundation</div>
+                <h2 id="h-intro">Building a DDD Shopping Cart</h2>
+
+                <div class="curriculum-desc">
+                    <h2>📘 A Production-Grade Shopping Cart in Python</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">
+                        This project demonstrates how to build a <span class="highlight">real-world e-commerce shopping cart</span>
+                        in Python using <span class="gold">Domain-Driven Design (DDD)</span> — an architectural approach
+                        that puts business logic at the heart of your codebase.
+                    </p>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">
+                        Unlike tutorial-grade CRUD apps, this system mirrors how large platforms structure their backend
+                        services. The cart handles <span class="highlight">currency-safe arithmetic</span>,
+                        <span class="highlight">inventory management</span>, <span class="highlight">order placement</span>,
+                        and a full interactive CLI — all without a single external framework.
+                    </p>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">
+                        Every code example in this guide is <span class="highlight">fully interactive</span> — you can
+                        <strong>copy</strong> and <strong>run</strong> each snippet right in your browser using the
+                        <strong>Pyodide</strong> Python runtime. No setup required.
+                    </p>
+                    <div class="desc-meta">
+                        <span><i class="fas fa-check-circle" style="color:var(--green);"></i> 6 DDD patterns explained</span>
+                        <span><i class="fas fa-check-circle" style="color:var(--green);"></i> 11 code components</span>
+                        <span><i class="fas fa-check-circle" style="color:var(--green);"></i> 5 knowledge-check questions</span>
+                        <span><i class="fas fa-check-circle" style="color:var(--green);"></i> Live code runner</span>
+                        <span><i class="fas fa-check-circle" style="color:var(--green);"></i> Real-world extensions</span>
+                    </div>
+                </div>
+
+                <div style="margin-top:0.5rem;">
+                    <div class="oop-block">
+                        <h3>🎯 Who Is This For?</h3>
+                        <ul class="intro-list">
+                            <li><strong>Junior developers</strong> — understand how real software is structured beyond tutorials</li>
+                            <li><strong>Intermediate Pythonistas</strong> — see <code>@dataclass</code>, <code>Decimal</code>, <code>uuid</code>, <code>datetime</code> used together</li>
+                            <li><strong>CS students</strong> — study applied OOP: encapsulation, abstraction, SOLID</li>
+                            <li><strong>Backend engineers</strong> — a reference implementation for e-commerce domain models</li>
+                            <li><strong>Tech educators</strong> — a production-pattern example to teach from</li>
+                        </ul>
+                    </div>
+
+                    <div class="oop-block">
+                        <h3>🏛 Architecture at a Glance</h3>
+                        <ul class="intro-list">
+                            <li><strong>Domain Layer</strong> — <code>Money</code>, <code>Product</code>, <code>CartItem</code>, <code>ShoppingCart</code>, <code>Order</code>, <code>Address</code></li>
+                            <li><strong>Repository Layer</strong> — <code>InMemoryProductRepository</code>, <code>InMemoryOrderRepository</code></li>
+                            <li><strong>Application Layer</strong> — <code>place_order()</code> service function</li>
+                            <li><strong>Presentation Layer</strong> — interactive CLI in <code>main()</code></li>
+                        </ul>
+                        <div class="callout" style="margin-top:.8rem;">
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><strong>💡 Layer Separation:</strong> Each layer has one responsibility. Swapping the CLI for a REST API requires touching only the presentation layer — the domain stays untouched.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="explanation" aria-labelledby="h-explanation">
+            <div class="page-col">
+                <div class="section-label">02 — Component Breakdown</div>
+                <h2 id="h-explanation">Deep Dive into Each Component</h2>
+                <p style="margin-bottom:1rem;">A component-by-component breakdown of the system's most important pieces.</p>
+
+                <div style="margin-top:0.5rem;">
+                    <div class="oop-block">
+                        <h3>🔹 1. The <code>Money</code> Value Object</h3>
+                        <div class="code-snippet"><pre><span class="kw">from</span> dataclasses <span class="kw">import</span> <span class="fn">dataclass</span>
+<span class="kw">from</span> decimal <span class="kw">import</span> <span class="cl">Decimal</span>
+<span class="kw">from</span> typing <span class="kw">import</span> <span class="cl">Union</span>
+
+<span class="dec">@dataclass(frozen=True)</span>
+<span class="kw">class</span> <span class="cl">Money</span>:
+    amount: <span class="cl">Decimal</span>
+    currency: <span class="cl">str</span> = <span class="st">"PHP"</span>
+
+    <span class="kw">def</span> <span class="fn">__add__</span>(<span class="kw">self</span>, other: <span class="st">'Money'</span>) -&gt; <span class="st">'Money'</span>:
+        <span class="kw">if not</span> <span class="fn">isinstance</span>(other, <span class="cl">Money</span>):
+            <span class="kw">return</span> <span class="cl">NotImplemented</span>
+        <span class="kw">if</span> <span class="kw">self</span>.currency != other.currency:
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">"Cannot add different currencies"</span>)
+        <span class="kw">return</span> <span class="cl">Money</span>(<span class="kw">self</span>.amount + other.amount, <span class="kw">self</span>.currency)
+
+    <span class="kw">def</span> <span class="fn">__mul__</span>(<span class="kw">self</span>, quantity: <span class="cl">Union</span>[<span class="cl">int</span>, <span class="cl">float</span>, <span class="cl">Decimal</span>]) -&gt; <span class="st">'Money'</span>:
+        <span class="kw">if</span> <span class="fn">isinstance</span>(quantity, <span class="cl">float</span>):
+            quantity = <span class="cl">Decimal</span>(<span class="fn">str</span>(quantity))
+        <span class="kw">elif</span> <span class="fn">isinstance</span>(quantity, <span class="cl">int</span>):
+            quantity = <span class="cl">Decimal</span>(quantity)
+        <span class="kw">return</span> <span class="cl">Money</span>(<span class="kw">self</span>.amount * quantity, <span class="kw">self</span>.currency)
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="kw">self</span>) -&gt; <span class="cl">str</span>:
+        <span class="kw">if</span> <span class="kw">self</span>.currency == <span class="st">"PHP"</span>:
+            <span class="kw">return</span> <span class="st">f"₱{self.amount:,.2f}"</span>
+        <span class="kw">return</span> <span class="st">f"{self.amount:,.2f} {self.currency}"</span></pre></div>
+                        <div class="insight" style="margin-top:1rem;">
+                            <strong>📝 Why This Matters</strong>
+                            <ol style="margin-top:.6rem;padding-left:1.2rem;display:flex;flex-direction:column;gap:.55rem;">
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">Why <code>Decimal</code>?</strong> Using floats for money leads to rounding errors — <code>0.1 + 0.2 ≠ 0.3</code>. <code>Decimal</code> provides exact decimal arithmetic.
+                                </li>
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">Why <code>frozen=True</code>?</strong> Money is a <span class="intro-em">value object</span> — it should be immutable. Two instances with the same amount and currency are interchangeable. Freezing prevents mutation and makes it hashable.
+                                </li>
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">Safe Arithmetic:</strong> <code>__add__</code> validates currency compatibility and returns a new <code>Money</code> instance. <code>__mul__</code> safely converts types before multiplying.
+                                </li>
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">Localized Formatting:</strong> <code>__str__</code> adds the ₱ symbol and thousand separators for Philippine Peso display.
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="oop-block">
+                        <h3>🔹 2. The <code>Product</code> Entity</h3>
+                        <div class="code-snippet"><pre><span class="dec">@dataclass</span>
+<span class="kw">class</span> <span class="cl">Product</span>:
+    id: <span class="cl">str</span>
+    name: <span class="cl">str</span>
+    description: <span class="cl">str</span>
+    price: <span class="cl">Money</span>
+    sku: <span class="cl">str</span>
+    stock_quantity: <span class="cl">int</span> = <span class="num">0</span>
+
+    <span class="kw">def</span> <span class="fn">has_stock</span>(<span class="kw">self</span>, qty: <span class="cl">int</span> = <span class="num">1</span>) -&gt; <span class="cl">bool</span>:
+        <span class="kw">return</span> <span class="kw">self</span>.stock_quantity &gt;= qty
+
+    <span class="kw">def</span> <span class="fn">reduce_stock</span>(<span class="kw">self</span>, qty: <span class="cl">int</span>) -&gt; <span class="cl">None</span>:
+        <span class="kw">if</span> qty &lt;= <span class="num">0</span>:
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">"Quantity to reduce must be positive"</span>)
+        <span class="kw">if not</span> <span class="kw">self</span>.<span class="fn">has_stock</span>(qty):
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">f"Insufficient stock for {self.name}"</span>)
+        <span class="kw">self</span>.stock_quantity -= qty</pre></div>
+                        <div class="insight" style="margin-top:1rem;">
+                            <strong>📝 Why This Matters</strong>
+                            <ol style="margin-top:.6rem;padding-left:1.2rem;display:flex;flex-direction:column;gap:.55rem;">
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">Entity vs Value Object:</strong> Products have an identity (<code>id</code>) and mutable state (stock) — they are <span class="intro-em">entities</span>, not value objects.
+                                </li>
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">Inventory Logic in the Domain:</strong> <code>has_stock</code> and <code>reduce_stock</code> centralise business rules, preventing negative stock anywhere in the system.
+                                </li>
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">Invariant Enforcement:</strong> Both methods raise descriptive <code>ValueError</code> exceptions on violation — keeping error handling explicit and domain-driven.
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="oop-block">
+                        <h3>🔹 3. The <code>ShoppingCart</code> Aggregate Root</h3>
+                        <div class="code-snippet"><pre><span class="kw">class</span> <span class="cl">ShoppingCart</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, cart_id: <span class="cl">str</span> = <span class="kw">None</span>):
+        <span class="kw">self</span>.id = cart_id <span class="kw">or</span> <span class="fn">str</span>(<span class="fn">uuid.uuid4</span>())
+        <span class="kw">self</span>.items: <span class="cl">Dict</span>[<span class="cl">str</span>, <span class="cl">CartItem</span>] = {}
+        <span class="kw">self</span>.created_at = <span class="fn">datetime.now</span>()
+        <span class="kw">self</span>.updated_at = <span class="kw">self</span>.created_at
+
+    <span class="kw">def</span> <span class="fn">add_item</span>(<span class="kw">self</span>, product: <span class="cl">Product</span>, quantity: <span class="cl">int</span> = <span class="num">1</span>) -&gt; <span class="cl">None</span>:
+        <span class="kw">if</span> quantity &lt;= <span class="num">0</span>:
+            <span class="kw">return</span>
+        <span class="kw">if not</span> product.<span class="fn">has_stock</span>(quantity):
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">f"Not enough stock for {product.name}"</span>)
+        <span class="kw">if</span> product.id <span class="kw">in</span> <span class="kw">self</span>.items:
+            current = <span class="kw">self</span>.items[product.id]
+            new_qty = current.quantity + quantity
+            <span class="kw">if not</span> product.<span class="fn">has_stock</span>(new_qty):
+                <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">f"Not enough stock for {product.name}"</span>)
+            <span class="kw">self</span>.items[product.id] = <span class="cl">CartItem</span>(
+                product=product,
+                quantity=new_qty,
+                added_at=current.added_at
+            )
+        <span class="kw">else</span>:
+            <span class="kw">self</span>.items[product.id] = <span class="cl">CartItem</span>(
+                product=product,
+                quantity=quantity,
+                added_at=<span class="fn">datetime.now</span>()
+            )
+        <span class="kw">self</span>.updated_at = <span class="fn">datetime.now</span>()
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">total</span>(<span class="kw">self</span>) -&gt; <span class="cl">Money</span>:
+        <span class="kw">if not</span> <span class="kw">self</span>.items:
+            <span class="kw">return</span> <span class="cl">Money</span>(<span class="cl">Decimal</span>(<span class="num">0</span>))
+        total = <span class="cl">Money</span>(<span class="cl">Decimal</span>(<span class="num">0</span>))
+        <span class="kw">for</span> item <span class="kw">in</span> <span class="kw">self</span>.items.<span class="fn">values</span>():
+            total += item.subtotal
+        <span class="kw">return</span> total</pre></div>
+                        <div class="insight" style="margin-top:1rem;">
+                            <strong>📝 Why This Matters</strong>
+                            <ol style="margin-top:.6rem;padding-left:1.2rem;display:flex;flex-direction:column;gap:.55rem;">
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">What is an Aggregate Root?</strong> The cart is the <span class="intro-em">entry point</span> that enforces consistency rules for all its items. It guarantees that adding an item never exceeds available stock.
+                                </li>
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">O(1) Lookups:</strong> Using a dictionary keyed by product ID makes lookups fast and naturally merges duplicate additions.
+                                </li>
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">Computed Total:</strong> The <code>total</code> property is computed on-demand using safe <code>Money</code> arithmetic — always accurate without manual recalculation.
+                                </li>
+                                <li style="font-size:.78rem;color:var(--muted);line-height:1.7;">
+                                    <strong style="color:var(--text)">Timestamps:</strong> <code>created_at</code> and <code>updated_at</code> enable audit logs and debugging.
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="full-source" aria-labelledby="h-source">
+            <div class="page-col">
+                <div class="section-label">03 — Full Source Code</div>
+                <h2 id="h-source">Complete Runnnable Implementation</h2>
+                <p style="margin-bottom:1rem;">Copy and save as <code>shopping_cart.py</code> — or <strong>Run</strong> it directly in your browser.</p>
+
+                <div class="code-container">
+                    <div class="code-header">
+                        <span style="color:var(--muted);">python · shopping_cart.py</span>
+                        <div class="code-actions">
+                            <button class="code-btn copy-btn" id="fullCopyBtn"><i class="fas fa-copy"></i> Copy</button>
+                            <button class="code-btn run-btn" id="fullRunBtn"><i class="fas fa-play"></i> Run</button>
+                        </div>
+                    </div>
+                    <div class="code-body" style="background:var(--code-bg);border:1px solid var(--border);border-top:none;border-radius:0;padding:1rem;">
+                        <pre id="fullSourcePre"><span class="kw">from</span> __future__ <span class="kw">import</span> <span class="cl">annotations</span>
+<span class="kw">from</span> dataclasses <span class="kw">import</span> <span class="fn">dataclass</span>, <span class="fn">field</span>
+<span class="kw">from</span> decimal <span class="kw">import</span> <span class="cl">Decimal</span>
+<span class="kw">from</span> datetime <span class="kw">import</span> <span class="cl">datetime</span>
+<span class="kw">from</span> typing <span class="kw">import</span> <span class="cl">Dict</span>, <span class="cl">Union</span>
+<span class="kw">import</span> <span class="cl">uuid</span>
+
+
+<span class="dec">@dataclass(frozen=True)</span>
+<span class="kw">class</span> <span class="cl">Money</span>:
+    amount: <span class="cl">Decimal</span>
+    currency: <span class="cl">str</span> = <span class="st">"PHP"</span>
+
+    <span class="kw">def</span> <span class="fn">__add__</span>(<span class="kw">self</span>, other: <span class="st">'Money'</span>) -&gt; <span class="st">'Money'</span>:
+        <span class="kw">if not</span> <span class="fn">isinstance</span>(other, <span class="cl">Money</span>):
+            <span class="kw">return</span> <span class="cl">NotImplemented</span>
+        <span class="kw">if</span> <span class="kw">self</span>.currency != other.currency:
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">"Cannot add different currencies"</span>)
+        <span class="kw">return</span> <span class="cl">Money</span>(<span class="kw">self</span>.amount + other.amount, <span class="kw">self</span>.currency)
+
+    <span class="kw">def</span> <span class="fn">__mul__</span>(<span class="kw">self</span>, quantity: <span class="cl">Union</span>[<span class="cl">int</span>, <span class="cl">float</span>, <span class="cl">Decimal</span>]) -&gt; <span class="st">'Money'</span>:
+        <span class="kw">if</span> <span class="fn">isinstance</span>(quantity, <span class="cl">float</span>):
+            quantity = <span class="cl">Decimal</span>(<span class="fn">str</span>(quantity))
+        <span class="kw">elif</span> <span class="fn">isinstance</span>(quantity, <span class="cl">int</span>):
+            quantity = <span class="cl">Decimal</span>(quantity)
+        <span class="kw">return</span> <span class="cl">Money</span>(<span class="kw">self</span>.amount * quantity, <span class="kw">self</span>.currency)
+
+    <span class="kw">def</span> <span class="fn">__str__</span>(<span class="kw">self</span>) -&gt; <span class="cl">str</span>:
+        <span class="kw">if</span> <span class="kw">self</span>.currency == <span class="st">"PHP"</span>:
+            <span class="kw">return</span> <span class="st">f"₱{self.amount:,.2f}"</span>
+        <span class="kw">return</span> <span class="st">f"{self.amount:,.2f} {self.currency}"</span>
+
+
+<span class="dec">@dataclass</span>
+<span class="kw">class</span> <span class="cl">Product</span>:
+    id: <span class="cl">str</span>
+    name: <span class="cl">str</span>
+    description: <span class="cl">str</span>
+    price: <span class="cl">Money</span>
+    sku: <span class="cl">str</span>
+    stock_quantity: <span class="cl">int</span> = <span class="num">0</span>
+
+    <span class="kw">def</span> <span class="fn">has_stock</span>(<span class="kw">self</span>, qty: <span class="cl">int</span> = <span class="num">1</span>) -&gt; <span class="cl">bool</span>:
+        <span class="kw">return</span> <span class="kw">self</span>.stock_quantity &gt;= qty
+
+    <span class="kw">def</span> <span class="fn">reduce_stock</span>(<span class="kw">self</span>, qty: <span class="cl">int</span>) -&gt; <span class="cl">None</span>:
+        <span class="kw">if</span> qty &lt;= <span class="num">0</span>:
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">"Quantity to reduce must be positive"</span>)
+        <span class="kw">if not</span> <span class="kw">self</span>.<span class="fn">has_stock</span>(qty):
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">f"Insufficient stock for {self.name}"</span>)
+        <span class="kw">self</span>.stock_quantity -= qty
+
+
+<span class="dec">@dataclass</span>
+<span class="kw">class</span> <span class="cl">CartItem</span>:
+    product: <span class="cl">Product</span>
+    quantity: <span class="cl">int</span>
+    added_at: <span class="cl">datetime</span> = <span class="fn">field</span>(default_factory=<span class="cl">datetime</span>.<span class="fn">now</span>)
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">subtotal</span>(<span class="kw">self</span>) -&gt; <span class="cl">Money</span>:
+        <span class="kw">return</span> <span class="kw">self</span>.product.price * <span class="kw">self</span>.quantity
+
+
+<span class="kw">class</span> <span class="cl">ShoppingCart</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>, cart_id: <span class="cl">str</span> = <span class="kw">None</span>):
+        <span class="kw">self</span>.id = cart_id <span class="kw">or</span> <span class="fn">str</span>(<span class="cl">uuid</span>.<span class="fn">uuid4</span>())
+        <span class="kw">self</span>.items: <span class="cl">Dict</span>[<span class="cl">str</span>, <span class="cl">CartItem</span>] = {}
+        <span class="kw">self</span>.created_at = <span class="cl">datetime</span>.<span class="fn">now</span>()
+        <span class="kw">self</span>.updated_at = <span class="kw">self</span>.created_at
+
+    <span class="kw">def</span> <span class="fn">add_item</span>(<span class="kw">self</span>, product: <span class="cl">Product</span>, quantity: <span class="cl">int</span> = <span class="num">1</span>) -&gt; <span class="cl">None</span>:
+        <span class="kw">if</span> quantity &lt;= <span class="num">0</span>:
+            <span class="kw">return</span>
+        <span class="kw">if not</span> product.<span class="fn">has_stock</span>(quantity):
+            <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">f"Not enough stock for {product.name}"</span>)
+        <span class="kw">if</span> product.id <span class="kw">in</span> <span class="kw">self</span>.items:
+            current = <span class="kw">self</span>.items[product.id]
+            new_qty = current.quantity + quantity
+            <span class="kw">if not</span> product.<span class="fn">has_stock</span>(new_qty):
+                <span class="kw">raise</span> <span class="cl">ValueError</span>(<span class="st">f"Not enough stock for {product.name}"</span>)
+            <span class="kw">self</span>.items[product.id] = <span class="cl">CartItem</span>(
+                product=product,
+                quantity=new_qty,
+                added_at=current.added_at
+            )
+        <span class="kw">else</span>:
+            <span class="kw">self</span>.items[product.id] = <span class="cl">CartItem</span>(
+                product=product,
+                quantity=quantity,
+                added_at=<span class="cl">datetime</span>.<span class="fn">now</span>()
+            )
+        <span class="kw">self</span>.updated_at = <span class="cl">datetime</span>.<span class="fn">now</span>()
+
+    <span class="kw">def</span> <span class="fn">remove_item</span>(<span class="kw">self</span>, product_id: <span class="cl">str</span>) -&gt; <span class="cl">None</span>:
+        <span class="kw">if</span> product_id <span class="kw">in</span> <span class="kw">self</span>.items:
+            <span class="kw">del</span> <span class="kw">self</span>.items[product_id]
+            <span class="kw">self</span>.updated_at = <span class="cl">datetime</span>.<span class="fn">now</span>()
+
+    <span class="kw">def</span> <span class="fn">clear</span>(<span class="kw">self</span>) -&gt; <span class="cl">None</span>:
+        <span class="kw">self</span>.items.<span class="fn">clear</span>()
+        <span class="kw">self</span>.updated_at = <span class="cl">datetime</span>.<span class="fn">now</span>()
+
+    <span class="dec">@property</span>
+    <span class="kw">def</span> <span class="fn">total</span>(<span class="kw">self</span>) -&gt; <span class="cl">Money</span>:
+        <span class="kw">if not</span> <span class="kw">self</span>.items:
+            <span class="kw">return</span> <span class="cl">Money</span>(<span class="cl">Decimal</span>(<span class="num">0</span>))
+        total = <span class="cl">Money</span>(<span class="cl">Decimal</span>(<span class="num">0</span>))
+        <span class="kw">for</span> item <span class="kw">in</span> <span class="kw">self</span>.items.<span class="fn">values</span>():
+            total += item.subtotal
+        <span class="kw">return</span> total
+
+    <span class="kw">def</span> <span class="fn">__repr__</span>(<span class="kw">self</span>) -&gt; <span class="cl">str</span>:
+        <span class="kw">return</span> <span class="st">f"ShoppingCart(id={self.id!r}, items={len(self.items)}, total={self.total})"</span>
+
+
+<span class="kw">class</span> <span class="cl">InMemoryCartRepository</span>:
+    <span class="kw">def</span> <span class="fn">__init__</span>(<span class="kw">self</span>):
+        <span class="kw">self</span>._store: <span class="cl">Dict</span>[<span class="cl">str</span>, <span class="cl">ShoppingCart</span>] = {}
+
+    <span class="kw">def</span> <span class="fn">save</span>(<span class="kw">self</span>, cart: <span class="cl">ShoppingCart</span>) -&gt; <span class="cl">None</span>:
+        <span class="kw">self</span>._store[cart.id] = cart
+
+    <span class="kw">def</span> <span class="fn">find_by_id</span>(<span class="kw">self</span>, cart_id: <span class="cl">str</span>) -&gt; <span class="cl">ShoppingCart</span> <span class="op">|</span> <span class="cl">None</span>:
+        <span class="kw">return</span> <span class="kw">self</span>._store.<span class="fn">get</span>(cart_id)
+
+    <span class="kw">def</span> <span class="fn">delete</span>(<span class="kw">self</span>, cart_id: <span class="cl">str</span>) -&gt; <span class="cl">None</span>:
+        <span class="kw">self</span>._store.<span class="fn">pop</span>(cart_id, <span class="kw">None</span>)
+
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    <span class="fn">print</span>(<span class="st">"="</span> * <span class="num">50</span>)
+    <span class="fn">print</span>(<span class="st">"  Python Shopping Cart — DDD Demo"</span>)
+    <span class="fn">print</span>(<span class="st">"="</span> * <span class="num">50</span>)
+
+    laptop = <span class="cl">Product</span>(
+        id=<span class="st">"p1"</span>,
+        name=<span class="st">"Laptop Pro 15"</span>,
+        description=<span class="st">"High-performance laptop"</span>,
+        price=<span class="cl">Money</span>(<span class="cl">Decimal</span>(<span class="st">"59999.00"</span>)),
+        sku=<span class="st">"LAP-PRO-15"</span>,
+        stock_quantity=<span class="num">5</span>
+    )
+
+    mouse = <span class="cl">Product</span>(
+        id=<span class="st">"p2"</span>,
+        name=<span class="st">"Wireless Mouse"</span>,
+        description=<span class="st">"Ergonomic wireless mouse"</span>,
+        price=<span class="cl">Money</span>(<span class="cl">Decimal</span>(<span class="st">"899.00"</span>)),
+        sku=<span class="st">"MSE-WRL-01"</span>,
+        stock_quantity=<span class="num">20</span>
+    )
+
+    bag = <span class="cl">Product</span>(
+        id=<span class="st">"p3"</span>,
+        name=<span class="st">"Laptop Bag"</span>,
+        description=<span class="st">"Padded 15-inch laptop bag"</span>,
+        price=<span class="cl">Money</span>(<span class="cl">Decimal</span>(<span class="st">"1299.00"</span>)),
+        sku=<span class="st">"BAG-LAP-15"</span>,
+        stock_quantity=<span class="num">10</span>
+    )
+
+    cart = <span class="cl">ShoppingCart</span>()
+    repo = <span class="cl">InMemoryCartRepository</span>()
+
+    <span class="fn">print</span>(<span class="st">f"\nCart ID : {cart.id}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Total   : {cart.total}  (empty cart)\n"</span>)
+
+    <span class="fn">print</span>(<span class="st">"Adding items..."</span>)
+    cart.<span class="fn">add_item</span>(laptop, <span class="num">1</span>)
+    cart.<span class="fn">add_item</span>(mouse, <span class="num">2</span>)
+    cart.<span class="fn">add_item</span>(bag, <span class="num">1</span>)
+
+    <span class="fn">print</span>(<span class="st">f"{'Product':&lt;20} {'Qty':&gt;5} {'Unit Price':&gt;14} {'Subtotal':&gt;14}"</span>)
+    <span class="fn">print</span>(<span class="st">"-"</span> * <span class="num">57</span>)
+    <span class="kw">for</span> item <span class="kw">in</span> cart.items.<span class="fn">values</span>():
+        <span class="fn">print</span>(<span class="st">f"{item.product.name:&lt;20} {item.quantity:&gt;5} {str(item.product.price):&gt;14} {str(item.subtotal):&gt;14}"</span>)
+
+    <span class="fn">print</span>(<span class="st">"-"</span> * <span class="num">57</span>)
+    <span class="fn">print</span>(<span class="st">f"{'TOTAL':&lt;20} {'':&gt;5} {'':&gt;14} {str(cart.total):&gt;14}\n"</span>)
+
+    <span class="fn">print</span>(<span class="st">"Reducing stock after checkout..."</span>)
+    <span class="kw">for</span> item <span class="kw">in</span> cart.items.<span class="fn">values</span>():
+        item.product.<span class="fn">reduce_stock</span>(item.quantity)
+        <span class="fn">print</span>(<span class="st">f"  {item.product.name}: stock remaining = {item.product.stock_quantity}"</span>)
+
+    repo.<span class="fn">save</span>(cart)
+    loaded = repo.<span class="fn">find_by_id</span>(cart.id)
+    <span class="fn">print</span>(<span class="st">f"\nRepository round-trip OK: {loaded is cart}"</span>)
+
+    <span class="fn">print</span>(<span class="st">"\nTesting domain invariants..."</span>)
+    <span class="kw">try</span>:
+        cart.<span class="fn">add_item</span>(laptop, <span class="num">999</span>)
+    <span class="kw">except</span> <span class="cl">ValueError</span> <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="st">f"  ✅ Caught expected error: {e}"</span>)
+
+    <span class="kw">try</span>:
+        laptop.<span class="fn">reduce_stock</span>(-<span class="num">1</span>)
+    <span class="kw">except</span> <span class="cl">ValueError</span> <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="st">f"  ✅ Caught expected error: {e}"</span>)
+
+    <span class="fn">print</span>(<span class="st">"\nDone."</span>)</pre>
+                    </div>
+                    <div class="output-panel" id="fullOutput"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="concepts" aria-labelledby="h-concepts">
+            <div class="page-col">
+                <div class="section-label">04 — DDD Concepts Reference</div>
+                <h2 id="h-concepts">Patterns &amp; Components</h2>
+                <p style="margin-bottom:1rem;">Quick-reference guide to the patterns used in this system.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Concept</th><th>Class</th><th>Type</th><th>Key Responsibility</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>Money</code></td><td>Value Object</td><td><span class="badge badge-beg">Immutable</span></td><td>Safe decimal arithmetic with currency awareness</td></tr>
+                            <tr><td><code>Product</code></td><td>Entity</td><td><span class="badge badge-int">Mutable</span></td><td>Product identity + inventory management</td></tr>
+                            <tr><td><code>CartItem</code></td><td>Value Object</td><td><span class="badge badge-beg">Immutable</span></td><td>A line-item snapshot within the cart</td></tr>
+                            <tr><td><code>ShoppingCart</code></td><td>Aggregate Root</td><td><span class="badge badge-adv">Controller</span></td><td>Enforces all cart business invariants</td></tr>
+                            <tr><td><code>Order</code></td><td>Entity</td><td><span class="badge badge-int">Mutable</span></td><td>Order lifecycle tracking</td></tr>
+                            <tr><td><code>InMemoryCartRepository</code></td><td>Repository</td><td><span class="badge badge-adv">Storage</span></td><td>Persist and query carts (swappable with DB)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="best-practices" aria-labelledby="h-bp">
+            <div class="page-col">
+                <div class="section-label">05 — Best Practices</div>
+                <h2 id="h-bp">Pro Tips for DDD in Python</h2>
+                <div style="margin-top:1rem;">
+                    <div class="oop-block">
+                        <h3>Key Takeaways</h3>
+                        <div class="callout-green"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><strong>🔢 Always use <code>Decimal</code> for money</strong> — Python's <code>float</code> cannot represent all decimal fractions exactly. Initialize with strings: <code>Decimal("19.99")</code> not <code>Decimal(19.99)</code>.</p></div>
+                        <div class="callout-green"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><strong>🧊 Freeze your value objects</strong> — Use <code>@dataclass(frozen=True)</code> on value objects like <code>Money</code>. This makes them hashable and prevents accidental mutation.</p></div>
+                        <div class="callout-green"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><strong>🏗 Push logic into the domain</strong> — Business rules belong in the domain entity, not in a controller. Domain objects should validate their own invariants and raise exceptions on violation.</p></div>
+                        <div class="callout-green"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><strong>🔑 Use UUIDs for identity</strong> — Generate IDs with <code>str(uuid.uuid4())</code>. UUIDs are globally unique and make distributed systems simpler.</p></div>
+                        <div class="callout-green"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><strong>📦 Repository pattern = swappable storage</strong> — Your in-memory repository can be replaced with SQLAlchemy, MongoDB, or Firebase without touching domain code.</p></div>
+                        <div class="callout-green"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><strong>🔄 Timestamps on every mutation</strong> — Store <code>created_at</code> and <code>updated_at</code> on mutable entities for audit logs and debugging.</p></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="roadmap" aria-labelledby="h-roadmap">
+            <div class="page-col">
+                <div class="section-label">06 — Learning Roadmap</div>
+                <h2 id="h-roadmap">From DDD to Production</h2>
+                <p style="margin-bottom:1rem;">Follow this progression to master Python e-commerce architecture step by step.</p>
+
+                <div style="position:relative;padding-left:2rem;margin-top:1.5rem;">
+                    <div style="position:absolute;left:.6rem;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--blue),var(--blue-deep),transparent);border-radius:2px;"></div>
+
+                    <div style="position:relative;margin-bottom:1.8rem;">
+                        <div style="position:absolute;left:-1.9rem;top:.2rem;width:14px;height:14px;border-radius:50%;background:var(--gold);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--blue);"></div>
+                        <div class="oop-block" style="margin:0;">
+                            <h3>🥚 Stage 1 — Python Fundamentals</h3>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Before diving into DDD, ensure you're comfortable with Python classes, <code>@dataclass</code>, type hints, and exception handling. These are the grammar of domain models.</p>
+                            <div class="tags"><span class="tag">Classes &amp; OOP</span><span class="tag">Dataclasses</span><span class="tag">Type Hints</span><span class="tag">Exceptions</span></div>
+                        </div>
+                    </div>
+
+                    <div style="position:relative;margin-bottom:1.8rem;">
+                        <div style="position:absolute;left:-1.9rem;top:.2rem;width:14px;height:14px;border-radius:50%;background:var(--blue);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--blue);"></div>
+                        <div class="oop-block" style="margin:0;">
+                            <h3>🐍 Stage 2 — This Project (DDD Domain Layer)</h3>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Study <code>Money</code>, <code>Product</code>, <code>CartItem</code>, <code>ShoppingCart</code>. Understand why each is either a value object or an entity, and how aggregate roots enforce invariants.</p>
+                            <div class="tags"><span class="tag">Value Objects</span><span class="tag">Entities</span><span class="tag">Aggregate Root</span><span class="tag">Repository Pattern</span></div>
+                        </div>
+                    </div>
+
+                    <div style="position:relative;margin-bottom:1.8rem;">
+                        <div style="position:absolute;left:-1.9rem;top:.2rem;width:14px;height:14px;border-radius:50%;background:var(--blue-lt);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--blue);"></div>
+                        <div class="oop-block" style="margin:0;">
+                            <h3>⚡ Stage 3 — Add a REST API Layer (FastAPI)</h3>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Wrap the domain in FastAPI endpoints. Define Pydantic request/response schemas, create route handlers that call your application service, and test with Swagger UI at <code>/docs</code>.</p>
+                            <div class="tags"><span class="tag">FastAPI</span><span class="tag">Pydantic</span><span class="tag">REST</span><span class="tag">Swagger/OpenAPI</span></div>
+                        </div>
+                    </div>
+
+                    <div style="position:relative;margin-bottom:1.8rem;">
+                        <div style="position:absolute;left:-1.9rem;top:.2rem;width:14px;height:14px;border-radius:50%;background:var(--muted);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--blue);"></div>
+                        <div class="oop-block" style="margin:0;">
+                            <h3>🗄 Stage 4 — Persist with SQLAlchemy + PostgreSQL</h3>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Replace <code>InMemoryRepository</code> with a real database. Map domain entities to ORM models using the Data Mapper pattern. Run Alembic migrations to keep your schema in sync.</p>
+                            <div class="tags"><span class="tag">SQLAlchemy</span><span class="tag">PostgreSQL</span><span class="tag">Alembic</span><span class="tag">Data Mapper</span></div>
+                        </div>
+                    </div>
+
+                    <div style="position:relative;">
+                        <div style="position:absolute;left:-1.9rem;top:.2rem;width:14px;height:14px;border-radius:50%;background:var(--green);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--green);"></div>
+                        <div class="oop-block" style="margin:0;border-color:rgba(16,185,129,.3);">
+                            <h3>🚀 Stage 5 — Production Deployment</h3>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Containerise with Docker, set up CI/CD with GitHub Actions, add Redis caching for product listings, and deploy to Fly.io or Railway. Add PayMongo or Stripe for real payment processing.</p>
+                            <div class="tags"><span class="tag">Docker</span><span class="tag">GitHub Actions</span><span class="tag">Redis</span><span class="tag">PayMongo / Stripe</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" aria-labelledby="h-quiz">
+            <div class="page-col">
+                <div class="section-label">07 — Test Your Knowledge</div>
+                <h2 id="h-quiz">DDD Concepts Quiz</h2>
+                <p style="margin-bottom:1rem;">A quick quiz on DDD concepts from this article. See how well you understood the patterns.</p>
+
+                <div class="quiz-wrap" id="quizWrap"></div>
+                <div style="display:flex;gap:.8rem;margin-top:1.5rem;flex-wrap:wrap;">
+                    <button onclick="submitQuiz()" class="btn btn-primary">✅ Submit Quiz</button>
+                    <button onclick="resetQuiz()" class="btn btn-outline">🔄 Reset</button>
+                </div>
+                <div class="quiz-score" id="quizScore">
+                    <span class="score-num" id="quizScoreNum">0/5</span>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;" id="quizScoreMsg">Great effort — review any missed questions above.</p>
+                    <button class="quiz-reset" onclick="resetQuiz()">↺ Retry Quiz</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison" aria-labelledby="h-compare">
+            <div class="page-col">
+                <div class="section-label">08 — Bad Code vs Clean Code</div>
+                <h2 id="h-compare">See the Difference</h2>
+                <p style="margin-bottom:1rem;">See exactly how DDD patterns improve naive Python approaches — side by side.</p>
+
+                <div class="comparison-grid">
+                    <div>
+                        <div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:10px 10px 0 0;padding:.5rem 1rem;font-size:.78rem;font-weight:700;color:#f87171;">❌ Naive Approach (Float Money)</div>
+                        <div class="code-snippet" style="border-radius:0 0 10px 10px;border-top:none;margin:0;">
+                            <pre>price = 19.99
+qty = 3
+total = price * qty
+# Result: 59.97000000000001  ❌
+
+tax = total * 0.12
+grand = total + tax
+print(f"Total: {grand:.2f}")
+# Fragile, loses precision</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:10px 10px 0 0;padding:.5rem 1rem;font-size:.78rem;font-weight:700;color:#4ade80;">✅ DDD Value Object (Decimal Money)</div>
+                        <div class="code-snippet" style="border-radius:0 0 10px 10px;border-top:none;margin:0;">
+                            <pre>price = Money(Decimal("19.99"))
+qty = 3
+total = price * qty
+# Result: ₱59.97  ✅
+
+tax = total * Decimal("0.12")
+grand = total + tax
+print(grand)  # ₱67.17
+# Precise, safe, readable</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-grid" style="margin-top:.75rem;">
+                    <div>
+                        <div style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:10px 10px 0 0;padding:.5rem 1rem;font-size:.78rem;font-weight:700;color:#f87171;">❌ Logic Scattered in Script</div>
+                        <div class="code-snippet" style="border-radius:0 0 10px 10px;border-top:none;margin:0;">
+                            <pre>stock = 5
+ordered = 10
+# Validation scattered everywhere:
+if ordered &gt; stock:
+  print("No stock")
+# No central enforcement
+# Bug: easy to bypass check</pre>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);border-radius:10px 10px 0 0;padding:.5rem 1rem;font-size:.78rem;font-weight:700;color:#4ade80;">✅ Invariant in Domain Entity</div>
+                        <div class="code-snippet" style="border-radius:0 0 10px 10px;border-top:none;margin:0;">
+                            <pre>product.reduce_stock(qty)
+# raises ValueError automatically
+# if insufficient stock.
+# Rules live in ONE place —
+# impossible to bypass or forget.
+# Domain is always consistent.</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="callout" style="margin-top:1.2rem;">
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><strong>💡 Key insight:</strong> Moving validation into domain objects means a bug fix or rule change happens in one class — not scattered across dozens of controllers, scripts, and API handlers.</p>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <section id="share" aria-labelledby="h-share" style="padding-top:0;">
+            <div class="page-col">
+                <div class="section-label">09 — Spread the Knowledge</div>
+                <h2 id="h-share">Share This Guide</h2>
+                <div class="share-wrap" style="margin-top:1rem;">
+                    <h2>Found this useful? Share it.</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;" class="share-sub">Help other developers discover clean Python architecture with DDD.</p>
+                    <div class="share-btns">
+                        <button class="sbtn s-fb" onclick="shareTo('facebook')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"></path></svg>Facebook</button>
+                        <button class="sbtn s-li" onclick="shareTo('linkedin')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.35-1.85 3.58 0 4.24 2.36 4.24 5.42v6.32zM5.34 7.43a2.06 2.06 0 110-4.12 2.06 2.06 0 010 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.72V1.72C24 .77 23.21 0 22.23 0z"></path></svg>LinkedIn</button>
+                        <button class="sbtn s-x" onclick="shareTo('x')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>X / Twitter</button>
+                        <button class="sbtn s-wa" onclick="shareTo('whatsapp')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.28-.1-.48-.15-.67.15s-.77.97-.94 1.17c-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.48-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51-.17 0-.37-.02-.57-.02s-.52.07-.8.37C7.35 7.6 6.6 8.3 6.6 9.77s1.07 3.06 1.22 3.27c.15.2 2.1 3.2 5.09 4.49.71.31 1.27.49 1.7.63.72.23 1.37.19 1.88.12.57-.09 1.76-.72 2.01-1.42.25-.7.25-1.3.17-1.42-.07-.12-.27-.2-.57-.34zm-5.47 7.45h-.01A9.93 9.93 0 017.17 20L3 21.15l1.17-4.13A9.93 9.93 0 012 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z"></path></svg>WhatsApp</button>
+                        <button class="sbtn s-yt" onclick="shareTo('youtube')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.19a3.02 3.02 0 00-2.12-2.14C19.54 3.5 12 3.5 12 3.5s-7.54 0-9.38.55A3.02 3.02 0 00.5 6.19C0 8.04 0 12 0 12s0 3.96.5 5.81a3.02 3.02 0 002.12 2.14C4.46 20.5 12 20.5 12 20.5s7.54 0 9.38-.55a3.02 3.02 0 002.12-2.14C24 15.96 24 12 24 12s0-3.96-.5-5.81zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"></path></svg>YouTube</button>
+                        <button class="sbtn s-tg" onclick="shareTo('telegram')"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.94 0A12 12 0 000 12a12 12 0 0012 12 12 12 0 0012-12A12 12 0 0011.94 0zm5.63 7.44l-1.87 8.82c-.14.63-.52.79-1.05.49l-2.9-2.14-1.4 1.35a.65.65 0 01-.52.24.66.66 0 01-.52-.24l.2-2.88 5.25-4.75c.23-.2-.05-.32-.36-.12l-6.5 4.1-2.8-.88c-.6-.19-.61-.6.12-.88l10.94-4.21c.5-.18.94.12.76.88z"></path></svg>Telegram</button>
+                        <button class="sbtn s-fb" onclick="copyLink()" style="border-color:var(--border);background:var(--panel);color:var(--muted);"><i class="fas fa-link"></i> Copy Link</button>
+                    </div>
+                    <div id="shareToast" class="share-toast" aria-live="polite"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="subscribe" aria-labelledby="h-sub" style="padding-top:0">
+            <div class="page-col">
+                <div class="section-label">10 — Stay in the Loop</div>
+                <h2 id="h-sub">Subscribe to Poetic Bytes</h2>
+                <div style="margin-top:1rem;">
+                    <div class="sub-wrap">
+                        <h2>Level up your Python knowledge.</h2>
+                        <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;" class="sub-desc">In-depth Python tutorials, DDD guides, and software engineering insights — delivered straight to your inbox. No spam, ever.</p>
+                        <div class="perks">
+                            <span class="perk">Weekly Python tutorials</span>
+                            <span class="perk">DDD &amp; architecture guides</span>
+                            <span class="perk">OOP series updates</span>
+                            <span class="perk">Free, cancel anytime</span>
+                        </div>
+                        <div class="sub-plans">
+                            <button class="plan-chip active" id="planFree" onclick="selectPlan('free')">🆓 Free Weekly</button>
+                            <button class="plan-chip premium" id="planPro" onclick="selectPlan('pro')">⭐ Pro Monthly — Deep Dives</button>
+                        </div>
+                        <div class="sub-form" style="margin-top:1.2rem">
+                            <input class="cinput" type="email" id="subEmail" placeholder="your@email.com" autocomplete="email">
+                            <button class="btn-submit" onclick="handleSubscribe()">Subscribe Free →</button>
+                        </div>
+                        <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;" class="sub-note">🔒 Join 8,400+ developers. Your email is never shared or sold.</p>
+                        <div class="sub-msg" id="subMsg" aria-live="polite"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="follow" aria-labelledby="h-follow" style="padding-top:0">
+            <div class="page-col">
+                <div class="section-label">11 — Connect With Us</div>
+                <h2 id="h-follow">Follow Poetic Bytes</h2>
+                <div style="margin-top:1rem;">
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Stay connected across every platform. Get daily Python tips, OOP insights, and the latest DDD developments — wherever you spend your time online.</p>
+                    <div class="follow-grid">
+                        <div class="follow-card fc-fb"><div class="follow-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.07C24 5.41 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.04V9.41c0-3.02 1.8-4.7 4.54-4.7 1.31 0 2.68.24 2.68.24v2.97h-1.5c-1.5 0-1.96.93-1.96 1.89v2.26h3.32l-.53 3.5h-2.8V24C19.62 23.1 24 18.1 24 12.07z"></path></svg></div><div class="follow-name">Facebook</div><div class="follow-handle">@Glenn Junsay Pansensoy</div><div class="follow-stat">2.4k followers</div><a href="#" class="follow-btn" id="fbBtn" onclick="toggleFollow(this,'fb')">+ Follow</a></div>
+                        <div class="follow-card fc-li"><div class="follow-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="#0a66c2"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.13 1.45-2.13 2.94v5.67H9.37V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.35-1.85 3.58 0 4.24 2.36 4.24 5.42v6.32zM5.34 7.43a2.06 2.06 0 110-4.12 2.06 2.06 0 010 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.72v20.56C0 23.23.79 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.72V1.72C24 .77 23.21 0 22.23 0z"></path></svg></div><div class="follow-name">LinkedIn</div><div class="follow-handle">Poetic Bytes</div><div class="follow-stat">5.1k connections</div><a href="#" class="follow-btn" id="liBtn" onclick="toggleFollow(this,'li')">+ Follow</a></div>
+                        <div class="follow-card fc-x"><div class="follow-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg></div><div class="follow-name">X / Twitter</div><div class="follow-handle">@PoeticGlenn</div><div class="follow-stat">8.7k followers</div><a href="#" class="follow-btn" id="xBtn" onclick="toggleFollow(this,'x')">+ Follow</a></div>
+                        <div class="follow-card fc-yt"><div class="follow-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="#ff0000"><path d="M23.5 6.19a3.02 3.02 0 00-2.12-2.14C19.54 3.5 12 3.5 12 3.5s-7.54 0-9.38.55A3.02 3.02 0 00.5 6.19C0 8.04 0 12 0 12s0 3.96.5 5.81a3.02 3.02 0 002.12 2.14C4.46 20.5 12 20.5 12 20.5s7.54 0 9.38-.55a3.02 3.02 0 002.12-2.14C24 15.96 24 12 24 12s0-3.96-.5-5.81zM9.75 15.5v-7l6.5 3.5-6.5 3.5z"></path></svg></div><div class="follow-name">YouTube</div><div class="follow-handle">Poetic Bytes</div><div class="follow-stat">3.2k subscribers</div><a href="#" class="follow-btn" id="ytBtn" onclick="toggleFollow(this,'yt')">Subscribe</a></div>
+                        <div class="follow-card fc-gh"><div class="follow-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.38.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.54-1.38-1.33-1.75-1.33-1.75-1.09-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 013-.4c1.02 0 2.04.13 3 .4 2.28-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"></path></svg></div><div class="follow-name">GitHub</div><div class="follow-handle">@PoeticBytes</div><div class="follow-stat">1.8k stars</div><a href="#" class="follow-btn" id="ghBtn" onclick="toggleFollow(this,'gh')">Star ★</a></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="outro" aria-labelledby="h-outro">
+            <div class="page-col">
+                <div class="section-label">12 — The Road Ahead</div>
+                <h2 id="h-outro">Wrapping Up: Your DDD Journey</h2>
+                <div style="margin-top:1rem;">
+                    <div class="curriculum-desc" style="border-color:var(--gold);">
+                        <h2>🏁 What You've Accomplished</h2>
+                        <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">
+                            You've just completed a deep-dive into <span class="gold">Domain-Driven Design</span> with a
+                            production-grade <span class="highlight">Python Shopping Cart</span> implementation.
+                        </p>
+                        <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">
+                            You now understand how to model <span class="highlight">value objects</span> like <code>Money</code>,
+                            <span class="highlight">entities</span> like <code>Product</code>, and
+                            <span class="highlight">aggregate roots</span> like <code>ShoppingCart</code>.
+                            You've seen how the <span class="highlight">Repository pattern</span> decouples storage from domain logic,
+                            and how domain invariants are enforced through <span class="highlight">explicit validation</span>.
+                        </p>
+                        <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">
+                            Every code example was <span class="highlight">interactive</span> — you ran Python in your browser,
+                            experimented with the code, and saw the results instantly.
+                        </p>
+                        <div class="desc-meta">
+                            <span><i class="fas fa-check-circle" style="color:var(--green);"></i> 6 DDD patterns mastered</span>
+                            <span><i class="fas fa-check-circle" style="color:var(--green);"></i> 11 code components</span>
+                            <span><i class="fas fa-check-circle" style="color:var(--green);"></i> 5 knowledge-check questions</span>
+                            <span><i class="fas fa-check-circle" style="color:var(--green);"></i> Live code runner</span>
+                        </div>
+                    </div>
+
+                    <div class="oop-block">
+                        <h3>Key Takeaways</h3>
+                        <ul class="outro-list">
+                            <li><strong>Use <code>Decimal</code> for money</strong> — floats are dangerous for financial calculations</li>
+                            <li><strong>Freeze value objects</strong> — immutability prevents bugs and enables hashing</li>
+                            <li><strong>Enforce invariants in the domain</strong> — business rules belong in entities, not controllers</li>
+                            <li><strong>Repository pattern = swappable storage</strong> — in-memory → database requires zero domain changes</li>
+                            <li><strong>Aggregate roots enforce consistency</strong> — the cart controls all item operations</li>
+                        </ul>
+                    </div>
+
+                    <div class="oop-block">
+                        <h3>Your Next Steps</h3>
+                        <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Now that you've mastered DDD fundamentals, you're ready to build on this foundation:</p>
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:0.8rem;margin-top:1rem;">
+                            <a href="abstraction.html" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--card-r);padding:1rem;text-decoration:none;color:var(--text);transition:border-color .2s;text-align:center;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+                                <div style="font-size:1.8rem;">🎭</div>
+                                <div style="font-weight:700;font-size:.82rem;margin-top:.3rem;">Abstraction</div>
+                                <div style="font-size:.68rem;color:var(--muted);">The second OOP pillar</div>
+                            </a>
+                            <a href="encapsulation.html" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--card-r);padding:1rem;text-decoration:none;color:var(--text);transition:border-color .2s;text-align:center;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">
+                                <div style="font-size:1.8rem;">🔒</div>
+                                <div style="font-weight:700;font-size:.82rem;margin-top:.3rem;">Encapsulation</div>
+                                <div style="font-size:.68rem;color:var(--muted);">The first OOP pillar</div>
+                            </a>
+                            <a href="inheritance.html" style="background:var(--panel);border:1px solid var(--border);border-radius:var(--card-r);padding:1rem;text-decoration:none;color:var(--text);transition:border-color .2s;text-align:center;" onmouseover="this.style.borderColor='#b59ee8'" onmouseout="this.style.borderColor='var(--border)'">
+                                <div style="font-size:1.8rem;">🧬</div>
+                                <div style="font-weight:700;font-size:.82rem;margin-top:.3rem;">Inheritance</div>
+                                <div style="font-size:.68rem;color:var(--muted);">The third OOP pillar</div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="callout" style="border-color:var(--gold);background:rgba(255,212,59,.04);margin-top:1.5rem;">
+                        <p style="font-size:.85rem;color:var(--text);">
+                            <strong>✨ "Great software is built on great domain models.</strong>
+                            When you master DDD, you write code that mirrors the business — making it easier to understand,
+                            easier to change, and easier to scale. Keep building, keep modeling, and remember:
+                            <span style="color:var(--gold);">the domain is the heart of your application.</span>"
+                        </p>
+                        <p style="margin-top:.5rem;font-size:.72rem;color:var(--muted);">— Glenn Junsay Pansensoy, Poetic Bytes</p>
+                    </div>
+
+                    <div style="display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1.5rem;">
+                        <a href="abstraction.html" class="btn btn-primary"><i class="fas fa-arrow-left"></i> Back to Abstraction</a>
+                        <a href="#intro" class="btn btn-outline"><i class="fas fa-arrow-up"></i> Back to Top</a>
+                        <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Print Guide</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+
+    </div><hr style="border:none;border-top:1px solid rgba(139,94,52,0.25);margin:2.5rem 0;"><div style="margin-bottom:1.5rem;"><span style="font-size:0.72rem;color:#8a7563;font-family:monospace;">Tags: </span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">Python Shopping Cart</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">DDD Python</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">Domain-Driven Design</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">Python E-Commerce</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">Money value object</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">Repository pattern</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">Aggregate Root Python</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">Programming</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">money</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">decimal</span></div><div style="margin:2rem 0;background:rgba(139,94,52,0.08);border:1px solid rgba(139,94,52,0.25);border-radius:16px;padding:1.4rem;"><div style="font-family:monospace;font-size:0.72rem;color:#7a3e1a;margin-bottom:1rem;">Comments</div><div id="disqus_thread"></div><script>var disqus_config=function(){this.page.url="https://poetic-bytes.blogspot.com/2026/11/python-shopping-cart-domain-driven.html";this.page.identifier="Python%20Shopping%20Cart%20%C2%B7%20Domain-Driven%20Design%20%7C%20Poetic%20Bytes";};(function(){var d=document,s=d.createElement("scr"+"ipt");s.src="https://"+(localStorage.getItem("pc_disqus")||"poetic-codes")+".disqus.com/embed.js";s.setAttribute("data-timestamp",+new Date());(d.head||d.body).appendChild(s);})();</script><noscript>Please enable JavaScript to view comments.</noscript></div><div style="background:rgba(139,94,52,0.08);border:1px solid rgba(139,94,52,0.25);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:2rem;"><div style="font-family:monospace;font-size:0.7rem;color:#7a3e1a;margin-bottom:0.8rem;">Share this essay</div><div style="display:flex;flex-wrap:wrap;"><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-shopping-cart-domain-driven.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#1877f2;">Facebook</a><a href="https://twitter.com/intent/tweet?text=Python%20Shopping%20Cart%20%C2%B7%20Domain-Driven%20Design%20%7C%20Poetic%20Bytes&url=https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-shopping-cart-domain-driven.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#000;">X</a><a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-shopping-cart-domain-driven.html&title=Python%20Shopping%20Cart%20%C2%B7%20Domain-Driven%20Design%20%7C%20Poetic%20Bytes" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#0077b5;">LinkedIn</a><a href="https://api.whatsapp.com/send?text=Python%20Shopping%20Cart%20%C2%B7%20Domain-Driven%20Design%20%7C%20Poetic%20Bytes%20https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-shopping-cart-domain-driven.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#25d366;">WhatsApp</a><a href="https://telegram.me/share/url?url=https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-shopping-cart-domain-driven.html&text=Python%20Shopping%20Cart%20%C2%B7%20Domain-Driven%20Design%20%7C%20Poetic%20Bytes" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#229ed9;">Telegram</a><a href="https://www.reddit.com/submit?url=https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-shopping-cart-domain-driven.html&title=Python%20Shopping%20Cart%20%C2%B7%20Domain-Driven%20Design%20%7C%20Poetic%20Bytes" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#ff4500;">Reddit</a><a href="mailto:?subject=Python%20Shopping%20Cart%20%C2%B7%20Domain-Driven%20Design%20%7C%20Poetic%20Bytes&body=Read%20this%3A%20https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-shopping-cart-domain-driven.html" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#555;">Email</a></div></div><div style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid rgba(139,94,52,0.25);text-align:center;font-family:monospace;font-size:0.7rem;color:#8a7563;line-height:2.2;"><div style="margin-bottom:0.5rem;"><a href="https://poetic-bytes.blogspot.com/2026/04/about_01131455884.html"   style="color:#8a7563;text-decoration:none;margin:0 0.5rem;" target="_blank" rel="noopener">About</a> | <a href="https://poetic-bytes.blogspot.com/2026/04/privacy-policy_01328570854.html" style="color:#8a7563;text-decoration:none;margin:0 0.5rem;" target="_blank" rel="noopener">Privacy Policy</a> | <a href="https://poetic-bytes.blogspot.com/2026/04/terms-of-service_01797605838.html"   style="color:#8a7563;text-decoration:none;margin:0 0.5rem;" target="_blank" rel="noopener">Terms of Service</a> | <a href="https://poetic-bytes.blogspot.com/2026/04/cookie-policy.html" style="color:#8a7563;text-decoration:none;margin:0 0.5rem;" target="_blank" rel="noopener">Cookie Policy</a></div><div style="font-size:0.62rem;opacity:0.7;">&copy; 2026 Glenn Junsay Pansensoy. All rights reserved.</div></div><div style="text-align:center;font-size:0.75rem;color:#8a7563;font-family:monospace;padding:1rem 0;">Published on <a href="https://poetic-bytes.blogspot.com" rel="noopener" style="color:#8B5E34;">poetic-bytes.blogspot.com</a> &nbsp;·&nbsp; #PythonShoppingCart #DDDPython #Domain-DrivenDesign #PythonE-Commerce #Moneyvalueobject</div></div>
+<div style="margin:2rem 0;text-align:center;min-height:90px;"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6428799122405621" data-ad-slot="3735753880" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>
+</article>
+<footer>
+<a href="https://poetic-bytes.blogspot.com/2026/04/about_01131455884.html" target="_blank" rel="noopener">About</a> |
+<a href="https://poetic-bytes.blogspot.com/2026/04/privacy-policy_01328570854.html" target="_blank" rel="noopener">Privacy</a> |
+<a href="https://poetic-bytes.blogspot.com/2026/04/terms-of-service_01797605838.html" target="_blank" rel="noopener">Terms</a> |
+<a href="https://poetic-bytes.blogspot.com/2026/04/cookie-policy.html" target="_blank" rel="noopener">Cookies</a><br>
+&copy; 2026 Glenn Junsay Pansensoy
+</footer>
+</body>
+</html>
