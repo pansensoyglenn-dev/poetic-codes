@@ -6,8 +6,9 @@
 
 What it does
   * reads the page (headings, paragraphs, bullet lists, callouts, tables, code snippets)
-  * shows each part as a clean slide: text cards, syntax-highlighted code, tables
-  * narrates the explanation text (code is shown, not read aloud; a short lead-in introduces it)
+  * shows each code snippet being TYPED on a laptop screen (syntax-highlighted), then explains it with
+    the explanation text under the laptop while the finished code stays in view
+  * other parts become clean slides: text cards, tables; narration reads the explanation text, never the code
   * writes out/<slug>.mp4 and out/<slug>.description.txt (link + YouTube chapters)
 
 Free: edge-tts voice + ffmpeg. Optional EXPLAIN_CODE=1 asks Cloudflare's free AI to add a
@@ -32,15 +33,17 @@ from pygments import lex
 from pygments.lexers import PythonLexer
 from pygments.token import Token
 
-SCRIPT_VERSION = "2026-11-06-c"
+SCRIPT_VERSION = "2026-11-06-e"
 W, H, FPS = 1280, 720, 25
 VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")
 VOICE_FALLBACKS = ["en-PH-RosaNeural", "en-US-ChristopherNeural"]
 RATE = os.environ.get("TTS_RATE", "+0%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "2500"))        # narration budget for the whole video
-PAGE_LINES = int(os.environ.get("PAGE_LINES", "20"))        # code lines per slide
+PAGE_LINES = int(os.environ.get("PAGE_LINES", "16"))        # code lines per slide
 SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "55"))      # longest paragraph shown on one slide
-READ_SECS_PER_LINE = float(os.environ.get("READ_SECS_PER_LINE", "0.8"))   # time to read a code line after the lead-in
+TYPE_CPS = float(os.environ.get("TYPE_CPS", "28"))             # typing speed on the laptop, characters per second
+TYPE_FPS = int(os.environ.get("TYPE_FPS", "10"))               # animation frames per second while typing
+LAPTOP_WORDS = int(os.environ.get("LAPTOP_WORDS", "26"))       # longest explanation shown under the laptop at once
 EXPLAIN_CODE = os.environ.get("EXPLAIN_CODE", "0") == "1"
 CF_ACCOUNT = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
 CF_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
@@ -140,6 +143,7 @@ class Builder:
         self.spoken = ""            # last heading that was read aloud
         self.label = ""             # caption above the next code block, e.g. "Naive approach"
         self.words = 0
+        self.cur = None             # the laptop currently on screen: explanation under the same heading is shown with it
 
     def room(self, speech):
         return self.words + len(speech.split()) <= MAX_WORDS
@@ -165,11 +169,22 @@ class Builder:
         text = screen_clean(text)
         if len(text.split()) < 3 or text[:1] in "\u2014\u2013-":     # too short, or a quote attribution
             return
+        if self.cur and self.cur["heading"] == self.heading:           # explaining the code that was just typed
+            for chunk in chunk_text(text, LAPTOP_WORDS):
+                self.add(kind="laptop_text", heading=self.heading, body=chunk, code=self.cur,
+                         speech=speak_clean(chunk))
+            return
         for chunk in chunk_text(text, SLIDE_WORDS):
             self.add(kind="text", heading=self.heading, body=chunk, speech=self.lead(speak_clean(chunk)))
 
     def bullets(self, items):
         items = [screen_clean(i) for i in items if len(screen_clean(i).split()) >= 2]
+        if self.cur and self.cur["heading"] == self.heading:           # list explaining the code just typed
+            for it in items:
+                for chunk in chunk_text(it, LAPTOP_WORDS):
+                    self.add(kind="laptop_text", heading=self.heading, body=chunk, code=self.cur,
+                             speech=speak_clean(chunk))
+            return
         group, n = [], 0
         for it in items + [None]:
             w = len(it.split()) if it else 0
@@ -194,20 +209,24 @@ class Builder:
         pages = page_code(code.split("\n"))
         label, self.label = self.label, ""
         name = label or re.sub(r"^\d+\.\s*", "", screen_clean(self.heading))
+        fname = file_name(name)
+        self.spoken = self.heading
         for k, (lines, start) in enumerate(pages):
             if k == 0:
                 if label:
-                    speech = f"Here is the {speak_clean(label)}."
+                    speech = f"Let's look at the {speak_clean(label)}."
                 else:
-                    speech = f"Here is the code for {speak_clean(name)}." if name else "Here is the code."
-                self.spoken = self.heading
-                extra = explain_code("\n".join(lines), name) if EXPLAIN_CODE else ""
-                if extra:
-                    speech += " " + extra
+                    speech = f"Let's write the code for {speak_clean(name)}." if name else "Let's write this code."
             else:
-                speech = ""
-            read = max(3.0, READ_SECS_PER_LINE * len(lines)) if not (k == 0 and EXPLAIN_CODE and len(speech.split()) > 12) else 2.0
-            self.add(kind="code", heading=self.heading, name=name, lines=lines, start=start, part=(k + 1, len(pages)), speech=speech, pad=read)
+                speech = "Now the next part."
+            self.add(kind="code", heading=self.heading, name=name, fname=fname, lines=lines, start=start,
+                     part=(k + 1, len(pages)), speech=speech)
+        lines, start = pages[-1]
+        self.cur = {"heading": self.heading, "lines": lines, "start": start, "fname": fname}
+        if EXPLAIN_CODE:
+            extra = explain_code(code, name)
+            for chunk in chunk_text(extra, LAPTOP_WORDS) if extra else []:
+                self.add(kind="laptop_text", heading=self.heading, body=chunk, code=self.cur, speech=chunk)
 
     def table(self, rows):
         rows = [[screen_clean(c) for c in r] for r in rows if any(screen_clean(c) for c in r)]
@@ -250,6 +269,15 @@ class Builder:
                 self.table([[c.get_text("") for c in tr.find_all(["th", "td"])] for tr in ch.find_all("tr")])
             else:
                 self.walk(ch, first_h2)
+
+
+def file_name(name):
+    """A believable file name for the editor tab, e.g. 'The Money Value Object' -> money_value_object.py"""
+    base = re.sub(r"[^a-z0-9]+", "_", re.sub(r"\(.*?\)", "", (name or "").lower())).strip("_")
+    base = re.sub(r"^(the|a|an)_", "", base)
+    if len(base) > 22:
+        base = base[:22].rsplit("_", 1)[0] if "_" in base[:22] else base[:22]
+    return (base.rstrip("_") or "example") + ".py"
 
 
 def page_code(lines):
@@ -328,6 +356,7 @@ def build_scenes(page_html, page_url):
         if stitle:
             b.add(kind="section", label=label, title=stitle, speech=speak_clean(stitle), chapter=stitle)
             b.heading, b.spoken = stitle, stitle
+            b.cur = None
         b.walk(sec, h2)
     b.add(kind="end", title="Try the code live", url=link or BRAND,
           speech=f"Try the live code on {BRAND}. The link is in the description.", chapter="Try it yourself")
@@ -483,46 +512,147 @@ def lex_lines(lines):
     return (out + [[] for _ in lines])[:len(lines)]
 
 
-def draw_code(sc, idx, total):
-    img = background()
+_BG = [None]
+
+
+def cached_bg():
+    if _BG[0] is None:
+        _BG[0] = background()
+    return _BG[0].copy()
+
+
+def laptop_setup(lines, fname, start):
+    """Draw the empty laptop once; return everything needed to draw typed-in frames quickly."""
+    img = cached_bg()
     d = ImageDraw.Draw(img)
-    chrome(img, d, idx, total)
-    name = sc.get("name") or re.sub(r"^\d+\.\s*", "", screen_clean(sc.get("heading", "")))
-    d.text((PADX, 64), name[:64], font=load_font(30, True), fill=GOLD)
-    lines = sc["lines"]
-    px0, py0, px1, py1 = 50, 118, W - 50, H - 58
-    d.rounded_rectangle([px0, py0, px1, py1], radius=14, fill=CODE_BG, outline=(31, 64, 96), width=2)
-    d.rounded_rectangle([px0, py0, px1, py0 + 38], radius=14, fill=PANEL)
-    d.rectangle([px0, py0 + 24, px1, py0 + 38], fill=PANEL)
+    lx0, lx1, ly0, ly1 = 140, 1140, 16, 536
+    d.ellipse([lx0 - 40, ly1 + 8, lx1 + 90, ly1 + 40], fill=(6, 10, 16))                       # shadow on the desk
+    d.rounded_rectangle([lx0, ly0, lx1, ly1], radius=20, fill=(46, 53, 68), outline=(78, 88, 108), width=2)
+    d.ellipse([(lx0 + lx1) // 2 - 3, ly0 + 5, (lx0 + lx1) // 2 + 3, ly0 + 11], fill=(20, 24, 32))   # camera
+    sx0, sy0, sx1, sy1 = lx0 + 14, ly0 + 16, lx1 - 14, ly1 - 14
+    d.rounded_rectangle([sx0, sy0, sx1, sy1], radius=6, fill=CODE_BG)
+    d.rectangle([sx0, sy0, sx1, sy0 + 30], fill=PANEL)                                          # editor title bar
     for k, c in enumerate(((239, 68, 68), (245, 158, 11), (16, 185, 129))):
-        d.ellipse([px0 + 18 + k * 24, py0 + 12, px0 + 30 + k * 24, py0 + 24], fill=c)
-    if sc["part"][1] > 1:
-        t = f"part {sc['part'][0]} of {sc['part'][1]}"
-        d.text((px1 - 18 - d.textlength(t, font=load_font(16)), py0 + 9), t, font=load_font(16), fill=MUTED)
-    avail = py1 - (py0 + 38) - 28
-    size = max(15, min(26, int(avail / (len(lines) * 1.42))))
+        d.ellipse([sx0 + 14 + k * 22, sy0 + 10, sx0 + 26 + k * 22, sy0 + 22], fill=c)
+    tf = load_font(14)
+    tw = int(d.textlength(fname, font=tf)) + 40
+    d.rectangle([sx0 + 90, sy0 + 4, sx0 + 90 + tw, sy0 + 30], fill=CODE_BG)
+    d.ellipse([sx0 + 102, sy0 + 13, sx0 + 110, sy0 + 21], fill=GOLD)
+    d.text((sx0 + 120, sy0 + 8), fname, font=tf, fill=TEXT)
+    d.rectangle([sx0, sy1 - 24, sx1, sy1], fill=(18, 52, 86))                                   # status bar
+    sf = load_font(13)
+    right = "Python   UTF-8   Spaces: 4"
+    d.text((sx1 - 14 - d.textlength(right, font=sf), sy1 - 20), right, font=sf, fill=(190, 215, 240))
+    d.rounded_rectangle([90, ly1, 1190, ly1 + 18], radius=8, fill=(70, 79, 98))                 # laptop base
+    d.rounded_rectangle([560, ly1, 720, ly1 + 7], radius=4, fill=(40, 46, 58))
+    geo = {"sx0": sx0, "sy0": sy0, "sx1": sx1, "sy1": sy1, "code_top": sy0 + 40,
+           "avail_h": (sy1 - 24) - (sy0 + 40) - 6, "code_w": sx1 - sx0 - 30}
+    n = max(len(lines), 10)
+    size = min(22, int(geo["avail_h"] / (n * 1.42)))
     longest = max((len(l) for l in lines), default=1)
-    size = max(15, min(size, int((px1 - px0 - 40 - 64) / (longest * 0.603))))   # shrink so long lines fit when possible
+    size = max(14, min(size, int((geo["code_w"] - 14) / ((longest + 3) * 0.603))))   # shrink so long lines fit
     font = load_font(size, mono=True)
-    lh = int(size * 1.42)
-    cw = font.getlength("M")
-    gutter = int(cw * 3) + 16
-    max_chars = int((px1 - px0 - 40 - gutter) / cw)
-    y = py0 + 38 + 16
-    start = sc.get("start", 1)
-    for n, toks in enumerate(lex_lines(lines)):
-        d.text((px0 + 16, y), str(start + n).rjust(2), font=font, fill=(70, 100, 130))
-        x, used = px0 + 20 + gutter, 0
-        for text, col in toks:
-            room = max_chars - used
-            if room <= 0:
+    return {"base": img, "geo": geo, "font": font, "lh": int(size * 1.42), "cw": font.getlength("M"),
+            "toks": lex_lines(lines), "lines": lines, "start": start}
+
+
+def laptop_frame(lp, nchars, caption, idx, total, cursor=True):
+    img = lp["base"].copy()
+    d = ImageDraw.Draw(img)
+    g, font, lh, cw, toks, start = lp["geo"], lp["font"], lp["lh"], lp["cw"], lp["toks"], lp["start"]
+    x0 = g["sx0"] + 16
+    gutter = int(cw * 3) + 14
+    # where is the cursor?
+    rem, cur_n, cur_col = nchars, len(toks) - 1, None
+    for n, lt in enumerate(toks):
+        ln = sum(len(t) for t, _ in lt)
+        if rem <= ln:
+            cur_n, cur_col = n, rem
+            break
+        rem -= ln + 1
+    if cur_col is None:
+        cur_col = sum(len(t) for t, _ in toks[-1]) if toks else 0
+    y = g["code_top"]
+    for n, lt in enumerate(toks[:cur_n + 1]):
+        if n == cur_n:
+            d.rectangle([g["sx0"] + 4, y - 2, g["sx1"] - 4, y + lh - 3], fill=(16, 38, 54))
+        d.text((x0, y), str(start + n).rjust(2), font=font, fill=(70, 100, 130))
+        shown, limit = 0, (cur_col if n == cur_n else 10 ** 6)
+        for text, colr in lt:
+            if shown >= limit:
                 break
-            if len(text) > room:
-                text = text[:max(room - 1, 0)] + "\u2026"
-            d.text((x + used * cw, y), text, font=font, fill=col)
-            used += len(text)
+            seg = text[:limit - shown]
+            d.text((x0 + gutter + shown * cw, y), seg, font=font, fill=colr)
+            shown += len(seg)
+        if n == cur_n and cursor:
+            cx = x0 + gutter + cur_col * cw
+            d.rectangle([cx, y + 1, cx + 2, y + lh - 5], fill=BLUE_LT)
         y += lh
+    sf = load_font(13)
+    d.text((g["sx0"] + 14, g["sy1"] - 20), f"Ln {start + cur_n}, Col {cur_col + 1}", font=sf, fill=(190, 215, 240))
+    # explanation panel under the laptop
+    py0, py1 = 574, H - 16
+    d.rounded_rectangle([60, py0, W - 60, py1], radius=14, fill=PANEL, outline=(31, 64, 96), width=2)
+    d.rectangle([60, py0 + 14, 66, py1 - 14], fill=GOLD)
+    cap = screen_clean(caption)
+    for size in range(28, 19, -2):
+        cf = load_font(size)
+        rows = wrap(d, cap, cf, W - 2 * 60 - 60)
+        clh = int(size * 1.35)
+        if len(rows) * clh <= py1 - py0 - 20:
+            break
+    maxrows = max(1, (py1 - py0 - 20) // clh)
+    if len(rows) > maxrows:
+        rows = rows[:maxrows]
+        rows[-1] = rows[-1].rstrip(" ,.;:") + "\u2026"
+    y = py0 + (py1 - py0 - len(rows) * clh) // 2
+    for ln in rows:
+        d.text((90, y), ln, font=cf, fill=TEXT)
+        y += clh
+    d.rectangle([0, H - 8, W, H], fill=(6, 12, 20))
+    d.rectangle([0, H - 8, int(W * (idx + 1) / total), H], fill=BLUE_LT)
     return img
+
+
+def draw_laptop_text(sc, idx, total):
+    c = sc["code"]
+    lp = laptop_setup(c["lines"], c["fname"], c["start"])
+    return laptop_frame(lp, sum(len(l) + 1 for l in c["lines"]), sc["body"], idx, total, cursor=False)
+
+
+def typing_clip(sc, idx, total, mp3, out, tmp):
+    """The code appears character by character on the laptop while the lead-in is spoken."""
+    lines = sc["lines"]
+    lp = laptop_setup(lines, sc["fname"], sc["start"])
+    nchars = max(1, sum(len(l) + 1 for l in lines) - 1)
+    lead = probe_duration(mp3)
+    secs = max(lead + 0.4, min(26.0, max(4.0, nchars / TYPE_CPS)))
+    nframes = max(2, int(secs * TYPE_FPS))
+    step = secs / nframes
+    paths, last_n = [], -1
+    for k in range(nframes):
+        n = nchars if k == nframes - 1 else int(nchars * (k + 1) / nframes)
+        if n == last_n and paths:
+            paths.append(paths[-1])
+            continue
+        last_n = n
+        pth = tmp / f"t{idx}_{k}.png"
+        laptop_frame(lp, n, sc["speech"], idx, total, cursor=(k % 4 != 3 or k == nframes - 1)).save(pth)
+        paths.append(pth)
+    hold = 1.2
+    listing = tmp / f"t{idx}.txt"
+    with open(listing, "w", encoding="utf-8") as fh:
+        for k, pth in enumerate(paths):
+            fh.write(f"file '{pth}'\nduration {step + (hold if k == len(paths) - 1 else 0):.3f}\n")
+        fh.write(f"file '{paths[-1]}'\n")
+    dur = secs + hold
+    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listing), "-i", str(mp3),
+         "-af", f"apad=whole_dur={dur:.2f}", "-t", f"{dur:.2f}", "-vf", f"fps={FPS},format=yuv420p",
+         "-c:v", "libx264", "-preset", "veryfast", "-crf", "27", "-r", str(FPS),
+         "-c:a", "aac", "-b:a", "64k", "-ar", "24000", "-ac", "1", str(out)])
+    for pth in set(paths):
+        pth.unlink(missing_ok=True)
+    return dur
 
 
 def draw_table(sc, idx, total):
@@ -574,7 +704,7 @@ def draw_end(sc, idx, total):
     return img
 
 
-RENDER = {"title": draw_title, "section": draw_section, "text": draw_text, "code": draw_code,
+RENDER = {"title": draw_title, "section": draw_section, "text": draw_text, "laptop_text": draw_laptop_text,
           "table": draw_table, "end": draw_end}
 
 
@@ -651,15 +781,14 @@ def main():
     try:
         for i, sc in enumerate(scenes):
             png, mp3, clip = tmp / f"s{i}.png", tmp / f"a{i}.mp3", tmp / f"c{i}.mp4"
-            RENDER[sc["kind"]](sc, i, len(scenes)).save(png)
             synth(sc.get("speech", ""), mp3)
             if sc.get("chapter"):
                 chapters.append((t, sc["chapter"]))
-            pad = sc.get("pad", 0.9)
-            if sc["kind"] == "code" and not sc.get("speech"):
-                silence(mp3, max(3.0, READ_SECS_PER_LINE * len(sc["lines"])))
-                pad = 0.3
-            t += make_clip(png, mp3, clip, pad)
+            if sc["kind"] == "code":
+                t += typing_clip(sc, i, len(scenes), mp3, clip, tmp)
+            else:
+                RENDER[sc["kind"]](sc, i, len(scenes)).save(png)
+                t += make_clip(png, mp3, clip, sc.get("pad", 0.9))
             clips.append(clip)
             if (i + 1) % 10 == 0 or i + 1 == len(scenes):
                 log(f"  slide {i + 1}/{len(scenes)} ready ({t / 60:.1f} min so far)")
