@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-06-z2"
+SCRIPT_VERSION = "2026-11-06-z3"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -58,7 +58,16 @@ ONLY_JOB = os.environ.get("ONLY_JOB", "").strip().lower()
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
 RUN_START = time.time()
 RUN_BUDGET = float(os.environ.get("MAX_RUN_MINUTES", "100")) * 60
-IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "480"))
+IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "1500"))
+# When Cloudflare's free daily allowance is used up (or has no keys), pictures come from free backup generators instead of
+# photos that do not match: Hugging Face (optional free HF_TOKEN) and Pollinations (no key). FALLBACK_IMAGES=0 turns this off.
+FALLBACK_IMAGES = os.environ.get("FALLBACK_IMAGES", "1") != "0"
+HF_TOKEN = os.environ.get("HF_TOKEN", "").strip()
+HF_MODEL = os.environ.get("HF_MODEL", "black-forest-labs/FLUX.1-schnell")
+POLLINATIONS_URL = os.environ.get(
+    "POLLINATIONS_URL",
+    "https://image.pollinations.ai/prompt/{prompt}?width=1280&height=720&model=flux&nologo=true&seed={seed}")
+FALLBACK_PAUSE = float(os.environ.get("FALLBACK_PAUSE", "4"))   # seconds between backup requests (they are rate limited)
 WIKI_IMAGES = os.environ.get("WIKI_IMAGES", "1") != "0"
 WIKI_MAX = int(os.environ.get("WIKI_MAX", "12"))
 UA = "article-video-bot/1.0 (https://poetic-codes.pages.dev; GitHub Actions)"
@@ -912,9 +921,65 @@ def gen_image_cloudflare(prompt):
 
 
 LAST_IMG_ERROR = [""]
+FALLBACK_STATE = {"fails": 0, "dead": False, "used": 0, "last": 0.0}
+
+
+def gen_image_hf(prompt):
+    if not HF_TOKEN:
+        return None
+    r = requests.post(f"https://router.huggingface.co/hf-inference/models/{HF_MODEL}",
+                      headers={"Authorization": f"Bearer {HF_TOKEN}"},
+                      json={"inputs": prompt[:900]}, timeout=120)
+    if not r.ok:
+        raise RuntimeError(f"Hugging Face HTTP {r.status_code}: {(r.text or '')[:150]}")
+    return _from_bytes(r.content)
+
+
+def gen_image_pollinations(prompt):
+    from urllib.parse import quote
+    url = POLLINATIONS_URL.format(prompt=quote(prompt[:700], safe=""), seed=int(time.time()) % 100000)
+    r = requests.get(url, headers={"User-Agent": UA}, timeout=120)
+    if not r.ok or "image" not in (r.headers.get("content-type") or ""):
+        raise RuntimeError(f"Pollinations HTTP {r.status_code}: {(r.text or '')[:150]}")
+    return _from_bytes(r.content)
+
+
+def gen_image_fallback(prompt):
+    """Free backup pictures made from the same prompt. Gives up for the rest of the run after 3 failures in a row."""
+    if not FALLBACK_IMAGES or FALLBACK_STATE["dead"]:
+        return None
+    wait = FALLBACK_PAUSE - (time.time() - FALLBACK_STATE["last"])
+    if wait > 0:
+        time.sleep(wait)
+    img = None
+    for fn in (gen_image_hf, gen_image_pollinations):
+        try:
+            img = fn(prompt)
+        except Exception as e:
+            LAST_IMG_ERROR[0] = str(e)[:300]
+            img = None
+        if img is not None:
+            break
+    FALLBACK_STATE["last"] = time.time()
+    if img is None:
+        FALLBACK_STATE["fails"] += 1
+        if FALLBACK_STATE["fails"] >= 3:
+            FALLBACK_STATE["dead"] = True
+            log(f"  backup picture generators failed 3 times in a row; stopping them ({LAST_IMG_ERROR[0]})")
+        return None
+    FALLBACK_STATE["fails"] = 0
+    FALLBACK_STATE["used"] += 1
+    return img
 
 
 def gen_image(prompt):
+    img = gen_image_cloudflare_retry(prompt) if (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) else None
+    if img is None:
+        img = gen_image_fallback(prompt)
+    return img
+
+
+def gen_image_cloudflare_retry(prompt):
     waits = [2, 4]                       # ordinary errors: two quick retries
     attempt = 0
     while True:
@@ -963,7 +1028,7 @@ def make_ai_images(segs, job):
     """One image per body slide, prompt locked to that slide's spoken words."""
     if not AI_IMAGES:
         return []
-    if not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN):
+    if not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) and not FALLBACK_IMAGES:
         log("  no Cloudflare keys (CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN): skipping generated pictures, using your photos")
         return []
     body_idx = [i for i, g in enumerate(segs) if g["kind"] == "body"]
@@ -984,7 +1049,10 @@ def make_ai_images(segs, job):
         }
         prompt = scene_prompt(seg, job)
         log(f"  picture {j + 1}/{k}: {prompt[:170]}")
-        if QUOTA_HIT[0]:
+        if QUOTA_HIT[0] and FALLBACK_IMAGES and not FALLBACK_STATE["dead"] and not FALLBACK_STATE.get("announced"):
+            FALLBACK_STATE["announced"] = True
+            log(f"  Cloudflare free quota reached at {j}/{k}; continuing with the free backup generators")
+        if QUOTA_HIT[0] and (not FALLBACK_IMAGES or FALLBACK_STATE["dead"]):
             log(f"  Cloudflare free quota reached at {j}/{k}; the remaining slides keep the last picture (no further calls)")
             if LAST_IMG_ERROR[0]:
                 log(f"  Cloudflare said: {LAST_IMG_ERROR[0]}")
@@ -1003,7 +1071,7 @@ def make_ai_images(segs, job):
         if (j + 1) % 6 == 0 or j + 1 == k:
             log(f"  generated pictures {j + 1}/{k}")
     got = sum(1 for x in out if x is not None)
-    log(f"  {got} of {k} generated pictures usable (matched to narration)")
+    log(f"  {got} of {k} generated pictures usable (matched to narration); {FALLBACK_STATE['used']} came from the free backup generators")
     return out
 
 
@@ -1868,6 +1936,7 @@ def build_video(job):
     CREDITS.clear()
     CREDIT_ROWS.clear()
     QUOTA_HIT[0] = False
+    FALLBACK_STATE.update(fails=0, dead=False, used=0, announced=False)
     photos = load_photos(job)
     if WIKI_GENERIC:
         photos += load_wiki_photos(job, len(photos))
