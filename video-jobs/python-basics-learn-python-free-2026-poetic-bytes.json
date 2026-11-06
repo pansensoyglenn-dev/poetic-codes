@@ -1,6 +1,6 @@
 {
-  "jobId": "1793937953820",
-  "createdAt": "2026-11-06T04:05:53.820Z",
+  "jobId": "1793937989944",
+  "createdAt": "2026-11-06T04:06:29.944Z",
   "title": "Python Basics – Learn Python Free 2026 | Poetic Bytes",
   "author": "Glenn Junsay Pansensoy",
   "category": "Programming",
@@ -21,5 +21,5 @@
   "slug": "python-basics-learn-python-free-2026-poetic-bytes",
   "articleId": 45,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1793937936503.jpg",
-  "force": false
+  "force": true
 }
