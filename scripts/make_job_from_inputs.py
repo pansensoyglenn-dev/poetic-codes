@@ -50,6 +50,15 @@ def has_video(row):
     return bool(row.get("video_url") or row.get("videoUrl"))
 
 
+def is_tutorial(row):
+    """Poetic Bytes lesson pages live in the same article list; they are made by the Tutorial video workflow."""
+    title = str(row.get("title") or "")
+    body = str(row.get("body") or row.get("content") or "")
+    return (bool(re.search(r"\|\s*Poetic Bytes\s*$", title.strip()))
+            or len(re.findall(r"<pre\b", body)) >= 3
+            or len(re.findall(r"\bCopy\s+Run\b", body)) >= 3)
+
+
 def num(v):
     try:
         return int(v)
@@ -119,7 +128,7 @@ def main():
     rows = fetch_articles()
     made = []
     if title_in == "*":
-        todo = [r for r in rows if r.get("title") and not has_video(r)]
+        todo = [r for r in rows if r.get("title") and not has_video(r) and not is_tutorial(r)]
         todo.sort(key=lambda r: num(r.get("id")), reverse=True)
         # a per-article location only makes sense for a single article, so it is not applied to a "*" run
         bulk_extra = {}
