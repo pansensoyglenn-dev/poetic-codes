@@ -1,33 +1,6 @@
 {
-  "jobId": "1793946518221",
-  "status": "done",
-  "title": "Python Basics \u2013 Learn Python Free 2026 | Poetic Bytes",
-  "videoUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/videos/video-1793948456085-python-basics-learn-python-free-2026-poetic-bytes-video-518221.mp4",
-  "articleUrl": "https://poetic-codes.pages.dev/articles/python-basics-learn-python-free-2026-poetic-bytes.html",
-  "attached": true,
-  "engine": "edge-tts",
-  "credits": [
-    "Photo by Ivan Ragozin via Unsplash https://unsplash.com/photos/man-riding-on-white-and-red-boat-on-sea-during-daytime-o9oQaOGpLz0",
-    "Photo by Katherine McCormack via Unsplash https://unsplash.com/photos/black-and-white-sailboat-in-body-of-water-during-sunset-j1egA73qp7c",
-    "Photo by Osman Rana via Unsplash https://unsplash.com/photos/white-boat-on-body-of-water-Oi1fJwi35oI",
-    "Photo by Willian Justen de Vasconcellos via Unsplash https://unsplash.com/photos/birds-eye-photography-of-white-boat-g5FyZvIzUS4",
-    "Photo by Bruce Warrington via Unsplash https://unsplash.com/photos/white-sailboat-on-ocean-eMqG0_PpoGg",
-    "Photo by Kristel Hayes via Unsplash https://unsplash.com/photos/white-sail-boat-on-body-of-wate--BcnpZHZJx4",
-    "Photo by Carles Rabada via Unsplash https://unsplash.com/photos/white-and-red-boat-on-sea-during-daytime-st0s-rXJAME",
-    "Photo by Alix Greenman via Unsplash https://unsplash.com/photos/white-sail-boat-on-sea-during-daytime-_-qLdvyvBhY",
-    "Photo by Falkenpost via Pixabay https://pixabay.com/photos/fishing-boat-abandoned-fields-grass-1654446/",
-    "Photo by pixel2013 via Pixabay https://pixabay.com/photos/sailboat-sailing-yacht-sailing-ship-3399014/",
-    "Photo by Ay\u015feg\u00fclAyt\u00f6ren via Pixabay https://pixabay.com/photos/canoe-raft-river-water-tree-10484993/",
-    "Photo by ymyphoto via Pixabay https://pixabay.com/photos/boat-sunset-beach-wave-afterglow-6572384/",
-    "Photo by pixel2013 via Pixabay https://pixabay.com/photos/paper-boat-sunset-sea-dawn-ship-3361172/",
-    "Photo by 44528033 via Pixabay https://pixabay.com/photos/sea-ocean-beach-sunset-seascape-8846477/",
-    "Photo by Arild V\u00e5gen via Wikimedia Commons https://commons.wikimedia.org/wiki/File:Pilot_boat_at_Landsort_April_2012.jpg",
-    "Photo by Slaunger via Wikimedia Commons https://commons.wikimedia.org/wiki/File:Fishing_boat_N%C3%B8rre_Vorup%C3%B8r_2012-11-18_cropped.jpg",
-    "Photo by Basile Morin via Wikimedia Commons https://commons.wikimedia.org/wiki/File:Pirogue_and_boat_on_the_Mekong_with_colorful_sky_at_sunset_in_Luang_Prabang_Laos.jpg",
-    "Photo by Basile Morin via Wikimedia Commons https://commons.wikimedia.org/wiki/File:Water_reflection_of_sunset_with_gray_and_orange_clouds_and_boats_moored_to_the_bank_in_Pakse_Laos.jpg",
-    "Photo by W.carter via Wikimedia Commons https://commons.wikimedia.org/wiki/File:Fishing_hut,_jetties_and_boats_in_Loddebo.jpg",
-    "Photo by Dimitrios Tzortzis via Wikimedia Commons https://commons.wikimedia.org/wiki/File:A_boat_rests_unused_near_the_Acheloos_river_delta.jpg",
-    "Photo by Pedro Lastra via Unsplash https://unsplash.com/photos/white-and-brown-city-buildings-during-daytime-Nyvq2juw4_o"
-  ],
-  "seconds": 1233
+  "jobId": "1793951946642",
+  "status": "skipped",
+  "reason": "tutorial page: use the Tutorial video workflow",
+  "title": "Python Basics \u2013 Learn Python Free 2026 | Poetic Bytes"
 }
