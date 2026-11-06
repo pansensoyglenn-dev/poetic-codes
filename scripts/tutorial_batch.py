@@ -8,7 +8,8 @@ Where the page list comes from (first that applies):
   4. the links found on the site's home page
 
 Finished videos are uploaded to a GitHub Release (tag "tutorial-videos") as <page-name>.mp4 plus a
-<page-name>.description.txt. A page that already has its .mp4 there is skipped, so you can run this
+<page-name>.description.txt (a long page becomes one video per topic: <page-name>--01-topic.mp4, ...).
+A page that already has a video there is skipped, so you can run this
 again and again and it only works on new pages.
 """
 import os
@@ -29,6 +30,7 @@ EXCLUDE = re.compile(os.environ.get(
     "EXCLUDE", r"/(index|about|contact|privacy|terms|404|sitemap|search|offline|tutorials?|courses?|blog)(\.html)?/?$"), re.I)
 INCLUDE = os.environ.get("INCLUDE", "").strip()
 MAX_PER_RUN = int(os.environ.get("MAX_PER_RUN", "3"))
+REDO = os.environ.get("REDO") == "1"          # rebuild the listed pages even if they already have a video
 MAX_MINUTES = float(os.environ.get("MAX_MINUTES", "100"))
 TAG = os.environ.get("RELEASE_TAG", "tutorial-videos")
 VIDEO_SCRIPT = Path(__file__).with_name("tutorial_video.py")
@@ -128,7 +130,8 @@ def existing_videos():
         if c.returncode != 0:
             raise RuntimeError("could not create the release: " + (c.stderr or "")[-300:])
         return set()
-    return {n[:-4] for n in r.stdout.split() if n.endswith(".mp4")}
+    # a long page becomes several videos named <page>--01-topic.mp4, <page>--02-topic.mp4 ...
+    return {n[:-4].split("--")[0] for n in r.stdout.split() if n.endswith(".mp4")}
 
 
 def main():
@@ -149,7 +152,7 @@ def main():
         return 1
 
     done = existing_videos()
-    pending = [u for u in urls if slug_for(u) not in done]
+    pending = list(urls) if REDO else [u for u in urls if slug_for(u) not in done]
     log(f"{len(done)} already have a video; {len(pending)} still need one (up to {MAX_PER_RUN} this run)")
     start, made, failed, skipped = time.time(), 0, [], []
     OUT.mkdir(exist_ok=True)
@@ -166,19 +169,19 @@ def main():
         if r.returncode == 3:
             skipped.append(url)
             continue
-        mp4, desc = OUT / f"{slug}.mp4", OUT / f"{slug}.description.txt"
-        if r.returncode != 0 or not mp4.exists():
+        files = sorted(f for f in OUT.glob(f"{slug}*") if f.suffix == ".mp4" or f.name.endswith(".description.txt"))
+        if r.returncode != 0 or not any(f.suffix == ".mp4" for f in files):
             failed.append(url)
             continue
-        up = gh("release", "upload", TAG, str(mp4), str(desc), "--clobber")
+        up = gh("release", "upload", TAG, *[str(f) for f in files], "--clobber")
         if up.returncode != 0:
             log("  upload failed: " + (up.stderr or "")[-300:])
             failed.append(url)
             continue
         made += 1
-        log(f"  uploaded {slug}.mp4 to release '{TAG}'")
-        mp4.unlink(missing_ok=True)
-        desc.unlink(missing_ok=True)
+        log(f"  uploaded {sum(f.suffix == '.mp4' for f in files)} video(s) for {slug} to release '{TAG}'")
+        for f in files:
+            f.unlink(missing_ok=True)
     log(f"\nSummary: {made} made, {len(skipped)} skipped (not tutorials), {len(failed)} failed")
     for u in skipped:
         log("  skipped:", u)
