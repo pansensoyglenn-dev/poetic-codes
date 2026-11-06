@@ -1,0 +1,48 @@
+name: Tutorial video
+# Make a narrated video from a Poetic Bytes tutorial page. Run it from Actions -> Run workflow and paste the page link.
+# The finished .mp4 and a description file (link + YouTube chapters) appear under "Artifacts" at the bottom of the run.
+on:
+  workflow_dispatch:
+    inputs:
+      page:
+        description: "Tutorial page link, e.g. https://poetic-bytes.vercel.app/shopping-cart.html"
+        required: true
+      explain:
+        description: "Type 1 to let the free AI add a short spoken explanation to each code snippet (check it before publishing)"
+        required: false
+        default: ""
+      check_only:
+        description: "Type 1 to only list what the video WOULD contain (sections and code snippets) without making it - takes seconds"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Install tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          pip install --quiet edge-tts pillow requests beautifulsoup4 pygments
+      - name: Make the video
+        env:
+          PAGE: ${{ inputs.page }}
+          EXPLAIN_CODE: ${{ inputs.explain == '1' && '1' || '0' }}
+          OUTLINE_ONLY: ${{ inputs.check_only == '1' && '1' || '0' }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: python scripts/tutorial_video.py "$PAGE"
+      - name: Keep the video
+        uses: actions/upload-artifact@v4
+        with:
+          name: tutorial-video
+          path: out/*
+          retention-days: 7
