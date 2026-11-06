@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-05-y"
+SCRIPT_VERSION = "2026-11-06-z2"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -42,7 +42,7 @@ VIDEO_URL_API = os.environ.get("VIDEO_URL_API", "https://poetic-codes.vercel.app
 UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/upload")
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 AI_IMAGES = os.environ.get("AI_IMAGES", "1") != "0"
-AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "16"))  # each picture covers a stretch of narration; lower to save free quota
+AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "60"))  # each picture covers a stretch of narration; lower to save free quota
 # Same names as your GitHub secrets. strip() removes a stray space or newline pasted along with a secret.
 # strip() removes a stray space or newline pasted along with the secret.
 CLOUDFLARE_ACCOUNT_ID = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
@@ -51,7 +51,7 @@ VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")   # Philippine English;
 VOICE_FALLBACKS = ["en-PH-RosaNeural", "en-US-ChristopherNeural"]
 RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
-SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "60"))  # longer slides = fewer, better-matched pictures
+SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "45"))  # one picture per slide, so shorter slides keep each picture close to its words
 INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"  # off: video starts straight on the content
 SPEAK_HEADINGS = os.environ.get("SPEAK_HEADINGS", "0") != "0"  # off: section headings are not read or shown
 ONLY_JOB = os.environ.get("ONLY_JOB", "").strip().lower()
@@ -103,14 +103,14 @@ FOOTAGE_ALL = os.environ.get("FOOTAGE_ALL", "0") == "1"
 _ARCHIVE_ENV, _STOCK_ENV = ARCHIVE_VIDEO, STOCK_VIDEO
 
 # Real photographs matched to each slide's own narration (Unsplash + Pixabay photos + Wikimedia Commons).
-SLIDE_PHOTOS = os.environ.get("SLIDE_PHOTOS", "1") != "0"
+SLIDE_PHOTOS = os.environ.get("SLIDE_PHOTOS", "0") == "1"   # stock photos are matched by keyword only and often miss the meaning; off by default
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "").strip()
 PHOTO_MAX_SEARCHES = int(os.environ.get("PHOTO_MAX_SEARCHES", "30"))   # per video; Unsplash demo keys allow 50 requests/hour
 # On Philippine stories a stock clip must itself mention the Philippines/a Philippine place, else the slide keeps a better-matched photo.
 # A small free AI text model (Cloudflare Workers AI) writes each slide's search words + "must not show" words and judges candidates.
 LLM_PLAN = os.environ.get("LLM_PLAN", "1") != "0"
 LLM_MODEL = os.environ.get("LLM_MODEL", "@cf/meta/llama-3.1-8b-instruct")
-LLM_MAX_CALLS = int(os.environ.get("LLM_MAX_CALLS", "160"))
+LLM_MAX_CALLS = int(os.environ.get("LLM_MAX_CALLS", "400"))
 # Strict matching: a body slide shows only a picture that matched ITS narration (or an AI image of it). Never a loosely related photo.
 STRICT_MATCH = os.environ.get("STRICT_MATCH", "1") != "0"
 WIKI_GENERIC = os.environ.get("WIKI_GENERIC", "0") == "1"   # 1 = also pull photos by the article title alone (they often do not match a slide)
@@ -801,6 +801,39 @@ def story_context(job: Job, speech: str) -> tuple[str, str, str]:
     return "; ".join(cast[:2]), setting, look
 
 
+_SCENE_CACHE: dict = {}
+
+
+def llm_scene(speech: str, heading: str, job: Job, cast: str) -> str:
+    """A film director's one-scene description of what this narration means, written by the free AI model.
+    Abstract ideas (inequality, migration, tension) become a concrete, filmable moment in the right place and era."""
+    if speech in _SCENE_CACHE:
+        return _SCENE_CACHE[speech]
+    loc = job.get("location") or {}
+    ctx = f"Article: {clean_text(job.get('title'))}. Place: {clean_text(loc.get('name'))}. Era: {clean_text(loc.get('era'))}."
+    if clean_text(loc.get("description")):
+        ctx += f" Typical scenery: {clean_text(loc.get('description'))[:200]}."
+    if cast:
+        ctx += f" Recurring people: {cast}."
+    out = llm_text(
+        "You direct a documentary. Read the narration and describe ONE concrete scene a camera could film that shows "
+        "what is being said. Rules: real people doing a specific action in a specific kind of place (for example "
+        "'a barefoot sugarcane cutter in Negros resting beside a hand cart while a landowner's jeep passes'); turn abstract ideas "
+        "(inequality, migration, tension, history) into one visible moment; match the place and era given and use no "
+        "modern objects if the era is historical; no text, signs, maps, charts, flags or logos; never mention the narration "
+        "or the camera. Reply with the description only, 25 to 45 words.",
+        f"{ctx}\nSection: {heading}\nNarration: {speech[:900]}", max_tokens=130)
+    scene = ""
+    if out:
+        scene = clean_text(out).strip().strip('"')
+        scene = re.sub(r"^(scene|description|image)\s*:\s*", "", scene, flags=re.I)
+        scene = " ".join(scene.split()[:55]).rstrip(" ,;:")
+        if len(scene.split()) < 6:
+            scene = ""
+    _SCENE_CACHE[speech] = scene
+    return scene
+
+
 def scene_prompt(seg: Seg, job: Job) -> str:
     """Describe EVERY sentence the picture sits under, shortened to its concrete part.
     The image model ignores the end of a long prompt, so the style words go first and the
@@ -811,6 +844,13 @@ def scene_prompt(seg: Seg, job: Job) -> str:
     heading = clean_text(seg.get("heading") or "")
     speech = clean_text(seg.get("speech") or seg.get("text") or "")
     cast, setting, look = story_context(job, speech)
+    director = llm_scene(speech, heading, job, cast)
+    if director:       # the scene comes FIRST: that is the part the picture must get right
+        has_people = bool(_PEOPLE_RE.search(director)) or bool(cast)
+        style = (look + ", " if look else "") + STYLE_BASE + (", " + STYLE_PEOPLE if has_people else "")
+        parts = [f"Photograph of: {director}.", f"Place: {setting}." if setting else "",
+                 f"Characters: {cast}." if cast else "", style + "."]
+        return " ".join(p for p in parts if p).strip()[:1900]
 
     def short(x, n=16):
         w = re.sub(r"\s+([,.;:])", r"\1", visual_focus(x)).split()
@@ -943,15 +983,16 @@ def make_ai_images(segs, job):
             "speech": " ".join(m["speech"] for m in narr),
         }
         prompt = scene_prompt(seg, job)
+        log(f"  picture {j + 1}/{k}: {prompt[:170]}")
         if QUOTA_HIT[0]:
-            log(f"  Cloudflare free quota reached at {j}/{k}; using photos for the rest (no further calls)")
+            log(f"  Cloudflare free quota reached at {j}/{k}; the remaining slides keep the last picture (no further calls)")
             if LAST_IMG_ERROR[0]:
                 log(f"  Cloudflare said: {LAST_IMG_ERROR[0]}")
             out.extend([None] * (k - j))
             break
         if time.time() - t_start > IMG_BUDGET or fails >= IMG_FAIL_LIMIT:
             log(f"  picture generation stopped at {j}/{k} "
-                f"({'time budget' if fails < IMG_FAIL_LIMIT else 'too many failures'}); using the rest as photos")
+                f"({'time budget' if fails < IMG_FAIL_LIMIT else 'too many failures'}); keeping the last picture for the rest")
             if LAST_IMG_ERROR[0]:
                 log(f"  last picture error: {LAST_IMG_ERROR[0]}")
             out.extend([None] * (k - j))
@@ -1867,6 +1908,7 @@ def build_video(job):
         log("  slide photos on (" + " + ".join(n for n, k in (("Unsplash", UNSPLASH_ACCESS_KEY), ("Pixabay", PIXABAY_API_KEY), ("Wikimedia", True)) if k)
             + f"), up to {PHOTO_MAX_SEARCHES} searches")
     clips, total_dur, body_seen, ai_used = [], 0.0, 0, {}
+    last_pic = None
     kling_used, kling_t0 = 0, time.time()
     kling_slides = pick_kling_slides(segs, KLING_MAX_CLIPS) if (KLING_ENABLED and KLING_API_KEY) else set()
     stock_slides, stock_used, stock_count = set(), set(), 0
@@ -1897,7 +1939,10 @@ def build_video(job):
             if ai:
                 gi = body_seen * len(ai) // max(body_total, 1)
                 pic = ai[gi] if gi < len(ai) else None
+                if pic is None:
+                    pic = last_pic          # quota or a failure: keep the previous picture rather than a blank card
                 if pic is not None:
+                    last_pic = pic
                     cover = pic
                     ai_used[gi] = ai_used.get(gi, 0) + 1
             body_seen += 1
@@ -2321,6 +2366,16 @@ def write_marker(name, data):
     (DONE_DIR / name).write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
+def looks_like_tutorial(job: Job) -> bool:
+    """Poetic Bytes lesson pages (code blocks, 'Copy Run' buttons) belong to the tutorial video workflow, not this one.
+    Put "essay": true in a job file to override."""
+    body = str(job.get("body") or "")
+    title = clean_text(job.get("title"))
+    return (len(re.findall(r"<pre\b", body)) >= 3
+            or len(re.findall(r"\bCopy\s+Run\b", clean_text(body))) >= 3
+            or bool(re.search(r"\|\s*Poetic Bytes\s*$", title)))
+
+
 def needs_work(job: Job, marker: Job | None) -> bool:
     if FORCE_REDO:
         return True
@@ -2362,6 +2417,13 @@ def process_job(path):
         if not clean_text(job.get("body")):
             raise RuntimeError("this job has no article text and the article was not found on the site "
                                "(the title must match exactly), so there is nothing to narrate")
+        if looks_like_tutorial(job) and not job.get("essay"):
+            log("  this is a Poetic Bytes tutorial page (code lessons), so it is skipped here: "
+                "make it with the 'Tutorial video' workflow, which shows the code typed on a laptop")
+            if not DRY_RUN:
+                write_marker(name, {"jobId": job.get("jobId"), "status": "skipped",
+                                    "reason": "tutorial page: use the Tutorial video workflow", "title": title})
+            return "skipped"
         set_job_voice(job)
         loc0 = dict(job.get("location") or {})
         job["location"] = infer_location(job)
