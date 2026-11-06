@@ -1,0 +1,92 @@
+name: Auto-make videos for new articles
+# No inputs needed. Every few hours (or when you click Run workflow) this finds articles on the site that have no video,
+# reads each article's text, works out place / era / scenes by itself, makes the video and attaches it to the article.
+# Real stock/archive footage is OFF: every slide gets an AI picture matched to its own narration.
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: article-video
+  cancel-in-progress: false
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Install tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
+          pip install --quiet edge-tts pillow requests
+      - name: Find articles without a video
+        id: build
+        env:
+          TITLE: "*"
+          LOCATION: ""
+          LOCATION_DETAILS: ""
+          CHARACTERS: ""
+          MAX_VIDEOS: "1"
+          QUIET_WHEN_EMPTY: "1"
+        run: python scripts/make_job_from_inputs.py
+      - name: Make the videos
+        if: steps.build.outputs.found != '0'
+        env:
+          ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          AI_IMAGES: "1"
+          # Footage only runs for a job file with "footage": true, so these stay harmless.
+          ARCHIVE_VIDEO: "0"
+          STOCK_VIDEO: "0"
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          KLING_ENABLED: "0"
+          MAX_WORDS: "3000"
+          TTS_RATE: "+0%"
+          MAX_JOBS_PER_RUN: "1"
+          AI_IMAGE_MAX: "20"
+          LLM_MAX_CALLS: "60"
+        run: python scripts/make_article_video.py
+      - name: Keep a downloadable copy of the video
+        if: always() && steps.build.outputs.found != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: article-videos
+          path: out/*
+          if-no-files-found: ignore
+          retention-days: 3
+      - name: Save progress markers
+        if: always() && steps.build.outputs.found != '0'
+        run: |
+          git config user.name "article-video-bot"
+          git config user.email "article-video-bot@users.noreply.github.com"
+          mkdir -p /tmp/new-markers
+          cp -r video-jobs/done/. /tmp/new-markers/ 2>/dev/null || true
+          cp video-jobs/to-index.txt /tmp/to-index.txt 2>/dev/null || true
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p video-jobs/done
+            cp -r /tmp/new-markers/. video-jobs/done/ 2>/dev/null || true
+            if [ -f /tmp/to-index.txt ]; then
+              { cat video-jobs/to-index.txt 2>/dev/null; cat /tmp/to-index.txt; } | awk 'NF && !seen[$0]++' > /tmp/merged.txt
+              cp /tmp/merged.txt video-jobs/to-index.txt
+            fi
+            git add video-jobs/done video-jobs/to-index.txt 2>/dev/null || true
+            if git diff --cached --quiet; then echo "No marker changes to save."; exit 0; fi
+            git commit -m "Article videos processed [skip ci]"
+            if git push origin HEAD:main; then exit 0; fi
+            echo "Push rejected (attempt $attempt); trying again."
+            sleep 5
+          done
+          exit 1
