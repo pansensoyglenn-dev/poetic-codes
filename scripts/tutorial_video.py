@@ -30,10 +30,10 @@ import requests
 from bs4 import BeautifulSoup, Tag
 from PIL import Image, ImageDraw, ImageFont
 from pygments import lex
-from pygments.lexers import PythonLexer
+from pygments.lexers import TextLexer, get_lexer_by_name
 from pygments.token import Token
 
-SCRIPT_VERSION = "2026-11-06-e"
+SCRIPT_VERSION = "2026-11-06-k"
 W, H, FPS = 1280, 720, 25
 VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")
 VOICE_FALLBACKS = ["en-PH-RosaNeural", "en-US-ChristopherNeural"]
@@ -43,6 +43,9 @@ PAGE_LINES = int(os.environ.get("PAGE_LINES", "16"))        # code lines per sli
 SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "55"))      # longest paragraph shown on one slide
 TYPE_CPS = float(os.environ.get("TYPE_CPS", "28"))             # typing speed on the laptop, characters per second
 TYPE_FPS = int(os.environ.get("TYPE_FPS", "10"))               # animation frames per second while typing
+FULL_LINES = int(os.environ.get("FULL_LINES", "60"))              # a code block longer than this is "the full source": not typed out
+SPLIT_MINUTES = float(os.environ.get("SPLIT_MINUTES", "12"))    # auto-split pages whose video would be longer than this
+SPLIT_MODE = os.environ.get("SPLIT", "auto")                  # auto = one video per topic when the page is too long for one video; 1 = always; 0 = never
 LAPTOP_WORDS = int(os.environ.get("LAPTOP_WORDS", "26"))       # longest explanation shown under the laptop at once
 EXPLAIN_CODE = os.environ.get("EXPLAIN_CODE", "0") == "1"
 CF_ACCOUNT = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
@@ -64,7 +67,7 @@ SKIP_TAGS = {"script", "style", "button", "svg", "i", "nav", "form", "input", "t
              "noscript", "canvas", "audio", "video", "footer", "header"}
 SKIP_CLASS = re.compile(r"(^|\s)(tags|desc-meta|code-header|code-actions|section-label|hero|nav-bar|toc|ad-slot|"
                         r"quiz|runner|output|console|breadcrumb)(\s|$)")
-SKIP_SECTION = re.compile(r"quiz|knowledge|question|comment|share|newsletter|subscribe|related|footer|follow|social|connect", re.I)
+SKIP_SECTION = re.compile(r"quiz|knowledge|question|comment|share|newsletter|subscribe|related|footer|follow|social|connect|\\btoc\\b|table of contents", re.I)
 EMOJI = re.compile("[\U00010000-\U0010ffff\u2600-\u27bf\u2b00-\u2bff\u2190-\u21ff\ufe0f\u200d]")
 
 
@@ -137,7 +140,8 @@ def get_page(src):
 
 
 class Builder:
-    def __init__(self):
+    def __init__(self, limit=None):
+        self.limit = limit or MAX_WORDS
         self.scenes = []
         self.heading = ""
         self.spoken = ""            # last heading that was read aloud
@@ -146,7 +150,7 @@ class Builder:
         self.cur = None             # the laptop currently on screen: explanation under the same heading is shown with it
 
     def room(self, speech):
-        return self.words + len(speech.split()) <= MAX_WORDS
+        return self.words + len(speech.split()) <= self.limit
 
     def add(self, **sc):
         sp = sc.get("speech", "")
@@ -196,7 +200,7 @@ class Builder:
                 group.append(it)
                 n += w
 
-    def code(self, code, is_full=False):
+    def code(self, code, is_full=False, lang="python"):
         code = textwrap.dedent(code.expandtabs(4)).strip("\n")
         code = "\n".join(l.rstrip() for l in code.split("\n"))
         if not code.strip():
@@ -208,8 +212,8 @@ class Builder:
             return
         pages = page_code(code.split("\n"))
         label, self.label = self.label, ""
-        name = label or re.sub(r"^\d+\.\s*", "", screen_clean(self.heading))
-        fname = file_name(name)
+        name = label or re.sub(r"^\d+(\.\d+)*\.?\s*", "", screen_clean(self.heading))
+        fname = file_name(name, lang)
         self.spoken = self.heading
         for k, (lines, start) in enumerate(pages):
             if k == 0:
@@ -219,10 +223,10 @@ class Builder:
                     speech = f"Let's write the code for {speak_clean(name)}." if name else "Let's write this code."
             else:
                 speech = "Now the next part."
-            self.add(kind="code", heading=self.heading, name=name, fname=fname, lines=lines, start=start,
-                     part=(k + 1, len(pages)), speech=speech)
+            self.add(kind="code", heading=self.heading, name=name, fname=fname, lang=lang, lines=lines, start=start,
+                     part=(k + 1, len(pages)), speech=speech, chapter=(name if k == 0 and not label else ""))
         lines, start = pages[-1]
-        self.cur = {"heading": self.heading, "lines": lines, "start": start, "fname": fname}
+        self.cur = {"heading": self.heading, "lines": lines, "start": start, "fname": fname, "lang": lang}
         if EXPLAIN_CODE:
             extra = explain_code(code, name)
             for chunk in chunk_text(extra, LAPTOP_WORDS) if extra else []:
@@ -249,7 +253,7 @@ class Builder:
             if name in SKIP_TAGS or SKIP_CLASS.search(cls):
                 continue
             if name in ("h2", "h3", "h4"):
-                if ch is not first_h2:
+                if name != "h4" and ch is not first_h2:
                     self.heading = el_text(ch)
                 continue
             if name in ("div", "span") and not ch.find(["p", "pre", "ul", "ol", "table", "h2", "h3", "h4", "div"]):
@@ -258,26 +262,56 @@ class Builder:
                 if nxt is not None and nxt.find("pre") is not None and 2 <= len(txt) <= 80:
                     self.label = txt
                     continue
+            if name in ("div", "span") and not ch.find(["p", "pre", "ul", "ol", "table", "h2", "h3", "h4", "div", "section"]):
+                self.paragraph(ch.get_text(""))        # e.g. a "💡 insight" box that holds plain text
+                continue
             if name == "p":
                 self.paragraph(ch.get_text(""))
             elif name in ("ul", "ol"):
                 self.bullets([li.get_text("") for li in ch.find_all("li", recursive=False)])
             elif name == "pre":
-                full = ch.get("id") == "fullSourcePre" or bool(ch.find_parent(class_="code-container"))
-                self.code(ch.get_text(""), is_full=full)
+                full = ch.get("id") == "fullSourcePre" or len(ch.get_text("").strip().splitlines()) > FULL_LINES
+                self.code(ch.get_text(""), is_full=full, lang=detect_lang(ch))
             elif name == "table":
                 self.table([[c.get_text("") for c in tr.find_all(["th", "td"])] for tr in ch.find_all("tr")])
             else:
                 self.walk(ch, first_h2)
 
 
-def file_name(name):
+EXT = {"python": ".py", "javascript": ".js", "js": ".js", "typescript": ".ts", "html": ".html", "css": ".css",
+       "bash": ".sh", "shell": ".sh", "sh": ".sh", "sql": ".sql", "json": ".json", "java": ".java", "c": ".c",
+       "cpp": ".cpp", "csharp": ".cs", "php": ".php", "go": ".go", "rust": ".rs", "yaml": ".yml", "text": ".txt"}
+
+
+LANG_LABEL = {"python": "Python", "javascript": "JavaScript", "js": "JavaScript", "typescript": "TypeScript", "html": "HTML",
+              "css": "CSS", "sql": "SQL", "json": "JSON", "bash": "Bash", "shell": "Shell", "sh": "Shell", "java": "Java",
+              "c": "C", "cpp": "C++", "csharp": "C#", "php": "PHP", "go": "Go", "rust": "Rust", "yaml": "YAML", "text": "Text"}
+
+
+def detect_lang(pre):
+    """The code's language: a language-xxx class, else the label in the code box header ('python'), else Python."""
+    for el in [pre] + list(pre.find_all("code")) + [pre.parent]:
+        for c in (el.get("class") or []) if hasattr(el, "get") else []:
+            m = re.match(r"(?:language|lang)-(\w+)", c)
+            if m:
+                return m.group(1).lower()
+    box = pre.find_parent(class_="code-container")
+    if box is not None:
+        hdr = box.select_one(".code-header span")
+        if hdr is not None:
+            word = screen_clean(hdr.get_text("")).lower()
+            if word in EXT:
+                return word
+    return "python"
+
+
+def file_name(name, lang="python"):
     """A believable file name for the editor tab, e.g. 'The Money Value Object' -> money_value_object.py"""
     base = re.sub(r"[^a-z0-9]+", "_", re.sub(r"\(.*?\)", "", (name or "").lower())).strip("_")
     base = re.sub(r"^(the|a|an)_", "", base)
     if len(base) > 22:
         base = base[:22].rsplit("_", 1)[0] if "_" in base[:22] else base[:22]
-    return (base.rstrip("_") or "example") + ".py"
+    return (base.rstrip("_") or "example") + EXT.get(lang, ".txt")
 
 
 def page_code(lines):
@@ -324,12 +358,24 @@ def explain_code(code, name):
         return ""
 
 
-def build_scenes(page_html, page_url):
+def heading_title(h1):
+    """Text of an <h1> whose lines are split with <br>: 'Python Basics<br>Build a Solid Foundation' -> 'Python Basics: Build a Solid Foundation'."""
+    parts = [screen_clean(BeautifulSoup(x, "html.parser").get_text(" ")) for x in re.split(r"<br\s*/?>", str(h1))]
+    out = parts[0] if parts else ""
+    for nxt in parts[1:]:
+        if not nxt:
+            continue
+        joiner = " " if (out[-1:] in "\u2014\u2013-:\u00b7," or nxt[:1].islower()) else ": "
+        out = out + joiner + nxt
+    return out.rstrip(" .!:;")
+
+
+def build_scenes(page_html, page_url, limit=None):
     soup = BeautifulSoup(page_html, "html.parser")
     for t in soup(["script", "style", "noscript"]):
         t.decompose()
     h1 = soup.find("h1")
-    title = el_text(h1) if h1 else screen_clean((soup.title.string or "").split("|")[0] if soup.title else "Tutorial")
+    title = heading_title(h1) if h1 else screen_clean((soup.title.string or "").split("|")[0] if soup.title else "Tutorial")
     title = title.rstrip(" .!:;")
     md = soup.find("meta", attrs={"name": "description"})
     desc = screen_clean(md["content"]) if md and md.get("content") else ""
@@ -338,7 +384,7 @@ def build_scenes(page_html, page_url):
     author = soup.find("meta", attrs={"name": "author"})
     author = screen_clean(author["content"]) if author and author.get("content") else ""
 
-    b = Builder()
+    b = Builder(limit)
     b.add(kind="title", title=title, desc=desc, author=author,
           speech=speak_clean(title).rstrip(".") + ". " + speak_clean(desc))
     root = soup.find("main") or soup.body or soup
@@ -495,14 +541,20 @@ def tok_color(t):
         return BLUE_LT
     if t in Token.Name.Builtin:
         return (45, 212, 191)
+    if t in Token.Name.Tag:
+        return BLUE_LT
     if t in Token.Keyword:
         return (192, 132, 252)
     return TEXT
 
 
-def lex_lines(lines):
+def lex_lines(lines, lang="python"):
     out = [[]]
-    for tt, val in lex("\n".join(lines), PythonLexer()):
+    try:
+        lexer = get_lexer_by_name(lang)
+    except Exception:
+        lexer = TextLexer()
+    for tt, val in lex("\n".join(lines), lexer):
         col = tok_color(tt)
         for k, part in enumerate(val.split("\n")):
             if k:
@@ -521,7 +573,7 @@ def cached_bg():
     return _BG[0].copy()
 
 
-def laptop_setup(lines, fname, start):
+def laptop_setup(lines, fname, start, lang="python"):
     """Draw the empty laptop once; return everything needed to draw typed-in frames quickly."""
     img = cached_bg()
     d = ImageDraw.Draw(img)
@@ -541,7 +593,7 @@ def laptop_setup(lines, fname, start):
     d.text((sx0 + 120, sy0 + 8), fname, font=tf, fill=TEXT)
     d.rectangle([sx0, sy1 - 24, sx1, sy1], fill=(18, 52, 86))                                   # status bar
     sf = load_font(13)
-    right = "Python   UTF-8   Spaces: 4"
+    right = f"{LANG_LABEL.get(lang, lang.capitalize())}   UTF-8   Spaces: 4"
     d.text((sx1 - 14 - d.textlength(right, font=sf), sy1 - 20), right, font=sf, fill=(190, 215, 240))
     d.rounded_rectangle([90, ly1, 1190, ly1 + 18], radius=8, fill=(70, 79, 98))                 # laptop base
     d.rounded_rectangle([560, ly1, 720, ly1 + 7], radius=4, fill=(40, 46, 58))
@@ -553,7 +605,7 @@ def laptop_setup(lines, fname, start):
     size = max(14, min(size, int((geo["code_w"] - 14) / ((longest + 3) * 0.603))))   # shrink so long lines fit
     font = load_font(size, mono=True)
     return {"base": img, "geo": geo, "font": font, "lh": int(size * 1.42), "cw": font.getlength("M"),
-            "toks": lex_lines(lines), "lines": lines, "start": start}
+            "toks": lex_lines(lines, lang), "lines": lines, "start": start}
 
 
 def laptop_frame(lp, nchars, caption, idx, total, cursor=True):
@@ -616,14 +668,14 @@ def laptop_frame(lp, nchars, caption, idx, total, cursor=True):
 
 def draw_laptop_text(sc, idx, total):
     c = sc["code"]
-    lp = laptop_setup(c["lines"], c["fname"], c["start"])
+    lp = laptop_setup(c["lines"], c["fname"], c["start"], c.get("lang", "python"))
     return laptop_frame(lp, sum(len(l) + 1 for l in c["lines"]), sc["body"], idx, total, cursor=False)
 
 
 def typing_clip(sc, idx, total, mp3, out, tmp):
     """The code appears character by character on the laptop while the lead-in is spoken."""
     lines = sc["lines"]
-    lp = laptop_setup(lines, sc["fname"], sc["start"])
+    lp = laptop_setup(lines, sc["fname"], sc["start"], sc.get("lang", "python"))
     nchars = max(1, sum(len(l) + 1 for l in lines) - 1)
     lead = probe_duration(mp3)
     secs = max(lead + 0.4, min(26.0, max(4.0, nchars / TYPE_CPS)))
@@ -759,23 +811,8 @@ def stamp(secs):
     return f"{secs // 60}:{secs % 60:02d}"
 
 
-def main():
-    src = (sys.argv[1] if len(sys.argv) > 1 else os.environ.get("PAGE", "")).strip()
-    if not src:
-        log("Give the tutorial page: a URL or an .html file, e.g. python tutorial_video.py https://poetic-bytes.vercel.app/shopping-cart.html")
-        return 1
-    log(f"tutorial_video.py {SCRIPT_VERSION}  page: {src}")
-    page_html, page_url = get_page(src)
-    scenes, meta = build_scenes(page_html, page_url)
-    kinds = {}
-    for s in scenes:
-        kinds[s["kind"]] = kinds.get(s["kind"], 0) + 1
-    log(f"  '{meta['title']}': {len(scenes)} slides {kinds}, {sum(len(s.get('speech', '').split()) for s in scenes)} narrated words")
-
-    if kinds.get("code", 0) < MIN_CODE_BLOCKS:
-        log(f"  skipped: only {kinds.get('code', 0)} code block(s), so this does not look like a tutorial page")
-        return 3
-
+def render_video(scenes, stem, title, desc, link):
+    """Render one list of scenes to out/<stem>.mp4 plus out/<stem>.description.txt."""
     tmp = Path(tempfile.mkdtemp(prefix="tut_"))
     clips, t, chapters = [], 0.0, []
     try:
@@ -795,22 +832,102 @@ def main():
         listing = tmp / "list.txt"
         listing.write_text("".join(f"file '{c}'\n" for c in clips), encoding="utf-8")
         OUT_DIR.mkdir(parents=True, exist_ok=True)
-        slug = os.environ.get("OUT_NAME") or slugify(meta["title"])
-        final = OUT_DIR / f"{slug}.mp4"
+        final = OUT_DIR / f"{stem}.mp4"
         run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listing),
              "-c", "copy", "-movflags", "+faststart", str(final)])
-        desc = [meta["title"], "", meta["desc"], ""]
-        if meta["link"]:
-            desc += [f"Read the tutorial and run the code in your browser: {meta['link']}", ""]
-        if chapters:
-            desc += ["Chapters:"] + [f"{stamp(s)} {c}" for s, c in chapters]
-            if chapters[0][0] > 0:
-                desc.insert(desc.index("Chapters:") + 1, "0:00 Intro")
-        (OUT_DIR / f"{slug}.description.txt").write_text("\n".join(desc), encoding="utf-8")
+        lines = [title, "", desc, ""]
+        if link:
+            lines += [f"Read the tutorial and run the code in your browser: {link}", ""]
+        chapters = [(c_t, c) for c_t, c in chapters if c]
+        if len(chapters) >= 2:
+            lines += ["Chapters:"]
+            if chapters[0][0] > 1:
+                lines += ["0:00 Intro"]
+            lines += [f"{stamp(c_t)} {c}" for c_t, c in chapters]
+        (OUT_DIR / f"{stem}.description.txt").write_text("\n".join(lines), encoding="utf-8")
         log(f"  done: {final} ({final.stat().st_size / 1048576:.1f} MB, {t / 60:.1f} min)")
-        return 0
+        return final
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+
+def estimate_minutes(scenes):
+    """Rough running time: narration at ~2.5 words a second plus the time spent typing code."""
+    t = 0.0
+    for sc in scenes:
+        if sc["kind"] == "code":
+            n = sum(len(l) + 1 for l in sc["lines"])
+            t += max(4.0, min(26.0, n / TYPE_CPS)) + 1.2
+        else:
+            t += len(sc.get("speech", "").split()) / 2.5 + 0.9
+    return t / 60
+
+
+def split_videos(scenes, meta):
+    """One video per topic (each <h2> section that contains code), plus an overview for the opening sections."""
+    title_sc, end_sc, body = scenes[0], scenes[-1], scenes[1:-1]
+    groups = []
+    for sc in body:
+        if sc["kind"] == "section" or not groups:
+            groups.append([sc.get("title") or meta["title"], []])
+        groups[-1][1].append(sc)
+    overview, vids = [], []
+    for gtitle, items in groups:
+        if any(x["kind"] == "code" for x in items):
+            vids.append({"title": gtitle, "scenes": items})
+        elif not vids:
+            overview += items
+        else:
+            vids[-1]["scenes"] += items          # closing remarks go with the last topic
+    out = []
+    if sum(len(x.get("speech", "").split()) for x in overview) >= 40:
+        out.append(("overview", [title_sc] + overview + [end_sc]))
+    for v in vids:
+        items = v["scenes"][1:] if v["scenes"][0]["kind"] == "section" else v["scenes"]
+        head = dict(title_sc, title=v["title"], desc=meta["title"], speech=speak_clean(v["title"]))
+        out.append((slugify(v["title"])[:30], [head] + items + [end_sc]))
+    return out
+
+
+def main():
+    src = (sys.argv[1] if len(sys.argv) > 1 else os.environ.get("PAGE", "")).strip()
+    if not src:
+        log("Give the tutorial page: a URL or an .html file, e.g. python tutorial_video.py https://poetic-bytes.vercel.app/shopping-cart.html")
+        return 1
+    log(f"tutorial_video.py {SCRIPT_VERSION}  page: {src}")
+    page_html, page_url = get_page(src)
+    scenes, meta = build_scenes(page_html, page_url, limit=10 ** 9)
+    kinds = {}
+    for s_ in scenes:
+        kinds[s_["kind"]] = kinds.get(s_["kind"], 0) + 1
+    words = sum(len(s_.get("speech", "").split()) for s_ in scenes)
+    est = estimate_minutes(scenes)
+    log(f"  '{meta['title']}': {len(scenes)} slides {kinds}, {words} narrated words, about {est:.0f} min in one video")
+    log("  outline of what will be made:")
+    for i, s_ in enumerate(scenes):
+        if s_["kind"] == "section":
+            log(f"    section: {s_.get('title', '')[:60]}")
+        elif s_["kind"] == "code" and s_["part"][0] == 1:
+            log(f"      code:  {s_.get('name', '')[:50]}  ({s_['fname']}, {len(s_['lines'])}+ lines)")
+    if os.environ.get("OUTLINE_ONLY") == "1":
+        return 0
+    if kinds.get("code", 0) < MIN_CODE_BLOCKS:
+        log(f"  skipped: only {kinds.get('code', 0)} code block(s), so this does not look like a tutorial page")
+        return 3
+
+    base = os.environ.get("OUT_NAME") or slugify(meta["title"])
+    if SPLIT_MODE == "1" or (SPLIT_MODE == "auto" and (est > SPLIT_MINUTES or words > MAX_WORDS)):
+        vids = split_videos(scenes, meta)
+        log(f"  long page: making {len(vids)} videos, one per topic")
+        for n, (name, vscenes) in enumerate(vids, 1):
+            title = meta["title"] if name == "overview" else next(x["title"] for x in vscenes if x["kind"] == "title")
+            log(f"\
+--- video {n}/{len(vids)}: {name}")
+            render_video(vscenes, f"{base}--{n:02d}-{name}", title, meta["desc"], meta["link"])
+    else:
+        scenes, _ = build_scenes(page_html, page_url, limit=MAX_WORDS)
+        render_video(scenes, base, meta["title"], meta["desc"], meta["link"])
+    return 0
 
 
 if __name__ == "__main__":
