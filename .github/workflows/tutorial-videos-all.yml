@@ -15,6 +15,10 @@ on:
         description: "How many videos to make this run"
         required: false
         default: "3"
+      redo:
+        description: "Type 1 to rebuild the pages even if they already have a video (use with the pages box after editing a lesson)"
+        required: false
+        default: ""
       explain:
         description: "Type 1 to add a short AI-written spoken explanation to each code snippet (check before publishing)"
         required: false
@@ -46,6 +50,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           PAGES: ${{ inputs.pages }}
           MAX_PER_RUN: ${{ inputs.limit || '3' }}
+          REDO: ${{ inputs.redo == '1' && '1' || '0' }}
           EXPLAIN_CODE: ${{ inputs.explain == '1' && '1' || '0' }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
