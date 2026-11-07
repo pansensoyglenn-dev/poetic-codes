@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "essay-v4"
+SCRIPT_VERSION = "essay-v5"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -2435,6 +2435,14 @@ def write_marker(name, data):
     (DONE_DIR / name).write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
+def looks_like_song(job: Job) -> bool:
+    """Song / lyrics pages belong to the Music video workflow, not this one. Put "essay": true in a job file to override."""
+    body = str(job.get("body") or "")
+    title = clean_text(job.get("title"))
+    labels = len(re.findall(r">\s*\[?\(?(verse|chorus|bridge|pre-?chorus|outro|hook)\b", body, re.I))
+    return bool(re.search(r"\blyrics?\b", title, re.I)) or "<audio" in body.lower() or labels >= 2
+
+
 def looks_like_tutorial(job: Job) -> bool:
     """Poetic Bytes lesson pages (code blocks, 'Copy Run' buttons) belong to the tutorial video workflow, not this one.
     Put "essay": true in a job file to override."""
@@ -2492,6 +2500,13 @@ def process_job(path):
             if not DRY_RUN:
                 write_marker(name, {"jobId": job.get("jobId"), "status": "skipped",
                                     "reason": "tutorial page: use the Tutorial video workflow", "title": title})
+            return "skipped"
+        if looks_like_song(job) and not job.get("essay"):
+            log("  this is a song / lyrics page, so it is skipped here: make it with the 'Music video' workflow "
+                "(pictures that follow the lyrics, no narration)")
+            if not DRY_RUN:
+                write_marker(name, {"jobId": job.get("jobId"), "status": "skipped",
+                                    "reason": "song page: use the Music video workflow", "title": title})
             return "skipped"
         set_job_voice(job)
         loc0 = dict(job.get("location") or {})
