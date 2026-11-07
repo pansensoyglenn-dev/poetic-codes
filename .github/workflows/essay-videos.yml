@@ -18,10 +18,10 @@ jobs:
   make:
     runs-on: ubuntu-latest
     timeout-minutes: 120
-    env:
-      JOBS_DIR: ${{ runner.temp }}/essay-jobs
     steps:
       - uses: actions/checkout@v4
+      - name: Use a temporary folder for job files
+        run: echo "JOBS_DIR=$RUNNER_TEMP/essay-jobs" >> "$GITHUB_ENV"
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
       - name: Install tools
