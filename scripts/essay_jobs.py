@@ -59,6 +59,15 @@ def is_tutorial(row):
             or len(re.findall(r"\bCopy\s+Run\b", body)) >= 3)
 
 
+def is_song(row):
+    """Song / lyrics pages are made by the Music video workflow, not narrated as essays."""
+    tags = row.get("tags") or ""
+    meta = " ".join([str(row.get("category") or ""), tags if isinstance(tags, str) else " ".join(map(str, tags))]).lower()
+    body = str(row.get("body") or row.get("content") or "")
+    labels = len(re.findall(r">\s*\[?\(?(verse|chorus|bridge|pre-?chorus|outro|hook)\b", body, re.I))
+    return bool(re.search(r"\b(songs?|lyrics?|music)\b", meta)) or bool(re.search(r"\blyrics?\b", str(row.get("title") or ""), re.I)) or "<audio" in body.lower() or labels >= 2
+
+
 def num(v):
     try:
         return int(v)
@@ -128,7 +137,7 @@ def main():
     rows = fetch_articles()
     made = []
     if title_in == "*":
-        todo = [r for r in rows if r.get("title") and not has_video(r) and not is_tutorial(r)]
+        todo = [r for r in rows if r.get("title") and not has_video(r) and not is_tutorial(r) and not is_song(r)]
         todo.sort(key=lambda r: num(r.get("id")), reverse=True)
         # a per-article location only makes sense for a single article, so it is not applied to a "*" run
         bulk_extra = {}
