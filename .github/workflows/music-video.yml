@@ -3,6 +3,7 @@ name: Music video
 # Either paste the link of the song's web page (lyrics + audio are read from the page), or use files in the repo's music/ folder:
 #   music/<song>.mp3   the song          music/<song>.txt   the lyrics, with [Verse 1] / [Chorus] labels (optional [m:ss] times)
 #   music/<song>.json  optional: title, artist, about, look, place, characters
+# No song file or audio link? Then the words are read aloud with the free voice and pictures follow what is being said.
 # Run it from Actions -> Music video -> Run workflow.
 on:
   workflow_dispatch:
@@ -12,6 +13,18 @@ on:
         required: true
       audio:
         description: "Only if the page has no audio player: link of the .mp3"
+        required: false
+        default: ""
+      silent:
+        description: "1 = silent video (you add the music yourself); 0 = include the song or a spoken narration"
+        required: false
+        default: "1"
+      duration:
+        description: "Silent video only: the song's length, like 3:30, so the pictures change on time (or write [m:ss] times in the lyrics)"
+        required: false
+        default: ""
+      captions:
+        description: "1 = show the lyrics on the video; 0 = clean pictures only (default for silent video). A lyrics .srt file is always made."
         required: false
         default: ""
       people:
@@ -53,8 +66,12 @@ jobs:
           SONG: ${{ inputs.song }}
           LOOK: ${{ inputs.look }}
           PEOPLE: ${{ inputs.people }}
+          SILENT: ${{ inputs.silent }}
+          DURATION: ${{ inputs.duration }}
+          CAPTIONS: ${{ inputs.captions }}
           PLACE: ${{ inputs.place }}
           AUDIO_URL: ${{ inputs.audio }}
+          ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -75,5 +92,5 @@ jobs:
         run: |
           ls out/*.mp4 >/dev/null 2>&1 || { echo "No video was made."; exit 0; }
           gh release view music-videos >/dev/null 2>&1 || gh release create music-videos --title "Music videos" --notes "Lyric music videos."
-          gh release upload music-videos out/*.mp4 out/*.timing.txt --clobber
+          gh release upload music-videos out/*.mp4 out/*.timing.txt out/*.srt --clobber
           echo "Download it from: ${{ github.server_url }}/${{ github.repository }}/releases/tag/music-videos"
