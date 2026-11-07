@@ -1,6 +1,6 @@
 {
-  "jobId": "1794045859240",
-  "createdAt": "2026-11-07T10:04:19.240Z",
+  "jobId": "1794081459395",
+  "createdAt": "2026-11-07T19:57:39.395Z",
   "title": "Never Mind Her Lyrics – colors | Poetic Codes",
   "author": "Glenn Junsay Pansensoy",
   "category": "Music Video",
@@ -24,7 +24,7 @@
     "song about lost connection"
   ],
   "slug": "never-mind-her-lyrics-colors-poetic-codes",
-  "articleId": 50,
-  "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794043067973.jpg",
-  "force": true
+  "articleId": 51,
+  "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794081456048.jpg",
+  "force": false
 }
