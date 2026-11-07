@@ -400,6 +400,65 @@ def write_ass(path, lines, dur, meta):
     Path(path).write_text(head + "\n".join(ev_lines) + "\n", encoding="utf-8")
 
 
+def parse_duration(v):
+    v = (v or "").strip()
+    m = re.match(r"^(\d+):(\d{1,2})(?:\.\d+)?$", v)
+    if m:
+        return int(m.group(1)) * 60 + int(m.group(2))
+    try:
+        return float(v)
+    except ValueError:
+        return 0.0
+
+
+def srt_time(t):
+    t = max(0.0, t)
+    return f"{int(t // 3600):02d}:{int(t % 3600 // 60):02d}:{int(t % 60):02d},{int(round((t % 1) * 1000)) % 1000:03d}"
+
+
+def write_srt(path, lines, dur):
+    rows = []
+    for i, ln in enumerate(lines):
+        end = lines[i + 1]["time"] if i + 1 < len(lines) else dur
+        end = min(end - 0.05, ln["time"] + 9.0)
+        rows.append(f"{i + 1}\n{srt_time(ln['time'])} --> {srt_time(max(end, ln['time'] + 0.6))}\n{ln['text']}\n")
+    Path(path).write_text("\n".join(rows), encoding="utf-8")
+
+
+def narrate(lines, work):
+    """No song: read the lyrics aloud with the free voice, and use the exact moments each line is spoken as the timing."""
+    work = Path(work)
+    gap_line, gap_section = 0.55, 1.1
+    parts, t, prev_section = [], 1.0, None
+    for i, ln in enumerate(lines):
+        mp3 = work / f"n{i}.mp3"
+        text = re.sub(r"\s+", " ", ln["text"].replace("&", " and ")).strip()
+        ev.synth(text, str(mp3))
+        d = probe(mp3)
+        if prev_section is not None and ln["section"] != prev_section:
+            t += gap_section - gap_line
+        ln["time"] = t
+        parts.append((mp3, d))
+        t += d + gap_line
+        prev_section = ln["section"]
+    # build with explicit silences so the spoken moments match the times above
+    cmd = ["ffmpeg", "-y"]
+    fc, labels, cursor = [], [], 0.0
+    for i, (mp3, d) in enumerate(parts):
+        cmd += ["-i", str(mp3)]
+        start = lines[i]["time"]
+        fc.append(f"[{i}:a]adelay={int(start * 1000)}|{int(start * 1000)},apad[a{i}]")
+        labels.append(f"[a{i}]")
+    total = lines[-1]["time"] + parts[-1][1] + 1.5
+    fc.append("".join(labels) + f"amix=inputs={len(parts)}:duration=longest:normalize=0,atrim=0:{total:.2f}[out]")
+    out = work / "narration.mp3"
+    cmd += ["-filter_complex", ";".join(fc), "-map", "[out]", "-ar", "24000", "-ac", "1", "-c:a", "libmp3lame", "-b:a", "96k", str(out)]
+    p = subprocess.run(cmd, capture_output=True)
+    if p.returncode != 0:
+        raise RuntimeError("could not build the narration: " + (p.stderr or b"").decode("utf-8", "replace")[-600:])
+    return out
+
+
 def probe(path):
     p = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(path)],
                        capture_output=True, text=True)
@@ -413,7 +472,8 @@ def render(shots, frames, audio, ass, dur, out):
     for i, s in enumerate(shots):
         length = segs[i] + (FADE if i < n - 1 else 0)
         cmd += ["-loop", "1", "-framerate", str(FPS), "-t", f"{length:.2f}", "-i", str(frames[i])]
-    cmd += ["-i", str(audio)]
+    if audio is not None:
+        cmd += ["-i", str(audio)]
     fc = []
     for i in range(n):
         nfr = max(2, int((segs[i] + (FADE if i < n - 1 else 0)) * FPS))
@@ -426,14 +486,40 @@ def render(shots, frames, audio, ass, dur, out):
         acc += segs[i - 1]
         fc.append(f"[{last}][p{i}]xfade=transition=fade:duration={FADE}:offset={acc:.2f}[x{i}]")
         last = f"x{i}"
-    ass_path = str(ass).replace("\\", "/").replace(":", "\\:")
-    fc.append(f"[{last}]ass='{ass_path}',format=yuv420p[v]")
-    cmd += ["-filter_complex", ";".join(fc), "-map", "[v]", "-map", f"{n}:a", "-t", f"{dur:.2f}",
-            "-c:v", "libx264", "-preset", "veryfast", "-crf", "24", "-r", str(FPS),
-            "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", str(out)]
+    if ass is not None:
+        ass_path = str(ass).replace("\\", "/").replace(":", "\\:")
+        fc.append(f"[{last}]ass='{ass_path}',format=yuv420p[v]")
+    else:
+        fc.append(f"[{last}]format=yuv420p[v]")
+    cmd += ["-filter_complex", ";".join(fc), "-map", "[v]"]
+    cmd += ["-map", f"{n}:a", "-c:a", "aac", "-b:a", "160k"] if audio is not None else ["-an"]
+    cmd += ["-t", f"{dur:.2f}", "-c:v", "libx264", "-preset", "veryfast", "-crf", "24", "-r", str(FPS),
+            "-movflags", "+faststart", str(out)]
     p = subprocess.run(cmd, capture_output=True)
     if p.returncode != 0:
         raise RuntimeError("ffmpeg failed: " + (p.stderr or b"").decode("utf-8", "replace")[-900:])
+
+
+def publish_to_article(page, video):
+    """When made from a song page link: upload the video and attach it to the article with the same title (needs ADMIN_KEY)."""
+    if not page or not re.match(r"https?://", page) or not os.environ.get("ADMIN_KEY", "").strip():
+        return
+    try:
+        import tutorial_publish as tp
+        title = tp.page_title(page)
+        r = requests.get(tp.ARTICLES_API, headers={"Accept": "application/json", "User-Agent": ev.UA}, timeout=60)
+        r.raise_for_status()
+        data = r.json()
+        rows = (data.get("articles") or data.get("results") or data.get("data") or []) if isinstance(data, dict) else data
+        row = tp.find_article(rows, title, page)
+        if row is None:
+            log(f"  not attached: no article titled '{title}' on Poetic Codes (the video is still on the release).")
+            return
+        url = tp.upload(video, f"{video.stem}-{int(time.time())}.mp4")
+        tp.attach(row, url)
+        log(f"  attached to the article '{row.get('title')}' (id {row.get('id')}): {url}")
+    except Exception as e:
+        log("  could not attach the video to the article: " + str(e)[:300])
 
 
 def main():
@@ -447,6 +533,7 @@ def main():
             return 1
     log(f"music_video.py music-v2  song: {name}")
     meta, work = {}, Path(tempfile.mkdtemp(prefix="mvsrc_"))
+    src_page = name if re.match(r"https?://", name) else ""
     if re.match(r"https?://(www\.)?github\.com/[^/]+/[^/]+/?(tree|blob)?", name):
         log("That is a GitHub repository link, not a song page. Enter either the link of the web page that shows the lyrics "
             "(for example https://your-site/my-song.html), or just the file name of a song in the music/ folder "
@@ -466,14 +553,13 @@ def main():
         elif local is not None:
             audio = local
         else:
-            log(f"The page has no audio link. Add the song's link in the 'audio' box, or upload music/{slug}.mp3 to the repo.")
-            return 1
+            audio = None        # no song anywhere: the lyrics are read aloud instead
         name = slug
     else:
         audio = next((p for ext in ("mp3", "wav", "m4a", "ogg", "flac") for p in [MUSIC_DIR / f"{name}.{ext}"] if p.exists()), None)
         lyr = MUSIC_DIR / f"{name}.txt"
-        if audio is None or not lyr.exists():
-            log(f"Missing files: need music/{name}.mp3 (or .wav/.m4a) and music/{name}.txt")
+        if not lyr.exists():
+            log(f"Missing file: music/{name}.txt (the words). The song file music/{name}.mp3 is optional: without it the words are read aloud.")
             return 1
         lyr_text = lyr.read_text(encoding="utf-8")
     mp = MUSIC_DIR / f"{name}.json"
@@ -486,11 +572,33 @@ def main():
         meta["people"] = os.environ["PEOPLE"].strip()
     if os.environ.get("PLACE", "").strip():
         meta["place"] = os.environ["PLACE"].strip()
-    dur = probe(audio)
     lines, sections = parse_lyrics(lyr_text)
     if not lines:
         log("The lyrics file has no lyric lines.")
         return 1
+    silent = os.environ.get("SILENT", "0") == "1"
+    narrated = (not silent) and (audio is None or os.environ.get("NARRATE") == "1")
+    if narrated:
+        log("  no song file: reading the words aloud with the free voice, one picture for each part")
+        for ln in lines:
+            ln["time"] = None
+        audio = narrate(lines, work)
+    if silent:
+        want = parse_duration(os.environ.get("DURATION", ""))
+        timed = [ln["time"] for ln in lines if ln["time"] is not None]
+        if audio is not None:
+            dur = probe(audio)
+            log("  silent video: the song file is used only to find the timing; it is not put in the video")
+        elif want > 0:
+            dur = want
+        elif timed:
+            dur = max(timed) + 8.0
+        else:
+            dur = max(30.0, len(lines) * 4.0)
+        log(f"  silent video of {dur / 60:.1f} min" + ("" if (audio is not None or want > 0 or timed) else
+            " (a guess: enter the song's length in the 'duration' box, like 3:30, so the pictures change on time)"))
+    else:
+        dur = probe(audio)
     if not meta.get("people") and looks_filipino(lines):
         meta["people"] = "Filipino"
         meta.setdefault("place", "the Philippines")
@@ -500,7 +608,15 @@ def main():
     log(f"  {len(lines)} lyric line(s) in {len(sections) - 1 or 1} section(s); song is {dur / 60:.1f} min")
 
     given = sum(ln["time"] is not None for ln in lines)
-    if given:
+    if narrated:
+        pass
+    elif silent and audio is None:
+        if given:
+            log(f"  using the {given} time(s) you wrote in the lyrics file")
+        else:
+            log("  no times in the lyrics and no song file: lines are spread evenly over the length. For pictures that change "
+                "exactly on your song, add [m:ss] at the start of lines (at least for each verse and chorus).")
+    elif given:
         log(f"  using the {given} time(s) you wrote in the lyrics file")
     elif USE_WHISPER != "0":
         heard = whisper_words(audio, meta.get("language"))
@@ -538,15 +654,19 @@ def main():
         frames.append(pth)
     log(f"  pictures ready in {(time.time() - t0) / 60:.1f} min ({ev.FALLBACK_STATE['used']} from the free backup generators)")
 
-    ass = tmp / "lyrics.ass"
-    write_ass(ass, lines, dur, meta)
+    captions = (os.environ.get("CAPTIONS") or ("0" if silent else "1")) == "1"
+    ass = tmp / "lyrics.ass" if captions else None
+    if ass is not None:
+        write_ass(ass, lines, dur, meta)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out = OUT_DIR / f"{name}-music-video.mp4"
     log("  building the video ...")
-    render(shots, frames, audio, ass, dur, out)
+    render(shots, frames, None if silent else audio, ass, dur, out)
+    write_srt(OUT_DIR / f"{name}-lyrics.srt", lines, dur)
     (OUT_DIR / f"{name}-music-video.timing.txt").write_text(
         "\n".join(f"{int(ln['time'] // 60)}:{ln['time'] % 60:05.2f}  {ln['text']}" for ln in lines), encoding="utf-8")
     log(f"  done: {out} ({out.stat().st_size / 1048576:.1f} MB, {dur / 60:.1f} min)")
+    publish_to_article(src_page, out)
     return 0
 
 
