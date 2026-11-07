@@ -27,6 +27,11 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y ffmpeg espeak-ng fonts-dejavu-core
           pip install --quiet edge-tts pillow requests
+      - name: Clear old job files
+        run: |
+          echo "=== WORKFLOW: auto-article-videos v2 (z3 script, AI_IMAGE_MAX 20) ==="
+          rm -f video-jobs/*.json
+          ls video-jobs 2>/dev/null || true
       - name: Find articles without a video
         id: build
         env:
