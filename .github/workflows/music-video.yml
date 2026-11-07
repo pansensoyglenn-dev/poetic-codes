@@ -1,6 +1,7 @@
 name: Music video
 # Makes a lyric music video from a song in the repo's music/ folder:
-# Either paste the link of the song's web page (lyrics + audio are read from the page), or use files in the repo's music/ folder:
+# Click Run workflow with the boxes empty: it finds the newest song/lyrics article on the site that has no video, makes a silent
+# video from its lyrics and attaches it to the article. Or paste the link of the song's web page (lyrics + audio are read from the page), or use files in the repo's music/ folder:
 #   music/<song>.mp3   the song          music/<song>.txt   the lyrics, with [Verse 1] / [Chorus] labels (optional [m:ss] times)
 #   music/<song>.json  optional: title, artist, about, look, place, characters
 # No song file or audio link? Then the words are read aloud with the free voice and pictures follow what is being said.
@@ -9,8 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       song:
-        description: "Link of the song's page (https://...html), or a file name in music/ without the extension"
-        required: true
+        description: "Leave EMPTY to make the newest song/lyrics article without a video. Or: link of a song page (https://...html), or a file name in music/"
+        required: false
+        default: ""
       audio:
         description: "Only if the page has no audio player: link of the .mp3"
         required: false
