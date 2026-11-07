@@ -3,12 +3,16 @@
 
     python scripts/music_video.py my-song          (reads music/my-song.mp3 + music/my-song.txt, optional music/my-song.json)
 
+Or give a song PAGE instead:  python scripts/music_video.py https://your-site/song.html   (or a saved .html file)
+                   Title, lyrics (headings like "Chorus" become labels, each line / <br> is a lyric line) and the audio link
+                   (an <audio> tag or a link to an .mp3) are read from the page. If the page has no audio link, set AUDIO_URL.
+
 music/<song>.mp3   the song (.wav/.m4a also work)
 music/<song>.txt   the lyrics. Section labels like [Verse 1] / [Chorus] on their own line. A repeated chorus reuses its pictures.
                    Optional times: put [0:42] at the start of any line (or before a label: [0:42] [Chorus]). Lines without a
                    time get one in between. With no times at all, the song is listened to (Whisper) to find them, and if that
                    cannot work the lines are spread evenly over the song.
-music/<song>.json  optional: {"title": "", "artist": "", "about": "what the song is about", "look": "visual style",
+music/<song>.json  optional: {"title": "", "artist": "", "about": "what the song is about", "look": "visual style", "people": "who is shown, e.g. Filipino / Caucasian American",
                    "place": "where it happens", "characters": [{"name": "", "description": ""}], "language": "tl"}
 
 Uses the same free picture generators as the essay videos (scripts/essay_video.py): Cloudflare first, then the free backups.
@@ -23,6 +27,8 @@ import tempfile
 import time
 from pathlib import Path
 
+import requests
+from bs4 import BeautifulSoup
 from PIL import Image, ImageFilter
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -161,6 +167,102 @@ def fill_times(lines, dur):
         prev = ln["time"]
 
 
+# ---------------------------------------------------------------- song page (HTML)
+SECTION_WORD = re.compile(r"^(intro|verse|pre[- ]?chorus|chorus|hook|refrain|bridge|outro|interlude|instrumental|solo|coda|"
+                          r"tag|ending|break|rap)\b", re.I)
+AUDIO_EXT = re.compile(r"\.(mp3|wav|m4a|ogg|flac)(\?.*)?$", re.I)
+
+
+def _clean(t):
+    return re.sub(r"\s+", " ", (t or "").replace("\xa0", " ")).strip()
+
+
+def read_song_page(src):
+    """A song page (link or .html file) -> (lyrics text in the lyrics-file format, meta dict, audio link or '')."""
+    from urllib.parse import urljoin
+    if re.match(r"https?://", src):
+        r = requests.get(src, headers={"User-Agent": ev.UA}, timeout=60)
+        r.raise_for_status()
+        html, base = r.text, src
+    else:
+        html, base = Path(src).read_text(encoding="utf-8", errors="replace"), ""
+    soup = BeautifulSoup(html, "html.parser")
+    for t in soup(["script", "style", "noscript", "nav", "footer", "form", "button", "svg", "iframe"]):
+        t.decompose()
+    h1 = soup.find("h1")
+    title = _clean(h1.get_text(" ")) if h1 else _clean((soup.title.string or "").split("|")[0] if soup.title else "")
+    md = soup.find("meta", attrs={"name": "description"})
+    about = _clean(md["content"]) if md and md.get("content") else ""
+    meta = {"title": title, "about": about}
+    audio = ""
+    for tag in soup.find_all(["audio", "source", "a"]):
+        link = tag.get("src") or tag.get("href") or ""
+        if link and AUDIO_EXT.search(link):
+            audio = urljoin(base, link) if base else str(Path(src).parent / link)
+            break
+    root = soup.find("main") or soup.find("article") or soup.body or soup
+    out = []
+
+    def add_label(t):
+        t = _clean(t).strip(":").strip()
+        if t:
+            out.append(f"[{t}]")
+
+    def add_text(el):
+        for chunk in el.get_text("\n").split("\n"):
+            ln = _clean(chunk)
+            if not ln:
+                continue
+            m = re.match(r"^\[?\(?((?:intro|verse|pre[- ]?chorus|chorus|hook|refrain|bridge|outro|interlude|instrumental|solo|coda|rap)"
+                         r"[^\]\):]{0,12})[\]\):]?$", ln, re.I)
+            if m:
+                add_label(m.group(1))
+            elif ln.startswith("[") and ln.endswith("]") and len(ln) < 30:
+                out.append(ln)
+            else:
+                out.append(ln)
+
+    def walk(node):
+        for ch in node.children:
+            name = getattr(ch, "name", None)
+            if not name:
+                continue
+            if name in ("h2", "h3", "h4", "h5", "h6"):
+                add_label(ch.get_text(" "))
+            elif name in ("p", "li", "pre", "blockquote", "span") and not ch.find(["p", "li", "pre", "div", "ul", "ol"]):
+                add_text(ch)
+            elif name in ("div", "section", "article", "ul", "ol", "main", "figure"):
+                if not ch.find(["p", "li", "pre", "div", "h2", "h3", "h4", "ul", "ol", "section"]):
+                    add_text(ch)
+                else:
+                    walk(ch)
+            elif name == "br":
+                continue
+            else:
+                walk(ch)
+
+    walk(root)
+    lines = [ln for ln in out if ln != "[]"]
+    # drop page chrome that is not lyrics: the page's own title line, and long prose paragraphs
+    keep = []
+    for ln in lines:
+        if ln.lower() == title.lower() or ln.lower() == about.lower():
+            continue
+        if not ln.startswith("[") and len(ln.split()) > 22:
+            continue
+        keep.append(ln)
+    return "\n".join(keep), meta, audio
+
+
+def fetch_audio(url, dest_dir):
+    r = requests.get(url, headers={"User-Agent": ev.UA}, timeout=300)
+    r.raise_for_status()
+    ext = (AUDIO_EXT.search(url).group(1) if AUDIO_EXT.search(url) else "mp3").lower()
+    p = Path(dest_dir) / f"song.{ext}"
+    p.write_bytes(r.content)
+    return p
+
+
 # ---------------------------------------------------------------- shots (one picture each)
 def build_shots(lines, sections, dur):
     """Group lines into shots. A section is split into shots of at least MIN_SHOT seconds; the same words give the same picture."""
@@ -196,8 +298,27 @@ def build_shots(lines, sections, dur):
     return merged
 
 
+PH_WORDS = {"ang", "ng", "mga", "sa", "ko", "mo", "ikaw", "ako", "ka", "kita", "imo", "akon", "gid", "nga", "kag", "kay",
+            "wala", "sang", "ini", "siya", "namin", "natin", "hindi", "pero", "lang", "naman", "ba", "po", "yan", "ito", "iyong"}
+
+
+def looks_filipino(lines):
+    words = [wnorm(w) for ln in lines for w in ln["text"].split() if wnorm(w)]
+    return bool(words) and sum(w in PH_WORDS for w in words) / len(words) >= 0.12
+
+
+def cast_text(meta):
+    """Who the pictures must show, e.g. 'Filipino people in the Philippines'."""
+    people, place = (meta.get("people") or "").strip(), (meta.get("place") or "").strip()
+    if not people:
+        return ""
+    return f"The people shown are {people}" + (f", in {place}" if place else "") + ", with matching faces, skin tones, clothing and surroundings"
+
+
 def describe(shot, section, meta):
     ctx = []
+    if cast_text(meta):
+        ctx.append(cast_text(meta) + ".")
     if meta.get("title"):
         ctx.append(f"Song: {meta['title']}.")
     if meta.get("about"):
@@ -226,7 +347,8 @@ def describe(shot, section, meta):
     look = meta.get("look") or DEFAULT_LOOK
     who = f" {chars}." if chars else ""
     place = f" Place: {meta['place']}." if meta.get("place") else ""
-    return f"Photograph of: {scene}.{place}{who} {look}, no text, no letters, no watermark."[:1900]
+    cast = (cast_text(meta) + ". ") if cast_text(meta) else ""
+    return f"Photograph of: {scene}. {cast}{place}{who} {look}, no text, no letters, no watermark."[:1900]
 
 
 def to_frame(img):
@@ -323,24 +445,53 @@ def main():
         else:
             log("Tell me which song: python scripts/music_video.py <name>   (files music/<name>.mp3 and music/<name>.txt)")
             return 1
-    log(f"music_video.py music-v1  song: {name}")
-    audio = next((p for ext in ("mp3", "wav", "m4a", "ogg", "flac") for p in [MUSIC_DIR / f"{name}.{ext}"] if p.exists()), None)
-    lyr = MUSIC_DIR / f"{name}.txt"
-    if audio is None or not lyr.exists():
-        log(f"Missing files: need music/{name}.mp3 (or .wav/.m4a) and music/{name}.txt")
-        return 1
-    meta = {}
+    log(f"music_video.py music-v2  song: {name}")
+    meta, work = {}, Path(tempfile.mkdtemp(prefix="mvsrc_"))
+    if re.match(r"https?://", name) or name.lower().endswith((".html", ".htm")):
+        lyr_text, meta, link = read_song_page(name)
+        link = os.environ.get("AUDIO_URL", "").strip() or link
+        slug = re.sub(r"[^a-z0-9]+", "-", (meta.get("title") or "song").lower()).strip("-")[:50] or "song"
+        local = next((p for ext in ("mp3", "wav", "m4a", "ogg", "flac") for p in [MUSIC_DIR / f"{slug}.{ext}"] if p.exists()), None)
+        if link:
+            log(f"  song page: '{meta.get('title')}'; getting the audio ...")
+            audio = fetch_audio(link, work) if re.match(r"https?://", link) else Path(link)
+            if not audio.exists():
+                log(f"The audio file '{link}' was not found. Put the song's link in the 'audio' box.")
+                return 1
+        elif local is not None:
+            audio = local
+        else:
+            log(f"The page has no audio link. Add the song's link in the 'audio' box, or upload music/{slug}.mp3 to the repo.")
+            return 1
+        name = slug
+    else:
+        audio = next((p for ext in ("mp3", "wav", "m4a", "ogg", "flac") for p in [MUSIC_DIR / f"{name}.{ext}"] if p.exists()), None)
+        lyr = MUSIC_DIR / f"{name}.txt"
+        if audio is None or not lyr.exists():
+            log(f"Missing files: need music/{name}.mp3 (or .wav/.m4a) and music/{name}.txt")
+            return 1
+        lyr_text = lyr.read_text(encoding="utf-8")
     mp = MUSIC_DIR / f"{name}.json"
     if mp.exists():
-        meta = json.loads(mp.read_text(encoding="utf-8"))
+        meta.update(json.loads(mp.read_text(encoding="utf-8")))
     meta.setdefault("title", name.replace("-", " ").replace("_", " ").title())
     if os.environ.get("LOOK"):
         meta["look"] = os.environ["LOOK"]
+    if os.environ.get("PEOPLE", "").strip():
+        meta["people"] = os.environ["PEOPLE"].strip()
+    if os.environ.get("PLACE", "").strip():
+        meta["place"] = os.environ["PLACE"].strip()
     dur = probe(audio)
-    lines, sections = parse_lyrics(lyr.read_text(encoding="utf-8"))
+    lines, sections = parse_lyrics(lyr_text)
     if not lines:
         log("The lyrics file has no lyric lines.")
         return 1
+    if not meta.get("people") and looks_filipino(lines):
+        meta["people"] = "Filipino"
+        meta.setdefault("place", "the Philippines")
+        log("  the lyrics are in a Philippine language, so the pictures will show Filipino people in the Philippines")
+    if meta.get("people"):
+        log(f"  people shown: {meta['people']}" + (f" ({meta['place']})" if meta.get("place") else ""))
     log(f"  {len(lines)} lyric line(s) in {len(sections) - 1 or 1} section(s); song is {dur / 60:.1f} min")
 
     given = sum(ln["time"] is not None for ln in lines)
