@@ -447,6 +447,11 @@ def main():
             return 1
     log(f"music_video.py music-v2  song: {name}")
     meta, work = {}, Path(tempfile.mkdtemp(prefix="mvsrc_"))
+    if re.match(r"https?://(www\.)?github\.com/[^/]+/[^/]+/?(tree|blob)?", name):
+        log("That is a GitHub repository link, not a song page. Enter either the link of the web page that shows the lyrics "
+            "(for example https://your-site/my-song.html), or just the file name of a song in the music/ folder "
+            "(for example my-song, for music/my-song.mp3 and music/my-song.txt).")
+        return 1
     if re.match(r"https?://", name) or name.lower().endswith((".html", ".htm")):
         lyr_text, meta, link = read_song_page(name)
         link = os.environ.get("AUDIO_URL", "").strip() or link
