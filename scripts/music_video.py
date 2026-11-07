@@ -210,6 +210,25 @@ def read_song_page(src):
     return text, meta, audio
 
 
+def song_from_row(row):
+    body = str(row.get("content") or row.get("body") or "")
+    if (row.get("content_type") or row.get("contentType") or "html") != "html" and "<" not in body[:300]:
+        body = "".join(f"<p>{ln}</p>" for ln in body.split("\n") if ln.strip())
+    return _parse_song(f"<html><body><main><h1>{row.get('title') or ''}</h1>{body}</main></body></html>", "", "")
+
+
+def pick_song_article():
+    """The newest song / lyrics article on the site that has no video yet."""
+    import essay_jobs as ej
+    api = os.environ.get("ARTICLES_API", "https://poetic-codes.vercel.app/api/articles")
+    rows = requests.get(api, headers={"Accept": "application/json", "User-Agent": ev.UA}, timeout=60).json()
+    if isinstance(rows, dict):
+        rows = rows.get("articles") or rows.get("results") or rows.get("data") or []
+    todo = [r for r in rows if r.get("title") and ej.is_song(r) and not (r.get("video_url") or r.get("videoUrl"))]
+    todo.sort(key=lambda r: ej.num(r.get("id")), reverse=True)
+    return todo[0] if todo else None
+
+
 def _parse_song(html, base, src):
     soup = BeautifulSoup(html, "html.parser")
     for t in soup(["script", "style", "noscript", "nav", "footer", "form", "button", "svg", "iframe"]):
@@ -535,18 +554,21 @@ def render(shots, frames, audio, ass, dur, out):
         raise RuntimeError("ffmpeg failed: " + (p.stderr or b"").decode("utf-8", "replace")[-900:])
 
 
-def publish_to_article(page, video):
-    """When made from a song page link: upload the video and attach it to the article with the same title (needs ADMIN_KEY)."""
-    if not page or not re.match(r"https?://", page) or not os.environ.get("ADMIN_KEY", "").strip():
+def publish_to_article(page, video, row=None):
+    """When made from a song page link or a site article: upload the video and attach it to that article (needs ADMIN_KEY)."""
+    if (not page and row is None) or not os.environ.get("ADMIN_KEY", "").strip():
         return
     try:
         import tutorial_publish as tp
-        title = tp.page_title(page)
-        r = requests.get(tp.ARTICLES_API, headers={"Accept": "application/json", "User-Agent": ev.UA}, timeout=60)
-        r.raise_for_status()
-        data = r.json()
-        rows = (data.get("articles") or data.get("results") or data.get("data") or []) if isinstance(data, dict) else data
-        row = tp.find_article(rows, title, page)
+        if row is None:
+            title = tp.page_title(page)
+            r = requests.get(tp.ARTICLES_API, headers={"Accept": "application/json", "User-Agent": ev.UA}, timeout=60)
+            r.raise_for_status()
+            data = r.json()
+            rows = (data.get("articles") or data.get("results") or data.get("data") or []) if isinstance(data, dict) else data
+            row = tp.find_article(rows, title, page)
+        else:
+            title = row.get("title")
         if row is None:
             log(f"  not attached: no article titled '{title}' on Poetic Codes (the video is still on the release).")
             return
@@ -559,22 +581,31 @@ def publish_to_article(page, video):
 
 def main():
     name = (sys.argv[1] if len(sys.argv) > 1 else os.environ.get("SONG", "")).strip()
+    auto_row = None
     if not name:
-        songs = sorted(p.stem for p in MUSIC_DIR.glob("*.txt"))
-        if len(songs) == 1:
-            name = songs[0]
-        else:
-            log("Tell me which song: python scripts/music_video.py <name>   (files music/<name>.mp3 and music/<name>.txt)")
-            return 1
+        auto_row = pick_song_article()
+        if auto_row is None:
+            log("Every song / lyrics article on the site already has a video; nothing to do. "
+                "(To redo one, type its page link in the 'song' box.)")
+            return 0
+        name = "article:" + str(auto_row.get("id"))
+        log(f"  no song given: making the newest song article without a video: '{auto_row.get('title')}' (id {auto_row.get('id')})")
     log(f"music_video.py music-v2  song: {name}")
     meta, work = {}, Path(tempfile.mkdtemp(prefix="mvsrc_"))
     src_page = name if re.match(r"https?://", name) else ""
-    if re.match(r"https?://(www\.)?github\.com/[^/]+/[^/]+/?(tree|blob)?", name):
+    if auto_row is not None:
+        lyr_text, meta, link = song_from_row(auto_row)
+        link = os.environ.get("AUDIO_URL", "").strip() or link
+        slug = re.sub(r"[^a-z0-9]+", "-", (auto_row.get("title") or "song").lower()).strip("-")[:50] or "song"
+        local = next((p for ext in ("mp3", "wav", "m4a", "ogg", "flac") for p in [MUSIC_DIR / f"{slug}.{ext}"] if p.exists()), None)
+        audio = (fetch_audio(link, work) if re.match(r"https?://", link or "") else None) or local
+        name = slug
+    elif re.match(r"https?://(www\.)?github\.com/[^/]+/[^/]+/?(tree|blob)?", name):
         log("That is a GitHub repository link, not a song page. Enter either the link of the web page that shows the lyrics "
             "(for example https://your-site/my-song.html), or just the file name of a song in the music/ folder "
             "(for example my-song, for music/my-song.mp3 and music/my-song.txt).")
         return 1
-    if re.match(r"https?://", name) or name.lower().endswith((".html", ".htm")):
+    elif re.match(r"https?://", name) or name.lower().endswith((".html", ".htm")):
         lyr_text, meta, link = read_song_page(name)
         link = os.environ.get("AUDIO_URL", "").strip() or link
         slug = re.sub(r"[^a-z0-9]+", "-", (meta.get("title") or "song").lower()).strip("-")[:50] or "song"
@@ -701,7 +732,7 @@ def main():
     (OUT_DIR / f"{name}-music-video.timing.txt").write_text(
         "\n".join(f"{int(ln['time'] // 60)}:{ln['time'] % 60:05.2f}  {ln['text']}" for ln in lines), encoding="utf-8")
     log(f"  done: {out} ({out.stat().st_size / 1048576:.1f} MB, {dur / 60:.1f} min)")
-    publish_to_article(src_page, out)
+    publish_to_article(src_page, out, auto_row)
     return 0
 
 
