@@ -1,6 +1,6 @@
 {
-  "jobId": "1794081459395",
-  "createdAt": "2026-11-07T19:57:39.395Z",
+  "jobId": "1794081487609",
+  "createdAt": "2026-11-07T19:58:07.609Z",
   "title": "Never Mind Her Lyrics – colors | Poetic Codes",
   "author": "Glenn Junsay Pansensoy",
   "category": "Music Video",
@@ -26,5 +26,5 @@
   "slug": "never-mind-her-lyrics-colors-poetic-codes",
   "articleId": 51,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794081456048.jpg",
-  "force": false
+  "force": true
 }
