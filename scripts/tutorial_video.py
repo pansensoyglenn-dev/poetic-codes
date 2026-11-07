@@ -33,7 +33,7 @@ from pygments import lex
 from pygments.lexers import TextLexer, get_lexer_by_name
 from pygments.token import Token
 
-SCRIPT_VERSION = "2026-11-07-m"
+SCRIPT_VERSION = "2026-11-07-n"
 W, H, FPS = 1280, 720, 25
 VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")
 VOICE_FALLBACKS = ["en-PH-RosaNeural", "en-US-ChristopherNeural"]
@@ -54,6 +54,9 @@ LLM_MODEL = os.environ.get("LLM_MODEL", "@cf/meta/llama-3.1-8b-instruct")
 BRAND = os.environ.get("BRAND", "Poetic Bytes")
 OUT_DIR = Path(os.environ.get("OUT_DIR", "out"))
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
+SHOW_OUTPUT = os.environ.get("SHOW_OUTPUT", "1") != "0"       # run each Python snippet and show what it prints in a terminal under the code
+OUT_LINES = int(os.environ.get("OUT_LINES", "7"))             # most output lines shown
+RUN_TIMEOUT = float(os.environ.get("RUN_TIMEOUT", "8"))       # seconds a snippet may run
 MIN_CODE_BLOCKS = int(os.environ.get("MIN_CODE_BLOCKS", "0"))   # batch mode sets 1 so non-tutorial pages are skipped
 UA = "tutorial-video-bot/1.0 (+https://poetic-bytes.vercel.app)"
 
@@ -218,6 +221,7 @@ class Builder:
         name = label or re.sub(r"^\d+(\.\d+)*\.?\s*", "", screen_clean(self.heading))
         fname = file_name(name, lang)
         self.spoken = self.heading
+        out = run_snippet(code) if (SHOW_OUTPUT and lang == "python") else []
         for k, (lines, start) in enumerate(pages):
             if k == 0:
                 if label:
@@ -226,10 +230,14 @@ class Builder:
                     speech = f"Let's write the code for {speak_clean(name)}." if name else "Let's write this code."
             else:
                 speech = "Now the next part."
+            last_page = k == len(pages) - 1
+            if out and last_page:
+                speech += " Run it, and the terminal shows the output."
             self.add(kind="code", heading=self.heading, name=name, fname=fname, lang=lang, lines=lines, start=start,
-                     part=(k + 1, len(pages)), speech=speech, chapter=(name if k == 0 and not label else ""))
+                     part=(k + 1, len(pages)), speech=speech, chapter=(name if k == 0 and not label else ""),
+                     out=(out if last_page else []))
         lines, start = pages[-1]
-        self.cur = {"heading": self.heading, "lines": lines, "start": start, "fname": fname, "lang": lang}
+        self.cur = {"heading": self.heading, "lines": lines, "start": start, "fname": fname, "lang": lang, "out": out}
         if EXPLAIN_CODE:
             extra = explain_code(code, name)
             for chunk in chunk_text(extra, LAPTOP_WORDS) if extra else []:
@@ -339,6 +347,41 @@ def page_code(lines):
     return pages or [(lines, 1)]
 
 
+_RUN_CACHE = {}
+
+
+def run_snippet(code):
+    """Run a Python snippet in a throw-away folder with no secrets and no input; return its printed output, or [] when it
+    fails, prints nothing, waits for input or takes too long (then no terminal is shown for it)."""
+    if code in _RUN_CACHE:
+        return _RUN_CACHE[code]
+    out = []
+    d = tempfile.mkdtemp(prefix="snip_")
+    try:
+        Path(d, "main.py").write_text(code + "\n", encoding="utf-8")
+        env = {"PATH": os.environ.get("PATH", ""), "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1",
+               "HOME": d, "LANG": "C.UTF-8"}
+        p = subprocess.run([sys.executable, "main.py"], cwd=d, env=env, input=b"", capture_output=True, timeout=RUN_TIMEOUT)
+        if p.returncode == 0:
+            text = p.stdout.decode("utf-8", "replace").replace("\r", "").rstrip("\n")
+            for ln in text.split("\n"):
+                ln = ln.replace("\t", "    ")
+                while len(ln) > 92:
+                    out.append(ln[:92])
+                    ln = "  " + ln[92:]
+                out.append(ln)
+            if len(out) > OUT_LINES:
+                out = out[:OUT_LINES - 1] + ["..."]
+    except Exception:
+        out = []
+    finally:
+        shutil.rmtree(d, ignore_errors=True)
+    if not any(x.strip() for x in out):
+        out = []
+    _RUN_CACHE[code] = out
+    return out
+
+
 def explain_code(code, name):
     """Optional: two spoken sentences about what this snippet does (free Cloudflare model)."""
     if not (CF_ACCOUNT and CF_TOKEN):
@@ -389,7 +432,7 @@ def steps_after_code(scenes):
             out.extend(scenes[j:k])
             last = scenes[k - 1]
             cur = {"heading": last["heading"], "lines": last["lines"], "start": last["start"],
-                   "fname": last["fname"], "lang": last.get("lang", "python")}
+                   "fname": last["fname"], "lang": last.get("lang", "python"), "out": last.get("out") or []}
             for sc in pending:
                 for it in sc["items"]:
                     for chunk in chunk_text(it, LAPTOP_WORDS):
@@ -605,7 +648,7 @@ def cached_bg():
     return _BG[0].copy()
 
 
-def laptop_setup(lines, fname, start, lang="python"):
+def laptop_setup(lines, fname, start, lang="python", out=None):
     """Draw the empty laptop once; return everything needed to draw typed-in frames quickly."""
     img = cached_bg()
     d = ImageDraw.Draw(img)
@@ -629,18 +672,21 @@ def laptop_setup(lines, fname, start, lang="python"):
     d.text((sx1 - 14 - d.textlength(right, font=sf), sy1 - 20), right, font=sf, fill=(190, 215, 240))
     d.rounded_rectangle([90, ly1, 1190, ly1 + 18], radius=8, fill=(70, 79, 98))                 # laptop base
     d.rounded_rectangle([560, ly1, 720, ly1 + 7], radius=4, fill=(40, 46, 58))
+    out = list(out or [])
+    term_h = (34 + len(out) * 21 + 12) if out else 0
     geo = {"sx0": sx0, "sy0": sy0, "sx1": sx1, "sy1": sy1, "code_top": sy0 + 40,
-           "avail_h": (sy1 - 24) - (sy0 + 40) - 6, "code_w": sx1 - sx0 - 30}
+           "avail_h": (sy1 - 24) - (sy0 + 40) - 6 - term_h, "code_w": sx1 - sx0 - 30,
+           "term_top": (sy1 - 24) - term_h}
     n = max(len(lines), 10)
     size = min(22, int(geo["avail_h"] / (n * 1.42)))
     longest = max((len(l) for l in lines), default=1)
     size = max(14, min(size, int((geo["code_w"] - 14) / ((longest + 3) * 0.603))))   # shrink so long lines fit
     font = load_font(size, mono=True)
     return {"base": img, "geo": geo, "font": font, "lh": int(size * 1.42), "cw": font.getlength("M"),
-            "toks": lex_lines(lines, lang), "lines": lines, "start": start}
+            "toks": lex_lines(lines, lang), "lines": lines, "start": start, "out": out, "fname": fname}
 
 
-def laptop_frame(lp, nchars, caption, idx, total, cursor=True):
+def laptop_frame(lp, nchars, caption, idx, total, cursor=True, show_out=False):
     img = lp["base"].copy()
     d = ImageDraw.Draw(img)
     g, font, lh, cw, toks, start = lp["geo"], lp["font"], lp["lh"], lp["cw"], lp["toks"], lp["start"]
@@ -672,6 +718,15 @@ def laptop_frame(lp, nchars, caption, idx, total, cursor=True):
             cx = x0 + gutter + cur_col * cw
             d.rectangle([cx, y + 1, cx + 2, y + lh - 5], fill=BLUE_LT)
         y += lh
+    if lp.get("out") and show_out:
+        tt = g["term_top"]
+        d.rectangle([g["sx0"], tt, g["sx1"], g["sy1"] - 24], fill=(6, 11, 17))
+        d.rectangle([g["sx0"], tt, g["sx1"], tt + 2], fill=(31, 64, 96))
+        mf = load_font(15, mono=True)
+        d.text((g["sx0"] + 16, tt + 8), "TERMINAL", font=load_font(11, True), fill=(110, 140, 170))
+        d.text((g["sx0"] + 16, tt + 24), "$ python " + lp.get("fname", "main.py"), font=mf, fill=(134, 239, 172))
+        for k, ln in enumerate(lp["out"]):
+            d.text((g["sx0"] + 16, tt + 45 + k * 21), ln, font=mf, fill=TEXT)
     sf = load_font(13)
     d.text((g["sx0"] + 14, g["sy1"] - 20), f"Ln {start + cur_n}, Col {cur_col + 1}", font=sf, fill=(190, 215, 240))
     # explanation panel under the laptop
@@ -700,14 +755,14 @@ def laptop_frame(lp, nchars, caption, idx, total, cursor=True):
 
 def draw_laptop_text(sc, idx, total):
     c = sc["code"]
-    lp = laptop_setup(c["lines"], c["fname"], c["start"], c.get("lang", "python"))
-    return laptop_frame(lp, sum(len(l) + 1 for l in c["lines"]), sc["body"], idx, total, cursor=False)
+    lp = laptop_setup(c["lines"], c["fname"], c["start"], c.get("lang", "python"), c.get("out"))
+    return laptop_frame(lp, sum(len(l) + 1 for l in c["lines"]), sc["body"], idx, total, cursor=False, show_out=True)
 
 
 def typing_clip(sc, idx, total, mp3, out, tmp):
     """The code appears character by character on the laptop while the lead-in is spoken."""
     lines = sc["lines"]
-    lp = laptop_setup(lines, sc["fname"], sc["start"], sc.get("lang", "python"))
+    lp = laptop_setup(lines, sc["fname"], sc["start"], sc.get("lang", "python"), sc.get("out"))
     nchars = max(1, sum(len(l) + 1 for l in lines) - 1)
     lead = probe_duration(mp3)
     secs = max(lead + 0.4, min(26.0, max(4.0, nchars / TYPE_CPS)))
@@ -721,9 +776,10 @@ def typing_clip(sc, idx, total, mp3, out, tmp):
             continue
         last_n = n
         pth = tmp / f"t{idx}_{k}.png"
-        laptop_frame(lp, n, sc["speech"], idx, total, cursor=(k % 4 != 3 or k == nframes - 1)).save(pth)
+        laptop_frame(lp, n, sc["speech"], idx, total, cursor=(k % 4 != 3 or k == nframes - 1),
+                     show_out=(k == nframes - 1)).save(pth)
         paths.append(pth)
-    hold = 1.2
+    hold = 2.6 if sc.get("out") else 1.2        # the terminal output stays on screen a moment before the explanation
     listing = tmp / f"t{idx}.txt"
     with open(listing, "w", encoding="utf-8") as fh:
         for k, pth in enumerate(paths):
