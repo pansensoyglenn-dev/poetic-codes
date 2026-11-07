@@ -1,0 +1,398 @@
+#!/usr/bin/env python3
+"""Make a lyric music video: a picture for what each part of the song is about, changing on the right line, with the lyrics shown.
+
+    python scripts/music_video.py my-song          (reads music/my-song.mp3 + music/my-song.txt, optional music/my-song.json)
+
+music/<song>.mp3   the song (.wav/.m4a also work)
+music/<song>.txt   the lyrics. Section labels like [Verse 1] / [Chorus] on their own line. A repeated chorus reuses its pictures.
+                   Optional times: put [0:42] at the start of any line (or before a label: [0:42] [Chorus]). Lines without a
+                   time get one in between. With no times at all, the song is listened to (Whisper) to find them, and if that
+                   cannot work the lines are spread evenly over the song.
+music/<song>.json  optional: {"title": "", "artist": "", "about": "what the song is about", "look": "visual style",
+                   "place": "where it happens", "characters": [{"name": "", "description": ""}], "language": "tl"}
+
+Uses the same free picture generators as the essay videos (scripts/essay_video.py): Cloudflare first, then the free backups.
+"""
+import difflib
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import time
+from pathlib import Path
+
+from PIL import Image, ImageFilter
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import essay_video as ev  # noqa: E402  (picture + AI-text helpers shared with the essay videos)
+
+MUSIC_DIR = Path(os.environ.get("MUSIC_DIR", "music"))
+OUT_DIR = Path(os.environ.get("OUT_DIR", "out"))
+MAX_PICS = int(os.environ.get("MAX_PICS", "18"))             # most different pictures per song (Cloudflare free allowance)
+MIN_SHOT = float(os.environ.get("MIN_SHOT", "7"))            # shortest time one picture stays
+FADE = float(os.environ.get("FADE", "0.9"))                  # crossfade between pictures
+FPS = 25
+W, H = 1280, 720
+WHISPER_MODEL = os.environ.get("WHISPER_MODEL", "small")
+USE_WHISPER = os.environ.get("WHISPER", "auto")              # auto | 1 | 0
+DEFAULT_LOOK = "cinematic music video still, moody natural lighting, shallow depth of field, 35mm film grain, wide 16:9 composition"
+log = ev.log
+
+
+# ---------------------------------------------------------------- lyrics
+TS = re.compile(r"^\[\s*(\d+):(\d{2})(?:[.:](\d{1,3}))?\s*\]\s*")
+LABEL = re.compile(r"^\[([^\]\d][^\]]*)\]$|^\(([^)]+)\)$")
+
+
+def parse_lyrics(text):
+    """-> (lines, sections). lines: [{'text', 'time' (seconds or None), 'section': index}]; sections: [label]."""
+    lines, sections = [], ["Song"]
+    cur = 0
+    for raw in text.replace("\r", "").split("\n"):
+        s = raw.strip()
+        if not s:
+            continue
+        t = None
+        m = TS.match(s)
+        if m:
+            frac = m.group(3) or "0"
+            t = int(m.group(1)) * 60 + int(m.group(2)) + int(frac) / (10 ** len(frac))
+            s = s[m.end():].strip()
+        lab = LABEL.match(s)
+        if lab:
+            sections.append((lab.group(1) or lab.group(2)).strip())
+            cur = len(sections) - 1
+            if t is not None:
+                lines.append({"text": "", "time": t, "section": cur, "label_only": True})
+            continue
+        if s:
+            lines.append({"text": s, "time": t, "section": cur})
+    # a time put on a label belongs to the next lyric line
+    out, carry = [], None
+    for ln in lines:
+        if ln.get("label_only"):
+            carry = ln["time"] if carry is None else carry
+            continue
+        if ln["time"] is None and carry is not None:
+            ln["time"], carry = carry, None
+        else:
+            carry = None
+        out.append(ln)
+    return out, sections
+
+
+def wnorm(s):
+    return re.sub(r"[^a-z0-9']+", "", s.lower())
+
+
+def whisper_words(audio, lang):
+    try:
+        from faster_whisper import WhisperModel
+    except Exception as e:
+        log(f"  Whisper is not installed ({str(e)[:60]}); lines will be timed without listening to the song")
+        return []
+    try:
+        log(f"  listening to the song with Whisper '{WHISPER_MODEL}' to find when each line is sung ...")
+        model = WhisperModel(WHISPER_MODEL, device="cpu", compute_type="int8")
+        segs, _ = model.transcribe(str(audio), word_timestamps=True, language=lang or None, vad_filter=False,
+                                   condition_on_previous_text=False)
+        words = [(wnorm(w.word), w.start, w.end) for s in segs for w in (s.words or []) if wnorm(w.word)]
+        log(f"  heard {len(words)} word(s)")
+        return words
+    except Exception as e:
+        log(f"  Whisper failed ({str(e)[:100]}); lines will be timed without listening to the song")
+        return []
+
+
+def align(lines, heard):
+    """Give every line without a time one, from where its words were heard. Returns how many lines were really matched."""
+    flat = [(wnorm(w), i) for i, ln in enumerate(lines) for w in ln["text"].split() if wnorm(w)]
+    a = [w for w, _ in flat]
+    b = [w for w, _, _ in heard]
+    matched = {}
+    if a and b:
+        sm = difflib.SequenceMatcher(None, a, b, autojunk=False)
+        for blk in sm.get_matching_blocks():
+            for k in range(blk.size):
+                li = flat[blk.a + k][1]
+                matched.setdefault(li, heard[blk.b + k][1])
+    n = 0
+    for i, ln in enumerate(lines):
+        if ln["time"] is None and i in matched:
+            ln["time"] = matched[i]
+            n += 1
+    return n
+
+
+def fill_times(lines, dur):
+    """Fill the remaining gaps by spreading lines between the known times (by number of words), then make times increase."""
+    n = len(lines)
+    if not n:
+        return
+    if all(ln["time"] is None for ln in lines):
+        lo, hi = dur * 0.06, dur * 0.94
+        total = sum(max(1, len(ln["text"].split())) for ln in lines)
+        t = lo
+        for ln in lines:
+            ln["time"] = t
+            t += (hi - lo) * max(1, len(ln["text"].split())) / total
+        return
+    known = [i for i, ln in enumerate(lines) if ln["time"] is not None]
+    if known[0] > 0:
+        lines[0]["time"] = max(0.0, lines[known[0]]["time"] - 3.5 * known[0])
+        known = [0] + known
+    last_i = known[-1]
+    if last_i < n - 1:
+        lines[n - 1]["time"] = min(dur - 1.0, lines[last_i]["time"] + 3.5 * (n - 1 - last_i))
+        known.append(n - 1)
+    for a_i, b_i in zip(known, known[1:]):
+        if b_i - a_i > 1:
+            w = [max(1, len(lines[k]["text"].split())) for k in range(a_i, b_i)]
+            span = lines[b_i]["time"] - lines[a_i]["time"]
+            acc = 0
+            for k in range(a_i + 1, b_i):
+                acc += w[k - 1 - a_i]
+                lines[k]["time"] = lines[a_i]["time"] + span * acc / sum(w)
+    prev = -1.0
+    for ln in lines:
+        ln["time"] = max(ln["time"], prev + 0.4)
+        prev = ln["time"]
+
+
+# ---------------------------------------------------------------- shots (one picture each)
+def build_shots(lines, sections, dur):
+    """Group lines into shots. A section is split into shots of at least MIN_SHOT seconds; the same words give the same picture."""
+    target = max(MIN_SHOT, dur / MAX_PICS)
+    for _ in range(6):
+        shots, cur = [], None
+        for i, ln in enumerate(lines):
+            end = lines[i + 1]["time"] if i + 1 < len(lines) else dur
+            if cur is None or ln["section"] != cur["section"] or cur["end"] - cur["start"] >= target:
+                cur = {"section": ln["section"], "start": ln["time"], "end": end, "lines": []}
+                shots.append(cur)
+            cur["lines"].append(ln["text"])
+            cur["end"] = end
+        for s in shots:
+            s["key"] = " ".join(wnorm(x) for x in s["lines"])
+        if len({s["key"] for s in shots}) <= MAX_PICS:
+            break
+        target *= 1.3
+    # the first picture also covers any intro, the last one the outro
+    shots[0]["start"] = 0.0
+    shots[-1]["end"] = dur
+    for a, b in zip(shots, shots[1:]):
+        a["end"] = b["start"]
+    # absorb shots that are too short into their neighbour
+    merged = []
+    for s in shots:
+        if merged and (s["end"] - s["start"] < max(3.0, FADE * 2.5)):
+            merged[-1]["end"] = s["end"]
+            merged[-1]["lines"] += s["lines"]
+            merged[-1]["key"] = " ".join(wnorm(x) for x in merged[-1]["lines"])
+        else:
+            merged.append(s)
+    return merged
+
+
+def describe(shot, section, meta):
+    ctx = []
+    if meta.get("title"):
+        ctx.append(f"Song: {meta['title']}.")
+    if meta.get("about"):
+        ctx.append(f"About: {meta['about']}.")
+    if meta.get("place"):
+        ctx.append(f"Place: {meta['place']}.")
+    chars = "; ".join(f"{c.get('name', '')}: {c.get('description', '')}" for c in (meta.get("characters") or []))
+    if chars:
+        ctx.append(f"Recurring people (show the same person each time): {chars}.")
+    lyric = " / ".join(shot["lines"])
+    out = ev.llm_text(
+        "You direct a music video. Read the lyric lines and describe ONE concrete scene a camera could film that shows what "
+        "they mean. Rules: turn metaphors into a literal, visible moment (a person, an action, a place, the weather); keep the "
+        "same people, place and mood across the song; no text, signs, subtitles, logos or maps; never mention the lyrics or the "
+        "camera. Reply with the description only, 25 to 45 words.",
+        " ".join(ctx) + f"\nSection: {section}\nLyrics: {lyric[:700]}", max_tokens=130)
+    scene = ""
+    if out:
+        scene = ev.clean_text(out).strip().strip('"')
+        scene = re.sub(r"^(scene|description|image)\s*:\s*", "", scene, flags=re.I)
+        scene = " ".join(scene.split()[:55]).rstrip(" ,;:")
+        if len(scene.split()) < 6:
+            scene = ""
+    if not scene:       # the AI helper is unavailable: describe the lyric words themselves
+        scene = "a scene that shows: " + " ".join(lyric.split()[:30])
+    look = meta.get("look") or DEFAULT_LOOK
+    who = f" {chars}." if chars else ""
+    place = f" Place: {meta['place']}." if meta.get("place") else ""
+    return f"Photograph of: {scene}.{place}{who} {look}, no text, no letters, no watermark."[:1900]
+
+
+def to_frame(img):
+    """Fill a 16:9 frame: crop to the right shape, never stretch."""
+    img = img.convert("RGB")
+    w, h = img.size
+    tw, th = 1920, 1080
+    s = max(tw / w, th / h)
+    img = img.resize((int(w * s) + 1, int(h * s) + 1), Image.LANCZOS)
+    x, y = (img.width - tw) // 2, (img.height - th) // 2
+    return img.crop((x, y, x + tw, y + th))
+
+
+def placeholder(i):
+    """A soft dark gradient, used only when a picture cannot be made at all."""
+    base = Image.new("RGB", (64, 36))
+    px = base.load()
+    for yy in range(36):
+        for xx in range(64):
+            px[xx, yy] = (14 + yy, 20 + (xx + i * 9) % 30, 40 + yy * 2)
+    return base.resize((1920, 1080), Image.BICUBIC).filter(ImageFilter.GaussianBlur(8))
+
+
+# ---------------------------------------------------------------- captions + video
+def ass_time(t):
+    t = max(0.0, t)
+    return f"{int(t // 3600)}:{int(t % 3600 // 60):02d}:{t % 60:05.2f}"
+
+
+def write_ass(path, lines, dur, meta):
+    head = ("[Script Info]\nScriptType: v4.00+\nPlayResX: 1280\nPlayResY: 720\nWrapStyle: 0\n\n[V4+ Styles]\n"
+            "Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, "
+            "StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
+            "Style: Lyric,DejaVu Sans,46,&H00FFFFFF,&H00FFFFFF,&H00000000,&H80000000,-1,0,0,0,100,100,0,0,1,3,1,2,70,70,64,1\n"
+            "Style: Title,DejaVu Sans,34,&H00F0F0F0,&H00F0F0F0,&H00000000,&H80000000,-1,0,0,0,100,100,2,0,1,2,1,8,70,70,40,1\n\n"
+            "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n")
+    ev_lines = []
+    card = " - ".join(x for x in (meta.get("title"), meta.get("artist")) if x)
+    first = lines[0]["time"] if lines else dur
+    if card:
+        ev_lines.append(f"Dialogue: 0,{ass_time(0.6)},{ass_time(min(5.0, max(2.5, first - 0.3)))},Title,,0,0,0,,{{\\fad(500,500)}}{card}")
+    for i, ln in enumerate(lines):
+        end = lines[i + 1]["time"] if i + 1 < len(lines) else dur
+        end = min(end - 0.05, ln["time"] + 9.0)
+        if end - ln["time"] < 0.6:
+            end = ln["time"] + 0.6
+        text = ln["text"].replace("{", "(").replace("}", ")")
+        ev_lines.append(f"Dialogue: 0,{ass_time(ln['time'])},{ass_time(end)},Lyric,,0,0,0,,{{\\fad(150,150)}}{text}")
+    Path(path).write_text(head + "\n".join(ev_lines) + "\n", encoding="utf-8")
+
+
+def probe(path):
+    p = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=nw=1:nk=1", str(path)],
+                       capture_output=True, text=True)
+    return float(p.stdout.strip())
+
+
+def render(shots, frames, audio, ass, dur, out):
+    n = len(shots)
+    cmd = ["ffmpeg", "-y"]
+    segs = [s["end"] - s["start"] for s in shots]
+    for i, s in enumerate(shots):
+        length = segs[i] + (FADE if i < n - 1 else 0)
+        cmd += ["-loop", "1", "-framerate", str(FPS), "-t", f"{length:.2f}", "-i", str(frames[i])]
+    cmd += ["-i", str(audio)]
+    fc = []
+    for i in range(n):
+        nfr = max(2, int((segs[i] + (FADE if i < n - 1 else 0)) * FPS))
+        zin = i % 2 == 0
+        zexpr = f"1+0.10*on/{nfr}" if zin else f"1.10-0.10*on/{nfr}"
+        px = (0.3, 0.7, 0.5, 0.2, 0.8)[i % 5]
+        fc.append(f"[{i}:v]zoompan=z='{zexpr}':x='(iw-iw/zoom)*{px}':y='(ih-ih/zoom)*0.5':d=1:s={W}x{H}:fps={FPS},setsar=1[p{i}]")
+    last, acc = "p0", 0.0
+    for i in range(1, n):
+        acc += segs[i - 1]
+        fc.append(f"[{last}][p{i}]xfade=transition=fade:duration={FADE}:offset={acc:.2f}[x{i}]")
+        last = f"x{i}"
+    ass_path = str(ass).replace("\\", "/").replace(":", "\\:")
+    fc.append(f"[{last}]ass='{ass_path}',format=yuv420p[v]")
+    cmd += ["-filter_complex", ";".join(fc), "-map", "[v]", "-map", f"{n}:a", "-t", f"{dur:.2f}",
+            "-c:v", "libx264", "-preset", "veryfast", "-crf", "24", "-r", str(FPS),
+            "-c:a", "aac", "-b:a", "160k", "-movflags", "+faststart", str(out)]
+    p = subprocess.run(cmd, capture_output=True)
+    if p.returncode != 0:
+        raise RuntimeError("ffmpeg failed: " + (p.stderr or b"").decode("utf-8", "replace")[-900:])
+
+
+def main():
+    name = (sys.argv[1] if len(sys.argv) > 1 else os.environ.get("SONG", "")).strip()
+    if not name:
+        songs = sorted(p.stem for p in MUSIC_DIR.glob("*.txt"))
+        if len(songs) == 1:
+            name = songs[0]
+        else:
+            log("Tell me which song: python scripts/music_video.py <name>   (files music/<name>.mp3 and music/<name>.txt)")
+            return 1
+    log(f"music_video.py music-v1  song: {name}")
+    audio = next((p for ext in ("mp3", "wav", "m4a", "ogg", "flac") for p in [MUSIC_DIR / f"{name}.{ext}"] if p.exists()), None)
+    lyr = MUSIC_DIR / f"{name}.txt"
+    if audio is None or not lyr.exists():
+        log(f"Missing files: need music/{name}.mp3 (or .wav/.m4a) and music/{name}.txt")
+        return 1
+    meta = {}
+    mp = MUSIC_DIR / f"{name}.json"
+    if mp.exists():
+        meta = json.loads(mp.read_text(encoding="utf-8"))
+    meta.setdefault("title", name.replace("-", " ").replace("_", " ").title())
+    if os.environ.get("LOOK"):
+        meta["look"] = os.environ["LOOK"]
+    dur = probe(audio)
+    lines, sections = parse_lyrics(lyr.read_text(encoding="utf-8"))
+    if not lines:
+        log("The lyrics file has no lyric lines.")
+        return 1
+    log(f"  {len(lines)} lyric line(s) in {len(sections) - 1 or 1} section(s); song is {dur / 60:.1f} min")
+
+    given = sum(ln["time"] is not None for ln in lines)
+    if given:
+        log(f"  using the {given} time(s) you wrote in the lyrics file")
+    elif USE_WHISPER != "0":
+        heard = whisper_words(audio, meta.get("language"))
+        got = align(lines, heard) if heard else 0
+        if got < max(3, len(lines) * 0.3):
+            log(f"  only {got} of {len(lines)} lines could be matched to the singing; timing is approximate. "
+                "For exact timing add [m:ss] at the start of lines in the lyrics file.")
+            for ln in lines:
+                ln["time"] = None
+        else:
+            log(f"  matched {got} of {len(lines)} lines to the singing")
+    fill_times(lines, dur)
+
+    shots = build_shots(lines, sections, dur)
+    uniq = {}
+    for s in shots:
+        uniq.setdefault(s["key"], len(uniq))
+    log(f"  {len(shots)} shot(s), {len(uniq)} different picture(s) needed")
+    tmp = Path(tempfile.mkdtemp(prefix="mv_"))
+    made, frames = {}, []
+    t0 = time.time()
+    for i, s in enumerate(shots):
+        k = s["key"]
+        if k not in made:
+            prompt = describe(s, sections[s["section"]] if s["section"] < len(sections) else "", meta)
+            log(f"  picture {len(made) + 1}/{len(uniq)} ({s['start']:.0f}s): {prompt[:170]}")
+            img = ev.gen_image(prompt) if ev.AI_IMAGES else None
+            if img is None:
+                prev = next((made[x] for x in reversed(list(made)) if made[x] is not None), None)
+                img = prev if prev is not None else placeholder(len(made))
+                log("    no picture could be made for this part; keeping the previous one")
+            made[k] = img
+        pth = tmp / f"f{i}.png"
+        to_frame(made[k]).save(pth)
+        frames.append(pth)
+    log(f"  pictures ready in {(time.time() - t0) / 60:.1f} min ({ev.FALLBACK_STATE['used']} from the free backup generators)")
+
+    ass = tmp / "lyrics.ass"
+    write_ass(ass, lines, dur, meta)
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    out = OUT_DIR / f"{name}-music-video.mp4"
+    log("  building the video ...")
+    render(shots, frames, audio, ass, dur, out)
+    (OUT_DIR / f"{name}-music-video.timing.txt").write_text(
+        "\n".join(f"{int(ln['time'] // 60)}:{ln['time'] % 60:05.2f}  {ln['text']}" for ln in lines), encoding="utf-8")
+    log(f"  done: {out} ({out.stat().st_size / 1048576:.1f} MB, {dur / 60:.1f} min)")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
