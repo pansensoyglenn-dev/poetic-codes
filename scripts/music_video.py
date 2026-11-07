@@ -178,14 +178,39 @@ def _clean(t):
 
 
 def read_song_page(src):
-    """A song page (link or .html file) -> (lyrics text in the lyrics-file format, meta dict, audio link or '')."""
-    from urllib.parse import urljoin
+    """A song page (link or .html file) -> (lyrics text in the lyrics-file format, meta dict, audio link or '').
+    If the page's own HTML holds no lyrics (the page is filled in by JavaScript), the article is read from the Poetic Codes API."""
     if re.match(r"https?://", src):
         r = requests.get(src, headers={"User-Agent": ev.UA}, timeout=60)
         r.raise_for_status()
         html, base = r.text, src
     else:
         html, base = Path(src).read_text(encoding="utf-8", errors="replace"), ""
+    text, meta, audio = _parse_song(html, base, src)
+    if len([x for x in text.split("\n") if x and not x.startswith("[")]) < 4 and base:
+        try:
+            api = os.environ.get("ARTICLES_API", "https://poetic-codes.vercel.app/api/articles")
+            rows = requests.get(api, headers={"Accept": "application/json", "User-Agent": ev.UA}, timeout=60).json()
+            if isinstance(rows, dict):
+                rows = rows.get("articles") or rows.get("results") or rows.get("data") or []
+            slug = base.rstrip("/").rsplit("/", 1)[-1].rsplit(".", 1)[0]
+            hit = next((r for r in rows if re.sub(r"[^a-z0-9]+", "-", str(r.get("title") or "").lower()).strip("-") == slug), None)
+            if hit is None:
+                hit = next((r for r in rows if slug.startswith(re.sub(r"[^a-z0-9]+", "-", str(r.get("title") or "").lower()).strip("-")[:40])), None)
+            if hit is not None:
+                body = str(hit.get("content") or hit.get("body") or "")
+                if (hit.get("content_type") or hit.get("contentType") or "html") != "html" and "<" not in body[:200]:
+                    body = "".join(f"<p>{ln}</p>" for ln in body.split("\n") if ln.strip())
+                t2, m2, a2 = _parse_song(f"<html><body><main><h1>{hit.get('title') or ''}</h1>{body}</main></body></html>", base, src)
+                if len([x for x in t2.split("\n") if x and not x.startswith("[")]) >= 4:
+                    log("  the page has no lyrics in its HTML; read them from the article on the site instead")
+                    return t2, {**m2, **{k: v for k, v in meta.items() if v}}, audio or a2
+        except Exception as e:
+            log(f"  could not read the article from the site API ({str(e)[:80]})")
+    return text, meta, audio
+
+
+def _parse_song(html, base, src):
     soup = BeautifulSoup(html, "html.parser")
     for t in soup(["script", "style", "noscript", "nav", "footer", "form", "button", "svg", "iframe"]):
         t.decompose()
