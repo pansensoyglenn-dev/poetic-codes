@@ -33,7 +33,7 @@ from pygments import lex
 from pygments.lexers import TextLexer, get_lexer_by_name
 from pygments.token import Token
 
-SCRIPT_VERSION = "2026-11-07-l"
+SCRIPT_VERSION = "2026-11-07-m"
 W, H, FPS = 1280, 720, 25
 VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")
 VOICE_FALLBACKS = ["en-PH-RosaNeural", "en-US-ChristopherNeural"]
@@ -136,6 +136,9 @@ def get_page(src):
         r = requests.get(src, headers={"User-Agent": UA}, timeout=60)
         r.raise_for_status()
         return r.text, src
+    if not Path(src).is_file():
+        raise SystemExit(f"'{src}' is not a page link or a file. The page box needs the lesson's link, "
+                         "for example https://poetic-bytes.vercel.app/python-basics.html (not its title).")
     return Path(src).read_text(encoding="utf-8", errors="replace"), ""
 
 
