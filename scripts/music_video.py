@@ -340,7 +340,11 @@ def cast_text(meta):
     return f"The people shown are {people}" + (f", in {place}" if place else "") + ", with matching faces, skin tones, clothing and surroundings"
 
 
-def describe(shot, section, meta):
+SHOT_TYPES = ["wide establishing shot", "medium shot", "close-up on hands or an object", "over-the-shoulder shot",
+              "low-angle shot", "profile close-up", "high wide shot", "detail shot of the surroundings"]
+
+
+def describe(shot, section, meta, prev=None, idx=0):
     ctx = []
     if cast_text(meta):
         ctx.append(cast_text(meta) + ".")
@@ -357,9 +361,12 @@ def describe(shot, section, meta):
     out = ev.llm_text(
         "You direct a music video. Read the lyric lines and describe ONE concrete scene a camera could film that shows what "
         "they mean. Rules: turn metaphors into a literal, visible moment (a person, an action, a place, the weather); keep the "
-        "same people, place and mood across the song; no text, signs, subtitles, logos or maps; never mention the lyrics or the "
-        "camera. Reply with the description only, 25 to 45 words.",
-        " ".join(ctx) + f"\nSection: {section}\nLyrics: {lyric[:700]}", max_tokens=130)
+        "same people and mood across the song, but CHANGE the place, the action and the time of day from shot to shot so the "
+        "video tells a story; do not begin with 'A woman stands alone'; if the singer speaks to or about someone, show that "
+        "relationship (two people, a gesture, an object that belongs to them); no text, signs, subtitles, logos or maps; never "
+        "mention the lyrics or the camera. Reply with the description only, 25 to 45 words.",
+        " ".join(ctx) + f"\nSection: {section}\nLyrics: {lyric[:700]}"
+        + (("\nEarlier shots (do not repeat their place or pose): " + " | ".join(prev[-4:])) if prev else ""), max_tokens=130)
     scene = ""
     if out:
         scene = ev.clean_text(out).strip().strip('"')
@@ -369,7 +376,10 @@ def describe(shot, section, meta):
             scene = ""
     if not scene:       # the AI helper is unavailable: describe the lyric words themselves
         scene = "a scene that shows: " + " ".join(lyric.split()[:30])
+    if prev is not None:
+        prev.append(" ".join(scene.split()[:14]))
     look = meta.get("look") or DEFAULT_LOOK
+    scene = f"{SHOT_TYPES[idx % len(SHOT_TYPES)]}: {scene}"
     who = f" {chars}." if chars else ""
     place = f" Place: {meta['place']}." if meta.get("place") else ""
     cast = (cast_text(meta) + ". ") if cast_text(meta) else ""
@@ -661,12 +671,12 @@ def main():
         uniq.setdefault(s["key"], len(uniq))
     log(f"  {len(shots)} shot(s), {len(uniq)} different picture(s) needed")
     tmp = Path(tempfile.mkdtemp(prefix="mv_"))
-    made, frames = {}, []
+    made, frames, prev_scenes = {}, [], []
     t0 = time.time()
     for i, s in enumerate(shots):
         k = s["key"]
         if k not in made:
-            prompt = describe(s, sections[s["section"]] if s["section"] < len(sections) else "", meta)
+            prompt = describe(s, sections[s["section"]] if s["section"] < len(sections) else "", meta, prev_scenes, len(made))
             log(f"  picture {len(made) + 1}/{len(uniq)} ({s['start']:.0f}s): {prompt[:170]}")
             img = ev.gen_image(prompt) if ev.AI_IMAGES else None
             if img is None:
