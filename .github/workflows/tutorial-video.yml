@@ -41,6 +41,15 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: python scripts/tutorial_video.py "$PAGE"
+      - name: Attach the video to the article on the website
+        if: ${{ inputs.check_only != '1' }}
+        env:
+          ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+          OUT_DIR: out
+          PAGE: ${{ inputs.page }}
+        run: |
+          NAME=$(ls out/*.mp4 2>/dev/null | head -1 | sed -E 's#out/##; s#\.mp4$##; s#--[0-9]{2}-.*$##')
+          python scripts/tutorial_publish.py "$PAGE" "$NAME"
       - name: Keep the video
         uses: actions/upload-artifact@v4
         with:
