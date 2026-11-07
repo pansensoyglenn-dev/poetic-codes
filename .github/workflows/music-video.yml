@@ -1,0 +1,79 @@
+name: Music video
+# Makes a lyric music video from a song in the repo's music/ folder:
+# Either paste the link of the song's web page (lyrics + audio are read from the page), or use files in the repo's music/ folder:
+#   music/<song>.mp3   the song          music/<song>.txt   the lyrics, with [Verse 1] / [Chorus] labels (optional [m:ss] times)
+#   music/<song>.json  optional: title, artist, about, look, place, characters
+# Run it from Actions -> Music video -> Run workflow.
+on:
+  workflow_dispatch:
+    inputs:
+      song:
+        description: "Link of the song's page (https://...html), or a file name in music/ without the extension"
+        required: true
+      audio:
+        description: "Only if the page has no audio player: link of the .mp3"
+        required: false
+        default: ""
+      people:
+        description: "Who is shown, e.g. Filipino, or Caucasian American. Empty = Filipino automatically for Tagalog/Hiligaynon lyrics, otherwise not specified"
+        required: false
+        default: ""
+      place:
+        description: "Optional place, e.g. the Philippines, rural Iowa"
+        required: false
+        default: ""
+      look:
+        description: "Optional picture style, e.g. warm 35mm film, rainy night, cinematic"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: music-video
+  cancel-in-progress: false
+
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Install tools
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+          pip install --quiet pillow requests edge-tts beautifulsoup4
+          pip install --quiet faster-whisper || echo "Whisper not installed; lines will be timed from the lyrics file"
+      - name: Make the music video
+        env:
+          SONG: ${{ inputs.song }}
+          LOOK: ${{ inputs.look }}
+          PEOPLE: ${{ inputs.people }}
+          PLACE: ${{ inputs.place }}
+          AUDIO_URL: ${{ inputs.audio }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          AI_IMAGES: "1"
+          LLM_MAX_CALLS: "60"
+        run: python scripts/music_video.py "$SONG"
+      - name: Keep a downloadable copy
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: music-video
+          path: out/*
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Attach the video to the "music-videos" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls out/*.mp4 >/dev/null 2>&1 || { echo "No video was made."; exit 0; }
+          gh release view music-videos >/dev/null 2>&1 || gh release create music-videos --title "Music videos" --notes "Lyric music videos."
+          gh release upload music-videos out/*.mp4 out/*.timing.txt --clobber
+          echo "Download it from: ${{ github.server_url }}/${{ github.repository }}/releases/tag/music-videos"
