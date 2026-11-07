@@ -1,6 +1,7 @@
 name: Tutorial video
 # Make a narrated video from a Poetic Bytes tutorial page. Run it from Actions -> Run workflow and paste the page link.
-# The finished .mp4 and a description file (link + YouTube chapters) appear under "Artifacts" at the bottom of the run.
+# The finished .mp4 files and description files (link + YouTube chapters) are attached to the repo's "tutorial-videos" release
+# (Code tab -> Releases) so each one downloads directly, and also kept as a zip under "Artifacts" at the bottom of the run.
 on:
   workflow_dispatch:
     inputs:
@@ -17,7 +18,7 @@ on:
         default: ""
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   make:
@@ -46,3 +47,12 @@ jobs:
           name: tutorial-video
           path: out/*
           retention-days: 7
+      - name: Attach the videos to the "tutorial-videos" release
+        if: ${{ inputs.check_only != '1' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls out/*.mp4 >/dev/null 2>&1 || { echo "No videos were made."; exit 0; }
+          gh release view tutorial-videos >/dev/null 2>&1 || gh release create tutorial-videos --title "Tutorial videos" --notes "Narrated tutorial videos made from Poetic Bytes pages."
+          gh release upload tutorial-videos out/*.mp4 out/*.description.txt --clobber
+          echo "Download them from: ${{ github.server_url }}/${{ github.repository }}/releases/tag/tutorial-videos"
