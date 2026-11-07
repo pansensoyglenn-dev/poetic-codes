@@ -70,16 +70,41 @@ def page_title(url):
     return re.sub(r"\s+", " ", m.group(1)).strip() if m else ""
 
 
+SITE_SUFFIX = re.compile(r"\s*[|\u2013\u2014-]\s*(poetic bytes|poetic codes)\s*$", re.I)
+
+
+def base_title(t):
+    """'Song | Poetic Codes - Poetic Bytes' -> 'song' (site name tails removed, so page title and article title can differ)."""
+    t = (t or "").strip()
+    for _ in range(3):
+        t2 = SITE_SUFFIX.sub("", t)
+        if t2 == t:
+            break
+        t = t2
+    return norm(t)
+
+
 def find_article(rows, title, url):
     want = norm(title)
     for r in rows:
         if norm(r.get("title")) == want:
             return r
-    slug = url.rstrip("/").rsplit("/", 1)[-1]
+    wb = base_title(title)
+    for r in rows:
+        if wb and base_title(r.get("title")) == wb:
+            return r
+    slug = url.rstrip("/").rsplit("/", 1)[-1].rsplit(".", 1)[0].replace("-", " ").strip()
     if slug:
+        for r in rows:
+            if norm(r.get("title")) == slug or base_title(r.get("title")) == slug:
+                return r
         for r in rows:
             if slug in str(r.get("content") or r.get("body") or "")[:200000] and "poetic bytes" in norm(r.get("title")):
                 return r
+    for r in rows:                 # one title contains the other (at least 15 characters)
+        b = base_title(r.get("title"))
+        if len(b) >= 15 and len(wb) >= 15 and (b in wb or wb in b):
+            return r
     return None
 
 
