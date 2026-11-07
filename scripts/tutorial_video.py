@@ -33,7 +33,7 @@ from pygments import lex
 from pygments.lexers import TextLexer, get_lexer_by_name
 from pygments.token import Token
 
-SCRIPT_VERSION = "2026-11-06-k"
+SCRIPT_VERSION = "2026-11-07-l"
 W, H, FPS = 1280, 720, 25
 VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")
 VOICE_FALLBACKS = ["en-PH-RosaNeural", "en-US-ChristopherNeural"]
@@ -370,6 +370,35 @@ def heading_title(h1):
     return out.rstrip(" .!:;")
 
 
+def steps_after_code(scenes):
+    """On many pages the 'Step 1, Step 2...' list comes BEFORE its code. For a tutorial the code should be typed first, then the
+    steps explained under the laptop while the finished code stays in view: move such lists to just after the code."""
+    out, i, n = [], 0, len(scenes)
+    while i < n:
+        j = i
+        while j < n and scenes[j]["kind"] == "text" and scenes[j].get("items"):
+            j += 1
+        if j > i and j < n and scenes[j]["kind"] == "code" and scenes[j]["heading"] == scenes[i]["heading"]:
+            pending = scenes[i:j]
+            k = j
+            while k < n and scenes[k]["kind"] == "code" and scenes[k]["heading"] == scenes[i]["heading"]:
+                k += 1
+            out.extend(scenes[j:k])
+            last = scenes[k - 1]
+            cur = {"heading": last["heading"], "lines": last["lines"], "start": last["start"],
+                   "fname": last["fname"], "lang": last.get("lang", "python")}
+            for sc in pending:
+                for it in sc["items"]:
+                    for chunk in chunk_text(it, LAPTOP_WORDS):
+                        out.append({"kind": "laptop_text", "heading": last["heading"], "body": chunk, "code": cur,
+                                    "speech": speak_clean(chunk)})
+            i = k
+        else:
+            out.append(scenes[i])
+            i += 1
+    return out
+
+
 def build_scenes(page_html, page_url, limit=None):
     soup = BeautifulSoup(page_html, "html.parser")
     for t in soup(["script", "style", "noscript"]):
@@ -406,7 +435,7 @@ def build_scenes(page_html, page_url, limit=None):
         b.walk(sec, h2)
     b.add(kind="end", title="Try the code live", url=link or BRAND,
           speech=f"Try the live code on {BRAND}. The link is in the description.", chapter="Try it yourself")
-    return b.scenes, {"title": title, "desc": desc, "link": link}
+    return steps_after_code(b.scenes), {"title": title, "desc": desc, "link": link}
 
 
 # ---------------------------------------------------------------- drawing
