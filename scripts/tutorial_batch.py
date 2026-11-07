@@ -173,6 +173,11 @@ def main():
         if r.returncode != 0 or not any(f.suffix == ".mp4" for f in files):
             failed.append(url)
             continue
+        try:
+            subprocess.run([sys.executable, str(Path(__file__).with_name("tutorial_publish.py")), url, slug],
+                           env={**os.environ, "OUT_DIR": str(OUT)}, timeout=1800)
+        except Exception as e:
+            log("  could not attach the video to the website: " + str(e)[:150])
         up = gh("release", "upload", TAG, *[str(f) for f in files], "--clobber")
         if up.returncode != 0:
             log("  upload failed: " + (up.stderr or "")[-300:])
