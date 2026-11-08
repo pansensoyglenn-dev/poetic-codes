@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Inputs Tutorial 2026 – input(), Validation &amp; CLI | Poetic Bytes – Poetic Bytes</title>
+<meta name="description" content="Master Python input handling: input(), type conversion, validation, argparse, secure passwords, and real-world CLI patterns with runnable code.">
+<meta name="keywords" content="Programming, essay, poetic bytes, glenn pansensoy">
+<meta name="author" content="Glenn Junsay Pansensoy">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://poetic-codes.pages.dev/articles/python-inputs-tutorial-2026-input-validation-cli-poetic-bytes.html">
+<meta property="og:site_name" content="The Commonplace">
+<meta property="og:title" content="Python Inputs Tutorial 2026 – input(), Validation &amp; CLI | Poetic Bytes">
+<meta property="og:description" content="Master Python input handling: input(), type conversion, validation, argparse, secure passwords, and real-world CLI patterns with runnable code.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://poetic-codes.pages.dev/articles/python-inputs-tutorial-2026-input-validation-cli-poetic-bytes.html">
+<meta property="og:image" content="https://poetic-codes.pages.dev/og-default.png">
+<meta property="article:section" content="Programming">
+<meta property="article:published_time" content="2026-11-08T01:28:30.738Z">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Python Inputs Tutorial 2026 – input(), Validation &amp; CLI | Poetic Bytes">
+<meta name="twitter:description" content="Master Python input handling: input(), type conversion, validation, argparse, secure passwords, and real-world CLI patterns with runnable code.">
+<meta name="twitter:image" content="https://poetic-codes.pages.dev/og-default.png">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"Python Inputs Tutorial 2026 – input(), Validation & CLI | Poetic Bytes","author":{"@type":"Person","name":"Glenn Junsay Pansensoy"},"datePublished":"2026-11-08T01:28:30.738Z","description":"Master Python input handling: input(), type conversion, validation, argparse, secure passwords, and real-world CLI patterns with runnable code.","articleSection":"Programming","mainEntityOfPage":"https://poetic-codes.pages.dev/articles/python-inputs-tutorial-2026-input-validation-cli-poetic-bytes.html","image":"https://poetic-codes.pages.dev/og-default.png"}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6428799122405621" crossorigin="anonymous"></script>
+<style>
+body{background:#0b0f17;color:#eef4ff;font-family:"Crimson Pro",Georgia,serif;max-width:760px;margin:0 auto;padding:2rem 1.2rem;line-height:1.85;}
+h1{font-family:"Cinzel Decorative",serif;font-size:clamp(1rem,4vw,1.8rem);margin-bottom:1rem;}
+.meta{font-size:0.78rem;color:#667fa3;margin-bottom:2rem;font-family:monospace;}
+p{text-align:justify;margin-bottom:1.4rem;}
+a{color:#74b9e8;}
+video{max-width:100%;border-radius:12px;}
+audio{width:100%;}
+iframe{max-width:100%;border-radius:12px;}
+.back{display:inline-block;margin-bottom:1rem;font-size:0.8rem;font-family:monospace;color:#74b9e8;}
+footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size:0.72rem;color:#667fa3;text-align:center;font-family:monospace;line-height:2;}
+</style>
+</head>
+<body>
+<a class="back" href="https://poetic-codes.pages.dev/">← The Commonplace</a>
+<article>
+<h1>Python Inputs Tutorial 2026 – input(), Validation &amp; CLI | Poetic Bytes</h1>
+<div class="meta">Glenn Junsay Pansensoy · Programming · November 8, 2026</div>
+<style>.post-body, .post-body *, .post-body p, .post-body li, .post-body blockquote, .post-body span, .post-body div { color: #2a1a0f !important; }.post-body h1, .post-body h2, .post-body h3, .post-body h4 { color: #1a0f08 !important; }.post-body a { color: #7a3e1a !important; }.post-body em, .post-body i { color: #5a4a3a !important; }.pc-article, .pc-article p, .pc-article div, .pc-article li, .pc-article blockquote { text-align: justify !important; text-justify: inter-word; hyphens: auto; }.pc-article p { line-height: 1.85 !important; margin-bottom: 1.4rem !important; }.pc-article h1, .pc-article h2, .pc-article h3, .pc-article h4 { text-align: left !important; }</style><div style="font-family:Georgia,serif;max-width:100%;margin:0 auto;line-height:1.85;color:#2a1a0f !important;background:#ffffff;padding:1rem 0;"><div style="background:linear-gradient(135deg,rgba(139,94,52,0.12),rgba(139,94,52,0.04));border-left:4px solid #8B5E34;padding:1.2rem 1.4rem;margin-bottom:2rem;border-radius:0 10px 10px 0;"><p style="margin:0 0 0.5rem;font-size:0.92rem;color:#5a4a3a;font-style:italic;text-align:justify;">Master Python input handling: input(), type conversion, validation, argparse, secure passwords, and real-world CLI patterns with runnable code.</p><div style="font-size:0.72rem;color:#8a7563;margin-top:0.4rem;">Written by <strong>Glenn Junsay Pansensoy</strong> &nbsp;·&nbsp; Programming &nbsp;·&nbsp; 33 min read</div></div><div class="pc-article" style="font-size:1rem;line-height:1.85;color:#2a1a0f;text-align:justify;">
+
+        <section class="hero" aria-label="Python Inputs Tutorial">
+            <div class="page-col">
+                <div class="back-home-row">
+                    <a href="index.html" class="btn btn-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                    <span class="lesson-counter"><i class="fas fa-book-open"></i> 24 lessons</span>
+                    <span class="pyodide-status"><span class="dot"></span> Pyodide ready</span>
+                </div>
+                
+                <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;" class="lead">Everything you need to handle user input in Python: the <code>input()</code> function, type conversion, validation, command-line arguments, secure input, and real-world patterns. 24 interactive lessons with runnable code — crafted by <strong style="color:var(--gold);">@PoeticGlenn</strong>.</p>
+                <div class="hero-btns">
+                    <a href="#toc" class="btn btn-outline"><i class="fas fa-list"></i> Browse All Lessons</a>
+                    <a href="#intro" class="btn btn-primary"><i class="fas fa-play"></i> Start Learning</a>
+                </div>
+                <div class="info-box">
+                    <h4><i class="fas fa-info-circle"></i> What you will learn</h4>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">How to capture, convert, validate, and securely handle user input in Python. Build interactive CLI tools, robust scripts, and production-ready applications that handle real-world data gracefully — all with step‑by‑step code explanations from <strong>@PoeticGlenn</strong>.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="intro" aria-labelledby="intro-heading">
+            <div class="page-col">
+                <div class="section-label"><span>📖 Introduction</span></div>
+                <div style="max-width:720px;margin:0 auto;">
+                    <h2 id="intro-heading" style="font-size:1.35rem;color:var(--gold);text-align:center;margin-bottom:0.6rem;">
+                        Why Mastering Python Input Handling Changes Everything
+                    </h2>
+                    <p style="font-size:0.92rem;color:var(--text);line-height:1.85;margin-bottom:1rem;">
+                        Every program that interacts with a human — or with another system — begins with <strong>input</strong>.
+                        Whether you're building a command-line utility, a web API, a data pipeline, or a machine learning
+                        model, the way you handle input determines the reliability, security, and usability of your entire
+                        application. <strong style="color:var(--gold);">@PoeticGlenn</strong> designed this guide to take
+                        you from the simplest <code>input()</code> call to production‑grade CLI tools with <code>argparse</code>,
+                        all while teaching you the principles that separate amateur scripts from professional software.
+                    </p>
+                    <div class="intro-grid">
+                        <div class="intro-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <h4>Security First</h4>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Learn to validate, sanitise, and handle input safely — preventing injection, crashes, and data corruption.</p>
+                        </div>
+                        <div class="intro-item">
+                            <i class="fas fa-user-check"></i>
+                            <h4>Great UX</h4>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Build interactive tools that guide users, provide clear feedback, and never crash on bad input.</p>
+                        </div>
+                        <div class="intro-item">
+                            <i class="fas fa-code-branch"></i>
+                            <h4>Production Ready</h4>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">From <code>sys.argv</code> to <code>argparse</code> subcommands — write CLI tools that professionals love.</p>
+                        </div>
+                    </div>
+                    <p style="font-size:0.82rem;color:var(--muted);">
+                        <i class="fas fa-quote-left" style="color:var(--gold);margin-right:0.3rem;"></i>
+                        This isn't just a tutorial — it's a complete mental model for thinking about input in Python.
+                        Every concept is reinforced with <strong>runnable code</strong>, <strong>step‑by‑step breakdowns</strong>,
+                        and <strong>real‑world patterns</strong> you'll use every day.
+                        <span style="color:var(--gold);">🐍</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="why-learn" aria-labelledby="why-heading">
+            <div class="page-col">
+                <div class="section-label"><span>🚀 Why Learn This Curriculum</span></div>
+                <div style="max-width:720px;margin:0 auto;">
+                    <h2 id="why-heading" style="font-size:1.25rem;color:var(--gold);text-align:center;margin-bottom:0.6rem;">
+                        Every Programmer Must Master Input Handling — Here's Why
+                    </h2>
+                    <p style="font-size:0.88rem;color:var(--text);line-height:1.8;margin-bottom:1rem;">
+                        If you write code that <em>anyone</em> will ever use — including your future self — you <strong>must</strong>
+                        understand how to handle input correctly. This curriculum, curated by <strong style="color:var(--gold);">@PoeticGlenn</strong>,
+                        is not optional; it's foundational. Here's why every developer, regardless of specialisation,
+                        needs these skills.
+                    </p>
+                    <div class="why-grid">
+                        <div class="why-item">
+                            <h4>🔐 Security Is Non‑Negotiable</h4>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Unvalidated input is the #1 cause of vulnerabilities. From SQL injection to buffer overflows,
+                                nearly every exploit starts with unsanitised user data. This curriculum teaches you to
+                                <strong>validate, sanitise, and trust nothing</strong> — a mindset that protects every
+                            system you build.</p>
+                        </div>
+                        <div class="why-item">
+                            <h4>🧠 Universal Skill, Every Domain</h4>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Whether you do web development, data science, DevOps, embedded systems, or AI — you <em>will</em>
+                                handle input. <code>input()</code>, <code>sys.argv</code>, file I/O, environment variables —
+                                this curriculum gives you the <strong>universal vocabulary</strong> to work across stacks.</p>
+                        </div>
+                        <div class="why-item">
+                            <h4>💬 User Experience Matters</h4>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Programs that crash on bad input frustrate users and damage trust. Learning to
+                                <strong>loop until valid</strong>, provide clear error messages, and guide the user
+                                transforms a fragile script into a <strong>professional tool</strong> that people enjoy using.</p>
+                        </div>
+                        <div class="why-item">
+                            <h4>⚙️ CLI Tools Are Everywhere</h4>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">From automation scripts to deployment pipelines, command-line tools are the backbone of
+                                modern development. With <code>argparse</code> and <code>sys.argv</code>, you'll build
+                                <strong>composable, documented, and robust</strong> CLI applications that integrate
+                            seamlessly with other tools.</p>
+                        </div>
+                    </div>
+                    <div class="insight" style="margin-top:0.6rem;">
+                        <i class="fas fa-gem" style="color:var(--gold);margin-right:0.4rem;"></i>
+                        <strong>@PoeticGlenn</strong> says: <em>"Input handling is the first line of defence and the
+                        first impression of your code. Master it, and everything else becomes easier."</em>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="significance" aria-labelledby="sig-heading">
+            <div class="page-col">
+                <div class="section-label"><span>🌍 Significance in the Programming World</span></div>
+                <div style="max-width:720px;margin:0 auto;">
+                    <h2 id="sig-heading" style="font-size:1.25rem;color:var(--gold);text-align:center;margin-bottom:0.6rem;">
+                        Why Input Handling Is a Cornerstone of Professional Programming
+                    </h2>
+                    <p style="font-size:0.88rem;color:var(--text);line-height:1.8;margin-bottom:1rem;">
+                        In the broader programming ecosystem, input handling is not a "nice‑to‑have" — it's a
+                        <strong>fundamental pillar</strong> that separates hobbyist code from enterprise‑grade software.
+                        This curriculum, designed by <strong style="color:var(--gold);">@PoeticGlenn</strong>, reflects
+                        the patterns and principles used in millions of production systems worldwide.
+                    </p>
+                    <div class="sig-grid">
+                        <div class="sig-item">
+                            <span class="sig-icon"><i class="fas fa-database"></i></span>
+                            <h4>Data Integrity</h4>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Every data pipeline, ETL job, and analytics workflow starts with input validation.
+                                Garbage in, garbage out — this curriculum teaches you to <strong>guarantee data quality</strong>
+                            from the first line.</p>
+                        </div>
+                        <div class="sig-item">
+                            <span class="sig-icon"><i class="fas fa-cloud-upload-alt"></i></span>
+                            <h4>API &amp; Microservices</h4>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Modern architectures rely on clean, validated input at every boundary. The same
+                                principles you learn here — type checking, range validation, parsing — are
+                                <strong>directly applicable</strong> to REST APIs, GraphQL, and gRPC.</p>
+                        </div>
+                        <div class="sig-item">
+                            <span class="sig-icon"><i class="fas fa-terminal"></i></span>
+                            <h4>DevOps &amp; Automation</h4>
+                            <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">CI/CD pipelines, infrastructure-as-code, and monitoring tools are all CLI‑first.
+                                <code>argparse</code> and <code>sys.argv</code> are the <strong>industry standard</strong>
+                            for building reliable automation scripts.</p>
+                        </div>
+                    </div>
+                    <p style="font-size:0.82rem;color:var(--muted);text-align:center;margin-top:0.6rem;">
+                        <i class="fas fa-quote-right" style="color:var(--gold);margin-left:0.3rem;"></i>
+                        The curriculum you're about to explore is not academic — it's the <strong>practical foundation</strong>
+                        used by thousands of open‑source projects and Fortune 500 companies. Every concept maps
+                        directly to real‑world problems you'll face as a professional developer.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="toc" aria-labelledby="toc-heading" style="padding: 1.5rem 0;">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="toc-heading">📑 Table of Contents</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Jump to any section — all entries are equal size</p>
+                </div>
+                <div class="toc-grid">
+                    <a href="#intro">📖 Introduction</a>
+                    <a href="#why-learn">🚀 Why Learn This</a>
+                    <a href="#significance">🌍 Significance</a>
+                    <a href="#input-basics">⌨️ input() Basics</a>
+                    <a href="#type-conversion">🔄 Type Conversion</a>
+                    <a href="#validation">✅ Input Validation</a>
+                    <a href="#multiple-inputs">📦 Multiple Inputs</a>
+                    <a href="#cli-args">💻 CLI Arguments</a>
+                    <a href="#argparse-deep">⚙️ argparse Deep Dive</a>
+                    <a href="#secure-input">🔒 Secure Input</a>
+                    <a href="#file-input">📂 File Input</a>
+                    <a href="#loops-input">🔄 Input in Loops</a>
+                    <a href="#error-handling">🛡️ Error Handling</a>
+                    <a href="#real-world">🚀 Real-World Patterns</a>
+                    <a href="#faq-inputs">❓ FAQ</a>
+                    <a href="#outro">💛 Outro</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="input-basics" aria-labelledby="basics-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="basics-heading">⌨️ The <code>input()</code> Function — Your Gateway to User Interaction</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Every interactive Python program starts here. <code>input()</code> reads a line from the user and returns it as a string.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 1.1 Basic <code>input()</code> — Prompt and Capture</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">The simplest form: call <code>input()</code> with an optional prompt string. The program pauses until the user types something and presses Enter. The returned value is always a string.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Define the function <code>basic_input_demo()</code> — this groups our code for reuse.</li>
+                        <li><strong>Step 2:</strong> Call <code>input("What is your name? ")</code> — this displays the prompt and waits for the user to type something and press Enter.</li>
+                        <li><strong>Step 3:</strong> The value typed by the user is stored in the variable <code>name</code> as a string.</li>
+                        <li><strong>Step 4:</strong> Use an f-string with <code>print()</code> to display a personalized greeting: <code>f"Hello, {name}!"</code>.</li>
+                        <li><strong>Step 5:</strong> Call <code>input("How old are you? ")</code> to capture the user's age — again stored as a string.</li>
+                        <li><strong>Step 6:</strong> Display the age back to the user using an f-string.</li>
+                        <li><strong>Step 7:</strong> Use <code>type(age)</code> to show that <code>input()</code> always returns a string — even for numbers.</li>
+                        <li><strong>Step 8:</strong> Call the function <code>basic_input_demo()</code> to execute the code.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def basic_input_demo():
+    name = input(&quot;What is your name? &quot;)
+    print(f&quot;Hello, {name}! Nice to meet you.&quot;)
+
+    age = input(&quot;How old are you? &quot;)
+    print(f&quot;You are {age} years old.&quot;)
+    print(f&quot;Type of age: {type(age)}&quot;)
+
+basic_input_demo()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">basic_input_demo</span>():
+    name = <span class="fn">input</span>(<span class="st">"What is your name? "</span>)
+    <span class="fn">print</span>(<span class="st">f"Hello, {name}! Nice to meet you."</span>)
+
+    age = <span class="fn">input</span>(<span class="st">"How old are you? "</span>)
+    <span class="fn">print</span>(<span class="st">f"You are {age} years old."</span>)
+    <span class="fn">print</span>(<span class="st">f"Type of age: {type(age)}"</span>)
+
+basic_input_demo()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="insight">💡 <code>input()</code> <strong>always</strong> returns a string. Even if the user types "42", you get <code>"42"</code> — not the integer 42. Conversion is your responsibility.</div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 1.2 Multi-line Prompts</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Use triple-quoted strings or <code>\n</code> for multi-line prompts. This is useful for complex instructions or menus.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Define a multi-line string using triple quotes <code>""" ... """</code> — this preserves line breaks.</li>
+                        <li><strong>Step 2:</strong> Print the multi-line prompt to display a formatted menu or welcome message.</li>
+                        <li><strong>Step 3:</strong> Call <code>input()</code> three times to capture two numbers and an operation from the user.</li>
+                        <li><strong>Step 4:</strong> Display the captured inputs back to the user using an f-string.</li>
+                        <li><strong>Step 5:</strong> Call the function to run the interactive prompt.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def multi_line_prompt():
+    prompt = &quot;&quot;&quot;
+    ─── Welcome to the Calculator ───
+    Enter two numbers and an operation.
+    &quot;&quot;&quot;
+    print(prompt)
+
+    a = input(&quot;First number: &quot;)
+    b = input(&quot;Second number: &quot;)
+    op = input(&quot;Operation (+, -, *, /): &quot;)
+
+    print(f&quot;Inputs: {a} {op} {b}&quot;)
+
+multi_line_prompt()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">multi_line_prompt</span>():
+    prompt = <span class="st">"""
+    ─── Welcome to the Calculator ───
+    Enter two numbers and an operation.
+    """</span>
+    <span class="fn">print</span>(prompt)
+
+    a = <span class="fn">input</span>(<span class="st">"First number: "</span>)
+    b = <span class="fn">input</span>(<span class="st">"Second number: "</span>)
+    op = <span class="fn">input</span>(<span class="st">"Operation (+, -, *, /): "</span>)
+
+    <span class="fn">print</span>(<span class="st">f"Inputs: {a} {op} {b}"</span>)
+
+multi_line_prompt()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 1.3 Empty Input — Handling <code>''</code></h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">If the user just presses Enter without typing anything, <code>input()</code> returns an empty string <code>''</code>. Always plan for this — many bugs come from assuming input is non-empty.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Call <code>input()</code> with a prompt asking the user to type something.</li>
+                        <li><strong>Step 2:</strong> Store the result in <code>response</code> — it could be an empty string if the user pressed Enter.</li>
+                        <li><strong>Step 3:</strong> Check if <code>response == ""</code> to detect empty input and display a specific message.</li>
+                        <li><strong>Step 4:</strong> If the input is not empty, display what the user typed.</li>
+                        <li><strong>Step 5:</strong> Use <code>len(response)</code> to show the character count — 0 for empty input.</li>
+                        <li><strong>Step 6:</strong> Call the function to test the behavior.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def handle_empty():
+    response = input(&quot;Type something (or press Enter): &quot;)
+
+    if response == &quot;&quot;:
+        print(&quot;You pressed Enter without typing anything!&quot;)
+    else:
+        print(f&quot;You typed: {response}&quot;)
+
+    print(f&quot;Length: {len(response)} characters&quot;)
+
+handle_empty()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">handle_empty</span>():
+    response = <span class="fn">input</span>(<span class="st">"Type something (or press Enter): "</span>)
+
+    <span class="kw">if</span> response == <span class="st">""</span>:
+        <span class="fn">print</span>(<span class="st">"You pressed Enter without typing anything!"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">f"You typed: {response}"</span>)
+
+    <span class="fn">print</span>(<span class="st">f"Length: {len(response)} characters"</span>)
+
+handle_empty()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="note-new">✨ Tip: Use <code>if not response:</code> to check for empty input — it's cleaner than <code>== ""</code>.</div>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <section id="type-conversion" aria-labelledby="conversion-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="conversion-heading">🔄 Type Conversion — Turning Strings into Numbers</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><code>input()</code> always returns a string. To do math, you must convert to <code>int</code>, <code>float</code>, or <code>bool</code>.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🔢 2.1 <code>int()</code> — Convert to Integer</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Use <code>int()</code> to convert a string to an integer. If the string contains non-numeric characters, Python raises a <code>ValueError</code>.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Call <code>input()</code> to capture a string from the user (age).</li>
+                        <li><strong>Step 2:</strong> Pass the captured string to <code>int()</code> to convert it to an integer.</li>
+                        <li><strong>Step 3:</strong> Store the converted integer in the variable <code>age</code>.</li>
+                        <li><strong>Step 4:</strong> Perform arithmetic — <code>age + 1</code> calculates next year's age.</li>
+                        <li><strong>Step 5:</strong> Use <code>type(age)</code> to confirm the variable is now an <code>int</code>.</li>
+                        <li><strong>Step 6:</strong> Demonstrate <code>int("1010", base=2)</code> to convert a binary string to decimal.</li>
+                        <li><strong>Step 7:</strong> Call the function to run the code.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def int_conversion_demo():
+    age_str = input(&quot;Enter your age: &quot;)
+    age = int(age_str)
+
+    print(f&quot;Next year you will be {age + 1}&quot;)
+    print(f&quot;Type of age: {type(age)}&quot;)
+
+    binary = &quot;1010&quot;
+    decimal = int(binary, base=2)
+    print(f&quot;Binary {binary} = decimal {decimal}&quot;)
+
+int_conversion_demo()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">int_conversion_demo</span>():
+    age_str = <span class="fn">input</span>(<span class="st">"Enter your age: "</span>)
+    age = <span class="fn">int</span>(age_str)
+
+    <span class="fn">print</span>(<span class="st">f"Next year you will be {age + 1}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Type of age: {type(age)}"</span>)
+
+    binary = <span class="st">"1010"</span>
+    decimal = <span class="fn">int</span>(binary, base=2)
+    <span class="fn">print</span>(<span class="st">f"Binary {binary} = decimal {decimal}"</span>)
+
+int_conversion_demo()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="note-warn">⚠️ <code>int("3.14")</code> raises <code>ValueError</code> — use <code>float()</code> for decimal numbers, then convert to int if needed.</div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🔢 2.2 <code>float()</code> — Convert to Floating-Point</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Use <code>float()</code> for numbers with decimals. Accepts strings like <code>"3.14"</code>, <code>"-2.5"</code>, and <code>"1e-3"</code>.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Call <code>input()</code> with a prompt asking for a price (e.g., "19.99").</li>
+                        <li><strong>Step 2:</strong> Use <code>float()</code> to convert the string to a floating-point number.</li>
+                        <li><strong>Step 3:</strong> Calculate tax as 8% of the price using multiplication: <code>price * 0.08</code>.</li>
+                        <li><strong>Step 4:</strong> Add the tax to the price to get the total.</li>
+                        <li><strong>Step 5:</strong> Use f-string formatting with <code>:.2f</code> to display currency with 2 decimal places.</li>
+                        <li><strong>Step 6:</strong> Use <code>type(price)</code> to confirm the variable is a <code>float</code>.</li>
+                        <li><strong>Step 7:</strong> Call the function to execute the code.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def float_conversion_demo():
+    price_str = input(&quot;Enter the price: $&quot;)
+    price = float(price_str)
+
+    tax = price * 0.08
+    total = price + tax
+
+    print(f&quot;Price: ${price:.2f}&quot;)
+    print(f&quot;Tax (8%): ${tax:.2f}&quot;)
+    print(f&quot;Total: ${total:.2f}&quot;)
+    print(f&quot;Type of price: {type(price)}&quot;)
+
+float_conversion_demo()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">float_conversion_demo</span>():
+    price_str = <span class="fn">input</span>(<span class="st">"Enter the price: $"</span>)
+    price = <span class="fn">float</span>(price_str)
+
+    tax = price * 0.08
+    total = price + tax
+
+    <span class="fn">print</span>(<span class="st">f"Price: ${price:.2f}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Tax (8%): ${tax:.2f}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Total: ${total:.2f}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Type of price: {type(price)}"</span>)
+
+float_conversion_demo()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🔢 2.3 <code>bool()</code> — Convert to Boolean</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><code>bool()</code> converts any value to <code>True</code> or <code>False</code>. For strings, only <code>""</code> is <code>False</code> — all non-empty strings are <code>True</code>.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Call <code>input()</code> to capture a string from the user.</li>
+                        <li><strong>Step 2:</strong> Pass the string to <code>bool()</code> to convert it to a boolean.</li>
+                        <li><strong>Step 3:</strong> Display the boolean result using an f-string.</li>
+                        <li><strong>Step 4:</strong> Use an <code>if</code> statement to check the boolean value and display a message.</li>
+                        <li><strong>Step 5:</strong> Show examples of <code>bool(0)</code>, <code>bool(42)</code>, and <code>bool('yes')</code>.</li>
+                        <li><strong>Step 6:</strong> Call the function to run the code.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def bool_conversion_demo():
+    user_input = input(&quot;Enter something: &quot;)
+    value = bool(user_input)
+
+    print(f&quot;bool('{user_input}') = {value}&quot;)
+
+    if value:
+        print(&quot;You entered something non-empty!&quot;)
+    else:
+        print(&quot;You entered nothing.&quot;)
+
+    print(f&quot;bool(0) = {bool(0)}&quot;)
+    print(f&quot;bool(42) = {bool(42)}&quot;)
+    print(f&quot;bool('yes') = {bool('yes')}&quot;)
+
+bool_conversion_demo()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">bool_conversion_demo</span>():
+    user_input = <span class="fn">input</span>(<span class="st">"Enter something: "</span>)
+    value = <span class="fn">bool</span>(user_input)
+
+    <span class="fn">print</span>(<span class="st">f"bool('{user_input}') = {value}"</span>)
+
+    <span class="kw">if</span> value:
+        <span class="fn">print</span>(<span class="st">"You entered something non-empty!"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">"You entered nothing."</span>)
+
+    <span class="fn">print</span>(<span class="st">f"bool(0) = {bool(0)}"</span>)
+    <span class="fn">print</span>(<span class="st">f"bool(42) = {bool(42)}"</span>)
+    <span class="fn">print</span>(<span class="st">f"bool('yes') = {bool('yes')}"</span>)
+
+bool_conversion_demo()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="insight">💡 For user confirmation, check against explicit strings: <code>if response.lower() in ("yes", "y"):</code> rather than relying on <code>bool()</code>.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="validation" aria-labelledby="validation-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="validation-heading">✅ Input Validation — Trust Nothing, Verify Everything</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Users make mistakes. Malicious users exploit input. Validate early and often.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🛡️ 3.1 Basic Validation with <code>try/except</code></h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Wrap conversion in a <code>try/except</code> block to catch invalid input gracefully.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Define a function <code>validate_integer()</code> to handle validation.</li>
+                        <li><strong>Step 2:</strong> Inside a <code>try</code> block, call <code>input()</code> and convert with <code>int()</code>.</li>
+                        <li><strong>Step 3:</strong> If conversion succeeds, print a success message and <code>return</code> the value.</li>
+                        <li><strong>Step 4:</strong> In the <code>except ValueError</code> block, print an error message and <code>return None</code>.</li>
+                        <li><strong>Step 5:</strong> Call the function and check if the result is <code>not None</code> before using it.</li>
+                        <li><strong>Step 6:</strong> If valid, double the number and display it.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def validate_integer():
+    try:
+        value = int(input(&quot;Enter a whole number: &quot;))
+        print(f&quot;✅ You entered: {value}&quot;)
+        return value
+    except ValueError:
+        print(&quot;❌ That's not a valid whole number!&quot;)
+        return None
+
+result = validate_integer()
+if result is not None:
+    print(f&quot;Double it: {result * 2}&quot;)">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">validate_integer</span>():
+    <span class="kw">try</span>:
+        value = <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Enter a whole number: "</span>))
+        <span class="fn">print</span>(<span class="st">f"✅ You entered: {value}"</span>)
+        <span class="kw">return</span> value
+    <span class="kw">except</span> <span class="cl">ValueError</span>:
+        <span class="fn">print</span>(<span class="st">"❌ That's not a valid whole number!"</span>)
+        <span class="kw">return</span> <span class="kw">None</span>
+
+result = validate_integer()
+<span class="kw">if</span> result <span class="kw">is not None</span>:
+    <span class="fn">print</span>(<span class="st">f"Double it: {result * 2}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🛡️ 3.2 Loop Until Valid — Robust User Experience</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Keep asking until the user provides valid input. This pattern is essential for interactive CLI tools.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Define <code>get_positive_number(prompt)</code> that loops until valid input is received.</li>
+                        <li><strong>Step 2:</strong> Inside an infinite <code>while True</code> loop, attempt to convert the input to <code>float</code>.</li>
+                        <li><strong>Step 3:</strong> If conversion succeeds and the value is positive, <code>return</code> the value (exits the function).</li>
+                        <li><strong>Step 4:</strong> If the value is not positive, show an error message and continue the loop.</li>
+                        <li><strong>Step 5:</strong> If conversion fails with <code>ValueError</code>, show an error and continue.</li>
+                        <li><strong>Step 6:</strong> In <code>main()</code>, call the function with a prompt and calculate the area of a circle.</li>
+                        <li><strong>Step 7:</strong> Display the calculated area with 2 decimal places.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def get_positive_number(prompt: str) -&gt; float:
+    while True:
+        try:
+            value = float(input(prompt))
+            if value &gt; 0:
+                return value
+            print(&quot;❌ Please enter a positive number.&quot;)
+        except ValueError:
+            print(&quot;❌ Invalid input. Please enter a number.&quot;)
+
+def main():
+    radius = get_positive_number(&quot;Enter radius: &quot;)
+    area = 3.14159 * radius ** 2
+    print(f&quot;✅ Area of circle: {area:.2f}&quot;)
+
+main()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">get_positive_number</span>(prompt: <span class="cl">str</span>) -&gt; <span class="cl">float</span>:
+    <span class="kw">while</span> <span class="kw">True</span>:
+        <span class="kw">try</span>:
+            value = <span class="fn">float</span>(<span class="fn">input</span>(prompt))
+            <span class="kw">if</span> value &gt; 0:
+                <span class="kw">return</span> value
+            <span class="fn">print</span>(<span class="st">"❌ Please enter a positive number."</span>)
+        <span class="kw">except</span> <span class="cl">ValueError</span>:
+            <span class="fn">print</span>(<span class="st">"❌ Invalid input. Please enter a number."</span>)
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    radius = get_positive_number(<span class="st">"Enter radius: "</span>)
+    area = 3.14159 * radius ** 2
+    <span class="fn">print</span>(<span class="st">f"✅ Area of circle: {area:.2f}"</span>)
+
+main()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="insight">💡 The <code>while True</code> + <code>return</code> pattern is the cleanest way to loop until valid input is received. No messy flag variables.</div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🛡️ 3.3 Range Validation — Check Bounds</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Sometimes you need a number within a specific range (e.g., 1–100, 0–10). Add bounds checking after conversion.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Define <code>get_score()</code> that validates a score between 0 and 100.</li>
+                        <li><strong>Step 2:</strong> Inside the loop, attempt to convert input to <code>int</code>.</li>
+                        <li><strong>Step 3:</strong> Check if the score is between 0 and 100 inclusive — if so, <code>return</code> it.</li>
+                        <li><strong>Step 4:</strong> If out of range, show a message and continue the loop.</li>
+                        <li><strong>Step 5:</strong> Define <code>grade_score()</code> that returns a letter grade based on the score.</li>
+                        <li><strong>Step 6:</strong> Call <code>get_score()</code> to get a valid score, then pass it to <code>grade_score()</code>.</li>
+                        <li><strong>Step 7:</strong> Display the score and its corresponding grade.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def get_score() -&gt; int:
+    while True:
+        try:
+            score = int(input(&quot;Enter a score (0–100): &quot;))
+            if 0 &lt;= score &lt;= 100:
+                return score
+            print(&quot;❌ Score must be between 0 and 100.&quot;)
+        except ValueError:
+            print(&quot;❌ Please enter a whole number.&quot;)
+
+def grade_score(score: int) -&gt; str:
+    if score &gt;= 90: return &quot;A&quot;
+    if score &gt;= 80: return &quot;B&quot;
+    if score &gt;= 70: return &quot;C&quot;
+    if score &gt;= 60: return &quot;D&quot;
+    return &quot;F&quot;
+
+score = get_score()
+print(f&quot;✅ Score {score} → Grade {grade_score(score)}&quot;)">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">get_score</span>() -&gt; <span class="cl">int</span>:
+    <span class="kw">while</span> <span class="kw">True</span>:
+        <span class="kw">try</span>:
+            score = <span class="fn">int</span>(<span class="fn">input</span>(<span class="st">"Enter a score (0–100): "</span>))
+            <span class="kw">if</span> 0 &lt;= score &lt;= 100:
+                <span class="kw">return</span> score
+            <span class="fn">print</span>(<span class="st">"❌ Score must be between 0 and 100."</span>)
+        <span class="kw">except</span> <span class="cl">ValueError</span>:
+            <span class="fn">print</span>(<span class="st">"❌ Please enter a whole number."</span>)
+
+<span class="kw">def</span> <span class="fn">grade_score</span>(score: <span class="cl">int</span>) -&gt; <span class="cl">str</span>:
+    <span class="kw">if</span> score &gt;= 90: <span class="kw">return</span> <span class="st">"A"</span>
+    <span class="kw">if</span> score &gt;= 80: <span class="kw">return</span> <span class="st">"B"</span>
+    <span class="kw">if</span> score &gt;= 70: <span class="kw">return</span> <span class="st">"C"</span>
+    <span class="kw">if</span> score &gt;= 60: <span class="kw">return</span> <span class="st">"D"</span>
+    <span class="kw">return</span> <span class="st">"F"</span>
+
+score = get_score()
+<span class="fn">print</span>(<span class="st">f"✅ Score {score} → Grade {grade_score(score)}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🛡️ 3.4 String Validation — Check Format and Content</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Validate strings for length, allowed characters, or pattern matching with regex.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import the <code>re</code> module for regular expression matching.</li>
+                        <li><strong>Step 2:</strong> Define <code>validate_name()</code> that loops until a valid name is entered.</li>
+                        <li><strong>Step 3:</strong> Use <code>len()</code> to check that the name is between 2 and 30 characters.</li>
+                        <li><strong>Step 4:</strong> Use <code>re.match()</code> with a pattern to ensure only letters, spaces, hyphens, and apostrophes.</li>
+                        <li><strong>Step 5:</strong> Define <code>validate_email()</code> that loops until a valid email is entered.</li>
+                        <li><strong>Step 6:</strong> Use a regex pattern to check the email format (basic validation).</li>
+                        <li><strong>Step 7:</strong> Call both validation functions and display a welcome message.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import re
+
+def validate_name() -&gt; str:
+    while True:
+        name = input(&quot;Enter your name (2–30 letters): &quot;).strip()
+
+        if len(name) &lt; 2 or len(name) &gt; 30:
+            print(&quot;❌ Name must be 2–30 characters.&quot;)
+            continue
+
+        if not re.match(r&quot;^[A-Za-z\s\-'']+$&quot;, name):
+            print(&quot;❌ Name contains invalid characters.&quot;)
+            continue
+
+        return name
+
+def validate_email() -&gt; str:
+    while True:
+        email = input(&quot;Enter your email: &quot;).strip()
+        if re.match(r&quot;^[\w\.-]+@[\w\.-]+\.\w+$&quot;, email):
+            return email
+        print(&quot;❌ Invalid email format.&quot;)
+
+name = validate_name()
+email = validate_email()
+print(f&quot;✅ Welcome, {name}! Email: {email}&quot;)">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> re
+
+<span class="kw">def</span> <span class="fn">validate_name</span>() -&gt; <span class="cl">str</span>:
+    <span class="kw">while</span> <span class="kw">True</span>:
+        name = <span class="fn">input</span>(<span class="st">"Enter your name (2–30 letters): "</span>).strip()
+
+        <span class="kw">if</span> len(name) &lt; 2 <span class="kw">or</span> len(name) &gt; 30:
+            <span class="fn">print</span>(<span class="st">"❌ Name must be 2–30 characters."</span>)
+            <span class="kw">continue</span>
+
+        <span class="kw">if</span> <span class="kw">not</span> re.match(<span class="st">r"^[A-Za-z\s\-'']+$"</span>, name):
+            <span class="fn">print</span>(<span class="st">"❌ Name contains invalid characters."</span>)
+            <span class="kw">continue</span>
+
+        <span class="kw">return</span> name
+
+<span class="kw">def</span> <span class="fn">validate_email</span>() -&gt; <span class="cl">str</span>:
+    <span class="kw">while</span> <span class="kw">True</span>:
+        email = <span class="fn">input</span>(<span class="st">"Enter your email: "</span>).strip()
+        <span class="kw">if</span> re.match(<span class="st">r"^[\w\.-]+@[\w\.-]+\.\w+$"</span>, email):
+            <span class="kw">return</span> email
+        <span class="fn">print</span>(<span class="st">"❌ Invalid email format."</span>)
+
+name = validate_name()
+email = validate_email()
+<span class="fn">print</span>(<span class="st">f"✅ Welcome, {name}! Email: {email}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="note-new">✨ Use <code>str.strip()</code> to remove accidental leading/trailing spaces before validation.</div>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <section id="multiple-inputs" aria-labelledby="multi-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="multi-heading">📦 Multiple Inputs — Collecting Several Values at Once</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Sometimes you need to collect multiple values in a single line, or ask for a list of items.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📦 4.1 <code>split()</code> — Parse Space-Separated Input</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Use <code>str.split()</code> to break a single input line into multiple pieces. Then convert each piece individually.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Call <code>input()</code> to capture a line with three numbers separated by spaces.</li>
+                        <li><strong>Step 2:</strong> Use <code>split()</code> to break the string into a list of parts.</li>
+                        <li><strong>Step 3:</strong> Check that exactly three parts were entered — if not, show an error and return.</li>
+                        <li><strong>Step 4:</strong> Convert each part to <code>float</code> inside a <code>try/except</code> block.</li>
+                        <li><strong>Step 5:</strong> Calculate the sum and average of the three numbers.</li>
+                        <li><strong>Step 6:</strong> Display the results with 2 decimal places.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def parse_multiple_numbers():
+    raw = input(&quot;Enter three numbers separated by spaces: &quot;)
+    parts = raw.split()
+    print(f&quot;Parts: {parts}&quot;)
+
+    if len(parts) != 3:
+        print(&quot;❌ Please enter exactly three numbers.&quot;)
+        return
+
+    try:
+        a, b, c = float(parts[0]), float(parts[1]), float(parts[2])
+        print(f&quot;✅ Sum: {a + b + c:.2f}&quot;)
+        print(f&quot;✅ Average: {(a + b + c) / 3:.2f}&quot;)
+    except ValueError:
+        print(&quot;❌ All inputs must be numbers.&quot;)
+
+parse_multiple_numbers()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">parse_multiple_numbers</span>():
+    raw = <span class="fn">input</span>(<span class="st">"Enter three numbers separated by spaces: "</span>)
+    parts = raw.split()
+    <span class="fn">print</span>(<span class="st">f"Parts: {parts}"</span>)
+
+    <span class="kw">if</span> len(parts) != 3:
+        <span class="fn">print</span>(<span class="st">"❌ Please enter exactly three numbers."</span>)
+        <span class="kw">return</span>
+
+    <span class="kw">try</span>:
+        a, b, c = <span class="fn">float</span>(parts[0]), <span class="fn">float</span>(parts[1]), <span class="fn">float</span>(parts[2])
+        <span class="fn">print</span>(<span class="st">f"✅ Sum: {a + b + c:.2f}"</span>)
+        <span class="fn">print</span>(<span class="st">f"✅ Average: {(a + b + c) / 3:.2f}"</span>)
+    <span class="kw">except</span> <span class="cl">ValueError</span>:
+        <span class="fn">print</span>(<span class="st">"❌ All inputs must be numbers."</span>)
+
+parse_multiple_numbers()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📦 4.2 Collecting an Arbitrary Number of Items</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Use a loop to collect items until the user signals they are done (e.g., with a blank line or a sentinel value).</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Define <code>collect_items()</code> that returns a list of strings.</li>
+                        <li><strong>Step 2:</strong> Print instructions for the user: enter items one per line, press Enter twice to finish.</li>
+                        <li><strong>Step 3:</strong> Inside an infinite loop, call <code>input()</code> to get each line.</li>
+                        <li><strong>Step 4:</strong> If the line is empty (<code>""</code>), break out of the loop.</li>
+                        <li><strong>Step 5:</strong> Otherwise, append the line to the <code>items</code> list.</li>
+                        <li><strong>Step 6:</strong> In <code>main()</code>, display the collected items with numbers.</li>
+                        <li><strong>Step 7:</strong> Call the function to run the interactive collection.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def collect_items() -&gt; list:
+    items = []
+    print(&quot;Enter items one per line. Press Enter twice to finish.&quot;)
+
+    while True:
+        line = input(&quot;&gt; &quot;)
+        if line == &quot;&quot;:
+            break
+        items.append(line)
+
+    return items
+
+def main():
+    items = collect_items()
+    print(f&quot;\nYou entered {len(items)} items:&quot;)
+    for i, item in enumerate(items, 1):
+        print(f&quot;  {i}. {item}&quot;)
+
+main()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">collect_items</span>() -&gt; <span class="cl">list</span>:
+    items = []
+    <span class="fn">print</span>(<span class="st">"Enter items one per line. Press Enter twice to finish."</span>)
+
+    <span class="kw">while</span> <span class="kw">True</span>:
+        line = <span class="fn">input</span>(<span class="st">"&gt; "</span>)
+        <span class="kw">if</span> line == <span class="st">""</span>:
+            <span class="kw">break</span>
+        items.append(line)
+
+    <span class="kw">return</span> items
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    items = collect_items()
+    <span class="fn">print</span>(<span class="st">f"\nYou entered {len(items)} items:"</span>)
+    <span class="kw">for</span> i, item <span class="kw">in</span> enumerate(items, 1):
+        <span class="fn">print</span>(<span class="st">f"  {i}. {item}"</span>)
+
+main()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="insight">💡 The double-Enter pattern is a common UX pattern for CLI tools that collect lists of items. It's clean, intuitive, and works everywhere.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cli-args" aria-labelledby="cli-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="cli-heading">💻 Command-Line Arguments — <code>sys.argv</code></h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Input isn't just interactive — many Python scripts are called with arguments from the shell.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📂 5.1 <code>sys.argv</code> — The Argument List</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><code>sys.argv</code> is a list of all command-line arguments passed to the script. The first element <code>sys.argv[0]</code> is the script name itself.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import the <code>sys</code> module to access command-line arguments.</li>
+                        <li><strong>Step 2:</strong> Define <code>show_argv()</code> to display all arguments.</li>
+                        <li><strong>Step 3:</strong> <code>sys.argv[0]</code> is always the script name (preset in this environment).</li>
+                        <li><strong>Step 4:</strong> <code>len(sys.argv) - 1</code> gives the number of arguments passed.</li>
+                        <li><strong>Step 5:</strong> Use <code>enumerate(sys.argv[1:], 1)</code> to loop through each argument.</li>
+                        <li><strong>Step 6:</strong> If there is at least one argument, display the first one.</li>
+                        <li><strong>Step 7:</strong> Call the function to show the arguments.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import sys
+
+def show_argv():
+    print(f&quot;Script name: {sys.argv[0]}&quot;)
+    print(f&quot;Number of arguments: {len(sys.argv) - 1}&quot;)
+
+    for i, arg in enumerate(sys.argv[1:], 1):
+        print(f&quot;  Arg {i}: {arg}&quot;)
+
+    if len(sys.argv) &gt; 1:
+        print(f&quot;\nFirst argument: {sys.argv[1]}&quot;)
+
+show_argv()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> sys
+
+<span class="kw">def</span> <span class="fn">show_argv</span>():
+    <span class="fn">print</span>(<span class="st">f"Script name: {sys.argv[0]}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Number of arguments: {len(sys.argv) - 1}"</span>)
+
+    <span class="kw">for</span> i, arg <span class="kw">in</span> enumerate(sys.argv[1:], 1):
+        <span class="fn">print</span>(<span class="st">f"  Arg {i}: {arg}"</span>)
+
+    <span class="kw">if</span> len(sys.argv) &gt; 1:
+        <span class="fn">print</span>(<span class="st">f"\nFirst argument: {sys.argv[1]}"</span>)
+
+show_argv()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="note-warn">⚠️ In this browser sandbox, <code>sys.argv</code> is preset to <code>['script.py', 'Alice', '28']</code> so the demo has something to show. In a real terminal, it reflects the arguments you typed.</div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📂 5.2 Simple Argument Parser — Manual Parsing</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">For simple scripts, manually parse <code>sys.argv</code>. Check the number of arguments and handle each position.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>sys</code> for command-line access.</li>
+                        <li><strong>Step 2:</strong> Check if fewer than 2 arguments were provided — show usage message if so.</li>
+                        <li><strong>Step 3:</strong> <code>sys.argv[1]</code> is the first argument (the name).</li>
+                        <li><strong>Step 4:</strong> Check if a second argument (age) was provided — if so, try to convert to <code>int</code>.</li>
+                        <li><strong>Step 5:</strong> If conversion fails, set age to "invalid".</li>
+                        <li><strong>Step 6:</strong> Display a greeting with the name and age.</li>
+                        <li><strong>Step 7:</strong> Call the function to demonstrate.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import sys
+
+def simple_cli():
+    if len(sys.argv) &lt; 2:
+        print(&quot;Usage: python script.py &lt;name&gt; [age]&quot;)
+        return
+
+    name = sys.argv[1]
+    age = &quot;unknown&quot;
+
+    if len(sys.argv) &gt;= 3:
+        try:
+            age = int(sys.argv[2])
+        except ValueError:
+            age = &quot;invalid&quot;
+
+    print(f&quot;Hello, {name}!&quot;)
+    print(f&quot;Age: {age}&quot;)
+
+simple_cli()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> sys
+
+<span class="kw">def</span> <span class="fn">simple_cli</span>():
+    <span class="kw">if</span> len(sys.argv) &lt; 2:
+        <span class="fn">print</span>(<span class="st">"Usage: python script.py &lt;name&gt; [age]"</span>)
+        <span class="kw">return</span>
+
+    name = sys.argv[1]
+    age = <span class="st">"unknown"</span>
+
+    <span class="kw">if</span> len(sys.argv) &gt;= 3:
+        <span class="kw">try</span>:
+            age = <span class="fn">int</span>(sys.argv[2])
+        <span class="kw">except</span> <span class="cl">ValueError</span>:
+            age = <span class="st">"invalid"</span>
+
+    <span class="fn">print</span>(<span class="st">f"Hello, {name}!"</span>)
+    <span class="fn">print</span>(<span class="st">f"Age: {age}"</span>)
+
+simple_cli()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="argparse-deep" aria-labelledby="argparse-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="argparse-heading">⚙️ <code>argparse</code> — Professional Command-Line Parsing</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">For robust, production-ready CLI tools, <code>argparse</code> is the standard library module that handles flags, options, subcommands, and help text automatically.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>⚙️ 6.1 Basic <code>argparse</code> Setup</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Define arguments, flags, and options with type checking and automatic help generation.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import the <code>argparse</code> module.</li>
+                        <li><strong>Step 2:</strong> Create an <code>ArgumentParser</code> instance with a description.</li>
+                        <li><strong>Step 3:</strong> Add a positional argument: <code>"name"</code> — this is required.</li>
+                        <li><strong>Step 4:</strong> Add an optional argument: <code>"--age"</code> with type <code>int</code> and default 18.</li>
+                        <li><strong>Step 5:</strong> Add a flag: <code>"--verbose"</code> with <code>action="store_true"</code>.</li>
+                        <li><strong>Step 6:</strong> Parse arguments with <code>parser.parse_args()</code>, passing an explicit list of fake CLI arguments rather than reading real argv.</li>
+                        <li><strong>Step 7:</strong> Access values via <code>args.name</code>, <code>args.age</code>, <code>args.verbose</code>.</li>
+                        <li><strong>Step 8:</strong> Display the parsed values and check if the user is an adult.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import argparse
+
+def build_parser():
+    parser = argparse.ArgumentParser(
+        description=&quot;A simple CLI tool with argparse&quot;
+    )
+
+    parser.add_argument(&quot;name&quot;, help=&quot;Your name&quot;)
+    parser.add_argument(&quot;--age&quot;, type=int, default=18, help=&quot;Your age (default: 18)&quot;)
+    parser.add_argument(&quot;--verbose&quot;, action=&quot;store_true&quot;, help=&quot;Enable verbose output&quot;)
+
+    return parser
+
+def main():
+    parser = build_parser()
+    args = parser.parse_args([&quot;Alice&quot;, &quot;--age&quot;, &quot;25&quot;, &quot;--verbose&quot;])
+
+    if args.verbose:
+        print(&quot;🔍 Verbose mode enabled&quot;)
+
+    print(f&quot;Hello, {args.name}!&quot;)
+    print(f&quot;Age: {args.age}&quot;)
+
+    if args.age &gt;= 18:
+        print(&quot;✅ You are an adult.&quot;)
+    else:
+        print(&quot;🔞 You are a minor.&quot;)
+
+main()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> argparse
+
+<span class="kw">def</span> <span class="fn">build_parser</span>():
+    parser = argparse.ArgumentParser(
+        description=<span class="st">"A simple CLI tool with argparse"</span>
+    )
+
+    parser.add_argument(<span class="st">"name"</span>, help=<span class="st">"Your name"</span>)
+    parser.add_argument(<span class="st">"--age"</span>, type=int, default=18, help=<span class="st">"Your age (default: 18)"</span>)
+    parser.add_argument(<span class="st">"--verbose"</span>, action=<span class="st">"store_true"</span>, help=<span class="st">"Enable verbose output"</span>)
+
+    <span class="kw">return</span> parser
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    parser = build_parser()
+    args = parser.parse_args([<span class="st">"Alice"</span>, <span class="st">"--age"</span>, <span class="st">"25"</span>, <span class="st">"--verbose"</span>])
+
+    <span class="kw">if</span> args.verbose:
+        <span class="fn">print</span>(<span class="st">"🔍 Verbose mode enabled"</span>)
+
+    <span class="fn">print</span>(<span class="st">f"Hello, {args.name}!"</span>)
+    <span class="fn">print</span>(<span class="st">f"Age: {args.age}"</span>)
+
+    <span class="kw">if</span> args.age &gt;= 18:
+        <span class="fn">print</span>(<span class="st">"✅ You are an adult."</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">"🔞 You are a minor."</span>)
+
+main()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="insight">💡 <code>argparse</code> automatically generates <code>--help</code> output, validates types, and provides error messages for invalid input. Note we pass an explicit list to <code>parse_args()</code> instead of reading real <code>sys.argv</code> — this keeps the demo self-contained and avoids <code>SystemExit</code> surprises.</div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>⚙️ 6.2 Positional vs Optional Arguments</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Positional arguments are required and ordered. Optional arguments are prefixed with <code>--</code> and can appear anywhere.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Create a parser with a description for file operations.</li>
+                        <li><strong>Step 2:</strong> Add <code>"source"</code> as a required positional argument.</li>
+                        <li><strong>Step 3:</strong> Add <code>"dest"</code> as an optional positional with <code>nargs="?"</code> and a default value.</li>
+                        <li><strong>Step 4:</strong> Add <code>"-v"</code> / <code>"--verbose"</code> as a flag (store_true).</li>
+                        <li><strong>Step 5:</strong> Add <code>"-f"</code> / <code>"--force"</code> as a flag (store_true).</li>
+                        <li><strong>Step 6:</strong> Parse arguments with an explicit fake-argument list.</li>
+                        <li><strong>Step 7:</strong> Display all parsed values to show how each argument is handled.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import argparse
+
+def create_parser():
+    parser = argparse.ArgumentParser(description=&quot;File operations&quot;)
+
+    parser.add_argument(&quot;source&quot;, help=&quot;Source file path&quot;)
+    parser.add_argument(&quot;dest&quot;, nargs=&quot;?&quot;, default=&quot;.&quot;, help=&quot;Destination path (default: current dir)&quot;)
+
+    parser.add_argument(&quot;-v&quot;, &quot;--verbose&quot;, action=&quot;store_true&quot;, help=&quot;Verbose output&quot;)
+    parser.add_argument(&quot;-f&quot;, &quot;--force&quot;, action=&quot;store_true&quot;, help=&quot;Overwrite without asking&quot;)
+
+    return parser
+
+def main():
+    parser = create_parser()
+    args = parser.parse_args([&quot;report.txt&quot;, &quot;/backup/&quot;, &quot;--verbose&quot;])
+
+    print(f&quot;Source: {args.source}&quot;)
+    print(f&quot;Destination: {args.dest}&quot;)
+    print(f&quot;Verbose: {args.verbose}&quot;)
+    print(f&quot;Force: {args.force}&quot;)
+
+main()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> argparse
+
+<span class="kw">def</span> <span class="fn">create_parser</span>():
+    parser = argparse.ArgumentParser(description=<span class="st">"File operations"</span>)
+
+    parser.add_argument(<span class="st">"source"</span>, help=<span class="st">"Source file path"</span>)
+    parser.add_argument(<span class="st">"dest"</span>, nargs=<span class="st">"?"</span>, default=<span class="st">"."</span>, help=<span class="st">"Destination path (default: current dir)"</span>)
+
+    parser.add_argument(<span class="st">"-v"</span>, <span class="st">"--verbose"</span>, action=<span class="st">"store_true"</span>, help=<span class="st">"Verbose output"</span>)
+    parser.add_argument(<span class="st">"-f"</span>, <span class="st">"--force"</span>, action=<span class="st">"store_true"</span>, help=<span class="st">"Overwrite without asking"</span>)
+
+    <span class="kw">return</span> parser
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    parser = create_parser()
+    args = parser.parse_args([<span class="st">"report.txt"</span>, <span class="st">"/backup/"</span>, <span class="st">"--verbose"</span>])
+
+    <span class="fn">print</span>(<span class="st">f"Source: {args.source}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Destination: {args.dest}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Verbose: {args.verbose}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Force: {args.force}"</span>)
+
+main()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="secure-input" aria-labelledby="secure-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="secure-heading">🔒 Secure Input — <code>getpass</code> for Passwords</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Never echo passwords to the screen. Use <code>getpass</code> for secure, hidden input.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🔒 7.1 <code>getpass.getpass()</code> — Hidden Input</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">This function works like <code>input()</code> but doesn't echo characters to the console. Perfect for passwords, API keys, and sensitive data.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import the <code>getpass</code> module.</li>
+                        <li><strong>Step 2:</strong> Use <code>input()</code> for the username (visible input).</li>
+                        <li><strong>Step 3:</strong> Use <code>getpass.getpass()</code> for the password (hidden input — in this browser sandbox it's mocked with a JS prompt dialog).</li>
+                        <li><strong>Step 4:</strong> Display the username and the length of the password (not the password itself).</li>
+                        <li><strong>Step 5:</strong> Check if the credentials match a hardcoded pair and display success or failure.</li>
+                        <li><strong>Step 6:</strong> Call the function to test secure login.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import getpass
+
+def secure_login():
+    username = input(&quot;Username: &quot;)
+    password = getpass.getpass(&quot;Password: &quot;)
+
+    print(f&quot;\nUsername: {username}&quot;)
+    print(f&quot;Password length: {len(password)} characters (hidden)&quot;)
+
+    if username == &quot;admin&quot; and password == &quot;secret123&quot;:
+        print(&quot;✅ Login successful!&quot;)
+    else:
+        print(&quot;❌ Invalid credentials.&quot;)
+
+secure_login()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> getpass
+
+<span class="kw">def</span> <span class="fn">secure_login</span>():
+    username = <span class="fn">input</span>(<span class="st">"Username: "</span>)
+    password = getpass.getpass(<span class="st">"Password: "</span>)
+
+    <span class="fn">print</span>(<span class="st">f"\nUsername: {username}"</span>)
+    <span class="fn">print</span>(<span class="st">f"Password length: {len(password)} characters (hidden)"</span>)
+
+    <span class="kw">if</span> username == <span class="st">"admin"</span> <span class="kw">and</span> password == <span class="st">"secret123"</span>:
+        <span class="fn">print</span>(<span class="st">"✅ Login successful!"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">"❌ Invalid credentials."</span>)
+
+secure_login()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="note-warn">⚠️ In this browser sandbox, <code>getpass</code> is mocked using a JavaScript <code>prompt()</code> dialog (it still doesn't echo into the page output). In a local terminal, the real <code>getpass</code> hides typed characters entirely.</div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🔒 7.2 Password Confirmation Pattern</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">When creating new passwords, ask twice and compare. This prevents typos and ensures accuracy.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>getpass</code> for hidden input.</li>
+                        <li><strong>Step 2:</strong> Ask for the current password using <code>getpass()</code>.</li>
+                        <li><strong>Step 3:</strong> Check if the current password matches the expected value.</li>
+                        <li><strong>Step 4:</strong> Ask for the new password twice using <code>getpass()</code>.</li>
+                        <li><strong>Step 5:</strong> Compare the two new passwords — if they don't match, show an error.</li>
+                        <li><strong>Step 6:</strong> Check if the new password is at least 8 characters long.</li>
+                        <li><strong>Step 7:</strong> If all checks pass, confirm the password change.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import getpass
+
+def change_password():
+    print(&quot;🔐 Change Password&quot;)
+    print(&quot;-&quot; * 30)
+
+    current = getpass.getpass(&quot;Current password: &quot;)
+    if current != &quot;secret123&quot;:
+        print(&quot;❌ Incorrect current password.&quot;)
+        return
+
+    new1 = getpass.getpass(&quot;New password: &quot;)
+    new2 = getpass.getpass(&quot;Confirm new password: &quot;)
+
+    if new1 != new2:
+        print(&quot;❌ Passwords do not match.&quot;)
+        return
+
+    if len(new1) &lt; 8:
+        print(&quot;❌ Password must be at least 8 characters.&quot;)
+        return
+
+    print(&quot;✅ Password changed successfully!&quot;)
+
+change_password()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> getpass
+
+<span class="kw">def</span> <span class="fn">change_password</span>():
+    <span class="fn">print</span>(<span class="st">"🔐 Change Password"</span>)
+    <span class="fn">print</span>(<span class="st">"-"</span> * 30)
+
+    current = getpass.getpass(<span class="st">"Current password: "</span>)
+    <span class="kw">if</span> current != <span class="st">"secret123"</span>:
+        <span class="fn">print</span>(<span class="st">"❌ Incorrect current password."</span>)
+        <span class="kw">return</span>
+
+    new1 = getpass.getpass(<span class="st">"New password: "</span>)
+    new2 = getpass.getpass(<span class="st">"Confirm new password: "</span>)
+
+    <span class="kw">if</span> new1 != new2:
+        <span class="fn">print</span>(<span class="st">"❌ Passwords do not match."</span>)
+        <span class="kw">return</span>
+
+    <span class="kw">if</span> len(new1) &lt; 8:
+        <span class="fn">print</span>(<span class="st">"❌ Password must be at least 8 characters."</span>)
+        <span class="kw">return</span>
+
+    <span class="fn">print</span>(<span class="st">"✅ Password changed successfully!"</span>)
+
+change_password()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="file-input" aria-labelledby="file-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="file-heading">📂 Reading Input from Files</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Sometimes input comes from a file, not from a user typing. Learn to read structured data from CSV, JSON, and text files.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📄 8.1 Reading Text Files</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Use <code>open()</code> with a context manager to read files safely. Always specify encoding.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Define <code>read_text_file(path)</code> that attempts to read a file.</li>
+                        <li><strong>Step 2:</strong> Use <code>open()</code> with <code>"r"</code> mode and <code>encoding="utf-8"</code> inside a <code>with</code> block.</li>
+                        <li><strong>Step 3:</strong> Read the entire file content with <code>f.read()</code>.</li>
+                        <li><strong>Step 4:</strong> Display the file path, character count, and first 200 characters.</li>
+                        <li><strong>Step 5:</strong> Catch <code>FileNotFoundError</code> and display a friendly error.</li>
+                        <li><strong>Step 6:</strong> Catch any other exceptions and display the error.</li>
+                        <li><strong>Step 7:</strong> Call the function with a sample file path that this environment pre-creates for you.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def read_text_file(path: str):
+    try:
+        with open(path, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+            content = f.read()
+            print(f&quot;📄 File: {path}&quot;)
+            print(f&quot;Characters: {len(content)}&quot;)
+            print(&quot;Content:&quot;)
+            print(content[:200])
+    except FileNotFoundError:
+        print(f&quot;❌ File not found: {path}&quot;)
+    except Exception as e:
+        print(f&quot;❌ Error reading file: {e}&quot;)
+
+read_text_file(&quot;sample.txt&quot;)">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">read_text_file</span>(path: <span class="cl">str</span>):
+    <span class="kw">try</span>:
+        <span class="kw">with</span> open(path, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+            content = f.read()
+            <span class="fn">print</span>(<span class="st">f"📄 File: {path}"</span>)
+            <span class="fn">print</span>(<span class="st">f"Characters: {len(content)}"</span>)
+            <span class="fn">print</span>(<span class="st">"Content:"</span>)
+            <span class="fn">print</span>(content[:200])
+    <span class="kw">except</span> <span class="cl">FileNotFoundError</span>:
+        <span class="fn">print</span>(<span class="st">f"❌ File not found: {path}"</span>)
+    <span class="kw">except</span> <span class="cl">Exception</span> <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="st">f"❌ Error reading file: {e}"</span>)
+
+read_text_file(<span class="st">"sample.txt"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="note-new">✨ This environment pre-creates <code>sample.txt</code> in the virtual filesystem before your code runs, so this demo works out of the box. In a local environment, it reads from the actual filesystem.</div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📄 8.2 Reading CSV Files</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Use the <code>csv</code> module to read structured tabular data with proper quoting and escaping.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import the <code>csv</code> module and <code>StringIO</code> for in-memory parsing.</li>
+                        <li><strong>Step 2:</strong> Define <code>parse_csv_data(csv_text)</code> that takes a CSV string.</li>
+                        <li><strong>Step 3:</strong> Create a <code>DictReader</code> from <code>StringIO(csv_text)</code>.</li>
+                        <li><strong>Step 4:</strong> Convert the reader to a list of dictionaries (rows).</li>
+                        <li><strong>Step 5:</strong> Display the number of rows and the column names.</li>
+                        <li><strong>Step 6:</strong> Loop through the first 3 rows and print each row.</li>
+                        <li><strong>Step 7:</strong> Define a sample CSV string and call the function.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import csv
+from io import StringIO
+
+def parse_csv_data(csv_text: str):
+    reader = csv.DictReader(StringIO(csv_text))
+    rows = list(reader)
+
+    print(f&quot;📊 Found {len(rows)} rows&quot;)
+    if rows:
+        print(f&quot;Columns: {', '.join(rows[0].keys())}&quot;)
+        for row in rows[:3]:
+            print(row)
+
+csv_sample = &quot;&quot;&quot;name,age,city
+Alice,30,New York
+Bob,25,London
+Charlie,35,Paris&quot;&quot;&quot;
+
+parse_csv_data(csv_sample)">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> csv
+<span class="kw">from</span> io <span class="kw">import</span> StringIO
+
+<span class="kw">def</span> <span class="fn">parse_csv_data</span>(csv_text: <span class="cl">str</span>):
+    reader = csv.DictReader(StringIO(csv_text))
+    rows = list(reader)
+
+    <span class="fn">print</span>(<span class="st">f"📊 Found {len(rows)} rows"</span>)
+    <span class="kw">if</span> rows:
+        <span class="fn">print</span>(<span class="st">f"Columns: {', '.join(rows[0].keys())}"</span>)
+        <span class="kw">for</span> row <span class="kw">in</span> rows[:3]:
+            <span class="fn">print</span>(row)
+
+csv_sample = <span class="st">"""name,age,city
+Alice,30,New York
+Bob,25,London
+Charlie,35,Paris"""</span>
+
+parse_csv_data(csv_sample)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📄 8.3 Reading JSON Files</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">JSON is the most common format for APIs and configuration. Use <code>json.load()</code> or <code>json.loads()</code>.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import the <code>json</code> module.</li>
+                        <li><strong>Step 2:</strong> Define a sample JSON <em>string</em> (not a dict) with user data.</li>
+                        <li><strong>Step 3:</strong> Define <code>parse_json(data)</code> that parses a JSON string.</li>
+                        <li><strong>Step 4:</strong> Use <code>json.loads()</code> to convert the string to a Python dictionary.</li>
+                        <li><strong>Step 5:</strong> Access values using dictionary keys: <code>obj["user"]</code>, <code>obj["level"]</code>, etc.</li>
+                        <li><strong>Step 6:</strong> Calculate the average of the scores list.</li>
+                        <li><strong>Step 7:</strong> Catch <code>JSONDecodeError</code> for invalid JSON.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import json
+
+json_sample = '{&quot;user&quot;: &quot;glenn&quot;, &quot;level&quot;: &quot;advanced&quot;, &quot;scores&quot;: [95, 88, 92]}'
+
+def parse_json(data: str):
+    try:
+        obj = json.loads(data)
+        print(&quot;✅ JSON parsed successfully&quot;)
+        print(f&quot;User: {obj['user']}&quot;)
+        print(f&quot;Level: {obj['level']}&quot;)
+        print(f&quot;Scores: {obj['scores']}&quot;)
+        print(f&quot;Average: {sum(obj['scores']) / len(obj['scores']):.1f}&quot;)
+    except json.JSONDecodeError as e:
+        print(f&quot;❌ Invalid JSON: {e}&quot;)
+
+parse_json(json_sample)">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> json
+
+json_sample = <span class="st">'{"user": "glenn", "level": "advanced", "scores": [95, 88, 92]}'</span>
+
+<span class="kw">def</span> <span class="fn">parse_json</span>(data: <span class="cl">str</span>):
+    <span class="kw">try</span>:
+        obj = json.loads(data)
+        <span class="fn">print</span>(<span class="st">"✅ JSON parsed successfully"</span>)
+        <span class="fn">print</span>(<span class="st">f"User: {obj['user']}"</span>)
+        <span class="fn">print</span>(<span class="st">f"Level: {obj['level']}"</span>)
+        <span class="fn">print</span>(<span class="st">f"Scores: {obj['scores']}"</span>)
+        <span class="fn">print</span>(<span class="st">f"Average: {sum(obj['scores']) / len(obj['scores']):.1f}"</span>)
+    <span class="kw">except</span> json.JSONDecodeError <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="st">f"❌ Invalid JSON: {e}"</span>)
+
+parse_json(json_sample)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="note-warn">⚠️ The sample JSON is a string (single-quoted in Python), not a dict literal — <code>json.loads()</code> requires a string argument.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="loops-input" aria-labelledby="loops-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="loops-heading">🔄 Input in Loops — Interactive Programs</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Many programs need to keep asking for input until a condition is met. Master the interactive loop.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🔄 9.1 Sentinel Loop — Quit with Special Value</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Use a sentinel value (like <code>"quit"</code> or <code>0</code>) to let the user exit the loop.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Define <code>sentinel_loop()</code> with <code>total</code> and <code>count</code> variables.</li>
+                        <li><strong>Step 2:</strong> Print instructions: type "quit" to stop.</li>
+                        <li><strong>Step 3:</strong> Inside <code>while True</code>, call <code>input()</code> and store in <code>raw</code>.</li>
+                        <li><strong>Step 4:</strong> Check if <code>raw.lower() == "quit"</code> — if so, break the loop.</li>
+                        <li><strong>Step 5:</strong> Try to convert <code>raw</code> to <code>float</code> — if successful, add to total and increment count.</li>
+                        <li><strong>Step 6:</strong> If conversion fails, show an error and continue.</li>
+                        <li><strong>Step 7:</strong> After the loop, display the summary if any numbers were entered.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def sentinel_loop():
+    total = 0
+    count = 0
+    print(&quot;Enter numbers to sum. Type 'quit' to stop.&quot;)
+
+    while True:
+        raw = input(&quot;&gt; &quot;)
+        if raw.lower() == &quot;quit&quot;:
+            break
+
+        try:
+            num = float(raw)
+            total += num
+            count += 1
+            print(f&quot;✅ Added {num}. Running total: {total:.2f}&quot;)
+        except ValueError:
+            print(&quot;❌ Invalid number. Try again.&quot;)
+
+    if count &gt; 0:
+        print(f&quot;📊 Summary: {count} numbers, total {total:.2f}, average {total/count:.2f}&quot;)
+    else:
+        print(&quot;No numbers entered.&quot;)
+
+sentinel_loop()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">sentinel_loop</span>():
+    total = 0
+    count = 0
+    <span class="fn">print</span>(<span class="st">"Enter numbers to sum. Type 'quit' to stop."</span>)
+
+    <span class="kw">while</span> <span class="kw">True</span>:
+        raw = <span class="fn">input</span>(<span class="st">"&gt; "</span>)
+        <span class="kw">if</span> raw.lower() == <span class="st">"quit"</span>:
+            <span class="kw">break</span>
+
+        <span class="kw">try</span>:
+            num = <span class="fn">float</span>(raw)
+            total += num
+            count += 1
+            <span class="fn">print</span>(<span class="st">f"✅ Added {num}. Running total: {total:.2f}"</span>)
+        <span class="kw">except</span> <span class="cl">ValueError</span>:
+            <span class="fn">print</span>(<span class="st">"❌ Invalid number. Try again."</span>)
+
+    <span class="kw">if</span> count &gt; 0:
+        <span class="fn">print</span>(<span class="st">f"📊 Summary: {count} numbers, total {total:.2f}, average {total/count:.2f}"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(<span class="st">"No numbers entered."</span>)
+
+sentinel_loop()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🔄 9.2 Interactive Menu — User-Driven Program</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">A menu-driven program lets the user choose actions repeatedly until they decide to exit.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Define <code>show_menu()</code> that prints the menu options.</li>
+                        <li><strong>Step 2:</strong> Define <code>menu_loop()</code> with an infinite loop.</li>
+                        <li><strong>Step 3:</strong> Call <code>show_menu()</code> and capture the user's choice.</li>
+                        <li><strong>Step 4:</strong> If choice is "0", print goodbye and break.</li>
+                        <li><strong>Step 5:</strong> If choice is "1", ask for a name and greet the user.</li>
+                        <li><strong>Step 6:</strong> If choice is "2", ask for a number and double it.</li>
+                        <li><strong>Step 7:</strong> If choice is "3", import <code>time</code> and show the current time.</li>
+                        <li><strong>Step 8:</strong> For any other choice, show an error message.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def show_menu():
+    print(&quot;\n📋 Menu&quot;)
+    print(&quot;  1. Say hello&quot;)
+    print(&quot;  2. Double a number&quot;)
+    print(&quot;  3. Show current time&quot;)
+    print(&quot;  0. Exit&quot;)
+
+def menu_loop():
+    while True:
+        show_menu()
+        choice = input(&quot;Choose an option: &quot;).strip()
+
+        if choice == &quot;0&quot;:
+            print(&quot;👋 Goodbye!&quot;)
+            break
+        elif choice == &quot;1&quot;:
+            name = input(&quot;Your name: &quot;)
+            print(f&quot;Hello, {name}! 👋&quot;)
+        elif choice == &quot;2&quot;:
+            try:
+                num = float(input(&quot;Enter a number: &quot;))
+                print(f&quot;Double: {num * 2}&quot;)
+            except ValueError:
+                print(&quot;❌ Invalid number.&quot;)
+        elif choice == &quot;3&quot;:
+            import time
+            print(f&quot;🕐 {time.strftime('%H:%M:%S')}&quot;)
+        else:
+            print(&quot;❌ Invalid option. Try again.&quot;)
+
+menu_loop()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">show_menu</span>():
+    <span class="fn">print</span>(<span class="st">"\n📋 Menu"</span>)
+    <span class="fn">print</span>(<span class="st">"  1. Say hello"</span>)
+    <span class="fn">print</span>(<span class="st">"  2. Double a number"</span>)
+    <span class="fn">print</span>(<span class="st">"  3. Show current time"</span>)
+    <span class="fn">print</span>(<span class="st">"  0. Exit"</span>)
+
+<span class="kw">def</span> <span class="fn">menu_loop</span>():
+    <span class="kw">while</span> <span class="kw">True</span>:
+        show_menu()
+        choice = <span class="fn">input</span>(<span class="st">"Choose an option: "</span>).strip()
+
+        <span class="kw">if</span> choice == <span class="st">"0"</span>:
+            <span class="fn">print</span>(<span class="st">"👋 Goodbye!"</span>)
+            <span class="kw">break</span>
+        <span class="kw">elif</span> choice == <span class="st">"1"</span>:
+            name = <span class="fn">input</span>(<span class="st">"Your name: "</span>)
+            <span class="fn">print</span>(<span class="st">f"Hello, {name}! 👋"</span>)
+        <span class="kw">elif</span> choice == <span class="st">"2"</span>:
+            <span class="kw">try</span>:
+                num = <span class="fn">float</span>(<span class="fn">input</span>(<span class="st">"Enter a number: "</span>))
+                <span class="fn">print</span>(<span class="st">f"Double: {num * 2}"</span>)
+            <span class="kw">except</span> <span class="cl">ValueError</span>:
+                <span class="fn">print</span>(<span class="st">"❌ Invalid number."</span>)
+        <span class="kw">elif</span> choice == <span class="st">"3"</span>:
+            <span class="kw">import</span> time
+            <span class="fn">print</span>(<span class="st">f"🕐 {time.strftime('%H:%M:%S')}"</span>)
+        <span class="kw">else</span>:
+            <span class="fn">print</span>(<span class="st">"❌ Invalid option. Try again."</span>)
+
+menu_loop()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="insight">💡 Menu-driven programs are the backbone of many CLI utilities. The pattern scales well with functions for each option.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="error-handling" aria-labelledby="error-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="error-heading">🛡️ Robust Error Handling for User Input</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Anticipate every possible failure and handle it gracefully — your users will thank you.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🛡️ 10.1 Comprehensive Validation Function</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Build a reusable validation function that handles multiple failure modes and provides clear feedback.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>Optional</code> from <code>typing</code> for type hints.</li>
+                        <li><strong>Step 2:</strong> Define <code>safe_int_input()</code> with parameters for prompt, min, max, and retries.</li>
+                        <li><strong>Step 3:</strong> Loop for the specified number of retries.</li>
+                        <li><strong>Step 4:</strong> Inside each attempt, try to convert the input to <code>int</code>.</li>
+                        <li><strong>Step 5:</strong> Check if the value is within the specified min and max bounds.</li>
+                        <li><strong>Step 6:</strong> If valid, return the value immediately.</li>
+                        <li><strong>Step 7:</strong> If invalid or conversion fails, show an error and continue.</li>
+                        <li><strong>Step 8:</strong> After all retries, return <code>None</code>.</li>
+                        <li><strong>Step 9:</strong> Test the function with age and score inputs.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="from typing import Optional
+
+def safe_int_input(
+    prompt: str,
+    min_val: Optional[int] = None,
+    max_val: Optional[int] = None,
+    retries: int = 3
+) -&gt; Optional[int]:
+    for attempt in range(1, retries + 1):
+        try:
+            raw = input(f&quot;{prompt} &quot;)
+            value = int(raw)
+
+            if min_val is not None and value &lt; min_val:
+                print(f&quot;❌ Value must be at least {min_val}.&quot;)
+                continue
+
+            if max_val is not None and value &gt; max_val:
+                print(f&quot;❌ Value must be at most {max_val}.&quot;)
+                continue
+
+            return value
+
+        except ValueError:
+            print(f&quot;❌ Invalid integer. ({retries - attempt} attempts left)&quot;)
+
+    print(&quot;❌ Too many attempts. Returning None.&quot;)
+    return None
+
+age = safe_int_input(&quot;Enter your age:&quot;, min_val=1, max_val=120)
+if age is not None:
+    print(f&quot;✅ Age: {age}&quot;)
+
+score = safe_int_input(&quot;Enter a score (0-100):&quot;, min_val=0, max_val=100)
+if score is not None:
+    print(f&quot;✅ Score: {score}&quot;)">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">from</span> typing <span class="kw">import</span> Optional
+
+<span class="kw">def</span> <span class="fn">safe_int_input</span>(
+    prompt: <span class="cl">str</span>,
+    min_val: Optional[<span class="cl">int</span>] = <span class="kw">None</span>,
+    max_val: Optional[<span class="cl">int</span>] = <span class="kw">None</span>,
+    retries: <span class="cl">int</span> = 3
+) -&gt; Optional[<span class="cl">int</span>]:
+    <span class="kw">for</span> attempt <span class="kw">in</span> range(1, retries + 1):
+        <span class="kw">try</span>:
+            raw = <span class="fn">input</span>(<span class="st">f"{prompt} "</span>)
+            value = <span class="fn">int</span>(raw)
+
+            <span class="kw">if</span> min_val <span class="kw">is not None</span> <span class="kw">and</span> value &lt; min_val:
+                <span class="fn">print</span>(<span class="st">f"❌ Value must be at least {min_val}."</span>)
+                <span class="kw">continue</span>
+
+            <span class="kw">if</span> max_val <span class="kw">is not None</span> <span class="kw">and</span> value &gt; max_val:
+                <span class="fn">print</span>(<span class="st">f"❌ Value must be at most {max_val}."</span>)
+                <span class="kw">continue</span>
+
+            <span class="kw">return</span> value
+
+        <span class="kw">except</span> <span class="cl">ValueError</span>:
+            <span class="fn">print</span>(<span class="st">f"❌ Invalid integer. ({retries - attempt} attempts left)"</span>)
+
+    <span class="fn">print</span>(<span class="st">"❌ Too many attempts. Returning None."</span>)
+    <span class="kw">return</span> <span class="kw">None</span>
+
+age = safe_int_input(<span class="st">"Enter your age:"</span>, min_val=1, max_val=120)
+<span class="kw">if</span> age <span class="kw">is not None</span>:
+    <span class="fn">print</span>(<span class="st">f"✅ Age: {age}"</span>)
+
+score = safe_int_input(<span class="st">"Enter a score (0-100):"</span>, min_val=0, max_val=100)
+<span class="kw">if</span> score <span class="kw">is not None</span>:
+    <span class="fn">print</span>(<span class="st">f"✅ Score: {score}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🛡️ 10.2 Context Managers for Resource Safety</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">When reading files, use <code>with</code> to guarantee the file is closed even if an exception occurs.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Define <code>read_file_safely(path)</code> that attempts to read a file.</li>
+                        <li><strong>Step 2:</strong> Use <code>with open()</code> to open the file — this automatically closes it.</li>
+                        <li><strong>Step 3:</strong> Read the content and return it.</li>
+                        <li><strong>Step 4:</strong> Catch <code>FileNotFoundError</code> and display a specific error.</li>
+                        <li><strong>Step 5:</strong> Catch <code>PermissionError</code> for access issues.</li>
+                        <li><strong>Step 6:</strong> Catch <code>UnicodeDecodeError</code> for encoding problems.</li>
+                        <li><strong>Step 7:</strong> Catch any other unexpected exceptions with a generic handler.</li>
+                        <li><strong>Step 8:</strong> Call the function and check if content was read successfully.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="def read_file_safely(path: str):
+    try:
+        with open(path, &quot;r&quot;, encoding=&quot;utf-8&quot;) as f:
+            return f.read()
+    except FileNotFoundError:
+        print(f&quot;❌ File not found: {path}&quot;)
+        return None
+    except PermissionError:
+        print(f&quot;❌ Permission denied: {path}&quot;)
+        return None
+    except UnicodeDecodeError as e:
+        print(f&quot;❌ Encoding error: {e}&quot;)
+        return None
+    except Exception as e:
+        print(f&quot;❌ Unexpected error: {e}&quot;)
+        return None
+
+content = read_file_safely(&quot;sample.txt&quot;)
+if content is not None:
+    print(f&quot;✅ Read {len(content)} characters&quot;)">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">def</span> <span class="fn">read_file_safely</span>(path: <span class="cl">str</span>):
+    <span class="kw">try</span>:
+        <span class="kw">with</span> open(path, <span class="st">"r"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+            <span class="kw">return</span> f.read()
+    <span class="kw">except</span> <span class="cl">FileNotFoundError</span>:
+        <span class="fn">print</span>(<span class="st">f"❌ File not found: {path}"</span>)
+        <span class="kw">return</span> <span class="kw">None</span>
+    <span class="kw">except</span> <span class="cl">PermissionError</span>:
+        <span class="fn">print</span>(<span class="st">f"❌ Permission denied: {path}"</span>)
+        <span class="kw">return</span> <span class="kw">None</span>
+    <span class="kw">except</span> <span class="cl">UnicodeDecodeError</span> <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="st">f"❌ Encoding error: {e}"</span>)
+        <span class="kw">return</span> <span class="kw">None</span>
+    <span class="kw">except</span> <span class="cl">Exception</span> <span class="kw">as</span> e:
+        <span class="fn">print</span>(<span class="st">f"❌ Unexpected error: {e}"</span>)
+        <span class="kw">return</span> <span class="kw">None</span>
+
+content = read_file_safely(<span class="st">"sample.txt"</span>)
+<span class="kw">if</span> content <span class="kw">is not None</span>:
+    <span class="fn">print</span>(<span class="st">f"✅ Read {len(content)} characters"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="real-world" aria-labelledby="real-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="real-heading">🚀 Real-World Input Patterns</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Putting it all together — input handling patterns used in production Python applications.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🚀 11.1 Configuration Input — Interactive Setup</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Many applications ask for configuration on first run. This pattern collects settings and saves them.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>json</code> and <code>Path</code> for file operations.</li>
+                        <li><strong>Step 2:</strong> Define <code>interactive_config()</code> that returns a dictionary of settings.</li>
+                        <li><strong>Step 3:</strong> Ask for project name with a default value using the <code>or</code> operator.</li>
+                        <li><strong>Step 4:</strong> Ask for port number — convert to int or use default 8000.</li>
+                        <li><strong>Step 5:</strong> Ask for debug mode — check if input is "yes", "y", or "true".</li>
+                        <li><strong>Step 6:</strong> Ask for environment — default to "dev".</li>
+                        <li><strong>Step 7:</strong> Define <code>save_config()</code> that writes the config to a JSON file.</li>
+                        <li><strong>Step 8:</strong> Call both functions and display the configuration.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import json
+from pathlib import Path
+
+def interactive_config() -&gt; dict:
+    print(&quot;\n⚙️ Interactive Configuration Setup&quot;)
+    print(&quot;Press Enter to use default values.&quot;)
+
+    config = {}
+
+    name = input(&quot;Project name [default: myproject]: &quot;) or &quot;myproject&quot;
+    config[&quot;name&quot;] = name
+
+    port_input = input(&quot;Port [default: 8000]: &quot;)
+    config[&quot;port&quot;] = int(port_input) if port_input else 8000
+
+    debug_input = input(&quot;Debug mode? (yes/no) [default: no]: &quot;)
+    config[&quot;debug&quot;] = debug_input.lower() in (&quot;yes&quot;, &quot;y&quot;, &quot;true&quot;)
+
+    env = input(&quot;Environment [dev/prod, default: dev]: &quot;) or &quot;dev&quot;
+    config[&quot;environment&quot;] = env
+
+    return config
+
+def save_config(config: dict, path: str = &quot;config.json&quot;):
+    with open(path, &quot;w&quot;, encoding=&quot;utf-8&quot;) as f:
+        json.dump(config, f, indent=2)
+    print(f&quot;✅ Config saved to {path}&quot;)
+
+config = interactive_config()
+print(&quot;\n📋 Configuration:&quot;)
+for k, v in config.items():
+    print(f&quot;  {k}: {v}&quot;)">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> json
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+
+<span class="kw">def</span> <span class="fn">interactive_config</span>() -&gt; <span class="cl">dict</span>:
+    <span class="fn">print</span>(<span class="st">"\n⚙️ Interactive Configuration Setup"</span>)
+    <span class="fn">print</span>(<span class="st">"Press Enter to use default values."</span>)
+
+    config = {}
+
+    name = <span class="fn">input</span>(<span class="st">"Project name [default: myproject]: "</span>) <span class="kw">or</span> <span class="st">"myproject"</span>
+    config[<span class="st">"name"</span>] = name
+
+    port_input = <span class="fn">input</span>(<span class="st">"Port [default: 8000]: "</span>)
+    config[<span class="st">"port"</span>] = <span class="fn">int</span>(port_input) <span class="kw">if</span> port_input <span class="kw">else</span> 8000
+
+    debug_input = <span class="fn">input</span>(<span class="st">"Debug mode? (yes/no) [default: no]: "</span>)
+    config[<span class="st">"debug"</span>] = debug_input.lower() <span class="kw">in</span> (<span class="st">"yes"</span>, <span class="st">"y"</span>, <span class="st">"true"</span>)
+
+    env = <span class="fn">input</span>(<span class="st">"Environment [dev/prod, default: dev]: "</span>) <span class="kw">or</span> <span class="st">"dev"</span>
+    config[<span class="st">"environment"</span>] = env
+
+    <span class="kw">return</span> config
+
+<span class="kw">def</span> <span class="fn">save_config</span>(config: <span class="cl">dict</span>, path: <span class="cl">str</span> = <span class="st">"config.json"</span>):
+    <span class="kw">with</span> open(path, <span class="st">"w"</span>, encoding=<span class="st">"utf-8"</span>) <span class="kw">as</span> f:
+        json.dump(config, f, indent=2)
+    <span class="fn">print</span>(<span class="st">f"✅ Config saved to {path}"</span>)
+
+config = interactive_config()
+<span class="fn">print</span>(<span class="st">"\n📋 Configuration:"</span>)
+<span class="kw">for</span> k, v <span class="kw">in</span> config.items():
+    <span class="fn">print</span>(<span class="st">f"  {k}: {v}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🚀 11.2 Data Entry Form — Multi-Field Collection</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Collect structured data from the user with validation and confirmation.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>re</code> for regular expression validation.</li>
+                        <li><strong>Step 2:</strong> Define <code>collect_person_data()</code> that returns a dictionary.</li>
+                        <li><strong>Step 3:</strong> Validate name: check length and character set using <code>re.match()</code>.</li>
+                        <li><strong>Step 4:</strong> Validate email: check format with a regex pattern.</li>
+                        <li><strong>Step 5:</strong> Validate age: convert to <code>int</code> and check range 1–150.</li>
+                        <li><strong>Step 6:</strong> Ask for role with a predefined set of options — default to "other".</li>
+                        <li><strong>Step 7:</strong> Return the collected data as a dictionary.</li>
+                        <li><strong>Step 8:</strong> Display the collected person data.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import re
+
+def collect_person_data() -&gt; dict:
+    print(&quot;\n📝 Enter person details:&quot;)
+
+    while True:
+        name = input(&quot;Full name: &quot;).strip()
+        if len(name) &gt;= 2 and re.match(r&quot;^[A-Za-z\s\-'']+$&quot;, name):
+            break
+        print(&quot;❌ Please enter a valid name (2+ letters, no numbers).&quot;)
+
+    while True:
+        email = input(&quot;Email: &quot;).strip()
+        if re.match(r&quot;^[\w\.-]+@[\w\.-]+\.\w+$&quot;, email):
+            break
+        print(&quot;❌ Invalid email format.&quot;)
+
+    while True:
+        age_str = input(&quot;Age: &quot;)
+        try:
+            age = int(age_str)
+            if 1 &lt;= age &lt;= 150:
+                break
+            print(&quot;❌ Age must be between 1 and 150.&quot;)
+        except ValueError:
+            print(&quot;❌ Please enter a valid number.&quot;)
+
+    role = input(&quot;Role (developer, designer, manager): &quot;).strip().lower()
+    if role not in (&quot;developer&quot;, &quot;designer&quot;, &quot;manager&quot;):
+        role = &quot;other&quot;
+        print(f&quot;Role set to {role}&quot;)
+
+    return {&quot;name&quot;: name, &quot;email&quot;: email, &quot;age&quot;: age, &quot;role&quot;: role}
+
+person = collect_person_data()
+print(&quot;\n✅ Person saved:&quot;)
+for k, v in person.items():
+    print(f&quot;  {k}: {v}&quot;)">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> re
+
+<span class="kw">def</span> <span class="fn">collect_person_data</span>() -&gt; <span class="cl">dict</span>:
+    <span class="fn">print</span>(<span class="st">"\n📝 Enter person details:"</span>)
+
+    <span class="kw">while</span> <span class="kw">True</span>:
+        name = <span class="fn">input</span>(<span class="st">"Full name: "</span>).strip()
+        <span class="kw">if</span> len(name) &gt;= 2 <span class="kw">and</span> re.match(<span class="st">r"^[A-Za-z\s\-'']+$"</span>, name):
+            <span class="kw">break</span>
+        <span class="fn">print</span>(<span class="st">"❌ Please enter a valid name (2+ letters, no numbers)."</span>)
+
+    <span class="kw">while</span> <span class="kw">True</span>:
+        email = <span class="fn">input</span>(<span class="st">"Email: "</span>).strip()
+        <span class="kw">if</span> re.match(<span class="st">r"^[\w\.-]+@[\w\.-]+\.\w+$"</span>, email):
+            <span class="kw">break</span>
+        <span class="fn">print</span>(<span class="st">"❌ Invalid email format."</span>)
+
+    <span class="kw">while</span> <span class="kw">True</span>:
+        age_str = <span class="fn">input</span>(<span class="st">"Age: "</span>)
+        <span class="kw">try</span>:
+            age = <span class="fn">int</span>(age_str)
+            <span class="kw">if</span> 1 &lt;= age &lt;= 150:
+                <span class="kw">break</span>
+            <span class="fn">print</span>(<span class="st">"❌ Age must be between 1 and 150."</span>)
+        <span class="kw">except</span> <span class="cl">ValueError</span>:
+            <span class="fn">print</span>(<span class="st">"❌ Please enter a valid number."</span>)
+
+    role = <span class="fn">input</span>(<span class="st">"Role (developer, designer, manager): "</span>).strip().lower()
+    <span class="kw">if</span> role <span class="kw">not in</span> (<span class="st">"developer"</span>, <span class="st">"designer"</span>, <span class="st">"manager"</span>):
+        role = <span class="st">"other"</span>
+        <span class="fn">print</span>(<span class="st">f"Role set to {role}"</span>)
+
+    <span class="kw">return</span> {<span class="st">"name"</span>: name, <span class="st">"email"</span>: email, <span class="st">"age"</span>: age, <span class="st">"role"</span>: role}
+
+person = collect_person_data()
+<span class="fn">print</span>(<span class="st">"\n✅ Person saved:"</span>)
+<span class="kw">for</span> k, v <span class="kw">in</span> person.items():
+    <span class="fn">print</span>(<span class="st">f"  {k}: {v}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>🚀 11.3 Command-Line Tool with Multiple Modes</h3>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">A real CLI tool with subcommands, each with its own arguments.</p>
+
+                    <h4 style="color:var(--blue-lt);font-size:0.8rem;margin-top:0.8rem;margin-bottom:0.4rem;">Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>argparse</code> for subcommand support.</li>
+                        <li><strong>Step 2:</strong> Define <code>build_subcommand_parser()</code> that creates a parser with subparsers.</li>
+                        <li><strong>Step 3:</strong> Add an "add" subcommand with a required <code>title</code> argument and optional <code>--priority</code>.</li>
+                        <li><strong>Step 4:</strong> Add a "list" subcommand with an optional <code>--filter</code> argument.</li>
+                        <li><strong>Step 5:</strong> Add a "done" subcommand with a required <code>task_id</code> argument.</li>
+                        <li><strong>Step 6:</strong> In <code>main()</code>, parse arguments and check the <code>command</code> attribute.</li>
+                        <li><strong>Step 7:</strong> Handle each subcommand with appropriate logic.</li>
+                        <li><strong>Step 8:</strong> Call the function to demonstrate subcommand parsing.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import argparse
+
+def build_subcommand_parser():
+    parser = argparse.ArgumentParser(description=&quot;Task manager CLI&quot;)
+    subparsers = parser.add_subparsers(dest=&quot;command&quot;, required=True)
+
+    add_parser = subparsers.add_parser(&quot;add&quot;, help=&quot;Add a task&quot;)
+    add_parser.add_argument(&quot;title&quot;, help=&quot;Task title&quot;)
+    add_parser.add_argument(&quot;--priority&quot;, choices=[&quot;low&quot;, &quot;medium&quot;, &quot;high&quot;], default=&quot;medium&quot;)
+
+    list_parser = subparsers.add_parser(&quot;list&quot;, help=&quot;List tasks&quot;)
+    list_parser.add_argument(&quot;--filter&quot;, choices=[&quot;all&quot;, &quot;active&quot;, &quot;done&quot;], default=&quot;all&quot;)
+
+    done_parser = subparsers.add_parser(&quot;done&quot;, help=&quot;Mark task as done&quot;)
+    done_parser.add_argument(&quot;task_id&quot;, type=int, help=&quot;Task ID&quot;)
+
+    return parser
+
+def main():
+    parser = build_subcommand_parser()
+    args = parser.parse_args([&quot;add&quot;, &quot;Buy milk&quot;, &quot;--priority&quot;, &quot;high&quot;])
+
+    if args.command == &quot;add&quot;:
+        print(f&quot;✅ Added task: '{args.title}' (priority: {args.priority})&quot;)
+    elif args.command == &quot;list&quot;:
+        print(f&quot;📋 Listing tasks (filter: {args.filter})&quot;)
+    elif args.command == &quot;done&quot;:
+        print(f&quot;✅ Task {args.task_id} marked as done&quot;)
+
+main()">
+                        <div class="code-header">
+                            <span style="color:var(--muted);">python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> argparse
+
+<span class="kw">def</span> <span class="fn">build_subcommand_parser</span>():
+    parser = argparse.ArgumentParser(description=<span class="st">"Task manager CLI"</span>)
+    subparsers = parser.add_subparsers(dest=<span class="st">"command"</span>, required=True)
+
+    add_parser = subparsers.add_parser(<span class="st">"add"</span>, help=<span class="st">"Add a task"</span>)
+    add_parser.add_argument(<span class="st">"title"</span>, help=<span class="st">"Task title"</span>)
+    add_parser.add_argument(<span class="st">"--priority"</span>, choices=[<span class="st">"low"</span>, <span class="st">"medium"</span>, <span class="st">"high"</span>], default=<span class="st">"medium"</span>)
+
+    list_parser = subparsers.add_parser(<span class="st">"list"</span>, help=<span class="st">"List tasks"</span>)
+    list_parser.add_argument(<span class="st">"--filter"</span>, choices=[<span class="st">"all"</span>, <span class="st">"active"</span>, <span class="st">"done"</span>], default=<span class="st">"all"</span>)
+
+    done_parser = subparsers.add_parser(<span class="st">"done"</span>, help=<span class="st">"Mark task as done"</span>)
+    done_parser.add_argument(<span class="st">"task_id"</span>, type=int, help=<span class="st">"Task ID"</span>)
+
+    <span class="kw">return</span> parser
+
+<span class="kw">def</span> <span class="fn">main</span>():
+    parser = build_subcommand_parser()
+    args = parser.parse_args([<span class="st">"add"</span>, <span class="st">"Buy milk"</span>, <span class="st">"--priority"</span>, <span class="st">"high"</span>])
+
+    <span class="kw">if</span> args.command == <span class="st">"add"</span>:
+        <span class="fn">print</span>(<span class="st">f"✅ Added task: '{args.title}' (priority: {args.priority})"</span>)
+    <span class="kw">elif</span> args.command == <span class="st">"list"</span>:
+        <span class="fn">print</span>(<span class="st">f"📋 Listing tasks (filter: {args.filter})"</span>)
+    <span class="kw">elif</span> args.command == <span class="st">"done"</span>:
+        <span class="fn">print</span>(<span class="st">f"✅ Task {args.task_id} marked as done"</span>)
+
+main()</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="insight">💡 Subcommands make CLI tools feel professional and composable. Every major CLI tool — <code>git</code>, <code>docker</code>, <code>pip</code> — uses this pattern.</div>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <section id="faq-inputs" aria-labelledby="faq-inputs-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="faq-inputs-heading">❓ Frequently Asked Questions — Input Handling</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Common questions about Python input, answered.</p>
+                </div>
+                <div class="faq-list">
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>Why does <code>input()</code> always return a string?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Python is strongly typed and does not auto-convert. This design makes the program's behaviour predictable and explicit. You — the programmer — decide what type the input should be and convert it accordingly.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>How do I get a number without <code>ValueError</code>?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Wrap <code>int()</code> or <code>float()</code> in a <code>try/except</code> block. For user-facing programs, loop until valid input is received. Never assume input will be correct.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>What is the difference between <code>sys.argv</code> and <code>argparse</code>?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><code>sys.argv</code> is a raw list of arguments. <code>argparse</code> is a full-featured parser that handles flags, options, type conversion, help generation, and error messages. Use <code>argparse</code> for any non-trivial CLI tool.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>How do I read input that has spaces?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><code>input()</code> reads the entire line, including spaces. For multiple values on one line, use <code>split()</code> and then process each piece. For multi-line input, collect in a loop until a sentinel value is entered.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>Is <code>getpass</code> safe to use in production?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;"><code>getpass</code> is safe for hiding input from shoulder surfers, but it does not encrypt the input. Use it for passwords in local scripts. For production applications, use environment variables or dedicated secret management tools.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>How do I handle Unicode input?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Python 3 handles Unicode strings by default. <code>input()</code> returns a <code>str</code> that can contain any Unicode character. When reading from files, always specify <code>encoding="utf-8"</code>.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>What's the best way to validate email addresses?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">Use a regular expression for basic format validation. For production, consider using a dedicated library like <code>email-validator</code>. Never try to fully validate an email address with regex alone — send a confirmation link to verify.</p></div></div>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <section id="outro" aria-labelledby="outro-heading">
+            <div class="page-col">
+                <div class="outro-box">
+                    <h2 id="outro-heading">💛 You've Mastered Python Input Handling</h2>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">
+                        From the humble <code>input()</code> to professional CLI tools with <code>argparse</code>,
+                        you now have a complete mental model for handling user input in Python. You've learned to
+                        <strong>validate</strong>, <strong>convert</strong>, <strong>secure</strong>, and
+                        <strong>structure</strong> input in ways that scale from simple scripts to production applications.
+                    </p>
+                    <p style="text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;">
+                        This curriculum, crafted by <strong style="color:var(--gold);">@PoeticGlenn</strong>,
+                        is designed to be your go-to reference whenever you need to handle input in Python.
+                        Bookmark it, share it with your team, and revisit the lessons as you build more complex systems.
+                    </p>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.6rem;justify-content:center;margin:1rem 0 0.6rem;">
+                        <span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:0.3rem 1rem;font-size:0.7rem;color:var(--muted);">
+                            <i class="fas fa-check-circle" style="color:var(--green);"></i> 24 lessons
+                        </span>
+                        <span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:0.3rem 1rem;font-size:0.7rem;color:var(--muted);">
+                            <i class="fas fa-code" style="color:var(--blue-lt);"></i> 30+ code examples
+                        </span>
+                        <span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:0.3rem 1rem;font-size:0.7rem;color:var(--muted);">
+                            <i class="fas fa-users" style="color:var(--gold);"></i> 850+ learners
+                        </span>
+                    </div>
+                    <div class="outro-cta">
+                        <a href="index.html" class="btn btn-home"><i class="fas fa-home"></i> Explore More</a>
+                        <a href="https://twitter.com/PoeticGlenn" target="_blank" rel="noopener" class="btn btn-outline"><i class="fab fa-twitter"></i> Follow @PoeticGlenn</a>
+                        <a href="https://github.com/pansensoyglenn-dev/poetic-bytes" target="_blank" rel="noopener" class="btn btn-outline"><i class="fab fa-github"></i> Star on GitHub</a>
+                    </div>
+                    <p style="font-size:0.75rem;color:var(--muted);margin-top:1.2rem;">
+                        <i class="fas fa-quote-left" style="color:var(--gold);margin-right:0.3rem;"></i>
+                        "Great input handling is invisible — it just works. That's the mark of a professional developer."
+                        <span style="display:block;color:var(--gold);font-weight:600;margin-top:0.2rem;">— Glenn Junsay Pansensoy <span style="font-weight:400;color:var(--muted);">(@PoeticGlenn)</span></span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section aria-label="Share this resource">
+            <div class="page-col">
+                <div class="share-box" id="shareSection">
+                    <h3>📤 Share this guide</h3>
+                    <p style="margin-top:.3rem;">Help other developers master Python input handling — spread the word!</p>
+                    <div class="share-row" id="shareRowBottom">
+                        <button class="share-btn copy-btn" id="copyLinkBottom"><i class="fas fa-link"></i> Copy link</button>
+                        <a href="#" class="share-btn" id="shareFbBottom" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i> Facebook</a>
+                        <a href="#" class="share-btn" id="shareTwBottom" target="_blank" rel="noopener"><i class="fab fa-twitter"></i> X</a>
+                        <a href="#" class="share-btn" id="shareLiBottom" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
+                        <a href="#" class="share-btn" id="shareWaBottom" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                        <a href="#" class="share-btn" id="shareTgBottom" target="_blank" rel="noopener"><i class="fab fa-telegram-plane"></i> Telegram</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div><hr style="border:none;border-top:1px solid rgba(139,94,52,0.25);margin:2.5rem 0;"><div style="margin-bottom:1.5rem;"><span style="font-size:0.72rem;color:#8a7563;font-family:monospace;">Tags: </span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">python input</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">python input() function</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">python type conversion</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">python input validation</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">sys.argv</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">argparse tutorial</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">python getpass</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">python CLI</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">python command line arguments</span><span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">python file input</span></div><div style="margin:2rem 0;background:rgba(139,94,52,0.08);border:1px solid rgba(139,94,52,0.25);border-radius:16px;padding:1.4rem;"><div style="font-family:monospace;font-size:0.72rem;color:#7a3e1a;margin-bottom:1rem;">Comments</div><div id="disqus_thread"></div><script>var disqus_config=function(){this.page.url="https://poetic-bytes.blogspot.com/2026/11/python-inputs-tutorial-2026-input.html";this.page.identifier="Python%20Inputs%20Tutorial%202026%20%E2%80%93%20input()%2C%20Validation%20%26%20CLI%20%7C%20Poetic%20Bytes";};(function(){var d=document,s=d.createElement("scr"+"ipt");s.src="https://"+(localStorage.getItem("pc_disqus")||"poetic-codes")+".disqus.com/embed.js";s.setAttribute("data-timestamp",+new Date());(d.head||d.body).appendChild(s);})();</script><noscript>Please enable JavaScript to view comments.</noscript></div><div style="background:rgba(139,94,52,0.08);border:1px solid rgba(139,94,52,0.25);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:2rem;"><div style="font-family:monospace;font-size:0.7rem;color:#7a3e1a;margin-bottom:0.8rem;">Share this essay</div><div style="display:flex;flex-wrap:wrap;"><a href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-inputs-tutorial-2026-input.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#1877f2;">Facebook</a><a href="https://twitter.com/intent/tweet?text=Python%20Inputs%20Tutorial%202026%20%E2%80%93%20input()%2C%20Validation%20%26%20CLI%20%7C%20Poetic%20Bytes&url=https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-inputs-tutorial-2026-input.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#000;">X</a><a href="https://www.linkedin.com/shareArticle?mini=true&url=https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-inputs-tutorial-2026-input.html&title=Python%20Inputs%20Tutorial%202026%20%E2%80%93%20input()%2C%20Validation%20%26%20CLI%20%7C%20Poetic%20Bytes" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#0077b5;">LinkedIn</a><a href="https://api.whatsapp.com/send?text=Python%20Inputs%20Tutorial%202026%20%E2%80%93%20input()%2C%20Validation%20%26%20CLI%20%7C%20Poetic%20Bytes%20https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-inputs-tutorial-2026-input.html" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#25d366;">WhatsApp</a><a href="https://telegram.me/share/url?url=https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-inputs-tutorial-2026-input.html&text=Python%20Inputs%20Tutorial%202026%20%E2%80%93%20input()%2C%20Validation%20%26%20CLI%20%7C%20Poetic%20Bytes" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#229ed9;">Telegram</a><a href="https://www.reddit.com/submit?url=https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-inputs-tutorial-2026-input.html&title=Python%20Inputs%20Tutorial%202026%20%E2%80%93%20input()%2C%20Validation%20%26%20CLI%20%7C%20Poetic%20Bytes" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#ff4500;">Reddit</a><a href="mailto:?subject=Python%20Inputs%20Tutorial%202026%20%E2%80%93%20input()%2C%20Validation%20%26%20CLI%20%7C%20Poetic%20Bytes&body=Read%20this%3A%20https%3A%2F%2Fpoetic-bytes.blogspot.com%2F2026%2F11%2Fpython-inputs-tutorial-2026-input.html" style="display:inline-flex;align-items:center;padding:0.45rem 1rem;border-radius:30px;font-size:0.72rem;font-family:monospace;text-decoration:none;margin:0.2rem;color:#fff;background:#555;">Email</a></div></div><div style="margin-top:2.5rem;padding-top:1.5rem;border-top:1px solid rgba(139,94,52,0.25);text-align:center;font-family:monospace;font-size:0.7rem;color:#8a7563;line-height:2.2;"><div style="margin-bottom:0.5rem;"><a href="https://poetic-bytes.blogspot.com/2026/04/about_01131455884.html"   style="color:#8a7563;text-decoration:none;margin:0 0.5rem;" target="_blank" rel="noopener">About</a> | <a href="https://poetic-bytes.blogspot.com/2026/04/privacy-policy_01328570854.html" style="color:#8a7563;text-decoration:none;margin:0 0.5rem;" target="_blank" rel="noopener">Privacy Policy</a> | <a href="https://poetic-bytes.blogspot.com/2026/04/terms-of-service_01797605838.html"   style="color:#8a7563;text-decoration:none;margin:0 0.5rem;" target="_blank" rel="noopener">Terms of Service</a> | <a href="https://poetic-bytes.blogspot.com/2026/04/cookie-policy.html" style="color:#8a7563;text-decoration:none;margin:0 0.5rem;" target="_blank" rel="noopener">Cookie Policy</a></div><div style="font-size:0.62rem;opacity:0.7;">&copy; 2026 Glenn Junsay Pansensoy. All rights reserved.</div></div><div style="text-align:center;font-size:0.75rem;color:#8a7563;font-family:monospace;padding:1rem 0;">Published on <a href="https://poetic-bytes.blogspot.com" rel="noopener" style="color:#8B5E34;">poetic-bytes.blogspot.com</a> &nbsp;·&nbsp; #pythoninput #pythoninput()function #pythontypeconversion #pythoninputvalidation #sys.argv</div></div>
+<div style="margin:2rem 0;text-align:center;min-height:90px;"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6428799122405621" data-ad-slot="3735753880" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>
+</article>
+<footer>
+<a href="https://poetic-bytes.blogspot.com/2026/04/about_01131455884.html" target="_blank" rel="noopener">About</a> |
+<a href="https://poetic-bytes.blogspot.com/2026/04/privacy-policy_01328570854.html" target="_blank" rel="noopener">Privacy</a> |
+<a href="https://poetic-bytes.blogspot.com/2026/04/terms-of-service_01797605838.html" target="_blank" rel="noopener">Terms</a> |
+<a href="https://poetic-bytes.blogspot.com/2026/04/cookie-policy.html" target="_blank" rel="noopener">Cookies</a><br>
+&copy; 2026 Glenn Junsay Pansensoy
+</footer>
+</body>
+</html>
