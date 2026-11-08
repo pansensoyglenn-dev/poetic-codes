@@ -33,7 +33,7 @@ from pygments import lex
 from pygments.lexers import TextLexer, get_lexer_by_name
 from pygments.token import Token
 
-SCRIPT_VERSION = "2026-11-07-n"
+SCRIPT_VERSION = "2026-11-08-o"
 W, H, FPS = 1280, 720, 25
 VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")
 VOICE_FALLBACKS = ["en-PH-RosaNeural", "en-US-ChristopherNeural"]
@@ -71,7 +71,7 @@ SKIP_TAGS = {"script", "style", "button", "svg", "i", "nav", "form", "input", "t
 SKIP_CLASS = re.compile(r"(^|\s)(tags|desc-meta|code-header|code-actions|section-label|hero|nav-bar|toc|ad-slot|"
                         r"quiz|runner|output|console|breadcrumb)(\s|$)")
 SKIP_SECTION = re.compile(r"quiz|knowledge|question|comment|share|newsletter|subscribe|related|footer|follow|social|connect|\\btoc\\b|table of contents", re.I)
-EMOJI = re.compile("[\U00010000-\U0010ffff\u2600-\u27bf\u2b00-\u2bff\u2190-\u21ff\ufe0f\u200d]")
+EMOJI = re.compile("[\U00010000-\U0010ffff\u2300-\u23ff\u2600-\u27bf\u2b00-\u2bff\u2190-\u21ff\ufe0f\u200d]")
 
 
 def log(*a):
@@ -349,6 +349,43 @@ def page_code(lines):
 
 _RUN_CACHE = {}
 
+# Added in front of snippets that call input() / getpass(): the answers are typed for the reader and shown in the terminal
+# the way they look on a real screen (prompt, then what was typed).
+INPUT_PRELUDE = '''
+import builtins as _b, sys as _s, itertools as _it
+_nums = _it.cycle(["10", "5", "3", "7", "2"])
+def _answer(p):
+    import re as _re
+    q = str(p).lower()
+    if any(k in q for k in ("password", "passcode", "secret", "pin ")): return "secret123"
+    if "email" in q: return "alice@example.com"
+    if "name" in q: return "Alice"
+    if _re.search(r"\\b(age|old)\\b", q) or "year" in q: return "25"
+    if any(k in q for k in ("city", "country", "where", "address")): return "Manila"
+    if "colo" in q: return "blue"
+    if any(k in q for k in ("y/n", "(y", "yes", "continue", "again", "sure", "confirm")): return "y"
+    if any(k in q for k in ("quit", "exit", "stop", "done", "finish")): return "done"
+    if "operat" in q or "+" in q: return "+"
+    if any(k in q for k in ("file", "path")): return "notes.txt"
+    if any(k in q for k in ("choice", "option", "menu", "select")): return "1"
+    if _re.search(r"\\b(numbers?|num|price|score|amount|quantity|value|values|first|second|third|count|total|height|weight|temperature|celsius|x|y|a|b|integer|float|decimal)\\b", q): return next(_nums)
+    if "enter" in q or "type" in q: return "Hello"
+    return "Alice"
+def _input(prompt=""):
+    a = _answer(prompt)
+    print(f"{prompt}{a}")
+    return a
+_b.input = _input
+try:
+    import getpass as _g
+    def _gp(prompt="Password: ", stream=None):
+        print(prompt)
+        return "secret123"
+    _g.getpass = _gp
+except Exception:
+    pass
+'''
+
 
 def run_snippet(code):
     """Run a Python snippet in a throw-away folder with no secrets and no input; return its printed output, or [] when it
@@ -358,7 +395,8 @@ def run_snippet(code):
     out = []
     d = tempfile.mkdtemp(prefix="snip_")
     try:
-        Path(d, "main.py").write_text(code + "\n", encoding="utf-8")
+        needs_input = bool(re.search(r"\binput\s*\(|getpass", code))
+        Path(d, "main.py").write_text((INPUT_PRELUDE if needs_input else "") + code + "\n", encoding="utf-8")
         env = {"PATH": os.environ.get("PATH", ""), "PYTHONIOENCODING": "utf-8", "PYTHONDONTWRITEBYTECODE": "1",
                "HOME": d, "LANG": "C.UTF-8"}
         p = subprocess.run([sys.executable, "main.py"], cwd=d, env=env, input=b"", capture_output=True, timeout=RUN_TIMEOUT)
@@ -445,6 +483,57 @@ def steps_after_code(scenes):
     return out
 
 
+def short_title(t):
+    """'Python Inputs: From input() to CLI mastery' -> 'Python Inputs'; 'Python Basics – Learn Python Free 2026 | Poetic Bytes' -> 'Python Basics'."""
+    t = re.split(r"\s*[|:\u2013\u2014]\s*", screen_clean(t))[0]
+    return t.strip(" .!")
+
+
+def spoken_topic(t):
+    t = short_title(t)
+    m = re.match(r"^(Python)\s+(.+)$", t)
+    return f"the Python {m.group(2).lower()}" if m else t
+
+
+def previous_lesson(page_url):
+    """Title of the lesson before this one, read from the order of lessons on the site's home page (best effort)."""
+    if not re.match(r"https?://", page_url or ""):
+        return ""
+    try:
+        from urllib.parse import urljoin
+        base = re.match(r"https?://[^/]+/", page_url).group(0)
+        me = page_url.rstrip("/").rsplit("/", 1)[-1].split("#")[0].split("?")[0]
+        home = BeautifulSoup(requests.get(base, headers={"User-Agent": UA}, timeout=30).text, "html.parser")
+        seen = []
+        for a in home.find_all("a", href=True):
+            h = a["href"].split("#")[0].split("?")[0]
+            name = h.rstrip("/").rsplit("/", 1)[-1]
+            if not name.endswith(".html") or name in ("index.html",) or name in seen:
+                continue
+            seen.append(name)
+        if me not in seen or seen.index(me) == 0:
+            return ""
+        prev = seen[seen.index(me) - 1]
+        r = requests.get(urljoin(base, prev), headers={"User-Agent": UA}, timeout=30)
+        m = re.search(r"(?is)<title[^>]*>(.*?)</title>", r.text)
+        return short_title(htmllib.unescape(m.group(1))) if m else ""
+    except Exception:
+        return ""
+
+
+def greeting(title, desc, prev):
+    topic = short_title(title)
+    lang = topic.split()[0] if topic.split() and topic.split()[0] in LANG_LABEL.values() else ""
+    another = f"another {lang} lesson" if lang else "another lesson"
+    if prev and prev.lower() != topic.lower():
+        first = (f"Hello and good day everybody! We learned {spoken_topic(prev)} from the previous video, and today we are "
+                 f"going to {another}, which is {topic}.")
+    else:
+        first = f"Hello and good day everybody! Welcome to this {BRAND} lesson. Today we are going to learn {topic}."
+    d = " ".join(x for x in split_sentences(screen_clean(desc)) if "@" not in x and not re.match(r"^by\b", x, re.I))
+    return first + (" " + speak_clean(d) if d else "")
+
+
 def build_scenes(page_html, page_url, limit=None):
     soup = BeautifulSoup(page_html, "html.parser")
     for t in soup(["script", "style", "noscript"]):
@@ -460,8 +549,17 @@ def build_scenes(page_html, page_url, limit=None):
     author = screen_clean(author["content"]) if author and author.get("content") else ""
 
     b = Builder(limit)
-    b.add(kind="title", title=title, desc=desc, author=author,
-          speech=speak_clean(title).rstrip(".") + ". " + speak_clean(desc))
+    prev = os.environ.get("PREVIOUS", "").strip()
+    if prev.startswith("http"):
+        try:
+            m = re.search(r"(?is)<title[^>]*>(.*?)</title>", requests.get(prev, headers={"User-Agent": UA}, timeout=30).text)
+            prev = short_title(htmllib.unescape(m.group(1))) if m else ""
+        except Exception:
+            prev = ""
+    elif not prev and os.environ.get("AUTO_PREVIOUS", "1") == "1":
+        prev = previous_lesson(page_url)
+    intro = os.environ.get("INTRO_TEXT", "").strip() or greeting(title, desc, prev)
+    b.add(kind="title", title=title, desc=desc, author=author, speech=intro)
     root = soup.find("main") or soup.body or soup
     sections = [s for s in root.find_all("section") if not s.find_parent("section")]
     for sec in sections:
@@ -479,9 +577,30 @@ def build_scenes(page_html, page_url, limit=None):
             b.heading, b.spoken = stitle, stitle
             b.cur = None
         b.walk(sec, h2)
+    scenes = steps_after_code(b.scenes)
+    topics, cur_sec = [], None
+    for sc in scenes:
+        if sc["kind"] == "section":
+            cur_sec = sc
+        elif sc["kind"] == "code" and cur_sec is not None and cur_sec not in topics:
+            topics.append(cur_sec)
+    names = []
+    for sc in topics:
+        nm = re.split(r"\s+[\u2014\u2013-]\s+", sc["title"])[0].strip()
+        nm = re.sub(r"^\d+(\.\d+)*\.?\s*", "", nm)
+        if nm and nm not in names:
+            names.append(nm)
+    if len(names) >= 2:
+        shown = names[:8]
+        spoken = ", ".join(speak_clean(n) for n in names[:-1]) + ", and " + speak_clean(names[-1])
+        overview = dict(kind="text", heading="In this lesson", items=shown,
+                        speech=f"In this lesson, we will cover {spoken}. Every example is typed on the laptop, and when it "
+                               f"prints something, you will see the output in the terminal. Let's get started.")
+        scenes.insert(1, overview)
+    b.scenes = scenes
     b.add(kind="end", title="Try the code live", url=link or BRAND,
           speech=f"Try the live code on {BRAND}. The link is in the description.", chapter="Try it yourself")
-    return steps_after_code(b.scenes), {"title": title, "desc": desc, "link": link}
+    return b.scenes, {"title": title, "desc": desc, "link": link}
 
 
 # ---------------------------------------------------------------- drawing
