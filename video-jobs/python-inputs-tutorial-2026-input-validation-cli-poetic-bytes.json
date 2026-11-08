@@ -1,6 +1,6 @@
 {
-  "jobId": "1794101318836",
-  "createdAt": "2026-11-08T01:28:38.836Z",
+  "jobId": "1794101339537",
+  "createdAt": "2026-11-08T01:28:59.537Z",
   "title": "Python Inputs Tutorial 2026 – input(), Validation & CLI | Poetic Bytes",
   "author": "Glenn Junsay Pansensoy",
   "category": "Programming",
@@ -26,5 +26,5 @@
   "slug": "python-inputs-tutorial-2026-input-validation-cli-poetic-bytes",
   "articleId": 52,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794101315686.png",
-  "force": false
+  "force": true
 }
