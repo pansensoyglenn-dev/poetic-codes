@@ -8,6 +8,10 @@ on:
       page:
         description: "Tutorial page link, e.g. https://poetic-bytes.vercel.app/shopping-cart.html"
         required: true
+      previous:
+        description: "Optional: the previous lesson's title or link, for the opening (we learned ... in the previous video). Empty = found automatically"
+        required: false
+        default: ""
       explain:
         description: "Type 1 to let the free AI add a short spoken explanation to each code snippet (check it before publishing)"
         required: false
@@ -36,6 +40,7 @@ jobs:
       - name: Make the video
         env:
           PAGE: ${{ inputs.page }}
+          PREVIOUS: ${{ inputs.previous }}
           EXPLAIN_CODE: ${{ inputs.explain == '1' && '1' || '0' }}
           OUTLINE_ONLY: ${{ inputs.check_only == '1' && '1' || '0' }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
