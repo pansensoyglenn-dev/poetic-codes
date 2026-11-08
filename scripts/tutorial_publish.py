@@ -64,6 +64,12 @@ def upload(path, filename):
     return info["url"]
 
 
+def page_h1(url):
+    html = requests.get(url, headers={"User-Agent": UA}, timeout=60).text
+    m = re.search(r"(?is)<h1[^>]*>(.*?)</h1>", html)
+    return norm(re.sub(r"<[^>]+>", " ", m.group(1))) if m else ""
+
+
 def page_title(url):
     html = requests.get(url, headers={"User-Agent": UA}, timeout=60).text
     m = re.search(r"(?is)<title[^>]*>(.*?)</title>", html)
@@ -84,7 +90,7 @@ def base_title(t):
     return norm(t)
 
 
-def find_article(rows, title, url):
+def find_article(rows, title, url, h1=""):
     want = norm(title)
     for r in rows:
         if norm(r.get("title")) == want:
@@ -101,6 +107,15 @@ def find_article(rows, title, url):
         for r in rows:
             if slug in str(r.get("content") or r.get("body") or "")[:200000] and "poetic bytes" in norm(r.get("title")):
                 return r
+    fname = url.rstrip("/").rsplit("/", 1)[-1].split("#")[0].split("?")[0]
+    for r in rows:                 # the article holds this page: its text names the page file or starts with the page's heading
+        body = str(r.get("content") or r.get("body") or "")
+        if "poetic bytes" not in norm(r.get("title")):
+            continue
+        if fname.endswith(".html") and fname in body[:300000]:
+            return r
+        if len(h1) >= 12 and h1 in norm(re.sub(r"<[^>]+>", " ", body[:12000])):
+            return r
     for r in rows:                 # one title contains the other (at least 15 characters)
         b = base_title(r.get("title"))
         if len(b) >= 15 and len(wb) >= 15 and (b in wb or wb in b):
@@ -148,7 +163,11 @@ def main():
     r.raise_for_status()
     data = r.json()
     rows = data.get("articles") or data.get("results") or data.get("data") or [] if isinstance(data, dict) else data
-    row = find_article(rows, os.environ.get("ARTICLE_TITLE") or title, url)
+    try:
+        h1 = page_h1(url)
+    except Exception:
+        h1 = ""
+    row = find_article(rows, os.environ.get("ARTICLE_TITLE") or title, url, h1)
     if row is None:
         log(f"publish skipped: no article titled '{title}' on Poetic Codes, so there is nothing to attach the video to.")
         return 0
