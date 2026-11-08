@@ -1,6 +1,6 @@
 {
-  "jobId": "1794129739364",
-  "createdAt": "2026-11-08T09:22:19.364Z",
+  "jobId": "1794129758272",
+  "createdAt": "2026-11-08T09:22:38.272Z",
   "title": "Origin of the Visayan People: Srivijaya & Borneo Bisaya Ties",
   "author": "Glenn Junsay Pansensoy",
   "category": "History",
@@ -27,5 +27,5 @@
   "slug": "origin-of-the-visayan-people-srivijaya-borneo-bisaya-ties",
   "articleId": 53,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794129638054.jpg",
-  "force": false
+  "force": true
 }
