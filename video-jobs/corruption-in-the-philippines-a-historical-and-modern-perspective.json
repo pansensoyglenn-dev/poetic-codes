@@ -1,6 +1,6 @@
 {
-  "jobId": "1794223810529",
-  "createdAt": "2026-11-09T11:30:10.529Z",
+  "jobId": "1794223870180",
+  "createdAt": "2026-11-09T11:31:10.180Z",
   "title": "Corruption in the Philippines:A Historical and Modern Perspective",
   "author": "Glenn Junsay Pansensoy",
   "category": "Local Politics",
@@ -21,5 +21,5 @@
   "slug": "corruption-in-the-philippines-a-historical-and-modern-perspective",
   "articleId": 54,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794223805929.jpg",
-  "force": false
+  "force": true
 }
