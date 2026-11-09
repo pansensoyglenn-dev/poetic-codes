@@ -293,8 +293,9 @@ def build_segments(job: Job) -> list[Seg]:
         if len(segs) > 400:
             break
 
-    greeting = narration_greeting(title)
-    if greeting and not any(str(s.get("speech", "")).lower().startswith(NARRATION_GREETING.lower()) for s in segs):
+    custom_intro = clean_text(job.get("intro"))  # per-article opening written in the portal
+    greeting = custom_intro or narration_greeting(title)
+    if greeting and (custom_intro or not any(str(s.get("speech", "")).lower().startswith(NARRATION_GREETING.lower()) for s in segs)):
         if INTRO_TITLE:
             # the title card is spoken: greeting replaces the bare title, excerpt still follows
             segs[0]["speech"] = greeting + (" " + excerpt if excerpt else "")
