@@ -42,6 +42,8 @@
 
   <link rel="stylesheet" href="/styles.css?v=2">
 
+  <!-- AdSense loader: the ONLY place this script appears on the site shell.
+       app.js (adBlock / injectAdsAndFooter / buildBloggerBody) injects <ins> units only. -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6428799122405621" crossorigin="anonymous"></script>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
@@ -86,8 +88,6 @@
   </style>
 </head>
 <body>
-  <!-- SEO FIX: <noscript> now names the sections and links to the machine-readable indexes,
-       so crawlers and broken-connection visitors still find something useful. -->
   <noscript>
     <div style="padding:2rem;font-family:sans-serif;color:#2a1a0f;max-width:760px;margin:0 auto;">
       <h1 style="font-family:Georgia,serif;">The Commonplace</h1>
@@ -371,18 +371,9 @@
           <div id="recent-list"></div>
         </div>
 
-        <div class="ad-slot page-col" id="ad-home">
-          <span class="ad-label">Advertisement</span>
-          <ins class="adsbygoogle"
-               style="display:block"
-               data-ad-client="ca-pub-6428799122405621"
-               data-ad-slot="8844498658"
-               data-ad-format="auto"
-               data-full-width-responsive="true"></ins>
-          <script>
-              (adsbygoogle = window.adsbygoogle || []).push({});
-          </script>
-        </div>
+        <!-- Home ad slot: app.js mountHomeAd() inserts the <ins> only while the home view is visible,
+             so a hidden unit can never swallow the push meant for an article's top ad. -->
+        <div class="ad-slot page-col" id="ad-home"></div>
 
         <div class="card ledger-panel">
           <h2>GitHub Auto-Deploy</h2>
@@ -406,6 +397,13 @@
             <div class="field">
               <label for="gh-token">Personal Access Token</label>
               <input type="password" id="gh-token" placeholder="ghp_…" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="gh-target">Repo is hosted on (sets canonical URLs)</label>
+              <select id="gh-target">
+                <option value="cloudflare">Cloudflare Pages — poetic-codes.pages.dev</option>
+                <option value="vercel">Vercel — poetic-bytes.vercel.app</option>
+              </select>
             </div>
           </div>
           <label style="display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;font-size:14px;color:var(--text-secondary);margin:8px 0 12px;">
@@ -478,6 +476,7 @@
             <button class="btn-primary" id="export-github-btn">📤 Export All to GitHub</button>
             <button class="btn-ghost" id="export-json-btn">💾 Export as JSON</button>
             <button class="btn-ghost" id="export-html-btn">🌐 Export as HTML</button>
+            <button class="btn-ghost" id="redeploy-all-btn">🔁 Rebuild all article pages</button>
           </div>
           <div id="export-status" style="margin-top:10px;font-size:13px;color:var(--faint);"></div>
         </div>
@@ -570,6 +569,6 @@
   </div>
 
   <div class="toast" id="toast" role="alert" aria-live="polite"></div>
-  <script src="/app.js?v=2"></script>
+  <script src="/app.js?v=3"></script>
 </body>
 </html>
