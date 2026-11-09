@@ -53,6 +53,17 @@ RATE = os.environ.get("TTS_RATE", "+10%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
 SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "60"))  # longer slides = fewer, better-matched pictures
 INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"  # off: video starts straight on the content
+# The narration opens with this greeting, then the topic (the article title), then the essay itself.
+# Set NARRATION_GREETING to an empty string in the workflow to switch it off.
+NARRATION_GREETING = os.environ.get("NARRATION_GREETING", "Hello everyone, this is an essay about").strip()
+
+
+def narration_greeting(title: str) -> str:
+    topic = (title or "").strip().rstrip(".!?:;, ")
+    if not NARRATION_GREETING or not topic or topic.lower() == "untitled":
+        return ""
+    return f"{NARRATION_GREETING} {topic}."
+
 SPEAK_HEADINGS = os.environ.get("SPEAK_HEADINGS", "0") != "0"  # off: section headings are not read or shown
 ONLY_JOB = os.environ.get("ONLY_JOB", "").strip().lower()
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
@@ -282,6 +293,14 @@ def build_segments(job: Job) -> list[Seg]:
         if len(segs) > 400:
             break
 
+    greeting = narration_greeting(title)
+    if greeting and not any(str(s.get("speech", "")).lower().startswith(NARRATION_GREETING.lower()) for s in segs):
+        if INTRO_TITLE:
+            # the title card is spoken: greeting replaces the bare title, excerpt still follows
+            segs[0]["speech"] = greeting + (" " + excerpt if excerpt else "")
+        else:
+            # the title card is dropped, so the greeting becomes the first thing said (and shown as a caption)
+            segs.insert(1, {"kind": "body", "text": greeting, "speech": greeting, "heading": ""})
     if not INTRO_TITLE and len(segs) > 1:
         segs = segs[1:]
     segs.append({
