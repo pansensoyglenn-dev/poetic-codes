@@ -113,7 +113,9 @@
     if (main != null) {
       csEditing = {
         id: main, ids: ids, date: article.date, category: article.category,
-        photoUrl: article.photoUrl || '', title: article.title
+        photoUrl: article.photoUrl || '', title: article.title,
+        pageUrl: article.pageUrl || article.page_url || '',
+        bloggerUrl: article.bloggerUrl || article.blogger_url || ''
       };
     }
     updateEditUI(article);
@@ -127,14 +129,42 @@
       var where = [];
       if (csEditing.ids && csEditing.ids.worker != null) where.push('Worker');
       if (csEditing.ids && csEditing.ids.vercel != null) where.push('Vercel');
+      var wrapOn = document.getElementById('update-rebuild-wrap');
+      if (wrapOn) wrapOn.style.display = 'inline-flex';
       banner.style.display = 'block';
       banner.textContent = 'Editing entry #' + csEditing.id + (where.length ? ' · Update entry saves to: ' + where.join(' + ') : '');
       btn.style.display = 'inline-flex';
     } else {
+      var wrapOff = document.getElementById('update-rebuild-wrap');
+      if (wrapOff) wrapOff.style.display = 'none';
       banner.style.display = 'none';
       btn.style.display = 'none';
     }
   };
+
+  // Rebuild the public static page (articles/<slug>.html) from the edited text, using the
+  // portal's own buildBloggerBody / buildGitHubPage so it gets the 3 ad units and the
+  // platform-aware canonical.
+  function pageSlugFor(title) {
+    var m = String((csEditing && csEditing.pageUrl) || '').match(/\/articles\/([^\/?#]+)\.html/i);
+    return { slug: m ? decodeURIComponent(m[1]) : slugify(title), stored: !!m };
+  }
+
+  async function rebuildGitHubPage(a) {
+    var sl = pageSlugFor(a.title);
+    if (!sl.slug) throw new Error('could not work out a page name from the title');
+    var author = (document.getElementById('f-author').value || '').trim() || 'Glenn Junsay Pansensoy';
+    var cover = /^https?:\/\//i.test(a.cover || '') ? a.cover : null;
+    var ghBody = buildBloggerBody(a.title, author, a.category, a.excerpt, articleOnlyHTML(a.content), a.tags,
+      (csEditing && csEditing.bloggerUrl) || '', true);
+    var page = buildGitHubPage(a.title, author, a.category, a.excerpt, ghBody, sl.slug, cover);
+    var url = await publishToGitHub(sl.slug, page, cover);
+    // a new page name (title changed, or never deployed) must also appear in the sitemap and feed
+    if (!sl.stored) {
+      try { if (await refreshArticleCache()) { await regenerateSitemap(); await regenerateFeed(); } } catch (e) { console.warn(e); }
+    }
+    return url;
+  }
 
   async function saveWorker(id, body) {
     var r = await fetch(COMMONPLACE_API + 'articles/' + encodeURIComponent(id), {
@@ -223,6 +253,18 @@
       catch (e) { failed.push('Vercel: ' + e.message); }
     }
 
+    var rebuildBox = document.getElementById('update-rebuild-gh');
+    var rebuilt = '';
+    if (done.length && rebuildBox && rebuildBox.checked) {
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Rebuilding page…';
+      try {
+        rebuilt = await rebuildGitHubPage({
+          title: title, category: category, excerpt: excerpt, tags: tags,
+          content: content, cover: csEditing.photoUrl
+        });
+      } catch (e) { failed.push('GitHub page: ' + e.message); }
+    }
+
     btn.disabled = false;
     btn.innerHTML = original;
 
@@ -231,7 +273,7 @@
       errorBox.style.display = 'block';
       showToast(done.length ? 'Partly updated — see error below.' : 'Update failed — see error below.', 'error', 6000);
     } else {
-      showToast('Entry #' + csEditing.id + ' updated (' + done.join(' + ') + ').', 'success', 4000);
+      showToast('Entry #' + csEditing.id + ' updated (' + done.join(' + ') + ')' + (rebuilt ? ' · page rebuilt' : '') + '.', 'success', 4000);
     }
     if (done.length) loadList(true);
   }
@@ -403,6 +445,15 @@
     newBtn.innerHTML = '<i class="fas fa-save" aria-hidden="true"></i> Update entry';
     oldBtn.parentNode.replaceChild(newBtn, oldBtn);
     newBtn.addEventListener('click', updateEntry);
+
+    newBtn.insertAdjacentHTML('afterend',
+      '<label id="update-rebuild-wrap" style="display:none;align-items:center;gap:.4rem;font-family:\'JetBrains Mono\',monospace;font-size:.6rem;color:var(--muted);cursor:pointer;">' +
+      '<input type="checkbox" id="update-rebuild-gh" style="accent-color:var(--blue);width:14px;height:14px;"> Also rebuild the GitHub page</label>');
+    var rb = document.getElementById('update-rebuild-gh');
+    try { rb.checked = localStorage.getItem('pc_update_rebuild') === '1'; } catch (e) {}
+    rb.addEventListener('change', function () {
+      try { localStorage.setItem('pc_update_rebuild', rb.checked ? '1' : '0'); } catch (e) {}
+    });
 
     document.getElementById('pr-refresh').addEventListener('click', function () { loadList(false); });
     document.getElementById('pr-section').addEventListener('change', renderList);
