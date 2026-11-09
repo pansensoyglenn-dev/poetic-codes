@@ -162,6 +162,38 @@ const SITE_URL = 'https://poetic-codes.pages.dev/';
 const CANONICAL_URL = 'https://poetic-codes.pages.dev/';
 const API_URL = 'https://poetic-codes.vercel.app/';
 
+// Public origin for each publishing platform. Used for canonical URLs, og:url,
+// sitemap and RSS so every copy of an article points at the host it lives on.
+const TARGETS = {
+  blogger:    'https://poetic-bytes.blogspot.com',
+  vercel:     'https://poetic-bytes.vercel.app',
+  cloudflare: 'https://poetic-codes.pages.dev'
+};
+const DEFAULT_TARGET = 'cloudflare';
+
+function detectTarget(host) {
+  host = host || (typeof location !== 'undefined' ? location.hostname : '');
+  if (host.indexOf('blogspot.com') !== -1) return 'blogger';
+  if (host.indexOf('vercel.app') !== -1) return 'vercel';
+  if (host.indexOf('pages.dev') !== -1) return 'cloudflare';
+  return DEFAULT_TARGET;
+}
+
+function originFor(target) {
+  return TARGETS[target] || TARGETS[DEFAULT_TARGET];
+}
+
+// Blogger permalinks look like /YYYY/MM/slug.html; static hosts use the repo path.
+function canonicalFor(article, target, pagePath) {
+  if (target === 'blogger') {
+    if (article && article.bloggerUrl) return article.bloggerUrl;
+    const d = new Date((article && article.date) || Date.now());
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    return `${TARGETS.blogger}/${d.getFullYear()}/${mm}/${slugify((article && article.title) || '') || 'article'}.html`;
+  }
+  return `${originFor(target)}/${String(pagePath || '').replace(/^\//, '')}`;
+}
+
 
 const BLOGGER_CLIENT_ID = '790965276439-flja0u6tel45rqbg47p6l8fp6aua1tch.apps.googleusercontent.com';
 const BLOGGER_BLOG_URL  = 'https://poetic-bytes.blogspot.com';
@@ -394,7 +426,7 @@ function sanitizeHtml(rawHtml) {
         if (HTML_DISALLOWED_TAGS.has(child.tagName.toUpperCase())) { child.remove(); continue; }
         for (const attr of Array.from(child.attributes)) {
           const name = attr.name.toLowerCase();
-          const val = attr.value.replace(/[\u0000-\u0020\u007f-\u009f]+/g, '').toLowerCase();
+          const val = attr.value.replace(/[\u0000- \u007f-\u009f]+/g, '').toLowerCase();
           if (name.startsWith('on') || name === 'srcdoc' || name === 'formaction') {
             child.removeAttribute(attr.name);
           } else if (URL_ATTRS.has(name)) {
@@ -744,6 +776,8 @@ function navigateTo(view, opts = {}) {
 
   closeMobileDrawer();
 
+  if (view !== 'home') unmountHomeAd();
+
   if (view === 'home') {
     markViewActive('home');
     renderHome();
@@ -849,7 +883,7 @@ function populateCategorySelects() {
   }
 }
 
-// SEO FIX: helpers for producing static-friendly article links
+// Helpers for producing static-friendly article links
 function articleStaticPath(a) {
   if (!a || !a.pageUrl) return null;
   try {
@@ -895,7 +929,6 @@ function renderHome() {
     if (recent.length === 0) {
       recentOut.innerHTML = `<div class="empty-state"><span class="glyph">✒️</span>Nothing written yet. Start with your first entry.</div>`;
     } else {
-      // SEO FIX: recent items now contain a real <a href> for crawlers
       recentOut.innerHTML = recent.map(a => {
         const cat = categoryOf(a.category);
         const href = articleHref(a);
@@ -908,7 +941,6 @@ function renderHome() {
             </span>
           </div>`;
       }).join('');
-      // Keep a click-to-open behaviour for the wrapper, but let link clicks win first
       recentOut.querySelectorAll('.recent-item').forEach(el => {
         el.addEventListener('click', (ev) => {
           if (ev.target.closest('a')) return;
@@ -925,6 +957,7 @@ function renderHome() {
     }
   }
 
+  mountHomeAd();
   loadAds();
 }
 
@@ -939,7 +972,6 @@ function renderLatestEntry() {
   const cat = categoryOf(latest.category);
   const snippet = latest.summary || shareSnippet(latest);
   const href = articleHref(latest);
-  // SEO FIX: title and "Continue reading" are real <a href> elements
   container.innerHTML = `
     <div class="latest-entry-meta">
       ${cat ? `<span class="category-tag" style="color:${cat.color};border-color:${cat.color};background:rgba(33,49,43,0.06);">${cat.name}</span>` : ''}
@@ -952,7 +984,7 @@ function renderLatestEntry() {
 }
 
 const GITHUB_SETTINGS_KEY = 'commonplace-github-settings';
-let githubSettings = { username: 'pansensoyglenn-dev', repo: 'poetic-codes', branch: 'main', token: '', autoDeploy: true };
+let githubSettings = { username: 'pansensoyglenn-dev', repo: 'poetic-codes', branch: 'main', token: '', autoDeploy: true, target: DEFAULT_TARGET };
 
 async function loadGithubSettings() {
   try {
@@ -962,20 +994,25 @@ async function loadGithubSettings() {
   if (!githubSettings.token) {
     githubSettings.token = localStorage.getItem('pc_gh_token') || '';
   }
+  if (!TARGETS[githubSettings.target]) githubSettings.target = DEFAULT_TARGET;
   setVal('gh-username', githubSettings.username || '');
   setVal('gh-repo', githubSettings.repo || '');
   setVal('gh-branch', githubSettings.branch || 'main');
   setVal('gh-token', githubSettings.token || '');
+  setVal('gh-target', githubSettings.target);
   setChecked('gh-autodeploy', githubSettings.autoDeploy);
 }
 
 async function saveGithubSettings() {
+  const targetEl = document.getElementById('gh-target');
+  const pickedTarget = targetEl ? targetEl.value : githubSettings.target;
   githubSettings = {
     username: document.getElementById('gh-username').value.trim() || 'pansensoyglenn-dev',
     repo: document.getElementById('gh-repo').value.trim() || 'poetic-codes',
     branch: document.getElementById('gh-branch').value.trim() || 'main',
     token: document.getElementById('gh-token').value.trim(),
-    autoDeploy: document.getElementById('gh-autodeploy').checked
+    autoDeploy: document.getElementById('gh-autodeploy').checked,
+    target: TARGETS[pickedTarget] ? pickedTarget : DEFAULT_TARGET
   };
   try {
     await window.storage.set(GITHUB_SETTINGS_KEY, JSON.stringify(githubSettings));
@@ -1071,12 +1108,12 @@ async function githubPutFile(path, base64Content, message) {
   return res.json();
 }
 
-// SEO FIX: regenerate sitemap.xml from the current article list
+// Regenerate sitemap.xml from the current article list, using the deploy target's own origin
 async function regenerateSitemap() {
   const missing = ['username', 'repo', 'token'].filter(k => !githubSettings[k]);
   if (missing.length) return;
 
-  const publicBase = 'https://poetic-codes.pages.dev';
+  const publicBase = originFor(githubSettings.target || detectTarget());
   const today = new Date().toISOString().slice(0, 10);
 
   const entries = [
@@ -1118,12 +1155,12 @@ ${entries.map(u => `  <url>
   }
 }
 
-// SEO FIX: regenerate feed.xml (RSS) from the current article list
+// Regenerate feed.xml (RSS) from the current article list, using the deploy target's own origin
 async function regenerateFeed() {
   const missing = ['username', 'repo', 'token'].filter(k => !githubSettings[k]);
   if (missing.length) return;
 
-  const publicBase = 'https://poetic-codes.pages.dev';
+  const publicBase = originFor(githubSettings.target || detectTarget());
   const sorted = [...articles]
     .sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id)
     .slice(0, 50);
@@ -1164,6 +1201,14 @@ ${items.join('\n')}
   }
 }
 
+// ---------------------------------------------------------------------------
+// AdSense
+//   * The loader <script src=".../adsbygoogle.js"> lives ONLY in the page <head>
+//     (index.html, generated static article pages, and the Blogger theme).
+//   * adBlock() emits just an <ins> unit plus its push call, never the loader.
+//   * stripAdsense() removes any ad markup/loader already inside a body, so
+//     re-injecting ads can never double them up.
+// ---------------------------------------------------------------------------
 function adBlock(slot) {
   return `<div class="ad-slot" style="margin:1.6rem 0;text-align:center;">`
     + `<ins class="adsbygoogle"`
@@ -1174,6 +1219,13 @@ function adBlock(slot) {
     + ` data-full-width-responsive="true"></ins>`
     + `<scr` + `ipt>(adsbygoogle=window.adsbygoogle||[]).push({});</scr` + `ipt>`
     + `</div>`;
+}
+
+function stripAdsense(html) {
+  return String(html || '')
+    .replace(/<script[^>]*adsbygoogle\.js[^>]*>\s*<\/script>/gi, '')
+    .replace(/<div class="ad-slot"[^>]*>\s*<ins class="adsbygoogle"[\s\S]*?<\/ins>\s*(?:<script>[\s\S]*?<\/script>\s*)?<\/div>/gi, '')
+    .replace(/<ins class="adsbygoogle"[\s\S]*?<\/ins>\s*(?:<script>\s*\(adsbygoogle[\s\S]*?<\/script>)?/gi, '');
 }
 
 function legalFooterBlock() {
@@ -1188,27 +1240,43 @@ function legalFooterBlock() {
     + `</div>`;
 }
 
+// Top + middle + bottom ad units around any article body (SPA view and static pages).
 function injectAdsAndFooter(htmlBody) {
-  const html = htmlBody || '';
-  const parts = html.split(/<\/p>\s*(?=<p)/i);
-  let withMid = html;
-  if (parts.length >= 3) {
-    const mid = Math.floor(parts.length / 2);
-    parts[mid] = parts[mid] + '</p>' + adBlock(ADSENSE_SLOT_MIDDLE);
-    withMid = parts.join('');
+  const clean = stripAdsense(htmlBody || '');
+  const parts = clean.split(/<\/p>\s*(?=<p)/i);
+  const rebuilt = parts.map((p, i) => (i < parts.length - 1 ? p + '</p>' : p));
+  let withMid;
+  if (rebuilt.length >= 2) {
+    const mid = Math.max(0, Math.floor(rebuilt.length / 2) - 1);
+    rebuilt[mid] = rebuilt[mid] + adBlock(ADSENSE_SLOT_MIDDLE);
+    withMid = rebuilt.join('\n');
+  } else {
+    withMid = clean + adBlock(ADSENSE_SLOT_MIDDLE);
   }
   return adBlock(ADSENSE_SLOT_TOP) + withMid + adBlock(ADSENSE_SLOT_BOTTOM) + legalFooterBlock();
 }
 
+// Full, crawlable article page. Loader appears once in <head>; the body carries
+// the top / middle / bottom ad units. The canonical points at whichever platform
+// this copy is being deployed to.
 function articleStaticHtml(article, cat, canonicalUrl, imageAbsUrl) {
   const title = escapeHtml(article.title);
   const desc = escapeHtml(shareSnippet(article));
   const spaUrl = `${SITE_URL}index.html#/article/${article.id}`;
-  const imageTag = imageAbsUrl ? `
-  <meta property="og:image" content="${escapeHtml(imageAbsUrl)}">
+  const bodyHtml = article.contentType === 'html'
+    ? sanitizeHtml(article.body)
+    : String(article.body || '').split(/\n\s*\n/)
+        .map(p => `<p>${escapeHtml(p.trim()).replace(/\n/g, '<br>')}</p>`).join('');
+  const heroImg = article.photo
+    ? (/^https?:\/\//.test(article.photo) ? article.photo : imageAbsUrl)
+    : null;
+  const mediaHtml = (heroImg ? `<img class="article-photo" src="${escapeHtml(heroImg)}" alt="${title}">` : '')
+    + (article.video ? videoHtml(article.video, 'article-video') : '');
+  const imageTag = imageAbsUrl
+    ? `<meta property="og:image" content="${escapeHtml(imageAbsUrl)}">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="${escapeHtml(imageAbsUrl)}">` : `
-  <meta name="twitter:card" content="summary">`;
+  <meta name="twitter:image" content="${escapeHtml(imageAbsUrl)}">`
+    : `<meta name="twitter:card" content="summary">`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -1220,12 +1288,14 @@ function articleStaticHtml(article, cat, canonicalUrl, imageAbsUrl) {
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="${canonicalUrl}">
   <meta name="theme-color" content="#3c2a1f">
+  <meta name="google-adsense-account" content="${ADSENSE_PUBLISHER}">
 
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="The Commonplace">
   <meta property="og:title" content="${title}">
   <meta property="og:description" content="${desc}">
-  <meta property="og:url" content="${canonicalUrl}">${imageTag}
+  <meta property="og:url" content="${canonicalUrl}">
+  ${imageTag}
   <meta name="twitter:title" content="${title}">
   <meta name="twitter:description" content="${desc}">
 
@@ -1233,17 +1303,24 @@ function articleStaticHtml(article, cat, canonicalUrl, imageAbsUrl) {
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Display&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>location.replace(${JSON.stringify(spaUrl)});</script>
+  <style>
+    .article-body, .article-body p, .article-body li { font-family: "Source Serif 4", Georgia, serif; font-size: 1.05rem; line-height: 1.85; color: #2a1a0f; }
+    .article-body p { text-align: justify; hyphens: auto; margin: 0 0 1.4rem; }
+    .article-body h2, .article-body h3 { font-family: "Libre Caslon Display", Georgia, serif; margin: 2rem 0 1rem; }
+    .article-body img, .article-body video, .article-body iframe, .article-photo, .article-video { max-width: 100%; border-radius: 8px; margin: 1rem 0; }
+    .article-body a { color: #7a3e1a; }
+  </style>
+
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUBLISHER}" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="legal-page">
     <a class="back-link" href="${SITE_URL}index.html">← The Commonplace</a>
     <h1>${title}</h1>
     <p class="updated">${cat ? cat.name : ''}${cat ? ' · ' : ''}${article.date}</p>
-    <p>${desc}</p>
-    <p>Redirecting you to the full article… if nothing happens,
-      <a class="inline-link" href="${spaUrl}">click here</a>.
-    </p>
+    ${mediaHtml}
+    <div class="article-body">${injectAdsAndFooter(bodyHtml)}</div>
+    <p><a class="inline-link" href="${spaUrl}">Open in The Commonplace app</a></p>
   </div>
 </body>
 </html>
@@ -1252,8 +1329,8 @@ function articleStaticHtml(article, cat, canonicalUrl, imageAbsUrl) {
 
 
 async function deployArticleToGitHub(article, opts = {}) {
-  // SEO FIX: Always deploy so every article gets a public, indexable URL.
-  // The `autoDeploy` toggle now only gates the social auto-post (see below).
+  // Always deploy so every article gets a public, indexable URL.
+  // The `autoDeploy` toggle only gates the social auto-post (see below).
   const missing = ['username', 'repo', 'token'].filter(k => !githubSettings[k]);
   if (missing.length) {
     showToast(`⚠️ GitHub settings missing: ${missing.join(', ')}`, 'error', 6000);
@@ -1265,6 +1342,10 @@ async function deployArticleToGitHub(article, opts = {}) {
   const slug = slugify(article.title) || `article-${article.id}`;
   const mdPath = `${folder}/${article.date}-${slug}.md`;
   const pagePath = `${folder}/${article.date}-${slug}.html`;
+
+  // Which platform this repo is published on decides every absolute URL below.
+  const target = opts.target || githubSettings.target || detectTarget();
+  const origin = originFor(target);
 
   try {
     await githubPutFile(mdPath, b64EncodeUnicode(articleMarkdown(article)), `Add/update article: ${article.title}`);
@@ -1280,13 +1361,13 @@ async function deployArticleToGitHub(article, opts = {}) {
         const extClean = ext === 'jpeg' ? 'jpg' : ext;
         photoPath = `${folder}/${article.date}-${slug}.${extClean}`;
         await githubPutFile(photoPath, base64Only, `Add photo for: ${article.title}`);
-        imageAbsUrl = `${SITE_URL}${photoPath}`;
+        imageAbsUrl = `${origin}/${photoPath}`;
       }
     }
-    if (!imageAbsUrl) imageAbsUrl = cat ? `${SITE_URL}covers/${cat.slug}.jpg` : null;
+    if (!imageAbsUrl) imageAbsUrl = cat ? `${origin}/covers/${cat.slug}.jpg` : null;
 
-    const liveUrl = `${SITE_URL}${pagePath}`;
-    const canonicalUrl = `${CANONICAL_URL}${pagePath}`;
+    const liveUrl = `${origin}/${pagePath}`;
+    const canonicalUrl = canonicalFor(article, target, pagePath);
     const pageHtml = articleStaticHtml(article, cat, canonicalUrl, imageAbsUrl);
     await githubPutFile(pagePath, b64EncodeUnicode(pageHtml), `Add share page for: ${article.title}`);
 
@@ -1300,16 +1381,44 @@ async function deployArticleToGitHub(article, opts = {}) {
       if (!wasDeployed && !opts.skipAutoPost && githubSettings.autoDeploy) maybeAutoPostFacebook(articles[idx]);
     }
 
-    // SEO FIX: refresh sitemap + RSS on every deploy
-    try { await regenerateSitemap(); } catch (e) { console.warn(e); }
-    try { await regenerateFeed(); }    catch (e) { console.warn(e); }
+    // Refresh sitemap + RSS on every deploy (skipped in bulk runs, which do it once at the end)
+    if (!opts.skipIndexes) {
+      try { await regenerateSitemap(); } catch (e) { console.warn(e); }
+      try { await regenerateFeed(); }    catch (e) { console.warn(e); }
+    }
 
-    showToast('🚀 Deployed — share links now carry a preview image', 'success', 4000);
+    if (!opts.quiet) showToast('🚀 Deployed — share links now carry a preview image', 'success', 4000);
     return liveUrl;
   } catch (e) {
     console.error('GitHub deploy failed:', e);
     showToast(`⚠️ GitHub deploy failed: ${e.message}`, 'error', 6000);
     return null;
+  }
+}
+
+// Rebuilds every already-deployed article page with the current template
+// (full article + ads + platform-aware canonical). Older pages were redirect stubs.
+async function redeployAllPages() {
+  const btn = document.getElementById('redeploy-all-btn');
+  const statusEl = document.getElementById('export-status');
+  const list = articles.filter(a => a.pageUrl);
+  if (!list.length) { showToast('📭 No deployed pages to rebuild', 'error'); return; }
+  if (!confirm(`Rebuild ${list.length} article page(s) on GitHub with ads and the correct canonical URL?`)) return;
+  if (btn) btn.disabled = true;
+  let ok = 0;
+  try {
+    for (let i = 0; i < list.length; i++) {
+      if (statusEl) statusEl.textContent = `Rebuilding ${i + 1}/${list.length}…`;
+      const url = await deployArticleToGitHub(list[i], { skipAutoPost: true, skipIndexes: true, quiet: true });
+      if (url) ok++;
+      await sleep(400);
+    }
+    try { await regenerateSitemap(); } catch (e) { console.warn(e); }
+    try { await regenerateFeed(); }    catch (e) { console.warn(e); }
+    if (statusEl) statusEl.textContent = `✅ Rebuilt ${ok} of ${list.length} page(s).`;
+    showToast(`🔁 Rebuilt ${ok}/${list.length} pages`, ok === list.length ? 'success' : 'error', 5000);
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -1426,6 +1535,8 @@ function autoSEO(title, excerpt, content, tags, category) {
   return { metaDesc, autoTags, readingTime };
 }
 
+// Blogger post body. Ad units only (top / middle / bottom); the AdSense loader
+// belongs once in the Blogger theme <head>, never inside a post.
 function buildBloggerBody(title, author, category, excerpt, content, tags, articleURL) {
   const seo = autoSEO(title, excerpt, content, tags, category);
   const articleUrl = articleURL || BLOGGER_BLOG_URL;
@@ -1435,17 +1546,23 @@ function buildBloggerBody(title, author, category, excerpt, content, tags, artic
   const AD = adBlock(ADSENSE_SLOT_MIDDLE);
 
   const P_STYLE = 'text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;';
-  const processedContent = content
+  const processedContent = stripAdsense(content)
     .replace(/<p>/gi, `<p style="${P_STYLE}">`)
     .replace(/<p (?!style=)/gi, `<p style="${P_STYLE}" `);
 
   const paragraphs = processedContent.split('</p>');
-  const midPoint = Math.floor(paragraphs.length / 2);
-  const mainContent = paragraphs.map((p, i) => {
-    if (!p.trim()) return p;
-    const ad = (i === midPoint) ? AD : '';
-    return p + (i < paragraphs.length - 1 ? '</p>' : '') + ad;
-  }).join('');
+  let mainContent;
+  if (paragraphs.length >= 3) {
+    const midPoint = Math.floor(paragraphs.length / 2);
+    mainContent = paragraphs.map((p, i) => {
+      if (!p.trim()) return p;
+      const ad = (i === midPoint) ? AD : '';
+      return p + (i < paragraphs.length - 1 ? '</p>' : '') + ad;
+    }).join('');
+  } else {
+    // Short article: still guarantee the middle slot
+    mainContent = processedContent + AD;
+  }
 
   const tagBadges = seo.autoTags.map(t =>
     `<span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.72rem;margin:0.2rem;font-family:monospace;">${esc(t)}</span>`
@@ -1735,7 +1852,6 @@ function renderArticlesList() {
     out.innerHTML = `<div class="empty-state"><span class="glyph">📭</span>No entries here yet.</div>`;
     return;
   }
-  // SEO FIX: title is now a real <a href>; row still clickable via JS as a fallback
   out.innerHTML = list.map(a => {
     const c = categoryOf(a.category);
     const tagsHtml = (a.tags && a.tags.length)
@@ -2194,7 +2310,7 @@ document.getElementById('article-share-row')?.addEventListener('click', async (e
   const a = articles.find(x => x.id === currentArticleId);
   if (!link || !a || a.pageUrl) return;
   e.preventDefault();
-  
+
   const win = link.id === 'share-email' ? null : window.open('about:blank', '_blank');
   const ok = await ensureSharePage(a);
   if (!ok) { if (win) win.close(); return; }
@@ -2216,7 +2332,6 @@ function renderSearchResults(query) {
     box.classList.add('open');
     return;
   }
-  // SEO FIX: search results are real <a href> elements so crawlers can follow them
   box.innerHTML = matches.map(a => {
     const c = categoryOf(a.category);
     const href = articleHref(a);
@@ -2225,16 +2340,38 @@ function renderSearchResults(query) {
   box.classList.add('open');
 }
 
+// AdSense's push({}) always initialises the FIRST unprocessed <ins> in the
+// document, not the one we "meant". A hidden or zero-width unit earlier in the
+// DOM therefore steals a push and leaves a later unit (e.g. the article's top
+// ad) empty. So: only visible units exist/are pushed, in document order, after
+// layout has settled, with one retry for anything that was still zero-width.
+function mountHomeAd() {
+  const slot = document.getElementById('ad-home');
+  if (!slot || slot.querySelector('ins')) return;
+  slot.innerHTML = '<span class="ad-label">Advertisement</span>'
+    + `<ins class="adsbygoogle" style="display:block" data-ad-client="${ADSENSE_PUBLISHER}"`
+    + ` data-ad-slot="${ADSENSE_SLOT_TOP}" data-ad-format="auto" data-full-width-responsive="true"></ins>`;
+}
+
+function unmountHomeAd() {
+  const slot = document.getElementById('ad-home');
+  if (slot && !slot.querySelector('ins[data-ads-pushed]')) slot.innerHTML = '';
+}
+
 function loadAds() {
-  try {
-    document.querySelectorAll('ins.adsbygoogle:not([data-ad-status]):not([data-ads-pushed])').forEach((el) => {
-      if (!el.offsetWidth) return;
-      el.setAttribute('data-ads-pushed', '1');
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    });
-  } catch (e) {
-    console.log('Ad loading:', e);
-  }
+  const run = () => {
+    try {
+      document.querySelectorAll('ins.adsbygoogle:not([data-adsbygoogle-status]):not([data-ad-status]):not([data-ads-pushed])').forEach((el) => {
+        if (!el.offsetWidth) return;
+        el.setAttribute('data-ads-pushed', '1');
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+      });
+    } catch (e) {
+      console.log('Ad loading:', e);
+    }
+  };
+  requestAnimationFrame(() => requestAnimationFrame(run));
+  setTimeout(run, 1500);
 }
 
 document.addEventListener('click', (e) => {
@@ -2270,6 +2407,7 @@ document.getElementById('search-input')?.addEventListener('input', (e) => {
 });
 
 document.getElementById('export-github-btn')?.addEventListener('click', exportToGitHub);
+document.getElementById('redeploy-all-btn')?.addEventListener('click', redeployAllPages);
 document.getElementById('backup-download-btn')?.addEventListener('click', downloadBackup);
 document.getElementById('backup-restore-btn')?.addEventListener('click', restoreFromBackup);
 document.getElementById('migrate-local-btn')?.addEventListener('click', migrateLocalArticles);
