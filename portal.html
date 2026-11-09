@@ -377,6 +377,11 @@
           </div>
 
           <div class="field-group">
+            <label class="field-label" for="f-video-intro">Video: narration opening (optional)</label>
+            <textarea id="f-video-intro" class="field-input" rows="4" maxlength="800" placeholder="e.g. Hello and good day everyone out there, here is another episode of Poetic Codes. Today we ask…"></textarea>
+          </div>
+
+          <div class="field-group">
             <label class="field-label" for="f-cover-image">Cover Image (Optional)</label>
             <input type="file" id="f-cover-image" class="field-input" accept="image/*" style="padding:0.5rem;">
             <div id="cover-preview" style="margin-top:0.5rem;display:none;text-align:center;">
@@ -941,14 +946,14 @@ function getArticleTextHTML() {
 }
 
 function getContentHTML() {
-  if (currentMode === 'html')  return document.getElementById('html-textarea').value.trim();
+  if (currentMode === 'html')  return articleOnlyHTML(document.getElementById('html-textarea').value.trim());
   if (currentMode === 'video') {
     const intro   = document.getElementById('vid-intro').value.trim();
     const caption = document.getElementById('vid-caption').value.trim();
     return (intro ? plainToHTML(intro) : '') + buildVideoEmbedHTML(caption) + getArticleTextHTML();
   }
   const raw = document.getElementById('plain-textarea').value.trim();
-  return looksLikeHTML(raw) ? raw : plainToHTML(raw);
+  return looksLikeHTML(raw) ? articleOnlyHTML(raw) : plainToHTML(raw);
 }
 
 function updateUrlPreview() {
@@ -1033,7 +1038,7 @@ function resetSubmitButton() {
 }
 
 function resetForm() {
-  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details','f-video-voice'].forEach(id => {
+  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details','f-video-voice','f-video-intro'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -1947,7 +1952,7 @@ async function fireWebhook(payload) {
 }
 
 // SEO FIX: rewritten so canonical + og:image + JSON-LD point at poetic-codes.pages.dev/articles/<slug>.html
-function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, coverImageUrl) {
+function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, coverImageUrl, videoUrl) {
   const pubDate  = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
   const isoDate  = new Date().toISOString();
   const siteOrigin   = originFor(getDeployTarget());
@@ -1957,6 +1962,16 @@ function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, cover
   // Loader exactly once, in <head>. The body already carries top/middle/bottom <ins> units
   // (buildBloggerBody). If a caller passed a body without any, add them here.
   const adLoader = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADSENSE_PUBLISHER + '" crossorigin="anonymous"><\/script>';
+  // Video player for the page. Skipped when the body already carries one (video-mode posts embed their own).
+  let videoBlock = '';
+  if (videoUrl && !/<video[\s>]|<iframe[^>]+(?:youtube|vimeo)/i.test(bodyHTML)) {
+    const yt = getYouTubeId(videoUrl);
+    const wrap  = 'position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin:1.5rem 0;';
+    const frame = 'position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:12px;';
+    if (yt) videoBlock = `<div style="${wrap}"><iframe src="https://www.youtube-nocookie.com/embed/${yt}" style="${frame}" allowfullscreen loading="lazy" title="Video"></iframe></div>`;
+    else if (isDirectVideoUrl(videoUrl)) videoBlock = `<div style="margin:1.5rem 0;"><video controls playsinline preload="metadata" style="width:100%;border-radius:12px;background:#000;display:block;"><source src="${esc(videoUrl)}" type="video/mp4"></video></div>`;
+    else videoBlock = `<p><a href="${esc(videoUrl)}" rel="noopener">Watch the video</a></p>`;
+  }
   const pageBody = /<ins class="adsbygoogle"/i.test(bodyHTML)
     ? bodyHTML.replace(/<script[^>]*adsbygoogle\.js[^>]*>\s*<\/script>/gi, '')
     : injectAds(bodyHTML);
@@ -2007,7 +2022,7 @@ footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size
 <article>
 <h1>${esc(title)}</h1>
 <div class="meta">${esc(author)} · ${esc(category)} · ${pubDate}</div>
-${pageBody}
+${videoBlock}${pageBody}
 </article>
 <footer>
 <a href="${BLOGSPOT_ABOUT_URL}" target="_blank" rel="noopener">About</a> |
@@ -2207,13 +2222,16 @@ function htmlToPlainText(html) {
 // If the pasted content is a whole web page, keep only the article itself (<main>);
 // anything else is returned unchanged.
 function articleOnlyHTML(html) {
-  const str = String(html || '');
-  if (!/<main[\s>]/i.test(str)) return str;
-  const doc = new DOMParser().parseFromString(str.replace(/^\s*```[a-z]*\s*$/gim, ''), 'text/html');
-  const main = doc.querySelector('main');
-  if (!main) return str;
-  main.querySelectorAll('script,style,iframe,noscript,header,footer,nav,aside,ins,.ad-slot,h1').forEach(n => n.remove());
-  return main.innerHTML;
+  const str = String(html || '').replace(/^\s*```[a-z]*\s*$/gim, '');
+  // A plain fragment (paragraphs, headings...) is returned untouched. A pasted full page, or a page
+  // wrapped in <main>/<article>, is unwrapped so its <head> (canonical, title, JSON-LD, og tags,
+  // styles) never ends up nested inside the published page.
+  if (!/<(?:html|head|body|main|article)[\s>]/i.test(str)) return str;
+  const doc = new DOMParser().parseFromString(str, 'text/html');
+  const root = doc.querySelector('main') || doc.querySelector('article') || doc.body;
+  if (!root) return str;
+  root.querySelectorAll('script,style,iframe,noscript,header,footer,nav,aside,ins,.ad-slot,.footer-note,h1,link,meta,title').forEach(n => n.remove());
+  return root.innerHTML.trim();
 }
 
 // FIX: more retries with a short back-off on 409/422 (another commit landed between
@@ -2275,6 +2293,8 @@ async function queueVideoJob(job) {
   };
   // Optional narration voice (an edge-tts neural voice name); empty = the default voice in the video script.
   if (job.voice && /^[a-z]{2,3}-[A-Z]{2}-[A-Za-z]+Neural$/.test(job.voice)) payload.voice = job.voice;
+  // Optional custom narration opening, spoken before the essay (replaces the default greeting)
+  if (job.intro && String(job.intro).trim()) payload.intro = String(job.intro).trim().slice(0, 800);
   // Where the story takes place: the video's pictures are drawn to match (see article_video.py)
   if (job.location && (job.location.name || job.location.description)) payload.location = job.location;
   await githubPutText(VIDEO_JOBS_DIR + '/' + slug + '.json', JSON.stringify(payload, null, 2), 'Queue video: ' + slug);
@@ -2417,7 +2437,8 @@ async function submitArticle() {
             name: ((document.getElementById('f-video-place') || {}).value || '').trim(),
             description: ((document.getElementById('f-video-details') || {}).value || '').trim()
           },
-          voice: ((document.getElementById('f-video-voice') || {}).value || '').trim()
+          voice: ((document.getElementById('f-video-voice') || {}).value || '').trim(),
+          intro: ((document.getElementById('f-video-intro') || {}).value || '').trim()
         });
         distLines.push('✓ Video: queued — it will appear on the article in about 1–3 minutes');
       } catch (vErr) {
