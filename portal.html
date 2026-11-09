@@ -568,6 +568,11 @@
               <button class="btn-save-hook" id="clear-gh-btn" type="button" style="flex:1;background:var(--rose);">Clear</button>
             </div>
             <div id="gh-config-status" style="font-family:'JetBrains Mono',monospace;font-size:0.55rem;margin-top:0.4rem;min-height:0.8rem;line-height:1.6;" aria-live="polite"></div>
+            <label class="field-label" for="deploy-target" style="margin-top:0.8rem;">Repo is hosted on (sets canonical URLs)</label>
+            <select id="deploy-target" class="webhook-input" style="width:100%;">
+              <option value="cloudflare">Cloudflare Pages: poetic-codes.pages.dev</option>
+              <option value="vercel">Vercel: poetic-bytes.vercel.app</option>
+            </select>
             <div class="dist-item" style="margin-top:0.8rem;">
               <input type="checkbox" id="dist-github" checked>
               <label for="dist-github"><i class="fab fa-github" aria-hidden="true"></i> Publish to GitHub Pages</label>
@@ -685,6 +690,19 @@
   };
 </script>
 
+<script>
+(function () {
+  var sel = document.getElementById('deploy-target');
+  if (!sel) return;
+  try { sel.value = localStorage.getItem('pc_deploy_target') || 'cloudflare'; } catch (e) {}
+  if (!sel.value) sel.value = 'cloudflare';
+  sel.addEventListener('change', function () {
+    try { localStorage.setItem('pc_deploy_target', sel.value); } catch (e) {}
+    if (typeof showToast === 'function') showToast('Canonical URLs will use ' + sel.options[sel.selectedIndex].text, 'success');
+  });
+})();
+</script>
+
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 
 <script>
@@ -692,6 +710,57 @@ const BLOGGER_CLIENT_ID = '790965276439-flja0u6tel45rqbg47p6l8fp6aua1tch.apps.go
 
 const SITE_URL = 'https://poetic-codes.pages.dev';
 const API_BASE = 'https://poetic-codes.vercel.app';
+
+// ---- AdSense (loader lives ONCE in each page <head>; these helpers emit <ins> units only) ----
+const ADSENSE_PUBLISHER   = 'ca-pub-6428799122405621';
+const ADSENSE_SLOT_TOP    = '8844498658';
+const ADSENSE_SLOT_MIDDLE = '9585168014';
+const ADSENSE_SLOT_BOTTOM = '1982565389';
+
+// ---- Platform-aware origins: decides canonical, og:url, sitemap and RSS ----
+// Blogger canonicals come from the post URL Blogger returns; this map is for static pages in the repo.
+const TARGETS = {
+  cloudflare: 'https://poetic-codes.pages.dev',
+  vercel:     'https://poetic-bytes.vercel.app',
+  blogger:    'https://poetic-bytes.blogspot.com'
+};
+function getDeployTarget() {
+  let t = 'cloudflare';
+  try { t = localStorage.getItem('pc_deploy_target') || 'cloudflare'; } catch (e) {}
+  return (t === 'vercel' || t === 'cloudflare') ? t : 'cloudflare';
+}
+function originFor(target) { return TARGETS[target] || TARGETS.cloudflare; }
+
+function adBlock(slot) {
+  return '<div class="ad-slot" style="margin:1.6rem 0;text-align:center;">'
+    + '<ins class="adsbygoogle" style="display:block"'
+    + ' data-ad-client="' + ADSENSE_PUBLISHER + '"'
+    + ' data-ad-slot="' + slot + '"'
+    + ' data-ad-format="auto" data-full-width-responsive="true"></ins>'
+    + '<scr' + 'ipt>(adsbygoogle=window.adsbygoogle||[]).push({});</scr' + 'ipt>'
+    + '</div>';
+}
+function stripAdsense(html) {
+  return String(html || '')
+    .replace(/<script[^>]*adsbygoogle\.js[^>]*>\s*<\/script>/gi, '')
+    .replace(/<div class="ad-slot"[^>]*>\s*<ins class="adsbygoogle"[\s\S]*?<\/ins>\s*(?:<script>[\s\S]*?<\/script>\s*)?<\/div>/gi, '')
+    .replace(/<ins class="adsbygoogle"[\s\S]*?<\/ins>\s*(?:<script>\s*\(adsbygoogle[\s\S]*?<\/script>)?/gi, '');
+}
+// Top + middle + bottom units around an article body. Safe to call on already-injected HTML.
+function injectAds(html) {
+  const clean = stripAdsense(html);
+  const parts = clean.split(/<\/p>\s*(?=<p)/i);
+  const rebuilt = parts.map((p, i) => (i < parts.length - 1 ? p + '</p>' : p));
+  let withMid;
+  if (rebuilt.length >= 2) {
+    const mid = Math.max(0, Math.floor(rebuilt.length / 2) - 1);
+    rebuilt[mid] = rebuilt[mid] + adBlock(ADSENSE_SLOT_MIDDLE);
+    withMid = rebuilt.join('\n');
+  } else {
+    withMid = clean + adBlock(ADSENSE_SLOT_MIDDLE);
+  }
+  return adBlock(ADSENSE_SLOT_TOP) + withMid + adBlock(ADSENSE_SLOT_BOTTOM);
+}
 
 const OWNER_EMAIL = 'pansensoyglenn150@gmail.com';
 const BLOGGER_BLOG_URL  = 'https://poetic-bytes.blogspot.com';
@@ -1649,16 +1718,19 @@ function autoSEO(title, excerpt, content, tags, category) {
   return { metaDesc, autoTags, readingTime: readTime(content) };
 }
 
-function buildBloggerBody(title, author, category, excerpt, content, tags, articleURL) {
+function buildBloggerBody(title, author, category, excerpt, content, tags, articleURL, withAds) {
+  if (withAds === undefined) withAds = true;
   const seo        = autoSEO(title, excerpt, content, tags, category);
   const articleUrl = articleURL || BLOGGER_BLOG_URL;
   const eURL       = encodeURIComponent(articleUrl);
   const eTitle     = encodeURIComponent(title);
 
   const P_STYLE = 'text-align:justify;text-justify:inter-word;hyphens:auto;margin-bottom:1.4rem;line-height:1.85;font-size:1rem;color:#2a1a0f;';
-  const mainContent = content
+  const styledContent = content
     .replace(/<p>/gi, `<p style="${P_STYLE}">`)
     .replace(/<p (?!style=)/gi, `<p style="${P_STYLE}" `);
+  // Ad <ins> units only (top/middle/bottom). The loader belongs in the page <head> / Blogger theme, never here.
+  const mainContent = withAds ? injectAds(styledContent) : stripAdsense(styledContent);
 
   const tagBadges = seo.autoTags.map(t =>
     `<span style="display:inline-block;background:rgba(139,94,52,0.15);color:#7a3e1a;border-radius:20px;padding:0.2rem 0.7rem;font-size:0.68rem;margin:0.2rem;font-family:monospace;">${esc(t)}</span>`
@@ -1860,7 +1932,7 @@ async function publishToGitHub(slug, htmlContent, coverImageUrl) {
     throw new Error('GitHub error: '+((err.message)||'HTTP '+res.status));
   }
   // SEO FIX: canonical URL is where the file actually lives after deploy
-  return `${SITE_URL}/${GH_ARTICLES_DIR}/${slug}.html`;
+  return `${originFor(getDeployTarget())}/${GH_ARTICLES_DIR}/${slug}.html`;
 }
 
 async function fireWebhook(payload) {
@@ -1878,13 +1950,16 @@ async function fireWebhook(payload) {
 function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, coverImageUrl) {
   const pubDate  = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
   const isoDate  = new Date().toISOString();
-  const canonicalURL = `${SITE_URL}/${GH_ARTICLES_DIR}/${slug}.html`;
-  const ogImage  = coverImageUrl || `${SITE_URL}/og-default.png`;
+  const siteOrigin   = originFor(getDeployTarget());
+  const canonicalURL = `${siteOrigin}/${GH_ARTICLES_DIR}/${slug}.html`;
+  const ogImage  = coverImageUrl || `${siteOrigin}/og-default.png`;
   const safeDesc = excerpt.replace(/\s+/g,' ').slice(0, 160);
-  const adLoader = /adsbygoogle\.js/i.test(bodyHTML) ? '' :
-    '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6428799122405621" crossorigin="anonymous"><\/script>';
-  const adUnit = /adsbygoogle/i.test(bodyHTML) ? '' :
-    '<div style="margin:2rem 0;text-align:center;min-height:90px;"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6428799122405621" data-ad-slot="3735753880" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});<\/script></div>';
+  // Loader exactly once, in <head>. The body already carries top/middle/bottom <ins> units
+  // (buildBloggerBody). If a caller passed a body without any, add them here.
+  const adLoader = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + ADSENSE_PUBLISHER + '" crossorigin="anonymous"><\/script>';
+  const pageBody = /<ins class="adsbygoogle"/i.test(bodyHTML)
+    ? bodyHTML.replace(/<script[^>]*adsbygoogle\.js[^>]*>\s*<\/script>/gi, '')
+    : injectAds(bodyHTML);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1896,6 +1971,7 @@ function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, cover
 <meta name="author" content="${esc(author)}">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="${canonicalURL}">
+<meta name="google-adsense-account" content="${ADSENSE_PUBLISHER}">
 <meta property="og:site_name" content="The Commonplace">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(safeDesc)}">
@@ -1931,8 +2007,7 @@ footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size
 <article>
 <h1>${esc(title)}</h1>
 <div class="meta">${esc(author)} · ${esc(category)} · ${pubDate}</div>
-${bodyHTML}
-${adUnit}
+${pageBody}
 </article>
 <footer>
 <a href="${BLOGSPOT_ABOUT_URL}" target="_blank" rel="noopener">About</a> |
@@ -1957,7 +2032,7 @@ async function refreshArticleCache() {
 async function regenerateSitemap() {
   const cfg = getGitHubConfig();
   if (!cfg.token || !csArticlesCache.length) return false;
-  const publicBase = SITE_URL;
+  const publicBase = originFor(getDeployTarget());
   const today = new Date().toISOString().slice(0, 10);
 
   const entries = [
@@ -2008,7 +2083,7 @@ ${entries.map(u => `  <url>
 async function regenerateFeed() {
   const cfg = getGitHubConfig();
   if (!cfg.token || !csArticlesCache.length) return false;
-  const publicBase = SITE_URL;
+  const publicBase = originFor(getDeployTarget());
   const sorted = [...csArticlesCache]
     .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
     .slice(0, 50);
@@ -2267,7 +2342,7 @@ async function submitArticle() {
     distLines.push('✓ Blogger: '+bloggerURL);
     setProgress(55);
 
-    const finalBodyHTML = buildBloggerBody(title, author, category, excerpt, content, tags, bloggerURL);
+    const finalBodyHTML = buildBloggerBody(title, author, category, excerpt, content, tags, bloggerURL, false);
 
     if (typeof window.saveToFirebase === 'function') {
       const cover = generateCoverImage(title, category);
