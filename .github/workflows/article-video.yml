@@ -47,7 +47,8 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           # "0" = no generated pictures (only your cover + Wikimedia photos).
           # Set to "1" to make a picture for each stretch of narration (uses Cloudflare's free daily quota).
-          AI_IMAGES: "0"
+          AI_IMAGES: "1"
+          AI_IMAGE_MAX: "20"
           # FREE moving people: real stock footage from Pexels (free key at pexels.com/api, saved as a secret)
           # Real old film (public domain) for stories set before 2000, from Wikimedia Commons + Internet Archive (no key needed)
           ARCHIVE_VIDEO: "1"
