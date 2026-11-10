@@ -114,6 +114,7 @@
       csEditing = {
         id: main, ids: ids, date: article.date, category: article.category,
         photoUrl: article.photoUrl || '', title: article.title,
+        videoUrl: article.videoUrl || article.video_url || '',
         pageUrl: article.pageUrl || article.page_url || '',
         bloggerUrl: article.bloggerUrl || article.blogger_url || ''
       };
@@ -157,7 +158,7 @@
     var cover = /^https?:\/\//i.test(a.cover || '') ? a.cover : null;
     var ghBody = buildBloggerBody(a.title, author, a.category, a.excerpt, articleOnlyHTML(a.content), a.tags,
       (csEditing && csEditing.bloggerUrl) || '', true);
-    var page = buildGitHubPage(a.title, author, a.category, a.excerpt, ghBody, sl.slug, cover);
+    var page = buildGitHubPage(a.title, author, a.category, a.excerpt, ghBody, sl.slug, cover, a.videoUrl || '', ((document.getElementById('f-youtube-url') || {}).value || '').trim());
     var url = await publishToGitHub(sl.slug, page, cover);
     // a new page name (title changed, or never deployed) must also appear in the sitemap and feed
     if (!sl.stored) {
@@ -260,7 +261,8 @@
       try {
         rebuilt = await rebuildGitHubPage({
           title: title, category: category, excerpt: excerpt, tags: tags,
-          content: content, cover: csEditing.photoUrl
+          content: content, cover: csEditing.photoUrl,
+          videoUrl: payload.videoUrl || csEditing.videoUrl || ''
         });
       } catch (e) { failed.push('GitHub page: ' + e.message); }
     }
