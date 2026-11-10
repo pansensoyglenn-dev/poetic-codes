@@ -382,6 +382,24 @@
           </div>
 
           <div class="field-group">
+            <label class="field-label" for="f-youtube-url">YouTube link for this essay (optional, add after you upload)</label>
+            <input type="url" id="f-youtube-url" class="field-input" placeholder="https://www.youtube.com/watch?v=...">
+          </div>
+
+          <div class="field-group">
+            <button type="button" class="field-input" id="yt-pack-btn" style="cursor:pointer;text-align:center;">📺 Make YouTube title, description &amp; tags</button>
+            <div id="yt-pack" style="display:none;margin-top:.6rem;">
+              <label class="field-label">YouTube title</label>
+              <textarea id="yt-title" class="field-input" rows="2" readonly></textarea>
+              <label class="field-label">Description</label>
+              <textarea id="yt-desc" class="field-input" rows="10" readonly></textarea>
+              <label class="field-label">Tags (comma separated)</label>
+              <textarea id="yt-tags" class="field-input" rows="3" readonly></textarea>
+              <button type="button" class="field-input" id="yt-copy-all" style="cursor:pointer;text-align:center;margin-top:.4rem;">Copy all</button>
+            </div>
+          </div>
+
+          <div class="field-group">
             <label class="field-label" for="f-cover-image">Cover Image (Optional)</label>
             <input type="file" id="f-cover-image" class="field-input" accept="image/*" style="padding:0.5rem;">
             <div id="cover-preview" style="margin-top:0.5rem;display:none;text-align:center;">
@@ -1038,7 +1056,7 @@ function resetSubmitButton() {
 }
 
 function resetForm() {
-  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details','f-video-voice','f-video-intro'].forEach(id => {
+  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details','f-video-voice','f-video-intro','f-youtube-url'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -1952,7 +1970,90 @@ async function fireWebhook(payload) {
 }
 
 // SEO FIX: rewritten so canonical + og:image + JSON-LD point at poetic-codes.pages.dev/articles/<slug>.html
-function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, coverImageUrl, videoUrl) {
+// Growth helpers: share buttons + "keep reading" links on every static page, and an IndexNow ping.
+function buildShareBlock(title, canonicalURL) {
+  const u = encodeURIComponent(canonicalURL), t = encodeURIComponent(title);
+  const b = 'display:inline-block;margin:0 .4rem .5rem 0;padding:.45rem .9rem;border:1px solid #253649;border-radius:999px;font:.75rem monospace;color:#74b9e8;text-decoration:none;background:none;cursor:pointer;';
+  return '<div style="margin:2.5rem 0 1rem;"><div style="font:.7rem monospace;color:#667fa3;margin-bottom:.6rem;">SHARE THIS ESSAY</div>'
+    + '<a style="'+b+'" href="https://www.facebook.com/sharer/sharer.php?u='+u+'" target="_blank" rel="noopener">Facebook</a>'
+    + '<a style="'+b+'" href="https://twitter.com/intent/tweet?url='+u+'&text='+t+'" target="_blank" rel="noopener">X</a>'
+    + '<a style="'+b+'" href="https://wa.me/?text='+t+'%20'+u+'" target="_blank" rel="noopener">WhatsApp</a>'
+    + '<a style="'+b+'" href="https://t.me/share/url?url='+u+'&text='+t+'" target="_blank" rel="noopener">Telegram</a>'
+    + '<button style="'+b+'" onclick="(navigator.share?navigator.share({title:document.title,url:location.href}):navigator.clipboard.writeText(location.href).then(function(){alert(\'Link copied\')}))">Share / copy link</button></div>';
+}
+function buildRelatedBlock(slug, category) {
+  try {
+    const base = originFor(getDeployTarget());
+    const list = (csArticlesCache || []).filter(a => a && a.title && slugify(a.title) !== slug);
+    list.sort((a, b) => ((b.category === category) - (a.category === category)) || (b.date || '').localeCompare(a.date || ''));
+    const pick = list.slice(0, 5);
+    if (!pick.length) return '';
+    return '<nav style="margin:2rem 0;padding-top:1.2rem;border-top:1px solid #253649;"><div style="font:.7rem monospace;color:#667fa3;margin-bottom:.6rem;">KEEP READING</div><ul style="padding-left:1.1rem;">'
+      + pick.map(a => '<li style="margin-bottom:.5rem;"><a href="'+base+'/'+GH_ARTICLES_DIR+'/'+slugify(a.title)+'.html">'+esc(a.title)+'</a></li>').join('')
+      + '</ul></nav>';
+  } catch (e) { return ''; }
+}
+
+// YouTube pack: title / description / tags for the essay's video, built from the form fields.
+function buildYouTubePack(title, excerpt, category, tagsArr, articleUrl, intro) {
+  const clean = x => String(x || '').replace(/\s+/g, ' ').trim();
+  title = clean(title); excerpt = clean(excerpt); category = clean(category);
+  const tags = (tagsArr || []).map(clean).filter(Boolean);
+  const suffix = ' | Poetic Codes';
+  let ytTitle = title.length + suffix.length <= 100 ? title + suffix : title.slice(0, 100);
+  const hash = ['#PoeticCodes', '#PoeticBytes'].concat(tags.slice(0, 2).map(t => '#' + t.replace(/[^A-Za-z0-9]/g, ''))).filter(h => h.length > 1).join(' ');
+  const lines = [];
+  lines.push(excerpt || title);
+  lines.push('');
+  lines.push('📖 Read the full essay (with sources and more): ' + articleUrl);
+  lines.push('🏠 More essays: ' + SITE_URL + '/');
+  lines.push('');
+  lines.push('If this made you think, like the video, subscribe to @PoeticBytes, and share it with someone who cares about ' + (category || 'these topics') + '. Tell me in the comments what you think.');
+  lines.push('▶ Subscribe: https://www.youtube.com/@PoeticBytes?sub_confirmation=1');
+  lines.push('');
+  lines.push('Written by Glenn Junsay Pansensoy (@PoeticGlenn)');
+  lines.push('');
+  lines.push(hash);
+  let desc = lines.join('\n');
+  const all = ['Poetic Codes', 'Poetic Bytes', 'PoeticBytes', 'essay', category].concat(tags, ['Philippines', 'Glenn Pansensoy']).map(clean).filter(Boolean);
+  const seen = new Set(); const out = []; let len = 0;
+  all.forEach(t => { const k = t.toLowerCase(); if (!seen.has(k) && len + t.length + 1 <= 450) { seen.add(k); out.push(t); len += t.length + 1; } });
+  return { title: ytTitle, description: desc, tags: out.join(', ') };
+}
+(function initYtPack() {
+  const btn = document.getElementById('yt-pack-btn');
+  if (!btn) return;
+  const val = id => ((document.getElementById(id) || {}).value || '').trim();
+  btn.addEventListener('click', () => {
+    const title = val('f-title');
+    if (!title) { alert('Enter the title first.'); return; }
+    const cat = (typeof csSectionFor === 'function' && csSectionFor(val('f-category'))) || val('f-category');
+    const url = originFor(getDeployTarget()) + '/' + GH_ARTICLES_DIR + '/' + slugify(title) + '.html';
+    const pack = buildYouTubePack(title, val('f-excerpt'), cat, val('f-tags').split(','), url);
+    document.getElementById('yt-title').value = pack.title;
+    document.getElementById('yt-desc').value = pack.description;
+    document.getElementById('yt-tags').value = pack.tags;
+    document.getElementById('yt-pack').style.display = 'block';
+  });
+  const copy = document.getElementById('yt-copy-all');
+  if (copy) copy.addEventListener('click', async () => {
+    const txt = 'TITLE:\n' + val('yt-title') + '\n\nDESCRIPTION:\n' + val('yt-desc') + '\n\nTAGS:\n' + val('yt-tags');
+    try { await navigator.clipboard.writeText(txt); copy.textContent = 'Copied ✓'; } catch (e) { document.getElementById('yt-desc').select(); copy.textContent = 'Select and copy manually'; }
+    setTimeout(() => { copy.textContent = 'Copy all'; }, 2000);
+  });
+})();
+
+// IndexNow: tells Bing, Yandex and others about a new URL right away (Google still needs Search Console).
+const INDEXNOW_KEY = 'pc7f3a91d2e84b4c6a9e05d1b8c3f2a47';
+async function pingIndexNow(url) {
+  try {
+    await githubPutText(INDEXNOW_KEY + '.txt', INDEXNOW_KEY, 'IndexNow key');
+    await fetch('https://api.indexnow.org/indexnow?url=' + encodeURIComponent(url) + '&key=' + INDEXNOW_KEY + '&keyLocation=' + encodeURIComponent(originFor(getDeployTarget()) + '/' + INDEXNOW_KEY + '.txt'), { mode: 'no-cors' });
+    return true;
+  } catch (e) { console.warn('IndexNow:', e); return false; }
+}
+
+function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, coverImageUrl, videoUrl, youtubeUrl) {
   const pubDate  = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
   const isoDate  = new Date().toISOString();
   const siteOrigin   = originFor(getDeployTarget());
@@ -1972,6 +2073,15 @@ function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, cover
     else if (isDirectVideoUrl(videoUrl)) videoBlock = `<div style="margin:1.5rem 0;"><video controls playsinline preload="metadata" style="width:100%;border-radius:12px;background:#000;display:block;"><source src="${esc(videoUrl)}" type="video/mp4"></video></div>`;
     else videoBlock = `<p><a href="${esc(videoUrl)}" rel="noopener">Watch the video</a></p>`;
   }
+  // Channel links: "Watch on YouTube" (when a link was given) and a subscribe button, shown under every essay.
+  const ytId = getYouTubeId(youtubeUrl || '');
+  if (ytId && !videoBlock && !/<video[\s>]|<iframe[^>]+(?:youtube|vimeo)/i.test(bodyHTML)) {
+    videoBlock = '<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin:1.5rem 0;"><iframe src="https://www.youtube-nocookie.com/embed/' + ytId + '" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:12px;" allowfullscreen loading="lazy" title="Video"></iframe></div>';
+  }
+  const ybtn = 'display:inline-block;margin:0 .5rem .5rem 0;padding:.55rem 1.1rem;border-radius:999px;font:.8rem monospace;text-decoration:none;';
+  const channelBlock = '<div style="margin:2rem 0 0;">'
+    + (ytId ? '<a style="' + ybtn + 'background:#c4302b;color:#fff;" href="https://www.youtube.com/watch?v=' + ytId + '" target="_blank" rel="noopener">▶ Watch on YouTube</a>' : '')
+    + '<a style="' + ybtn + 'border:1px solid #c4302b;color:#ff8a85;" href="https://www.youtube.com/@PoeticBytes?sub_confirmation=1" target="_blank" rel="noopener">Subscribe @PoeticBytes</a></div>';
   const pageBody = /<ins class="adsbygoogle"/i.test(bodyHTML)
     ? bodyHTML.replace(/<script[^>]*adsbygoogle\.js[^>]*>\s*<\/script>/gi, '')
     : injectAds(bodyHTML);
@@ -2024,6 +2134,9 @@ footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size
 <div class="meta">${esc(author)} · ${esc(category)} · ${pubDate}</div>
 ${videoBlock}${pageBody}
 </article>
+${channelBlock}
+${buildShareBlock(title, canonicalURL)}
+${buildRelatedBlock(slug, category)}
 <footer>
 <a href="${BLOGSPOT_ABOUT_URL}" target="_blank" rel="noopener">About</a> |
 <a href="${BLOGSPOT_PRIVACY_URL}" target="_blank" rel="noopener">Privacy</a> |
@@ -2388,7 +2501,7 @@ async function submitArticle() {
       try {
         // SEO FIX: a pasted full web page is cut down to its <main> so the static page has one title/canonical
         const ghBody = buildBloggerBody(title, author, category, excerpt, articleOnlyHTML(content), tags, bloggerURL);
-        const ghPage = buildGitHubPage(title, author, category, excerpt, ghBody, slug, uploadedCoverUrl);
+        const ghPage = buildGitHubPage(title, author, category, excerpt, ghBody, slug, uploadedCoverUrl, '', ((document.getElementById('f-youtube-url') || {}).value || '').trim());
         githubURL    = await publishToGitHub(slug, ghPage, uploadedCoverUrl);
         distLines.push('✓ GitHub: '+githubURL);
       } catch(ghErr) {
@@ -2461,6 +2574,7 @@ async function submitArticle() {
       window.pcLastPushError = '';
       try { fdOk = await regenerateFeed(); }    catch (e) { console.warn('Feed:', e); window.pcLastPushError = 'feed: ' + e.message; }
       const fdErr = fdOk ? '' : (window.pcLastPushError || 'unknown');
+      try { const inOk = await pingIndexNow(originFor(getDeployTarget()) + '/' + GH_ARTICLES_DIR + '/' + slugify(title) + '.html'); distLines.push((inOk ? '✓' : '⚠') + ' IndexNow ping ' + (inOk ? 'sent (Bing/Yandex)' : 'failed')); } catch (e) {}
       distLines.push(
         (smOk ? '✓' : '⚠') + ' Sitemap ' + (smOk ? 'updated' : 'not updated [' + smErr + ']')
         + ' · ' + (fdOk ? '✓' : '⚠') + ' RSS feed ' + (fdOk ? 'updated' : 'not updated [' + fdErr + ']')
