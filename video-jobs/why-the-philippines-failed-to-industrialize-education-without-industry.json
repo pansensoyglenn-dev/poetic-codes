@@ -1,6 +1,6 @@
 {
-  "jobId": "1794277872199",
-  "createdAt": "2026-11-10T02:31:12.199Z",
+  "jobId": "1794277904697",
+  "createdAt": "2026-11-10T02:31:44.697Z",
   "title": "Why the Philippines Failed to Industrialize: Education Without Industry",
   "author": "Glenn Junsay Pansensoy",
   "category": "Economy",
@@ -21,5 +21,5 @@
   "slug": "why-the-philippines-failed-to-industrialize-education-without-industry",
   "articleId": 56,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794277870071.png",
-  "force": false
+  "force": true
 }
