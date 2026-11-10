@@ -55,14 +55,26 @@ SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "45"))  # one picture per slide,
 INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"  # off: video starts straight on the content
 # The narration opens with this greeting, then the topic (the article title), then the essay itself.
 # Set NARRATION_GREETING to an empty string in the workflow to switch it off.
-NARRATION_GREETING = os.environ.get("NARRATION_GREETING", "Hello everyone, this is an essay about").strip()
+NARRATION_GREETING = os.environ.get("NARRATION_GREETING", "Hello and good day, everyone, and welcome to another episode of Poetic Codes. In today's discussion, we will explore").strip()
 
 
-def narration_greeting(title: str) -> str:
+NARRATION_CLOSER = os.environ.get(
+    "NARRATION_CLOSER",
+    "Along the way, we will look at the background, the key ideas, and what they mean for us today. "
+    "So please settle in, and let's begin.").strip()
+
+
+def narration_greeting(title: str, excerpt: str = "") -> str:
     topic = (title or "").strip().rstrip(".!?:;, ")
     if not NARRATION_GREETING or not topic or topic.lower() == "untitled":
         return ""
-    return f"{NARRATION_GREETING} {topic}."
+    parts = [f"{NARRATION_GREETING} {topic}."]
+    ex = (excerpt or "").strip()
+    if ex:
+        parts.append(ex if ex[-1] in ".!?" else ex + ".")
+    if NARRATION_CLOSER:
+        parts.append(NARRATION_CLOSER)
+    return " ".join(parts)
 
 SPEAK_HEADINGS = os.environ.get("SPEAK_HEADINGS", "0") != "0"  # off: section headings are not read or shown
 ONLY_JOB = os.environ.get("ONLY_JOB", "").strip().lower()
@@ -303,14 +315,15 @@ def build_segments(job: Job) -> list[Seg]:
             break
 
     custom_intro = clean_text(job.get("intro"))  # per-article opening written in the portal
-    greeting = custom_intro or narration_greeting(title)
+    greeting = custom_intro or narration_greeting(title, excerpt)
     if greeting and (custom_intro or not any(str(s.get("speech", "")).lower().startswith(NARRATION_GREETING.lower()) for s in segs)):
         if INTRO_TITLE:
             # the title card is spoken: greeting replaces the bare title, excerpt still follows
-            segs[0]["speech"] = greeting + (" " + excerpt if excerpt else "")
+            segs[0]["speech"] = greeting
+            segs[0]["kind"] = "intro"
         else:
             # the title card is dropped, so the greeting becomes the first thing said (and shown as a caption)
-            segs.insert(1, {"kind": "body", "text": greeting, "speech": greeting, "heading": ""})
+            segs.insert(1, {"kind": "intro", "title": title, "text": greeting, "speech": greeting, "heading": ""})
     if not INTRO_TITLE and len(segs) > 1:
         segs = segs[1:]
     segs.append({
@@ -390,6 +403,60 @@ def fit_band(img):
     return canvas
 
 
+PROFILE = [None]   # the round profile picture shown while the introduction is narrated
+
+
+def load_profile(job):
+    """Profile picture for the intro slide: job "profileUrl", env PROFILE_IMAGE_URL, or a file in the repo."""
+    for u in (job.get("profileUrl"), os.environ.get("PROFILE_IMAGE_URL", "").strip()):
+        if u and str(u).startswith("http"):
+            img = load_cover(u)
+            if img is not None:
+                return img
+    for name in ("profile.jpg", "profile.jpeg", "profile.png", "assets/profile.jpg", "assets/profile.png", "images/profile.jpg", "images/profile.png"):
+        try:
+            if Path(name).exists():
+                return Image.open(name).convert("RGB")
+        except Exception as e:
+            log(f"  profile picture not usable ({str(e)[:80]})")
+    return None
+
+
+def draw_intro_card(ov, d, seg, has_cover=False):
+    """Round profile picture, channel name and essay title in the picture area."""
+    prof = None if has_cover else PROFILE[0]
+    y = 36
+    if has_cover:
+        d.rectangle([0, 0, W, IMGH], fill=(6, 10, 18, 150))   # darken the article's cover so the words read
+        y = 150
+    if prof is not None:
+        D = 250
+        s = min(prof.width, prof.height)
+        sq = prof.crop(((prof.width - s) // 2, (prof.height - s) // 2, (prof.width + s) // 2, (prof.height + s) // 2)).resize((D, D), Image.LANCZOS).convert("RGBA")
+        mask = Image.new("L", (D, D), 0)
+        ImageDraw.Draw(mask).ellipse([0, 0, D - 1, D - 1], fill=255)
+        x = (W - D) // 2
+        d.ellipse([x - 7, y - 7, x + D + 7, y + D + 7], fill=ACCENT + (255,))
+        ov.paste(sq, (x, y), mask)
+        y += D + 22
+    elif not has_cover:
+        y = 120
+    name = "Poetic Codes"
+    f = load_font(46, True)
+    w = d.textlength(name, font=f)
+    d.text(((W - w) / 2 + 2, y + 2), name, font=f, fill=(0, 0, 0, 255))
+    d.text(((W - w) / 2, y), name, font=f, fill=ACCENT + (255,))
+    y += 66
+    title = seg.get("title", "")
+    if title:
+        font, lines, lh = fit_text(d, title, W - 160, max(60, IMGH - y - 16), range(40, 23, -2), True)
+        for ln in lines:
+            w = d.textlength(ln, font=font)
+            d.text(((W - w) / 2 + 2, y + 2), ln, font=font, fill=(0, 0, 0, 255))
+            d.text(((W - w) / 2, y), ln, font=font, fill=TEXT + (255,))
+            y += lh
+
+
 def render_layers(seg, idx, total, cover):
     if cover is not None:
         bg = fit_band(cover.convert("RGB"))
@@ -400,6 +467,8 @@ def render_layers(seg, idx, total, cover):
     d.rectangle([0, IMGH, W, H], fill=(6, 10, 18, 255))
     d.rectangle([0, IMGH, W, IMGH + 3], fill=ACCENT + (255,))
     d.rectangle([0, H - 8, int(W * (idx + 1) / total), H], fill=ACCENT + (255,))
+    if seg.get("kind") == "intro":
+        draw_intro_card(ov, d, seg, cover is not None)
     if seg.get("kind") == "end":
         # End card: darken the picture and show the link on screen.
         d.rectangle([0, 0, W, IMGH], fill=(6, 10, 18, 175))
@@ -1958,6 +2027,8 @@ def build_video(job):
     QUOTA_HIT[0] = False
     FALLBACK_STATE.update(fails=0, dead=False, used=0, announced=False)
     photos = load_photos(job)
+    PROFILE[0] = load_profile(job)
+    log("  profile picture for the introduction: " + ("found" if PROFILE[0] is not None else "not found (put profile.jpg in the repo root)"))
     if WIKI_GENERIC:
         photos += load_wiki_photos(job, len(photos))
     if CREDIT_ROWS and CREDITS_CARD:
@@ -2043,6 +2114,8 @@ def build_video(job):
             _pl = slide_plan(seg, job)
             log(f"  storyboard slide {i}: [{src_note}] {clean_text(seg.get('speech') or '')[:90]}"
                 + (f" | AI search: {', '.join(_pl.get('queries', [])[:2])} | avoid: {', '.join(_pl.get('avoid', [])[:5])}" if _pl else ""))
+        elif seg.get("kind") == "intro":
+            cover = photos[0] if photos else None   # the article's cover image; draw_intro_card puts the words on it
         elif photos:
             cover = photos[0]
 
