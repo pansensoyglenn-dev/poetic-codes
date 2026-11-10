@@ -7,6 +7,14 @@
   <language>en-ph</language>
   <atom:link href="https://poetic-codes.pages.dev/feed.xml" rel="self" type="application/rss+xml"/>
   <item>
+    <title>Satti: The Red Gravy of Zamboanga</title>
+    <link>https://poetic-codes.pages.dev/articles/satti-the-red-gravy-of-zamboanga.html</link>
+    <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/satti-the-red-gravy-of-zamboanga.html</guid>
+    <pubDate>Wed, 11 Nov 2026 12:00:00 GMT</pubDate>
+    <category>Culinary</category>
+    <description>Zamboanga's red-gravy breakfast: grilled skewers, puso rice and a history carried across the Sulu Sea from Malay and Tausug kitchens.</description>
+  </item>
+  <item>
     <title>Why the Philippines Failed to Industrialize: Education Without Industry</title>
     <link>https://poetic-codes.pages.dev/articles/why-the-philippines-failed-to-industrialize-education-without-industry.html</link>
     <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/why-the-philippines-failed-to-industrialize-education-without-industry.html</guid>
@@ -19,14 +27,6 @@
     <link>https://poetic-codes.pages.dev/articles/corruption-in-the-philippines-a-historical-and-modern-perspective.html</link>
     <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/corruption-in-the-philippines-a-historical-and-modern-perspective.html</guid>
     <pubDate>Tue, 10 Nov 2026 12:00:00 GMT</pubDate>
-    <category>Local Politics</category>
-    <description>Corruption in the Philippines steals public funds, weakens services, and victimizes ordinary citizens—explore its historical roots and modern consequences.</description>
-  </item>
-  <item>
-    <title>Corruption in the Philippines:A Historical and Modern Perspective</title>
-    <link>https://poetic-codes.pages.dev/articles/corruption-in-the-philippines-a-historical-and-modern-perspective.html</link>
-    <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/corruption-in-the-philippines-a-historical-and-modern-perspective.html</guid>
-    <pubDate>Mon, 09 Nov 2026 12:00:00 GMT</pubDate>
     <category>Local Politics</category>
     <description>Corruption in the Philippines steals public funds, weakens services, and victimizes ordinary citizens—explore its historical roots and modern consequences.</description>
   </item>
@@ -45,14 +45,6 @@
     <pubDate>Sun, 08 Nov 2026 12:00:00 GMT</pubDate>
     <category>Programming</category>
     <description>Master Python input handling: input(), type conversion, validation, argparse, secure passwords, and real-world CLI patterns with runnable code.</description>
-  </item>
-  <item>
-    <title>Never Mind Her Lyrics – colors | Poetic Codes</title>
-    <link>https://poetic-codes.pages.dev/articles/never-mind-her-lyrics-colors-poetic-codes.html</link>
-    <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/never-mind-her-lyrics-colors-poetic-codes.html</guid>
-    <pubDate>Sun, 08 Nov 2026 12:00:00 GMT</pubDate>
-    <category>Music Video</category>
-    <description>Read the full lyrics to &quot;Never Mind Her&quot; by colors — a haunting track about longing and lost connection.</description>
   </item>
   <item>
     <title>Ken Laszlo – &quot;Don't Cry&quot; (1986): The Soft Power of Italo Disco</title>
@@ -317,14 +309,6 @@
     <pubDate>Wed, 28 Oct 2026 12:00:00 GMT</pubDate>
     <category>Culinary</category>
     <description>Kansi is Iloilo's sour, soulful beef soup — rich, tangy, and deeply comforting.</description>
-  </item>
-  <item>
-    <title>Satti: The Red Gravy of Zamboanga — History, Recipe, and Morning Ritual</title>
-    <link>https://poetic-codes.pages.dev/articles/satti-the-red-gravy-of-zamboanga-history-recipe-and-morning-ritual.html</link>
-    <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/satti-the-red-gravy-of-zamboanga-history-recipe-and-morning-ritual.html</guid>
-    <pubDate>Wed, 28 Oct 2026 12:00:00 GMT</pubDate>
-    <category>Culinary</category>
-    <description>Here is the complete, SEO-optimized HTML file, with all comment markers removed and the byline included.</description>
   </item>
 </channel>
 </rss>
