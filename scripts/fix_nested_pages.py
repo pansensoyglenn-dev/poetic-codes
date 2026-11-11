@@ -91,6 +91,52 @@ def fix(txt: str):
     return new
 
 
+
+OLD_HOSTS = ("https://poetic-codes.pansensoyglenn150.workers.dev",)
+NEW_HOST = "https://poetic-codes.pages.dev"
+STUB_DIRS = ("ai", "culinary", "culture", "economy", "global-politics", "history", "music-video", "philosophy", "programming")
+
+
+def fix_old_hosts(root: Path, dry: bool):
+    """Pages whose canonical / og:url still name the old workers.dev address."""
+    n = 0
+    for p in sorted(root.glob("*.html")):
+        t = p.read_text(encoding="utf-8")
+        new = t
+        for old in OLD_HOSTS:
+            new = re.sub(r'(<link[^>]+rel=["\']canonical["\'][^>]*href=["\'])' + re.escape(old), r"\g<1>" + NEW_HOST, new, flags=re.I)
+            new = re.sub(r'(<meta[^>]+property=["\']og:url["\'][^>]*content=["\'])' + re.escape(old), r"\g<1>" + NEW_HOST, new, flags=re.I)
+        if new != t:
+            print(f"{'would change' if dry else 'changed'} canonical host in {p.name}")
+            n += 1
+            if not dry:
+                p.write_text(new, encoding="utf-8")
+    return n
+
+
+def fix_stubs(root: Path, dry: bool):
+    """Old redirect stub pages in the category folders: point their canonical at the real /articles/ page."""
+    n = 0
+    for d in STUB_DIRS:
+        for p in sorted((root / d).glob("*.html")) if (root / d).is_dir() else []:
+            t = p.read_text(encoding="utf-8")
+            if "location.replace(" not in t:
+                continue
+            slug = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", p.stem)
+            target = root / "articles" / f"{slug}.html"
+            if not target.exists():
+                continue
+            url = f"{NEW_HOST}/articles/{slug}.html"
+            new = re.sub(r'(<link[^>]+rel=["\']canonical["\'][^>]*href=["\'])[^"\']*', r"\g<1>" + url, t, count=1, flags=re.I)
+            new = re.sub(r'(<meta[^>]+property=["\']og:url["\'][^>]*content=["\'])[^"\']*', r"\g<1>" + url, new, count=1, flags=re.I)
+            if new != t:
+                print(f"{'would point' if dry else 'pointed'} {d}/{p.name} at articles/{slug}.html")
+                n += 1
+                if not dry:
+                    p.write_text(new, encoding="utf-8")
+    return n
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=".")
@@ -115,6 +161,9 @@ def main():
             p.write_text(new, encoding="utf-8")
         fixed += 1
     print(f"\n{fixed} page(s) {'to fix' if a.dry_run else 'fixed'}, {skipped} skipped.")
+    h = fix_old_hosts(Path(a.root), a.dry_run)
+    st = fix_stubs(Path(a.root), a.dry_run)
+    print(f"{h} page(s) with the old workers.dev address, {st} redirect stub(s) re-pointed.")
 
 
 if __name__ == "__main__":
