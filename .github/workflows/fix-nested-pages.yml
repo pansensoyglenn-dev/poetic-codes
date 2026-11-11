@@ -1,0 +1,38 @@
+name: Fix essay pages (remove nested pages and wrong canonicals)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "yes = only report what would change, no = rewrite the pages"
+        required: true
+        default: "yes"
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Report or fix the pages
+        run: |
+          if [ "${{ github.event.inputs.dry_run }}" = "no" ]; then
+            python scripts/fix_nested_pages.py --root .
+          else
+            python scripts/fix_nested_pages.py --root . --dry-run
+          fi
+
+      - name: Check the result
+        run: python scripts/seo_tools.py check --root . --site "https://poetic-codes.pages.dev" || true
+
+      - name: Save the fixed pages in the repo
+        if: ${{ github.event.inputs.dry_run == 'no' }}
+        run: |
+          git config user.name "seo-bot"
+          git config user.email "seo-bot@users.noreply.github.com"
+          git add articles
+          git diff --cached --quiet || git commit -m "Fix essay pages: remove nested pages and wrong canonicals"
+          git push
