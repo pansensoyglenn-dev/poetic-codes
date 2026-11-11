@@ -97,17 +97,24 @@ NEW_HOST = "https://poetic-codes.pages.dev"
 STUB_DIRS = ("ai", "culinary", "culture", "economy", "global-politics", "history", "music-video", "philosophy", "programming")
 
 
+SKIP_DIRS = {".git", ".github", "node_modules", "scripts", "deleted-essays", "video-jobs"}
+
+
 def fix_old_hosts(root: Path, dry: bool):
-    """Pages whose canonical / og:url still name the old workers.dev address."""
+    """Replace the old workers.dev address with poetic-codes.pages.dev everywhere it appears in the
+    site's pages (canonical, og:url, links, JSON-LD), sitemap and feeds. Script files (.js) are left
+    alone because the publishing API still lives at that address."""
     n = 0
-    for p in sorted(root.glob("*.html")):
-        t = p.read_text(encoding="utf-8")
+    files = [p for ext in ("*.html", "*.xml", "*.txt") for p in root.rglob(ext)]
+    for p in sorted(set(files)):
+        if any(part in SKIP_DIRS for part in p.relative_to(root).parts):
+            continue
+        t = p.read_text(encoding="utf-8", errors="ignore")
         new = t
         for old in OLD_HOSTS:
-            new = re.sub(r'(<link[^>]+rel=["\']canonical["\'][^>]*href=["\'])' + re.escape(old), r"\g<1>" + NEW_HOST, new, flags=re.I)
-            new = re.sub(r'(<meta[^>]+property=["\']og:url["\'][^>]*content=["\'])' + re.escape(old), r"\g<1>" + NEW_HOST, new, flags=re.I)
+            new = new.replace(old, NEW_HOST)
         if new != t:
-            print(f"{'would change' if dry else 'changed'} canonical host in {p.name}")
+            print(f"{'would change' if dry else 'changed'} old address in {p.relative_to(root).as_posix()}")
             n += 1
             if not dry:
                 p.write_text(new, encoding="utf-8")
