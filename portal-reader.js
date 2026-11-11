@@ -156,8 +156,7 @@
     if (!sl.slug) throw new Error('could not work out a page name from the title');
     var author = (document.getElementById('f-author').value || '').trim() || 'Glenn Junsay Pansensoy';
     var cover = /^https?:\/\//i.test(a.cover || '') ? a.cover : null;
-    var ghBody = buildBloggerBody(a.title, author, a.category, a.excerpt, articleOnlyHTML(a.content), a.tags,
-      (csEditing && csEditing.bloggerUrl) || '', true);
+    var ghBody = buildPageBody(a.content);
     var page = buildGitHubPage(a.title, author, a.category, a.excerpt, ghBody, sl.slug, cover, a.videoUrl || '', ((document.getElementById('f-youtube-url') || {}).value || '').trim());
     var url = await publishToGitHub(sl.slug, page, cover);
     // a new page name (title changed, or never deployed) must also appear in the sitemap and feed
