@@ -400,6 +400,16 @@
           </div>
 
           <div class="field-group">
+            <label class="field-label" for="f-video-images">Video: extra picture links (optional, one per line)</label>
+            <textarea id="f-video-images" class="field-input" rows="4" placeholder="https://.../satti-1.jpg&#10;https://.../puso.jpg&#10;(direct links to .jpg/.png files; shown across the video instead of generated pictures)"></textarea>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="f-video-clips">Video: extra short video clips (optional, one .mp4 link per line)</label>
+            <textarea id="f-video-clips" class="field-input" rows="3" placeholder="https://poetic-codes.pages.dev/clips/market.mp4&#10;(direct links to short .mp4 files, up to 12; they play under the narration)"></textarea>
+          </div>
+
+          <div class="field-group">
             <label class="field-label" for="f-cover-image">Cover Image (Optional)</label>
             <input type="file" id="f-cover-image" class="field-input" accept="image/*" style="padding:0.5rem;">
             <div id="cover-preview" style="margin-top:0.5rem;display:none;text-align:center;">
@@ -754,7 +764,11 @@ function getDeployTarget() {
 }
 function originFor(target) { return TARGETS[target] || TARGETS.cloudflare; }
 
+// Articles carry ads in the middle and at the bottom only. Set ADS_SHOW_TOP = true to bring the top unit back.
+const ADS_SHOW_TOP = false;
+
 function adBlock(slot) {
+  if (slot === ADSENSE_SLOT_TOP && !ADS_SHOW_TOP) return '';
   return '<div class="ad-slot" style="margin:1.6rem 0;text-align:center;">'
     + '<ins class="adsbygoogle" style="display:block"'
     + ' data-ad-client="' + ADSENSE_PUBLISHER + '"'
@@ -1056,7 +1070,7 @@ function resetSubmitButton() {
 }
 
 function resetForm() {
-  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details','f-video-voice','f-video-intro','f-youtube-url'].forEach(id => {
+  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details','f-video-voice','f-video-intro','f-video-images','f-video-clips','f-youtube-url'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -2092,7 +2106,7 @@ function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, cover
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${esc(title)} – Poetic Bytes</title>
+<title>${esc(title)} – Poetic Codes</title>
 <meta name="description" content="${esc(safeDesc)}">
 <meta name="keywords" content="${esc(category)}, essay, poetic bytes, glenn pansensoy">
 <meta name="author" content="${esc(author)}">
@@ -2108,12 +2122,14 @@ function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, cover
 <meta property="article:section" content="${esc(category)}">
 <meta property="article:published_time" content="${isoDate}">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@PoeticGlenn">
+<meta name="twitter:creator" content="@PoeticGlenn">
 <meta name="twitter:title" content="${esc(title)}">
 <meta name="twitter:description" content="${esc(safeDesc)}">
 <meta name="twitter:image" content="${esc(ogImage)}">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Article","headline":${JSON.stringify(title)},"author":{"@type":"Person","name":${JSON.stringify(author)}},"datePublished":${JSON.stringify(isoDate)},"description":${JSON.stringify(safeDesc)},"articleSection":${JSON.stringify(category)},"mainEntityOfPage":${JSON.stringify(canonicalURL)},"image":${JSON.stringify(ogImage)}}
+{"@context":"https://schema.org","@type":"Article","headline":${JSON.stringify(title)},"author":{"@type":"Person","name":${JSON.stringify(author)},"url":"https://x.com/PoeticGlenn","sameAs":["https://x.com/PoeticGlenn","https://www.youtube.com/@PoeticBytes"]},"publisher":{"@type":"Organization","name":"Poetic Codes","url":"https://poetic-codes.pages.dev/","sameAs":["https://x.com/PoeticGlenn","https://www.youtube.com/@PoeticBytes"]},"datePublished":${JSON.stringify(isoDate)},"description":${JSON.stringify(safeDesc)},"articleSection":${JSON.stringify(category)},"mainEntityOfPage":${JSON.stringify(canonicalURL)},"image":${JSON.stringify(ogImage)}}
 <\/script>
 ${adLoader}
 <style>
@@ -2144,6 +2160,9 @@ ${buildRelatedBlock(slug, category)}
 <a href="${BLOGSPOT_PRIVACY_URL}" target="_blank" rel="noopener">Privacy</a> |
 <a href="${BLOGSPOT_TERMS_URL}" target="_blank" rel="noopener">Terms</a> |
 <a href="${BLOGSPOT_COOKIES_URL}" target="_blank" rel="noopener">Cookies</a><br>
+<a href="https://x.com/PoeticGlenn" target="_blank" rel="noopener me">X @PoeticGlenn</a> |
+<a href="https://www.youtube.com/@PoeticBytes?sub_confirmation=1" target="_blank" rel="noopener me">YouTube @PoeticBytes</a> |
+<a href="https://poetic-codes.pages.dev/">poetic-codes.pages.dev</a><br>
 &copy; ${new Date().getFullYear()} Glenn Junsay Pansensoy
 </footer>
 </body>
@@ -2410,6 +2429,16 @@ async function queueVideoJob(job) {
   if (job.voice && /^[a-z]{2,3}-[A-Z]{2}-[A-Za-z]+Neural$/.test(job.voice)) payload.voice = job.voice;
   // Optional custom narration opening, spoken before the essay (replaces the default greeting)
   if (job.intro && String(job.intro).trim()) payload.intro = String(job.intro).trim().slice(0, 800);
+  // Optional short video clips (direct .mp4 links) that play under the narration
+  if (Array.isArray(job.clips)) {
+    const cl = job.clips.map(u => String(u || '').trim()).filter(u => /^https?:\/\/\S+$/i.test(u) && u.length <= 500).slice(0, 12);
+    if (cl.length) payload.clips = cl;
+  }
+  // Optional extra pictures (direct image links) shown across the video
+  if (Array.isArray(job.images)) {
+    const imgs = job.images.map(u => String(u || '').trim()).filter(u => /^https?:\/\/\S+$/i.test(u) && u.length <= 500).slice(0, 20);
+    if (imgs.length) payload.images = imgs;
+  }
   // Where the story takes place: the video's pictures are drawn to match (see article_video.py)
   if (job.location && (job.location.name || job.location.description)) payload.location = job.location;
   await githubPutText(VIDEO_JOBS_DIR + '/' + slug + '.json', JSON.stringify(payload, null, 2), 'Queue video: ' + slug);
@@ -2553,7 +2582,9 @@ async function submitArticle() {
             description: ((document.getElementById('f-video-details') || {}).value || '').trim()
           },
           voice: ((document.getElementById('f-video-voice') || {}).value || '').trim(),
-          intro: ((document.getElementById('f-video-intro') || {}).value || '').trim()
+          intro: ((document.getElementById('f-video-intro') || {}).value || '').trim(),
+          images: ((document.getElementById('f-video-images') || {}).value || '').split(/\s+/).filter(Boolean),
+          clips: ((document.getElementById('f-video-clips') || {}).value || '').split(/\s+/).filter(Boolean)
         });
         distLines.push('✓ Video: queued — it will appear on the article in about 1–3 minutes');
       } catch (vErr) {
