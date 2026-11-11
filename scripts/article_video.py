@@ -397,6 +397,35 @@ def fit_band(img):
 PROFILE = [None]   # the round profile picture shown while the introduction is narrated
 
 
+USER_CLIPS = []   # short video clips supplied with the job (portal "Extra video clips"), downloaded for this run
+
+
+def load_user_clips(job, tmp):
+    """Download the author's own short clips (direct .mp4 links) so they can play under the narration."""
+    USER_CLIPS.clear()
+    urls = [str(u).strip() for u in (job.get("clips") or []) if u and str(u).strip().startswith("http")][:12]
+    for n, u in enumerate(urls):
+        dest = Path(tmp) / f"user_clip_{n}.mp4"
+        try:
+            with requests.get(u, stream=True, timeout=120, headers={"User-Agent": UA}) as r:
+                r.raise_for_status()
+                size = 0
+                with open(dest, "wb") as fh:
+                    for chunk in r.iter_content(1 << 20):
+                        size += len(chunk)
+                        if size > 80 * 1024 * 1024:
+                            raise ValueError("clip larger than 80 MB")
+                        fh.write(chunk)
+            if probe_duration(dest) > 0.5:
+                USER_CLIPS.append(str(dest))
+            else:
+                log(f"  clip {n + 1} is not a playable video; skipped")
+        except Exception as e:
+            log(f"  clip {n + 1} not usable ({str(e)[:80]})")
+    if urls:
+        log(f"  {len(USER_CLIPS)} of {len(urls)} supplied video clip(s) ready")
+
+
 def load_profile(job):
     """Profile picture for the intro slide: job "profileUrl", env PROFILE_IMAGE_URL, or a file in the repo."""
     for u in (job.get("profileUrl"), os.environ.get("PROFILE_IMAGE_URL", "").strip()):
@@ -415,6 +444,8 @@ def load_profile(job):
 
 def draw_intro_card(ov, d, seg, has_cover=False):
     """Round profile picture, channel name and essay title in the picture area."""
+    if has_cover and os.environ.get("INTRO_TEXT", "0") != "1":
+        return   # plain article picture: no words on top, only the caption bar below
     prof = None if has_cover else PROFILE[0]
     y = 36
     if has_cover:
@@ -460,7 +491,7 @@ def render_layers(seg, idx, total, cover):
     d.rectangle([0, H - 8, int(W * (idx + 1) / total), H], fill=ACCENT + (255,))
     if seg.get("kind") == "intro":
         draw_intro_card(ov, d, seg, cover is not None)
-    if seg.get("kind") == "end":
+    if seg.get("kind") == "end" and os.environ.get("END_CARD_TEXT", "1") == "1":
         # End card: darken the picture and show the link on screen.
         d.rectangle([0, 0, W, IMGH], fill=(6, 10, 18, 175))
         rows = [(seg.get("title", ""), load_font(54, True), TEXT),
@@ -691,17 +722,24 @@ def load_cover(url):
         return None
 
 
+USER_PHOTOS = []   # extra pictures supplied with the job (portal 'Extra images')
+
+
 def load_photos(job):
     urls = []
     for u in [job.get("coverUrl")] + list(job.get("images") or []):
         if u and str(u).startswith("http") and u not in urls:
             urls.append(u)
     photos = []
+    USER_PHOTOS.clear()
+    mine = {str(u) for u in (job.get("images") or []) if u}
     for u in urls[:21]:
         img = load_cover(u)
         if img is not None and img.width >= 400 and img.height >= 250:
             photos.append(img)
-    log(f"  {len(photos)} photograph(s) available for the background")
+            if str(u) in mine:
+                USER_PHOTOS.append(img)   # pictures the author supplied in the portal: shown across the content slides
+    log(f"  {len(photos)} photograph(s) available for the background ({len(USER_PHOTOS)} supplied by you)")
     return photos
 
 
@@ -1918,6 +1956,7 @@ def build_video(job):
     QUOTA_HIT[0] = False
     photos = load_photos(job)
     PROFILE[0] = load_profile(job)
+    load_user_clips(job, tmp)
     log("  profile picture for the introduction: " + ("found" if PROFILE[0] is not None else "not found (put profile.jpg in the repo root)"))
     if WIKI_GENERIC:
         photos += load_wiki_photos(job, len(photos))
@@ -1991,6 +2030,9 @@ def build_video(job):
                 if pic is not None:
                     cover = pic
                     ai_used[gi] = ai_used.get(gi, 0) + 1
+            if USER_PHOTOS:
+                # the author's own pictures win over generated ones: cycle through them, each reuse in a new framing
+                cover = framing(USER_PHOTOS[body_seen % len(USER_PHOTOS)], body_seen // len(USER_PHOTOS))
             body_seen += 1
             src_note = "AI image" if (ai and cover is not None) else ("generic photo" if cover is not None else "no picture matched: text card")
             sp = fetch_slide_photo(seg, job, photo_used)
@@ -2035,6 +2077,15 @@ def build_video(job):
                 used_kling = True
                 kling_used += 1
                 Path(got).unlink(missing_ok=True)
+
+        if not used_kling and USER_CLIPS and seg.get("kind") == "body" and (not USER_PHOTOS or (body_seen - 1) % 2 == 0):
+            # the author's own short clips: cycle through them under the narration (short clips ping-pong)
+            ucl = USER_CLIPS[((body_seen - 1) // (2 if USER_PHOTOS else 1)) % len(USER_CLIPS)]
+            try:
+                total_dur += make_clip_from_video(ucl, ovp, mp3s[i], clip, caps, vkbps=vkbps)
+                used_kling = True
+            except Exception as e:
+                log(f"  supplied clip failed on slide {i} ({str(e)[:80]}); using a still picture")
 
         if not used_kling and i in stock_slides:
             got = fetch_archive_clip(seg, job, stock_used, tmp / f"s{i}.mp4") or fetch_stock_clip(seg, job, stock_used, tmp / f"s{i}.mp4")
