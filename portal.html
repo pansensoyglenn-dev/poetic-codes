@@ -2003,7 +2003,7 @@ function buildRelatedBlock(slug, category) {
     const pick = list.slice(0, 5);
     if (!pick.length) return '';
     return '<nav style="margin:2rem 0;padding-top:1.2rem;border-top:1px solid #253649;"><div style="font:.7rem monospace;color:#667fa3;margin-bottom:.6rem;">KEEP READING</div><ul style="padding-left:1.1rem;">'
-      + pick.map(a => '<li style="margin-bottom:.5rem;"><a href="'+base+'/'+GH_ARTICLES_DIR+'/'+slugify(a.title)+'.html">'+esc(a.title)+'</a></li>').join('')
+      + pick.map(a => '<li style="margin-bottom:.5rem;"><a href="'+base+'/'+GH_ARTICLES_DIR+'/'+slugify(a.title)+'.html">'+esc(String(a.title).replace(/([:;,?!])(?=[A-Za-z])/g,'$1 '))+'</a></li>').join('')
       + '</ul></nav>';
   } catch (e) { return ''; }
 }
@@ -2067,6 +2067,24 @@ async function pingIndexNow(url) {
     await fetch('https://api.indexnow.org/indexnow?url=' + encodeURIComponent(url) + '&key=' + INDEXNOW_KEY + '&keyLocation=' + encodeURIComponent(originFor(getDeployTarget()) + '/' + INDEXNOW_KEY + '.txt'), { mode: 'no-cors' });
     return true;
   } catch (e) { console.warn('IndexNow:', e); return false; }
+}
+
+
+// Clean body for the static GitHub/Pages essay: just the article text, no Blogger chrome, no colours or
+// justification forced inline, so it reads well on the page's own dark theme.
+function buildPageBody(content) {
+  let html = typeof articleOnlyHTML === 'function' ? articleOnlyHTML(content) : String(content || '');
+  try {
+    const doc = new DOMParser().parseFromString('<div id="r">' + html + '</div>', 'text/html');
+    const root = doc.getElementById('r');
+    root.querySelectorAll('[style]').forEach(el => {
+      const keep = (el.getAttribute('style') || '').split(';').filter(d => d.trim() && !/^\s*(color|background(-color|-image)?|text-align|text-justify|hyphens|font-family|font-size|line-height|margin(-bottom|-top)?|padding(-top|-bottom)?)\s*:/i.test(d));
+      if (keep.length && !/^(P|H[1-6]|DIV|SPAN|BLOCKQUOTE|LI|UL|OL)$/.test(el.tagName)) el.setAttribute('style', keep.join(';')); else el.removeAttribute('style');
+    });
+    root.querySelectorAll('.pc-article,.post-body').forEach(el => { el.removeAttribute('class'); });
+    html = root.innerHTML;
+  } catch (e) { console.warn('buildPageBody:', e); }
+  return injectAds(html);
 }
 
 function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, coverImageUrl, videoUrl, youtubeUrl) {
@@ -2133,16 +2151,20 @@ function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, cover
 <\/script>
 ${adLoader}
 <style>
-body{background:#0b0f17;color:#eef4ff;font-family:"Crimson Pro",Georgia,serif;max-width:760px;margin:0 auto;padding:2rem 1.2rem;line-height:1.85;}
-h1{font-family:"Cinzel Decorative",serif;font-size:clamp(1rem,4vw,1.8rem);margin-bottom:1rem;}
-.meta{font-size:0.78rem;color:#667fa3;margin-bottom:2rem;font-family:monospace;}
-p{text-align:justify;margin-bottom:1.4rem;}
+body{background:#0b0f17;color:#e6edf7;font-family:"Crimson Pro",Georgia,serif;font-size:1.2rem;max-width:720px;margin:0 auto;padding:1.5rem 1.25rem 3rem;line-height:1.8;overflow-wrap:break-word;}
+h1{font-family:"Cinzel Decorative",serif;font-size:clamp(1.3rem,5vw,2rem);line-height:1.3;margin:.5rem 0 .8rem;color:#fff;}
+h2,h3{font-family:"Cinzel Decorative",serif;color:#fff;line-height:1.35;margin:2rem 0 .8rem;font-size:1.25rem;}
+.meta{font-size:0.78rem;color:#8fa6c7;margin-bottom:1.5rem;font-family:monospace;}
+article p{text-align:left;hyphens:none;-webkit-hyphens:none;margin:0 0 1.3rem;}
+article li{margin-bottom:.5rem;}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1rem;border-left:3px solid #74b9e8;color:#c9d6ea;font-style:italic;}
 a{color:#74b9e8;}
+img{max-width:100%;height:auto;border-radius:10px;}
 video{max-width:100%;border-radius:12px;}
 audio{width:100%;}
 iframe{max-width:100%;border-radius:12px;}
-.back{display:inline-block;margin-bottom:1rem;font-size:0.8rem;font-family:monospace;color:#74b9e8;}
-footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size:0.72rem;color:#667fa3;text-align:center;font-family:monospace;line-height:2;}
+.back{display:inline-block;margin-bottom:.5rem;font-size:0.8rem;font-family:monospace;color:#74b9e8;text-decoration:none;}
+footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size:0.72rem;color:#8fa6c7;text-align:center;font-family:monospace;line-height:2;}
 </style>
 </head>
 <body>
@@ -2531,7 +2553,7 @@ async function submitArticle() {
     if (doGitHub) {
       try {
         // SEO FIX: a pasted full web page is cut down to its <main> so the static page has one title/canonical
-        const ghBody = buildBloggerBody(title, author, category, excerpt, articleOnlyHTML(content), tags, bloggerURL);
+        const ghBody = buildPageBody(content);
         const ghPage = buildGitHubPage(title, author, category, excerpt, ghBody, slug, uploadedCoverUrl, '', ((document.getElementById('f-youtube-url') || {}).value || '').trim());
         githubURL    = await publishToGitHub(slug, ghPage, uploadedCoverUrl);
         distLines.push('✓ GitHub: '+githubURL);
