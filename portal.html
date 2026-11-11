@@ -2003,10 +2003,12 @@ function buildYouTubePack(title, excerpt, category, tagsArr, articleUrl, intro) 
   let ytTitle = title.length + suffix.length <= 100 ? title + suffix : title.slice(0, 100);
   const hash = ['#PoeticCodes', '#PoeticBytes'].concat(tags.slice(0, 2).map(t => '#' + t.replace(/[^A-Za-z0-9]/g, ''))).filter(h => h.length > 1).join(' ');
   const lines = [];
+  const slugPart = (articleUrl.split('/').pop() || '').replace(/\.html$/, '').replace(/[^a-z0-9-]/gi, '').slice(0, 60);
+  const tracked = articleUrl + '?utm_source=youtube&utm_medium=video_description&utm_campaign=' + (slugPart || 'essay');
   lines.push(excerpt || title);
+  lines.push('📖 Read the full essay: ' + tracked);
   lines.push('');
-  lines.push('📖 Read the full essay (with sources and more): ' + articleUrl);
-  lines.push('🏠 More essays: ' + SITE_URL + '/');
+  lines.push('🏠 More essays: ' + SITE_URL + '/?utm_source=youtube&utm_medium=video_description&utm_campaign=home');
   lines.push('');
   lines.push('If this made you think, like the video, subscribe to @PoeticBytes, and share it with someone who cares about ' + (category || 'these topics') + '. Tell me in the comments what you think.');
   lines.push('▶ Subscribe: https://www.youtube.com/@PoeticBytes?sub_confirmation=1');
