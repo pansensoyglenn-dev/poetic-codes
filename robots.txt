@@ -1,5 +1,9 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /portal.html
+Disallow: /article-head.html
+Disallow: /newsletter-cta.html
+Disallow: /related-essays.html
 
 Sitemap: https://poetic-codes.pages.dev/sitemap.xml
