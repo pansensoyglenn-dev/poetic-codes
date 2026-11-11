@@ -4,9 +4,12 @@ on:
   workflow_dispatch:
     inputs:
       site:
-        description: "Site address with no slash at the end"
+        description: "Which site is THIS repo? poetic-codes repo = poetic-codes.pages.dev, poetic-bytes repo = poetic-bytes.vercel.app"
+        type: choice
         required: true
-        default: "https://poetic-bytes.vercel.app"
+        options:
+          - "https://poetic-codes.pages.dev"
+          - "https://poetic-bytes.vercel.app"
 
 permissions:
   contents: write
