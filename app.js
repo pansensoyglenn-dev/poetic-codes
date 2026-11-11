@@ -1209,7 +1209,11 @@ ${items.join('\n')}
 //   * stripAdsense() removes any ad markup/loader already inside a body, so
 //     re-injecting ads can never double them up.
 // ---------------------------------------------------------------------------
+// Articles carry ads in the middle and at the bottom only. Set ADS_SHOW_TOP = true to bring the top unit back.
+const ADS_SHOW_TOP = false;
+
 function adBlock(slot) {
+  if (slot === ADSENSE_SLOT_TOP && !ADS_SHOW_TOP) return '';
   return `<div class="ad-slot" style="margin:1.6rem 0;text-align:center;">`
     + `<ins class="adsbygoogle"`
     + ` style="display:block"`
