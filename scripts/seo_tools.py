@@ -22,7 +22,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-SKIP_NAMES = {"404.html", "google0cf0da0571a5948b.html"}          # pages that should not be in a sitemap
+SKIP_NAMES = {"404.html", "google0cf0da0571a5948b.html", "portal.html", "article-head.html", "newsletter-cta.html", "related-essays.html"}          # pages that should not be in a sitemap
 SKIP_DIRS = {".git", ".github", "node_modules", "scripts", "tests", "api"}
 
 
@@ -75,6 +75,24 @@ def check(root: Path, site: str) -> int:
     return problems
 
 
+def host_of(u: str) -> str:
+    return urllib.parse.urlparse(u).netloc.lower()
+
+
+def site_matches_repo(root: Path, site: str) -> bool:
+    """True when most pages name this site in their canonical link. Stops the script being run with the
+    wrong site address (for example poetic-bytes' address on the poetic-codes repo)."""
+    hosts = []
+    for p in pages(root):
+        c = re.findall(r'<link[^>]+rel=["\']canonical["\'][^>]*href=["\']([^"\']*)["\']',
+                       p.read_text(encoding="utf-8", errors="ignore"), re.I)
+        if c:
+            hosts.append(host_of(c[0]))
+    if not hosts:
+        return True
+    return sum(1 for h in hosts if h == host_of(site)) / len(hosts) >= 0.5
+
+
 def build_sitemap(root: Path, site: str) -> str:
     today = dt.date.today().isoformat()
     rows = []
@@ -84,7 +102,9 @@ def build_sitemap(root: Path, site: str) -> str:
         loc = url_for(site, root, p)
         canon = re.findall(r'<link[^>]+rel=["\']canonical["\'][^>]*href=["\']([^"\']*)["\']',
                            p.read_text(encoding="utf-8", errors="ignore"), re.I)
-        if canon and canon[0].rstrip("/") != loc.rstrip("/"):
+        if not canon:
+            continue   # template pieces and fragments have no canonical: not pages to index
+        if canon[0].rstrip("/") != loc.rstrip("/"):
             print(f"left out of the sitemap (its canonical is another address): {p.relative_to(root).as_posix()}")
             continue
         mtime = dt.date.fromtimestamp(p.stat().st_mtime).isoformat()
@@ -95,8 +115,13 @@ def build_sitemap(root: Path, site: str) -> str:
 
 
 def write_sitemap(root: Path, site: str):
-    (root / "sitemap.xml").write_text(build_sitemap(root, site), encoding="utf-8")
-    print(f"wrote sitemap.xml with {len(pages(root))} URL(s)")
+    xml = build_sitemap(root, site)
+    n = xml.count("<url>")
+    if n == 0:
+        print("STOPPED: no page would be listed, so sitemap.xml was not changed. Is the site address right?")
+        sys.exit(1)
+    (root / "sitemap.xml").write_text(xml, encoding="utf-8")
+    print(f"wrote sitemap.xml with {n} URL(s)")
     robots = root / "robots.txt"
     line = f"Sitemap: {site.rstrip('/')}/sitemap.xml"
     if robots.exists():
@@ -140,6 +165,10 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
     root = Path(a.root).resolve()
+    if a.cmd != "check" and not site_matches_repo(root, a.site):
+        print(f"STOPPED: most pages in this repo do not belong to {a.site}. Nothing was written or sent. "
+              "Run it again with this repo's own address.")
+        return 1
     if a.cmd in ("check", "all"):
         check(root, a.site)
     if a.cmd in ("sitemap", "all"):
