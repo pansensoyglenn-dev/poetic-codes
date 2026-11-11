@@ -1,0 +1,46 @@
+name: Delete old essays
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "list = delete the slugs in delete-list.txt, age = delete essays older than the days below"
+        type: choice
+        options: [list, age]
+        default: list
+      days:
+        description: "For mode age: delete essays older than this many days"
+        default: "730"
+      keep:
+        description: "Never delete this many newest essays"
+        default: "10"
+      apply:
+        description: "no = preview only, yes = really delete"
+        type: choice
+        options: ["no", "yes"]
+        default: "no"
+
+permissions:
+  contents: write
+
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run
+        run: |
+          ARGS="--root . --keep ${{ inputs.keep }}"
+          if [ "${{ inputs.mode }}" = "list" ]; then ARGS="$ARGS --list delete-list.txt"; else ARGS="$ARGS --older-than ${{ inputs.days }}"; fi
+          if [ "${{ inputs.apply }}" = "yes" ]; then ARGS="$ARGS --apply"; fi
+          python scripts/delete_old_essays.py $ARGS
+      - name: Commit
+        if: ${{ inputs.apply == 'yes' }}
+        run: |
+          git config user.name "seo-bot"
+          git config user.email "seo-bot@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && echo "nothing to commit" || (git commit -m "Delete old essays" && git push)
