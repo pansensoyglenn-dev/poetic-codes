@@ -382,6 +382,11 @@
           </div>
 
           <div class="field-group">
+            <label class="field-label" for="f-pubdate">Publish date (optional; leave empty for today)</label>
+            <input type="date" id="f-pubdate" class="field-input">
+          </div>
+
+          <div class="field-group">
             <label class="field-label" for="f-youtube-url">YouTube link for this essay (optional, add after you upload)</label>
             <input type="url" id="f-youtube-url" class="field-input" placeholder="https://www.youtube.com/watch?v=...">
           </div>
@@ -1070,7 +1075,7 @@ function resetSubmitButton() {
 }
 
 function resetForm() {
-  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details','f-video-voice','f-video-intro','f-video-images','f-video-clips','f-youtube-url'].forEach(id => {
+  ['f-title','f-excerpt','f-tags','f-video-place','f-video-details','f-video-voice','f-video-intro','f-video-images','f-video-clips','f-youtube-url','f-pubdate'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -2087,9 +2092,16 @@ function buildPageBody(content) {
   return injectAds(html);
 }
 
+function getPubDate() {
+  const v = ((document.getElementById('f-pubdate') || {}).value || '').trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : '';
+}
+
 function buildGitHubPage(title, author, category, excerpt, bodyHTML, slug, coverImageUrl, videoUrl, youtubeUrl) {
-  const pubDate  = new Date().toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric'});
-  const isoDate  = new Date().toISOString();
+  const _pd = getPubDate();
+  const _dt = _pd ? new Date(_pd + 'T08:00:00+08:00') : new Date();
+  const pubDate  = _dt.toLocaleDateString('en-PH',{year:'numeric',month:'long',day:'numeric',timeZone:'Asia/Manila'});
+  const isoDate  = _dt.toISOString();
   const siteOrigin   = originFor(getDeployTarget());
   const canonicalURL = `${siteOrigin}/${GH_ARTICLES_DIR}/${slug}.html`;
   const ogImage  = coverImageUrl || `${siteOrigin}/og-default.png`;
@@ -2342,7 +2354,7 @@ async function publishToCommonplace(meta, payload, coverUrlOrDataUrl) {
     body: JSON.stringify({
       title: meta.title,
       category: CP_CATEGORY[meta.category] || 'culture',
-      date: new Date().toLocaleDateString('en-CA'),
+      date: getPubDate() || new Date().toLocaleDateString('en-CA'),
       contentType: 'html',
       body: payload.body,
       summary: meta.excerpt,
@@ -2386,7 +2398,7 @@ function articleOnlyHTML(html) {
   const doc = new DOMParser().parseFromString(str, 'text/html');
   const root = doc.querySelector('main') || doc.querySelector('article') || doc.body;
   if (!root) return str;
-  root.querySelectorAll('script,style,iframe,noscript,header,footer,nav,aside,ins,.ad-slot,.footer-note,h1,link,meta,title').forEach(n => n.remove());
+  root.querySelectorAll('script,style,iframe,noscript,header,footer,nav,aside,ins,.ad-slot,.footer-note,.post-meta,.byline,.article-footer,h1,link,meta,title').forEach(n => n.remove());
   return root.innerHTML.trim();
 }
 
@@ -3077,7 +3089,7 @@ async function updateCommonplaceEntry() {
       body: JSON.stringify({
         title,
         category: sameSection ? (csEditing.category || CP_CATEGORY[category]) : (CP_CATEGORY[category] || csEditing.category || 'culture'),
-        date: (csEditing.date || '').slice(0, 10) || new Date().toLocaleDateString('en-CA'),
+        date: getPubDate() || (csEditing.date || '').slice(0, 10) || new Date().toLocaleDateString('en-CA'),
         contentType: 'html',
         body: payload.body,
         summary: excerpt,
