@@ -1,6 +1,6 @@
 {
-  "jobId": "1794448372863",
-  "createdAt": "2026-11-12T01:52:52.863Z",
+  "jobId": "1794448420508",
+  "createdAt": "2026-11-12T01:53:40.508Z",
   "title": "Why Sara Duterte Should Be Impeached: Public Accountability Case",
   "author": "Glenn Junsay Pansensoy",
   "category": "Local Politics",
@@ -21,6 +21,5 @@
   "slug": "why-sara-duterte-should-be-impeached-public-accountability-case",
   "articleId": 61,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794448367906.jpg",
-  "force": false,
-  "intro": "Hello and good day everyone out there, here is another episode of Poetic Codes. Today we ask whether public office is a public trust, and what the Senate impeachment trial of Vice President Sara Duterte means for Filipino citizens."
+  "force": true
 }
