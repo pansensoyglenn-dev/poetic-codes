@@ -1,0 +1,41 @@
+name: Blogger - add AdSense to existing posts
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "no = preview only, yes = rewrite the posts"
+        type: choice
+        options: ["no", "yes"]
+        default: "no"
+      only:
+        description: "Only posts whose title contains this text (empty = all)"
+        required: false
+        default: ""
+
+jobs:
+  inject:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          BLOG_URL: https://poetic-bytes.blogspot.com
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.only }}" ]; then ARGS="$ARGS --only \"${{ inputs.only }}\""; fi
+          if [ "${{ inputs.apply }}" = "yes" ]; then ARGS="$ARGS --apply"; fi
+          eval python scripts/blogger_inject_ads.py $ARGS
+      - name: Keep a copy of the old post bodies
+        if: ${{ inputs.apply == 'yes' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: blogger-backups
+          path: blogger-backups
+          if-no-files-found: ignore
