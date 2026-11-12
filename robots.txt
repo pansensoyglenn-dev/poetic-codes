@@ -5,5 +5,7 @@ Disallow: /portal.html
 Disallow: /article-head.html
 Disallow: /newsletter-cta.html
 Disallow: /related-essays.html
+Disallow: /deleted-essays/
+Disallow: /video-jobs/
 
 Sitemap: https://poetic-codes.pages.dev/sitemap.xml
