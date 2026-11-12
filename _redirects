@@ -1,0 +1,2 @@
+/old-page.html /new-page.html 301
+/blog/* /articles/:splat 301
