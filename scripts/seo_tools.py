@@ -23,7 +23,7 @@ import urllib.request
 from pathlib import Path
 
 SKIP_NAMES = {"404.html", "google0cf0da0571a5948b.html", "portal.html", "article-head.html", "newsletter-cta.html", "related-essays.html"}          # pages that should not be in a sitemap
-SKIP_DIRS = {".git", ".github", "node_modules", "scripts", "tests", "api"}
+SKIP_DIRS = {".git", ".github", "node_modules", "scripts", "tests", "api", "deleted-essays", "video-jobs"}
 
 
 def pages(root: Path):
