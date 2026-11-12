@@ -444,8 +444,8 @@ def load_profile(job):
 
 def draw_intro_card(ov, d, seg, has_cover=False):
     """Round profile picture, channel name and essay title in the picture area."""
-    if has_cover and os.environ.get("INTRO_TEXT", "0") != "1":
-        return   # plain article picture: no words on top, only the caption bar below
+    if os.environ.get("INTRO_TEXT", "0") != "1":
+        return   # introduction = the cover picture only: no words on top, only the caption bar below
     prof = None if has_cover else PROFILE[0]
     y = 36
     if has_cover:
@@ -2043,7 +2043,7 @@ def build_video(job):
             log(f"  storyboard slide {i}: [{src_note}] {clean_text(seg.get('speech') or '')[:90]}"
                 + (f" | AI search: {', '.join(_pl.get('queries', [])[:2])} | avoid: {', '.join(_pl.get('avoid', [])[:5])}" if _pl else ""))
         elif seg.get("kind") == "intro":
-            cover = photos[0] if photos else None   # the article's cover image; draw_intro_card puts the words on it
+            cover = photos[0] if photos else (PROFILE[0].convert("RGB") if PROFILE[0] is not None else None)   # the article's cover image (profile picture if none); no words on it
         elif photos:
             cover = photos[0]
 
