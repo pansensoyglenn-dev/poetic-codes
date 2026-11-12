@@ -10,7 +10,7 @@ It always shows what it would do first. Nothing is deleted unless you add --appl
 For every deleted page it also:
   * removes the page's entry from sitemap.xml and from RSS/feed files
   * removes video-jobs/done/<slug>.json (so the video job can be redone later)
-  * keeps a copy in deleted-essays/ (unless --no-backup), so you can bring a page back
+  * keeps nothing on the website: the deleted file stays in the repo's git history (add --backup to also copy it to deleted-essays/)
 
   python delete_old_essays.py --root . --list delete-list.txt            (preview)
   python delete_old_essays.py --root . --list delete-list.txt --apply    (delete)
@@ -69,7 +69,7 @@ def main():
     ap.add_argument("--older-than", type=int)
     ap.add_argument("--keep", type=int, default=10)
     ap.add_argument("--apply", action="store_true")
-    ap.add_argument("--no-backup", action="store_true")
+    ap.add_argument("--backup", action="store_true", help="also copy deleted pages into deleted-essays/ (they would then be PUBLISHED with the site; git history already keeps every deleted file)")
     a = ap.parse_args()
     if not a.list and not a.older_than:
         print("Give --list FILE or --older-than DAYS.")
@@ -120,7 +120,7 @@ def main():
         if not a.apply:
             continue
         src = pages[s]
-        if not a.no_backup:
+        if a.backup:
             backup.mkdir(exist_ok=True)
             shutil.copy2(src, backup / src.name)
         src.unlink()
@@ -132,7 +132,7 @@ def main():
             if d.is_dir() and d.name not in ("articles", ".git", ".github", "scripts", "deleted-essays", "video-jobs", "node_modules"):
                 for stub in d.glob(f"*-{s}.html"):
                     if "location.replace(" in stub.read_text(encoding="utf-8", errors="ignore") and re.fullmatch(r"\d{4}-\d{2}-\d{2}-" + re.escape(s), stub.stem):
-                        if not a.no_backup:
+                        if a.backup:
                             (backup / d.name).mkdir(parents=True, exist_ok=True)
                             shutil.copy2(stub, backup / d.name / stub.name)
                         stub.unlink()
@@ -144,7 +144,7 @@ def main():
     if not a.apply:
         print("\nPreview only. Add --apply (or choose 'apply' in the workflow) to delete.")
     else:
-        print(f"\nDone. Backups are in deleted-essays/ ({'skipped' if a.no_backup else 'kept'}).")
+        print("\nDone. Every deleted file is still in the repo's git history if you need it back.")
     return 0
 
 
