@@ -1,0 +1,35 @@
+name: Blogger cleanup (delete duplicate posts)
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: "no = preview only, yes = really delete (permanent)"
+        type: choice
+        options: ["no", "yes"]
+        default: "no"
+      keep:
+        description: "Which copy of a duplicate to keep"
+        type: choice
+        options: ["oldest", "newest"]
+        default: "oldest"
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          BLOG_URL: https://poetic-bytes.blogspot.com
+        run: |
+          ARGS="--keep ${{ inputs.keep }}"
+          if [ -f delete-titles.txt ]; then ARGS="$ARGS --titles delete-titles.txt"; fi
+          if [ "${{ inputs.apply }}" = "yes" ]; then ARGS="$ARGS --apply"; fi
+          python scripts/blogger_cleanup.py $ARGS
