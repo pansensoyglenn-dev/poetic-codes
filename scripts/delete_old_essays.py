@@ -127,6 +127,17 @@ def main():
         drop_from_sitemap(root / "sitemap.xml", s)
         for f in feeds:
             drop_from_feed(f, s)
+        # old redirect stubs in the category folders (e.g. history/2026-10-28-<slug>.html) that pointed at this page
+        for d in root.iterdir():
+            if d.is_dir() and d.name not in ("articles", ".git", ".github", "scripts", "deleted-essays", "video-jobs", "node_modules"):
+                for stub in d.glob(f"*-{s}.html"):
+                    if "location.replace(" in stub.read_text(encoding="utf-8", errors="ignore") and re.fullmatch(r"\d{4}-\d{2}-\d{2}-" + re.escape(s), stub.stem):
+                        if not a.no_backup:
+                            (backup / d.name).mkdir(parents=True, exist_ok=True)
+                            shutil.copy2(stub, backup / d.name / stub.name)
+                        stub.unlink()
+                        print(f"    also removed stub {d.name}/{stub.name}")
+                        drop_from_sitemap(root / "sitemap.xml", f"{d.name}/{stub.stem}")
         marker = root / "video-jobs" / "done" / f"{s}.json"
         if marker.exists():
             marker.unlink()
