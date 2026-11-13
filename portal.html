@@ -2519,6 +2519,8 @@ function videoJobFromCsArticle(a) {
     slug: slugify(a.title || ''),
     articleId: a.id,
     coverUrl: a.photoUrl || null,
+    // pictures listed in the "Video: extra picture links" box are used for this article's video too
+    images: ((document.getElementById('f-video-images') || {}).value || '').split(/\s+/).filter(Boolean),
     force: true
   };
 }
