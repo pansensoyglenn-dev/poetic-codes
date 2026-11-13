@@ -406,8 +406,8 @@
 
           <div class="field-group">
             <label class="field-label" for="f-video-images">Video: extra picture links (optional, one per line)</label>
-            <input type="file" id="f-video-image-files" class="field-input" accept="image/*" multiple style="padding:0.5rem;margin-bottom:0.5rem;">
-            <div id="f-video-image-status" style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--dim);margin-bottom:0.5rem;min-height:0.8rem;" aria-live="polite">Choose pictures from your device: they upload and their links are added below.</div>
+            <input type="file" id="f-video-image-files" class="field-input" accept="image/*" style="padding:0.5rem;margin-bottom:0.5rem;">
+            <div id="f-video-image-status" style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--dim);margin-bottom:0.5rem;min-height:0.8rem;" aria-live="polite">Choose a picture: it uploads and its link is added below. Choose again to add the next one (up to 20).</div>
             <textarea id="f-video-images" class="field-input" rows="4" placeholder="https://.../satti-1.jpg&#10;https://.../puso.jpg&#10;(direct links to .jpg/.png files; shown across the video instead of generated pictures)"></textarea>
           </div>
 
@@ -1514,28 +1514,32 @@ document.getElementById('f-cover-image').addEventListener('change', function() {
   }
 });
 
-// Upload the pictures chosen for the video and add their links to the "extra picture links" box.
+// Upload one picture at a time for the video (up to 20) and add its link to the "extra picture links" box.
 document.getElementById('f-video-image-files').addEventListener('change', async function() {
-  const files = Array.from(this.files || []);
+  const file = (this.files || [])[0];
   const box = document.getElementById('f-video-images');
   const st = document.getElementById('f-video-image-status');
-  if (!files.length) return;
-  const urls = [];
-  for (let i = 0; i < files.length; i++) {
-    st.textContent = 'Uploading ' + (i + 1) + ' of ' + files.length + '…';
-    try {
-      const u = await uploadCoverToSupabase(files[i]);
-      if (u) urls.push(u);
-    } catch (e) {
-      st.textContent = 'Stopped at picture ' + (i + 1) + ': ' + e.message;
-      break;
+  const input = this;
+  if (!file) return;
+  const have = box.value.split(/\s+/).filter(Boolean).length;
+  if (have >= 20) {
+    st.textContent = 'You already have 20 pictures. Remove a line below to add another.';
+    input.value = '';
+    return;
+  }
+  st.textContent = 'Uploading picture ' + (have + 1) + ' of 20…';
+  input.disabled = true;
+  try {
+    const u = await uploadCoverToSupabase(file);
+    if (u) {
+      box.value = (box.value.trim() ? box.value.trim() + '\n' : '') + u;
+      st.textContent = 'Picture ' + (have + 1) + ' added (' + (have + 1) + ' of 20). Choose another, or publish.';
     }
+  } catch (e) {
+    st.textContent = 'Upload failed: ' + e.message;
   }
-  if (urls.length) {
-    box.value = (box.value.trim() ? box.value.trim() + '\n' : '') + urls.join('\n');
-    st.textContent = urls.length + ' picture(s) uploaded and added to the list below.';
-  }
-  this.value = '';
+  input.disabled = false;
+  input.value = '';
 });
 
 function signInBlogger(onSuccess) {
