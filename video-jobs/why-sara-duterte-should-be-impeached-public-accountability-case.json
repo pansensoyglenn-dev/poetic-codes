@@ -1,6 +1,6 @@
 {
-  "jobId": "1794546808700",
-  "createdAt": "2026-11-13T05:13:28.700Z",
+  "jobId": "1794548953724",
+  "createdAt": "2026-11-13T05:49:13.724Z",
   "title": "Why Sara Duterte Should Be Impeached: Public Accountability Case",
   "author": "Glenn Junsay Pansensoy",
   "category": "Local Politics",
@@ -17,5 +17,24 @@
   "slug": "why-sara-duterte-should-be-impeached-public-accountability-case",
   "articleId": 63,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794543659704.jpg",
-  "force": true
+  "force": true,
+  "images": [
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548720131.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548737425.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548749528.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548769108.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548777909.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548788856.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548797127.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548806851.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548818391.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548830570.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548838905.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548846679.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548856839.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548864016.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548870977.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548887911.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794548904394.jpg"
+  ]
 }
