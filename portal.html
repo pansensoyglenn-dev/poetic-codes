@@ -413,6 +413,8 @@
 
           <div class="field-group">
             <label class="field-label" for="f-video-clips">Video: extra short video clips (optional, one .mp4 link per line)</label>
+            <input type="file" id="f-video-clip-files" class="field-input" accept="video/mp4,video/quicktime,video/webm" style="padding:0.5rem;margin-bottom:0.5rem;">
+            <div id="f-video-clip-status" style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--dim);margin-bottom:0.5rem;min-height:0.8rem;" aria-live="polite">Choose a short video: it uploads and its link is added below. Choose again to add the next one (up to 12).</div>
             <textarea id="f-video-clips" class="field-input" rows="3" placeholder="https://poetic-codes.pages.dev/clips/market.mp4&#10;(direct links to short .mp4 files, up to 12; they play under the narration)"></textarea>
           </div>
 
@@ -1512,6 +1514,34 @@ document.getElementById('f-cover-image').addEventListener('change', function() {
     previewBox.style.display = 'none';
     if (info) info.textContent = '';
   }
+});
+
+// Upload one short video clip at a time (up to 12) and add its link to the "extra short video clips" box.
+document.getElementById('f-video-clip-files').addEventListener('change', async function() {
+  const file = (this.files || [])[0];
+  const box = document.getElementById('f-video-clips');
+  const st = document.getElementById('f-video-clip-status');
+  const input = this;
+  if (!file) return;
+  const have = box.value.split(/\s+/).filter(Boolean).length;
+  if (have >= 12) {
+    st.textContent = 'You already have 12 clips. Remove a line below to add another.';
+    input.value = '';
+    return;
+  }
+  st.textContent = 'Uploading clip ' + (have + 1) + ' of 12… 0%';
+  input.disabled = true;
+  try {
+    const u = await uploadToR2(file, pct => { st.textContent = 'Uploading clip ' + (have + 1) + ' of 12… ' + pct + '%'; });
+    if (u) {
+      box.value = (box.value.trim() ? box.value.trim() + '\n' : '') + u;
+      st.textContent = 'Clip ' + (have + 1) + ' added (' + (have + 1) + ' of 12). Choose another, or publish.';
+    }
+  } catch (e) {
+    st.textContent = 'Upload failed: ' + e.message;
+  }
+  input.disabled = false;
+  input.value = '';
 });
 
 // Upload one picture at a time for the video (up to 20) and add its link to the "extra picture links" box.
