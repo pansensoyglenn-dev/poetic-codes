@@ -1,0 +1,42 @@
+name: Share articles
+
+on:
+  workflow_run:
+    workflows: ["Article video"]
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: share-articles
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  share:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --quiet requests
+      - name: Post new articles
+        env:
+          FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+          FB_PAGE_TOKEN: ${{ secrets.FB_PAGE_TOKEN }}
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: python scripts/post_social.py
+      - name: Save what was posted
+        run: |
+          git config user.name "article-video-bot"
+          git config user.email "article-video-bot@users.noreply.github.com"
+          git add video-jobs/social-posted.txt 2>/dev/null || true
+          git diff --cached --quiet && exit 0
+          git commit -m "Record shared articles [skip ci]"
+          for i in 1 2 3; do git pull --rebase origin main && git push origin HEAD:main && exit 0; sleep 5; done
+          exit 1
