@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-06-z3"
+SCRIPT_VERSION = "2026-11-14-modern"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -2165,6 +2165,8 @@ def build_video(job):
                 + (f" | AI search: {', '.join(_pl.get('queries', [])[:2])} | avoid: {', '.join(_pl.get('avoid', [])[:5])}" if _pl else ""))
         elif seg.get("kind") == "intro":
             cover = photos[0] if photos else (PROFILE[0].convert("RGB") if PROFILE[0] is not None else None)   # the article's cover image (profile picture if none); no words on it
+            if cover is None:   # no cover and no profile picture: open on the first generated picture instead of a blank card
+                cover = next((x for x in (ai or []) if x is not None), None)
         elif photos:
             cover = photos[0]
 
