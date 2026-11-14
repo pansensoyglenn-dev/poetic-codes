@@ -958,11 +958,13 @@ def llm_scene(speech: str, heading: str, job: Job, cast: str) -> str:
         ctx += f" Recurring people: {cast}."
     out = llm_text(
         "You direct a documentary. Read the narration and describe ONE concrete scene a camera could film that shows "
-        "what is being said. Rules: real people doing a specific action in a specific kind of place (for example "
-        "'a barefoot sugarcane cutter in Negros resting beside a hand cart while a landowner's jeep passes'); turn abstract ideas "
-        "(inequality, migration, tension, history) into one visible moment; match the place and era given and use no "
-        "modern objects if the era is historical; no text, signs, maps, charts, flags or logos; never mention the narration "
-        "or the camera. Reply with the description only, 25 to 45 words.",
+        "what is being said. Rules: real people doing a specific action in a specific kind of place; turn abstract ideas "
+        "(policy, inequality, migration, supply chains) into one visible moment. Follow the era given: if it says present day, "
+        "show modern settings (factories, labs, offices, ports, classrooms, data centers) and NEVER a 1950s or rural scene; "
+        "if it is historical, use no modern objects (example for a historical sugar essay: 'a barefoot cane cutter resting beside a hand cart'). "
+        "Show only what the narration or typical scenery supports: do not add farmers, looms, markets, rice fields or foreign "
+        "nationalities unless the narration mentions them. No text, signs, maps, charts, flags or logos; never mention the "
+        "narration or the camera. Reply with the description only, 25 to 45 words.",
         f"{ctx}\nSection: {heading}\nNarration: {speech[:900]}", max_tokens=130)
     scene = ""
     if out:
@@ -2555,6 +2557,18 @@ _VISUALS = [
 ]
 
 
+_TECH_VISUALS = [
+    (r"semiconductor|\bchips?\b|wafer|fabricat", "technicians in white cleanroom suits at a semiconductor plant"),
+    (r"\bai\b|artificial intelligence|data.?cent", "rows of server racks in a modern data center"),
+    (r"supply chain|logistic|shipping|container|\bports?\b", "container ships and cranes at a modern port"),
+    (r"electric|energy|power grid|renewable|solar", "power transmission lines and solar panels"),
+    (r"invest|econom|industrial|manufactur|factory|factories", "a clean modern factory floor with engineers"),
+    (r"engineer|technician|training|universit|school|students", "engineering students and trainers in a modern lab"),
+    (r"minister|government|policy|coalition|agreement|diplomat", "officials at a conference table in a modern meeting room"),
+    (r"new clark|industrial zone|economic security zone", "a planned modern industrial park with new buildings"),
+]
+
+
 def infer_location(job: Job) -> Job:
     """Work out place, era and visual details from the article itself, so no form needs filling in.
     Anything the job already has (e.g. typed in the portal or the Actions form) is kept as it is."""
@@ -2574,16 +2588,26 @@ def infer_location(job: Job) -> Job:
         era = f"{decs[0]}s" if len(decs) == 1 else f"{decs[0]}s to {decs[-1]}s"
 
     low = text.lower()
-    scored = sorted(((len(re.findall(rx, low)), phrase) for rx, phrase in _VISUALS), reverse=True)
-    phrases = [ph for c, ph in scored if c > 0][:6]
-    if in_ph and phrases:
-        phrases.append("tropical Philippine setting")
+    # Modern technology / economy / policy articles: show today's settings, never market stalls or looms picked up from a stray word.
+    tech_hits = sum(len(re.findall(rx, low)) for rx, _ in _TECH_VISUALS)
+    modern = (not era) and (tech_hits >= 12 or (years and sum(y >= 2015 for y in years) >= 0.6 * len(years)))
+    if modern:
+        era = "present day"
+        scored = sorted(((len(re.findall(rx, low)), phrase) for rx, phrase in _TECH_VISUALS), reverse=True)
+        phrases = [ph for c, ph in scored if c > 0][:6] or ["modern offices and industrial buildings"]
+        if in_ph:
+            phrases.append("modern Philippine setting")
+    else:
+        scored = sorted(((len(re.findall(rx, low)), phrase) for rx, phrase in _VISUALS), reverse=True)
+        phrases = [ph for c, ph in scored if c > 0][:6]
+        if in_ph and phrases:
+            phrases.append("tropical Philippine setting")
     out = {"name": name, "era": era, "description": ", ".join(phrases)}
     ai = llm_text(
         "You prepare a documentary video from an article. Reply with JSON only: "
-        '{"name": "main place, region, country", "era": "time period such as 1950s or present day", '
-        '"description": "6-10 concrete visual details of the scenes the article describes, comma-separated, '
-        'e.g. wooden outrigger fishing boats, nipa huts, wet market stalls", '
+        '{"name": "main place, region, country", "era": "time period such as 1950s, or present day when the article is about current events", '
+        '"description": "6-10 concrete visual details of the scenes the article describes, in the right era, comma-separated, '
+        'e.g. for a history essay: wooden outrigger fishing boats, nipa huts; for a technology essay: semiconductor cleanroom, container port, server racks", '
         '"palette": "3-5 colour words", "characters": [{"name": "...", "description": "age, clothing, look", '
         '"appearsIn": ["words in the text where they appear"]}]} . Use only what the article says. Max 3 characters.',
         f"Title: {title}\nText: {body[:3500]}", max_tokens=420)
@@ -2600,7 +2624,9 @@ def infer_location(job: Job) -> Job:
             if chars and not job.get("characters"):
                 job["characters"] = chars
         except Exception:
-            pass
+            log("  AI location planner gave no usable answer; using built-in rules")
+    else:
+        log("  AI location planner unavailable; using built-in rules")
     have = {k: v for k, v in (job.get("location") or {}).items() if clean_text(str(v))}
     return {**{k: v for k, v in out.items() if v}, **have}
 
