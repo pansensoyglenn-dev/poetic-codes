@@ -2583,6 +2583,8 @@ function videoJobFromCsArticle(a) {
     coverUrl: a.photoUrl || null,
     // pictures listed in the "Video: extra picture links" box are used for this article's video too
     images: ((document.getElementById('f-video-images') || {}).value || '').split(/\s+/).filter(Boolean),
+    // clips listed in the "Video: extra short video clips" box are used too (they were being dropped here)
+    clips: ((document.getElementById('f-video-clips') || {}).value || '').split(/\s+/).filter(Boolean),
     force: true
   };
 }
