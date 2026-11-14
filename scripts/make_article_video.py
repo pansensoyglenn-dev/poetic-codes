@@ -2341,6 +2341,88 @@ def publish_to_repo(path, filename):
     raise RuntimeError("Could not push the video to the repo: " + str(last))
 
 
+# YouTube auto-upload (optional). Turns on only when all three secrets exist; uses plain requests, no new packages.
+YT_CLIENT_ID = os.environ.get("YT_CLIENT_ID", "").strip()
+YT_CLIENT_SECRET = os.environ.get("YT_CLIENT_SECRET", "").strip()
+YT_REFRESH_TOKEN = os.environ.get("YT_REFRESH_TOKEN", "").strip()
+YT_PRIVACY = os.environ.get("YT_PRIVACY", "private").strip().lower()   # private | unlisted | public
+YT_CATEGORY = os.environ.get("YT_CATEGORY", "27")                      # 27 = Education
+YT_ENABLED = bool(YT_CLIENT_ID and YT_CLIENT_SECRET and YT_REFRESH_TOKEN) and os.environ.get("YT_UPLOAD", "1") != "0"
+
+
+def youtube_seo(job, title, desc, row_tags=None):
+    """Search-friendly YouTube title, description with hashtags, and tags. Uses the free Cloudflare AI when
+    available, otherwise simple rules from the article's own title, category and tags. Never invents facts."""
+    body = clean_text(extract_main(job.get("body")))[:3000]
+    category = clean_text(job.get("category"))
+    base_tags = [clean_text(t) for t in (row_tags or []) if clean_text(t)]
+    ai = {}
+    raw = llm_text(
+        "You write YouTube metadata for a documentary-style essay video. Use ONLY facts in the text. Reply with JSON only: "
+        '{"title": "clear search-friendly title, max 90 characters, main keyword first, no clickbait, no all caps", '
+        '"summary": "2-3 sentence description of what the video covers", '
+        '"tags": ["10-15 search phrases people would type, 1-3 words each"], '
+        '"hashtags": ["3-5 relevant single-word or CamelCase hashtags without the # sign"]}',
+        f"Title: {title}\nCategory: {category}\nText: {body}", max_tokens=420)
+    if raw:
+        m = re.search(r"\{.*\}", raw, re.S)
+        try:
+            ai = json.loads(m.group(0)) if m else {}
+        except Exception:
+            ai = {}
+    yt_title = clean_text(ai.get("title")) if isinstance(ai.get("title"), str) else ""
+    if not (10 <= len(yt_title) <= 100):
+        yt_title = title
+    summary = clean_text(ai.get("summary")) if isinstance(ai.get("summary"), str) else ""
+    tags = [clean_text(t) for t in (ai.get("tags") or []) if isinstance(t, str)] + base_tags + [category, "Poetic Codes", "essay", "documentary"]
+    seen, out, total = set(), [], 0
+    for t in tags:
+        t = re.sub(r"[<>,]", "", t).strip()
+        if t and t.lower() not in seen and total + len(t) + 1 <= 450:
+            seen.add(t.lower()); out.append(t); total += len(t) + 1
+    hs = []
+    for h in (ai.get("hashtags") or []) + [category, "PoeticCodes"]:
+        if isinstance(h, str):
+            h = re.sub(r"[^A-Za-z0-9]", "", "".join(w[:1].upper() + w[1:] for w in clean_text(h).split()))
+            if h and h.lower() not in [x.lower() for x in hs]:
+                hs.append(h)
+    hs = hs[:5]
+    tagline = " ".join("#" + h for h in hs)
+    new_desc = (summary + "\n\n" if summary else "") + desc + ("\n\n" + tagline if tagline else "")
+    return yt_title, new_desc, out
+
+
+def upload_to_youtube(path, title, description, tags=None):
+    """Upload the finished video to YouTube. Returns the video id. Raises on failure (caller logs and carries on)."""
+    tok = requests.post("https://oauth2.googleapis.com/token", data={
+        "client_id": YT_CLIENT_ID, "client_secret": YT_CLIENT_SECRET,
+        "refresh_token": YT_REFRESH_TOKEN, "grant_type": "refresh_token"}, timeout=60)
+    if not tok.ok:
+        raise RuntimeError(f"YouTube sign-in failed ({tok.status_code}): {tok.text[:200]}")
+    access = tok.json()["access_token"]
+    privacy = YT_PRIVACY if YT_PRIVACY in ("private", "unlisted", "public") else "private"
+    clean = lambda s, n: re.sub(r"[<>]", "", s or "").strip()[:n]
+    meta = {
+        "snippet": {"title": clean(title, 100) or "Poetic Codes", "description": clean(description, 4900),
+                    "tags": [clean(t, 30) for t in (tags or []) if clean(t, 30)][:15], "categoryId": YT_CATEGORY},
+        "status": {"privacyStatus": privacy, "selfDeclaredMadeForKids": False},
+    }
+    size = os.path.getsize(path)
+    start = requests.post(
+        "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
+        headers={"Authorization": "Bearer " + access, "Content-Type": "application/json; charset=UTF-8",
+                 "X-Upload-Content-Type": "video/mp4", "X-Upload-Content-Length": str(size)},
+        json=meta, timeout=60)
+    if not start.ok:
+        raise RuntimeError(f"YouTube refused the upload ({start.status_code}): {start.text[:300]}")
+    with open(path, "rb") as fh:
+        up = requests.put(start.headers["Location"], data=fh,
+                          headers={"Content-Type": "video/mp4", "Content-Length": str(size)}, timeout=900)
+    if not up.ok:
+        raise RuntimeError(f"YouTube upload failed ({up.status_code}): {up.text[:300]}")
+    return up.json()["id"]
+
+
 def upload_video(path, filename):
     try:
         try:
@@ -2674,7 +2756,18 @@ def process_job(path):
             log(f"  attached to article #{row['id']}")
             add_to_index_list(article_url)
             log(f"  article page (request indexing in Search Console): {article_url}")
-        write_marker(name, {"jobId": job.get("jobId"), "status": "done", "title": title,
+        yt_id = ""
+        if YT_ENABLED and not (marker and marker.get("jobId") == job.get("jobId") and marker.get("youtubeId")):
+            try:
+                tags = row.get("tags") if row else None
+                if isinstance(tags, str):
+                    tags = [t.strip() for t in tags.split(",") if t.strip()]
+                yt_title, yt_desc, yt_tags = youtube_seo(job, title, desc, tags if isinstance(tags, list) else [])
+                yt_id = upload_to_youtube(final, yt_title, yt_desc, yt_tags)
+                log(f"  uploaded to YouTube ({YT_PRIVACY}): https://youtu.be/{yt_id}")
+            except Exception as e:
+                log(f"  YouTube upload skipped ({str(e)[:300]})")   # never fails the job
+        write_marker(name, {"jobId": job.get("jobId"), "status": "done", "title": title, "youtubeId": yt_id,
                             "videoUrl": url, "articleUrl": article_url, "attached": attached, "engine": engine, "credits": CREDITS[:30],
                             "seconds": round(dur)})
         return "done"
