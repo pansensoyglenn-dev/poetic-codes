@@ -1,6 +1,6 @@
 {
-  "jobId": "1794640907099",
-  "createdAt": "2026-11-14T07:21:47.099Z",
+  "jobId": "1794693121100",
+  "createdAt": "2026-11-14T21:52:01.100Z",
   "title": "Pax Silica: Secure Tech Supply Chains & Philippine Growth",
   "author": "Glenn Junsay Pansensoy",
   "category": "Economy",
@@ -26,5 +26,5 @@
   "slug": "pax-silica-secure-tech-supply-chains-philippine-growth",
   "articleId": 64,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794640902149.jpg",
-  "force": false
+  "force": true
 }
