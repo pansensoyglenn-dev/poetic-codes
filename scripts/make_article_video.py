@@ -55,7 +55,7 @@ SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "45"))  # one picture per slide,
 INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"  # off: video starts straight on the content
 # The narration opens with this greeting, then the topic (the article title), then the essay itself.
 # Set NARRATION_GREETING to an empty string in the workflow to switch it off.
-NARRATION_GREETING = os.environ.get("NARRATION_GREETING", "Hello and good day, everyone, and welcome to another episode of Poetic Codes. In today's discussion, we will explore").strip()
+NARRATION_GREETING = os.environ.get("NARRATION_GREETING", "Hello everyone, welcome back to Poetic Codes. This is an educational video that tackles topics on AI, economy, and history. This video is about").strip()
 
 
 NARRATION_CLOSER = os.environ.get(
@@ -287,6 +287,11 @@ def build_segments(job: Job) -> list[Seg]:
     if not re.search(r"<[a-zA-Z/!][^>]*>", raw_body):  # plain text from the portal
         raw_body = strip_flat_page_chrome(raw_body, title, author)
     main_html = extract_main(raw_body)
+    if not excerpt:   # no excerpt written: use the article's own first sentence so the intro always has one
+        for s0 in split_sentences(clean_text(main_html))[:6]:
+            if 6 <= len(s0.split()) <= 40:
+                excerpt = s0
+                break
     parts = re.split(r"(?is)(<h[1-3]\b[^>]*>.*?</h[1-3]>)", main_html)
     budget, heading, first = MAX_WORDS, "", True
     for part in parts:
@@ -2170,7 +2175,8 @@ def build_video(job):
 
         spoken = probe_duration(mp3s[i])
         caps = []
-        for k, (txt, t0, t1) in enumerate(caption_timings(seg.get("caption") or seg["speech"], spoken)):
+        no_caps = seg.get("kind") == "intro" and os.environ.get("INTRO_CAPTIONS", "0") != "1"   # opening: cover picture + narration only, no text
+        for k, (txt, t0, t1) in enumerate([] if no_caps else caption_timings(seg.get("caption") or seg["speech"], spoken)):
             cp = tmp / f"cap{i}_{k}.png"
             render_caption(txt).save(cp)
             caps.append((cp, t0, t1))
