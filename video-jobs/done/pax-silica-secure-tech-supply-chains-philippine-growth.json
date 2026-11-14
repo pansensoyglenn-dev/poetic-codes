@@ -1,6 +1,12 @@
 {
-  "jobId": "1794640907099",
-  "status": "skipped",
-  "reason": "article already has a video",
-  "title": "Pax Silica: Secure Tech Supply Chains & Philippine Growth"
+  "jobId": "1794693121100",
+  "status": "done",
+  "title": "Pax Silica: Secure Tech Supply Chains & Philippine Growth",
+  "youtubeId": "",
+  "videoUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/videos/video-1794695033615-pax-silica-secure-tech-supply-chains-philippine-growth-video-121100.mp4",
+  "articleUrl": "https://poetic-codes.pages.dev/articles/pax-silica-secure-tech-supply-chains-philippine-growth.html",
+  "attached": true,
+  "engine": "edge-tts",
+  "credits": [],
+  "seconds": 1338
 }
