@@ -1,6 +1,6 @@
 {
-  "jobId": "1794710509596",
-  "createdAt": "2026-11-15T02:41:49.596Z",
+  "jobId": "1794710636469",
+  "createdAt": "2026-11-15T02:43:56.469Z",
   "title": "Vietnam's Cooperative Model and the Philippine Challenge",
   "author": "Glenn Junsay Pansensoy",
   "category": "Economy",
@@ -17,9 +17,5 @@
   "slug": "vietnam-s-cooperative-model-and-the-philippine-challenge",
   "articleId": 65,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794710504823.jpg",
-  "force": false,
-  "location": {
-    "name": "",
-    "description": "farmers' cooperative meeting, rice drying and milling, fishing boats and cold storage, members reviewing accounts, training classroom"
-  }
+  "force": true
 }
