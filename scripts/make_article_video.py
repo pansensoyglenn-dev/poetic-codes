@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-15-ordered"
+SCRIPT_VERSION = "2026-11-15-gemini"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -97,6 +97,12 @@ UA = "article-video-bot/1.0 (https://poetic-codes.pages.dev; GitHub Actions)"
 CREDITS = []
 CREDIT_ROWS = []
 QUOTA_HIT = [False]
+# Gemini (Google AI Studio key saved as the GitHub secret GEMINI_API_KEY): writes the picture prompts and makes the pictures.
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+GEMINI_IMAGE_MODEL = os.environ.get("GEMINI_IMAGE_MODEL", "gemini-2.5-flash-image").strip()
+GEMINI_TEXT_MODEL = os.environ.get("GEMINI_TEXT_MODEL", "gemini-flash-latest").strip()
+GEMINI_PAUSE = float(os.environ.get("GEMINI_PAUSE", "6"))     # seconds between picture requests (free keys are rate limited)
+GEMINI = {"img_dead": False, "txt_dead": False, "used": 0, "last": 0.0, "aspect": True}
 IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
 FORCE_REDO = os.environ.get("FORCE_REDO") == "1"  # ignore finished-job markers and the "article already has a video" check
@@ -1106,8 +1112,75 @@ def gen_image_fallback(prompt):
     return img
 
 
+def gemini_alive():
+    return bool(GEMINI_KEY) and not GEMINI["img_dead"]
+
+
+def _gemini_retry_seconds(text):
+    m = re.search(r'retryDelay"?\s*:\s*"?(\d+(?:\.\d+)?)s', text or "") or re.search(r"retry in (\d+(?:\.\d+)?)s", text or "", re.I)
+    return float(m.group(1)) if m else None
+
+
+def gen_image_gemini(prompt):
+    """One picture from Gemini. Returns None when this picture is not possible. Turns itself off for the run when the key
+    cannot make pictures (no access, no free quota), so the other generators take over."""
+    if not gemini_alive():
+        return None
+    import base64
+    wait = GEMINI_PAUSE - (time.time() - GEMINI["last"])
+    if wait > 0:
+        time.sleep(wait)
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_IMAGE_MODEL}:generateContent"
+    for attempt in range(3):
+        gen_cfg = {"responseModalities": ["IMAGE"]}
+        if GEMINI["aspect"]:
+            gen_cfg["imageConfig"] = {"aspectRatio": "16:9"}
+        try:
+            r = requests.post(url, headers={"x-goog-api-key": GEMINI_KEY},
+                              json={"contents": [{"parts": [{"text": prompt[:1900]}]}], "generationConfig": gen_cfg}, timeout=120)
+        except Exception as e:
+            LAST_IMG_ERROR[0] = "Gemini " + str(e)[:150]
+            time.sleep(3)
+            continue
+        GEMINI["last"] = time.time()
+        if r.status_code == 400 and GEMINI["aspect"] and ("aspect" in r.text.lower() or "imageconfig" in r.text.lower()):
+            GEMINI["aspect"] = False          # this model does not take an aspect ratio: ask again without it
+            continue
+        if r.status_code == 429:
+            delay = _gemini_retry_seconds(r.text)
+            if delay is not None and delay <= 70 and attempt < 2 and "limit: 0" not in r.text:
+                time.sleep(delay + 1)
+                continue
+            GEMINI["img_dead"] = True
+            log(f"  Gemini pictures off for this run: free limit reached or not available for this key (HTTP 429). {(r.text or '')[:160]}")
+            return None
+        if r.status_code in (400, 401, 403, 404):
+            GEMINI["img_dead"] = True
+            log(f"  Gemini pictures off for this run (HTTP {r.status_code}): {(r.text or '')[:200]}")
+            return None
+        if not r.ok:
+            LAST_IMG_ERROR[0] = f"Gemini HTTP {r.status_code}"
+            time.sleep(3)
+            continue
+        try:
+            parts = (r.json().get("candidates") or [{}])[0].get("content", {}).get("parts", [])
+            for part in parts:
+                blob = part.get("inlineData") or part.get("inline_data")
+                if blob and blob.get("data"):
+                    img = _from_bytes(base64.b64decode(blob["data"]))
+                    if img is not None:
+                        GEMINI["used"] += 1
+                        return img
+        except Exception as e:
+            LAST_IMG_ERROR[0] = "Gemini " + str(e)[:150]
+        return None                           # no picture for this prompt (e.g. blocked): the next generator tries it
+    return None
+
+
 def gen_image(prompt):
-    img = gen_image_cloudflare_retry(prompt) if (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) else None
+    img = gen_image_gemini(prompt) if gemini_alive() else None
+    if img is None:
+        img = gen_image_cloudflare_retry(prompt) if (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) else None
     if img is None:
         img = gen_image_fallback(prompt)
     return img
@@ -1162,7 +1235,7 @@ def make_ai_images(segs, job):
     """One image per body slide, prompt locked to that slide's spoken words."""
     if not AI_IMAGES:
         return []
-    if not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) and not FALLBACK_IMAGES:
+    if not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) and not FALLBACK_IMAGES and not GEMINI_KEY:
         log("  no Cloudflare keys (CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN): skipping generated pictures, using your photos")
         return []
     body_idx = [i for i, g in enumerate(segs) if g["kind"] == "body"]
@@ -1183,10 +1256,10 @@ def make_ai_images(segs, job):
         }
         prompt = scene_prompt(seg, job)
         log(f"  picture {j + 1}/{k}: {prompt[:170]}")
-        if QUOTA_HIT[0] and FALLBACK_IMAGES and not FALLBACK_STATE["dead"] and not FALLBACK_STATE.get("announced"):
+        if QUOTA_HIT[0] and not gemini_alive() and FALLBACK_IMAGES and not FALLBACK_STATE["dead"] and not FALLBACK_STATE.get("announced"):
             FALLBACK_STATE["announced"] = True
             log(f"  Cloudflare free quota reached at {j}/{k}; continuing with the free backup generators")
-        if QUOTA_HIT[0] and (not FALLBACK_IMAGES or FALLBACK_STATE["dead"]):
+        if QUOTA_HIT[0] and not gemini_alive() and (not FALLBACK_IMAGES or FALLBACK_STATE["dead"]):
             log(f"  Cloudflare free quota reached at {j}/{k}; the remaining slides keep the last picture (no further calls)")
             if LAST_IMG_ERROR[0]:
                 log(f"  Cloudflare said: {LAST_IMG_ERROR[0]}")
@@ -1205,7 +1278,7 @@ def make_ai_images(segs, job):
         if (j + 1) % 6 == 0 or j + 1 == k:
             log(f"  generated pictures {j + 1}/{k}")
     got = sum(1 for x in out if x is not None)
-    log(f"  {got} of {k} generated pictures usable (matched to narration); {FALLBACK_STATE['used']} came from the free backup generators")
+    log(f"  {got} of {k} generated pictures usable (matched to narration); {GEMINI['used']} from Gemini, {FALLBACK_STATE['used']} from the free backup generators")
     return out
 
 
@@ -1709,7 +1782,39 @@ _LLM_DEAD = [False]
 _PLAN_CACHE: dict = {}
 
 
+def llm_gemini(system: str, user: str, max_tokens: int, retried: bool = False) -> str | None:
+    """Gemini writes the scene descriptions / plans (free text tier). None means: let the Cloudflare model try."""
+    if not GEMINI_KEY or GEMINI["txt_dead"]:
+        return None
+    try:
+        r = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_TEXT_MODEL}:generateContent",
+            headers={"x-goog-api-key": GEMINI_KEY},
+            json={"systemInstruction": {"parts": [{"text": system}]}, "contents": [{"parts": [{"text": user}]}],
+                  "generationConfig": {"maxOutputTokens": max(max_tokens * 4, 600), "temperature": 0.2}}, timeout=60)
+        if r.status_code == 429:
+            delay = _gemini_retry_seconds(r.text)
+            if delay is not None and delay <= 30 and not retried:
+                time.sleep(delay + 1)
+                return llm_gemini(system, user, max_tokens, retried=True)
+        if not r.ok:
+            GEMINI["txt_dead"] = True
+            log(f"  Gemini text off for this run (HTTP {r.status_code}); using the Cloudflare planner")
+            return None
+        parts = (r.json().get("candidates") or [{}])[0].get("content", {}).get("parts", [])
+        txt = "".join(p.get("text", "") for p in parts if isinstance(p, dict))
+        return txt.strip() or None
+    except Exception as e:
+        log(f"  Gemini text call failed ({str(e)[:80]})")
+        return None
+
+
 def llm_text(system: str, user: str, max_tokens: int = 160) -> str | None:
+    if LLM_PLAN and _LLM_CALLS[0] < LLM_MAX_CALLS:
+        got = llm_gemini(system, user, max_tokens)
+        if got:
+            _LLM_CALLS[0] += 1
+            return got
     if not LLM_PLAN or _LLM_DEAD[0] or not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) or _LLM_CALLS[0] >= LLM_MAX_CALLS:
         return None
     _LLM_CALLS[0] += 1
