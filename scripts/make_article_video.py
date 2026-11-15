@@ -20,7 +20,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-15-gemini"
+SCRIPT_VERSION = "2026-11-15-lively"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
@@ -55,7 +55,11 @@ SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "45"))  # one picture per slide,
 INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"  # off: video starts straight on the content
 # The narration opens with this greeting, then the topic (the article title), then the essay itself.
 # Set NARRATION_GREETING to an empty string in the workflow to switch it off.
-NARRATION_GREETING = os.environ.get("NARRATION_GREETING", "Hello everyone, welcome back to Poetic Codes. This is an educational video that tackles topics on AI, economy, and history. This video is about").strip()
+# Lively introduction: the greeting is spoken a little faster and higher. INTRO_LIVELY=0 turns it off.
+INTRO_LIVELY = os.environ.get("INTRO_LIVELY", "1") != "0"
+INTRO_RATE_BOOST = int(os.environ.get("INTRO_RATE_BOOST", "8"))
+INTRO_PITCH = os.environ.get("INTRO_PITCH", "+6Hz")
+NARRATION_GREETING = os.environ.get("NARRATION_GREETING", "Hello everyone! Welcome back to Poetic Codes! This is an educational video that tackles topics on AI, economy, and history. This video is about").strip()
 
 
 NARRATION_CLOSER = os.environ.get(
@@ -584,9 +588,18 @@ def set_job_voice(job: Job) -> None:
     ACTIVE_VOICE[0] = v if _VOICE_RE.match(v or "") else None
 
 
-async def _edge_synth(text, out, voice=None):
+def _lively_rate():
+    base = float(RATE.strip("%")) if RATE.endswith("%") else 0.0
+    return f"{int(base + INTRO_RATE_BOOST):+d}%"
+
+
+async def _edge_synth(text, out, voice=None, lively=False):
     import edge_tts
-    await edge_tts.Communicate(text, voice or ACTIVE_VOICE[0] or VOICE, rate=RATE).save(out)
+    if lively:   # the introduction: a little faster, brighter and louder so it sounds upbeat
+        await edge_tts.Communicate(text, voice or ACTIVE_VOICE[0] or VOICE, rate=_lively_rate(),
+                                   pitch=INTRO_PITCH, volume="+8%").save(out)
+    else:
+        await edge_tts.Communicate(text, voice or ACTIVE_VOICE[0] or VOICE, rate=RATE).save(out)
 
 
 def pick_rate(segs: list[Seg]) -> str:
@@ -602,7 +615,7 @@ def pick_rate(segs: list[Seg]) -> str:
     return f"{int(pct)}%"
 
 
-def synth(text, out_mp3):
+def synth(text, out_mp3, lively=False):
     if TTS_FAKE:
         dur = max(1.5, len(text.split()) / 2.6)
         run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
@@ -615,7 +628,7 @@ def synth(text, out_mp3):
     for attempt in range(4):
         v = voices[min(attempt // 2, len(voices) - 1)]    # two tries per voice, then the next voice
         try:
-            asyncio.run(_edge_synth(text, out_mp3, v))
+            asyncio.run(_edge_synth(text, out_mp3, v, lively and attempt < 2))
             if os.path.exists(out_mp3) and os.path.getsize(out_mp3) > 1000:
                 return "edge-tts"
         except Exception as e:
@@ -2206,7 +2219,7 @@ def build_video(job):
     engines, mp3s, est = set(), [], 0.0
     for i, seg in enumerate(segs):
         mp3 = tmp / f"a{i}.mp3"
-        engines.add(synth(seg["speech"], str(mp3)))
+        engines.add(synth(seg["speech"], str(mp3), lively=(seg.get("kind") == "intro" and INTRO_LIVELY)))
         mp3s.append(mp3)
         est += probe_duration(mp3) + 0.7
     vkbps = pick_bitrate(est)
@@ -2744,7 +2757,8 @@ def infer_location(job: Job) -> Job:
 
 def fill_job_from_article(job: Job, row: Job) -> None:
     """A job file may hold only a title (+ location/characters). Take the text from the article on the site."""
-    for key, names in (("body", ("content", "body")), ("excerpt", ("excerpt", "summary")), ("category", ("category",))):
+    for key, names in (("body", ("content", "body")), ("excerpt", ("excerpt", "summary")), ("category", ("category",)),
+                       ("coverUrl", ("photo_url", "photoUrl"))):
         if not str(job.get(key) or "").strip():
             for n in names:
                 if str(row.get(n) or "").strip():
