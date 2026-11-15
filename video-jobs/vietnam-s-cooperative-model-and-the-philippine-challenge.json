@@ -1,6 +1,6 @@
 {
-  "jobId": "1794710636469",
-  "createdAt": "2026-11-15T02:43:56.469Z",
+  "jobId": "1794720657252",
+  "createdAt": "2026-11-15T05:30:57.253Z",
   "title": "Vietnam's Cooperative Model and the Philippine Challenge",
   "author": "Glenn Junsay Pansensoy",
   "category": "Economy",
@@ -17,5 +17,27 @@
   "slug": "vietnam-s-cooperative-model-and-the-philippine-challenge",
   "articleId": 65,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794710504823.jpg",
-  "force": true
+  "force": true,
+  "images": [
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720011908.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720023449.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720034643.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720046222.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720064351.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720073126.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720087423.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720114838.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720128533.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720136104.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720145410.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720154969.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720166969.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720179848.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720190512.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720198796.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720592823.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720601437.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720608337.jpg",
+    "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794720615062.jpg"
+  ]
 }
