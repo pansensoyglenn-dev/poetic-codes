@@ -1,7 +1,9 @@
+SCRIPT_VERSION = "2026-11-16-cinema-v2"
 import asyncio
 import glob
 import html
 import json
+import math
 import os
 import re
 import shutil
@@ -16,17 +18,20 @@ from typing import Any
 import requests
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
-# Shapes used throughout: a job file / article row, and one slide of the video.
+
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-05-y"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
 BANDH = H - IMGH
 CROPW, CROPH = 2000, 844
 ZOOM = float(os.environ.get("ZOOM", "0.18"))
+
+
+SHOT_SECONDS = float(os.environ.get("SHOT_SECONDS", "10"))
+SHOT_FADE = float(os.environ.get("SHOT_FADE", "0.5"))
 GRAIN = int(os.environ.get("GRAIN", "2"))
 VIGNETTE = os.environ.get("VIGNETTE", "1") != "0"
 CAP_WORDS = int(os.environ.get("CAP_WORDS", "20"))
@@ -42,26 +47,32 @@ VIDEO_URL_API = os.environ.get("VIDEO_URL_API", "https://poetic-codes.vercel.app
 UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/upload")
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 AI_IMAGES = os.environ.get("AI_IMAGES", "1") != "0"
-AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "16"))  # each picture covers a stretch of narration; lower to save free quota
-# Same names as your GitHub secrets. strip() removes a stray space or newline pasted along with a secret.
-# strip() removes a stray space or newline pasted along with the secret.
+AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "60"))
+
+
 CLOUDFLARE_ACCOUNT_ID = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
 CLOUDFLARE_API_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
-VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")   # Philippine English; en-PH-RosaNeural is the female voice
+VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")
 VOICE_FALLBACKS = ["en-PH-RosaNeural", "en-US-ChristopherNeural"]
-RATE = os.environ.get("TTS_RATE", "+10%")
+RATE = os.environ.get("TTS_RATE", "+0%")
 MAX_WORDS = int(os.environ.get("MAX_WORDS", "6000"))
-SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "60"))  # longer slides = fewer, better-matched pictures
-INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"  # off: video starts straight on the content
-# The narration opens with this greeting, then the topic (the article title), then the essay itself.
-# Set NARRATION_GREETING to an empty string in the workflow to switch it off.
-NARRATION_GREETING = os.environ.get("NARRATION_GREETING", "Hello and good day, everyone, and welcome to another episode of Poetic Codes. In today's discussion, we will explore").strip()
+SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "45"))
+INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"
+
+
+INTRO_LIVELY = os.environ.get("INTRO_LIVELY", "1") != "0"
+INTRO_RATE_BOOST = int(os.environ.get("INTRO_RATE_BOOST", "4"))
+INTRO_PITCH = os.environ.get("INTRO_PITCH", "+6Hz")
+NARRATION_GREETING = os.environ.get("NARRATION_GREETING", ("Hello, everyone! Welcome back to Poetic Codes, where curiosity comes first! "
+    "Here we explore the big ideas and everyday questions that shape our lives: AI, philosophy, economy, history, "
+    "computer programming, local and international politics, the weather, agriculture, and so much more. "
+    "So get ready to discover something new, because today's video is about")).strip()
 
 
 NARRATION_CLOSER = os.environ.get(
     "NARRATION_CLOSER",
-    "Along the way, we will look at the background, the key ideas, and what they mean for us today. "
-    "So please settle in, and let's begin.").strip()
+    "Why does it matter, and what does it mean for you and me? Stay with me, because the answers may surprise you. "
+    "Let's dive in!").strip()
 
 
 def narration_greeting(title: str, excerpt: str = "") -> str:
@@ -76,68 +87,90 @@ def narration_greeting(title: str, excerpt: str = "") -> str:
         parts.append(NARRATION_CLOSER)
     return " ".join(parts)
 
-SPEAK_HEADINGS = os.environ.get("SPEAK_HEADINGS", "0") != "0"  # off: section headings are not read or shown
+SPEAK_HEADINGS = os.environ.get("SPEAK_HEADINGS", "0") != "0"
 ONLY_JOB = os.environ.get("ONLY_JOB", "").strip().lower()
 MAX_JOBS_PER_RUN = int(os.environ.get("MAX_JOBS_PER_RUN", "5"))
 RUN_START = time.time()
 RUN_BUDGET = float(os.environ.get("MAX_RUN_MINUTES", "100")) * 60
-IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "480"))
+IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "1500"))
+
+
+FALLBACK_IMAGES = os.environ.get("FALLBACK_IMAGES", "1") != "0"
+HF_TOKEN = os.environ.get("HF_TOKEN", "").strip()
+
+
+LOCAL_IMAGES = os.environ.get("LOCAL_IMAGES", "auto").strip().lower()
+LOCAL_MODEL = os.environ.get("LOCAL_MODEL", "stabilityai/sd-turbo").strip()
+LOCAL_W = int(os.environ.get("LOCAL_W", "512"))
+LOCAL_H = int(os.environ.get("LOCAL_H", "512"))
+LOCAL_STEPS = int(os.environ.get("LOCAL_STEPS", "2"))
+LOCAL_BUDGET = float(os.environ.get("LOCAL_BUDGET_SECONDS", "3600"))
+LOCAL = {"pipe": None, "dead": False, "used": 0, "announced": False}
+HF_MODEL = os.environ.get("HF_MODEL", "black-forest-labs/FLUX.1-schnell")
+POLLINATIONS_URL = os.environ.get(
+    "POLLINATIONS_URL",
+    "https://image.pollinations.ai/prompt/{prompt}?width=1280&height=720&model=flux&nologo=true&seed={seed}")
+FALLBACK_PAUSE = float(os.environ.get("FALLBACK_PAUSE", "4"))
 WIKI_IMAGES = os.environ.get("WIKI_IMAGES", "1") != "0"
 WIKI_MAX = int(os.environ.get("WIKI_MAX", "12"))
 UA = "article-video-bot/1.0 (https://poetic-codes.pages.dev; GitHub Actions)"
 CREDITS = []
 CREDIT_ROWS = []
 QUOTA_HIT = [False]
+
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+GEMINI_IMAGE_MODEL = os.environ.get("GEMINI_IMAGE_MODEL", "gemini-2.5-flash-image").strip()
+GEMINI_TEXT_MODEL = os.environ.get("GEMINI_TEXT_MODEL", "gemini-flash-latest").strip()
+GEMINI_PAUSE = float(os.environ.get("GEMINI_PAUSE", "6"))
+GEMINI = {"img_dead": False, "txt_dead": False, "used": 0, "last": 0.0, "aspect": True}
 IMG_FAIL_LIMIT = int(os.environ.get("IMG_FAIL_LIMIT", "4"))
 DRY_RUN = os.environ.get("DRY_RUN") == "1"
-FORCE_REDO = os.environ.get("FORCE_REDO") == "1"  # ignore finished-job markers and the "article already has a video" check
+FORCE_REDO = os.environ.get("FORCE_REDO") == "1"
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
 
-# Kling image-to-video (real character motion). Off by default — needs API key + budget.
+
 KLING_ENABLED = os.environ.get("KLING_ENABLED", "0") == "1"
 KLING_API_KEY = os.environ.get("KLING_API_KEY", "") or os.environ.get("FAL_KEY", "") or os.environ.get("PIAPI_API_KEY", "")
-KLING_PROVIDER = os.environ.get("KLING_PROVIDER", "fal").strip().lower()  # fal | piapi | aimlapi
+KLING_PROVIDER = os.environ.get("KLING_PROVIDER", "fal").strip().lower()
 KLING_MAX_CLIPS = int(os.environ.get("KLING_MAX_CLIPS", "12"))
-KLING_DURATION = int(os.environ.get("KLING_DURATION", "5"))  # 5-10 typical
-KLING_MODEL = os.environ.get("KLING_MODEL", "")  # provider-specific override
-KLING_BUDGET = float(os.environ.get("KLING_BUDGET_SECONDS", "600"))  # max wall time on Kling calls
+KLING_DURATION = int(os.environ.get("KLING_DURATION", "5"))
+KLING_MODEL = os.environ.get("KLING_MODEL", "")
+KLING_BUDGET = float(os.environ.get("KLING_BUDGET_SECONDS", "600"))
 KLING_NEG = os.environ.get(
     "KLING_NEG",
     "still photo, frozen pose, static image, text, watermark, logo, cartoon, illustration, low quality",
 )
 
-# Free moving people: real stock footage from Pexels (free key from pexels.com/api). Off unless STOCK_VIDEO=1.
+
 STOCK_VIDEO = os.environ.get("STOCK_VIDEO", "0") == "1"
 PEXELS_API_KEY = os.environ.get("PEXELS_API_KEY", "").strip()
 PIXABAY_API_KEY = os.environ.get("PIXABAY_API_KEY", "").strip()
 STOCK_MAX_CLIPS = int(os.environ.get("STOCK_MAX_CLIPS", "8"))
 STOCK_MAX_MB = float(os.environ.get("STOCK_MAX_MB", "25"))
 
-# Real archival footage (public domain / Creative Commons) for stories set before 2000: Wikimedia Commons + Internet Archive.
-# No key needed. Only used when the article is about a past era; falls back to the stock sites above.
+
 ARCHIVE_VIDEO = os.environ.get("ARCHIVE_VIDEO", "0") == "1"
-ARCHIVE_ANY_ERA = os.environ.get("ARCHIVE_ANY_ERA", "0") == "1"   # 1 = real archive footage for every article, not only pre-2000 stories
+ARCHIVE_ANY_ERA = os.environ.get("ARCHIVE_ANY_ERA", "0") == "1"
 ARCHIVE_MAX_MB = float(os.environ.get("ARCHIVE_MAX_MB", "120"))
 ARCHIVE_CLIP_SEC = float(os.environ.get("ARCHIVE_CLIP_SEC", "12"))
-# Real footage is OPT-IN per article: STOCK_VIDEO / ARCHIVE_VIDEO only take effect for a job file that has
-# "footage": true, unless FOOTAGE_ALL=1. History/culture essays rarely have footage of their exact subject,
-# so by default every new article gets AI pictures matched to its narration instead of a guessed clip.
+
+
 FOOTAGE_ALL = os.environ.get("FOOTAGE_ALL", "0") == "1"
 _ARCHIVE_ENV, _STOCK_ENV = ARCHIVE_VIDEO, STOCK_VIDEO
 
-# Real photographs matched to each slide's own narration (Unsplash + Pixabay photos + Wikimedia Commons).
-SLIDE_PHOTOS = os.environ.get("SLIDE_PHOTOS", "1") != "0"
+
+SLIDE_PHOTOS = os.environ.get("SLIDE_PHOTOS", "0") == "1"
 UNSPLASH_ACCESS_KEY = os.environ.get("UNSPLASH_ACCESS_KEY", "").strip()
-PHOTO_MAX_SEARCHES = int(os.environ.get("PHOTO_MAX_SEARCHES", "30"))   # per video; Unsplash demo keys allow 50 requests/hour
-# On Philippine stories a stock clip must itself mention the Philippines/a Philippine place, else the slide keeps a better-matched photo.
-# A small free AI text model (Cloudflare Workers AI) writes each slide's search words + "must not show" words and judges candidates.
+PHOTO_MAX_SEARCHES = int(os.environ.get("PHOTO_MAX_SEARCHES", "30"))
+
+
 LLM_PLAN = os.environ.get("LLM_PLAN", "1") != "0"
 LLM_MODEL = os.environ.get("LLM_MODEL", "@cf/meta/llama-3.1-8b-instruct")
-LLM_MAX_CALLS = int(os.environ.get("LLM_MAX_CALLS", "160"))
-# Strict matching: a body slide shows only a picture that matched ITS narration (or an AI image of it). Never a loosely related photo.
+LLM_MAX_CALLS = int(os.environ.get("LLM_MAX_CALLS", "400"))
+
 STRICT_MATCH = os.environ.get("STRICT_MATCH", "1") != "0"
-WIKI_GENERIC = os.environ.get("WIKI_GENERIC", "0") == "1"   # 1 = also pull photos by the article title alone (they often do not match a slide)
-CREDITS_CARD = os.environ.get("CREDITS_CARD", "0") == "1"   # 1 = also speak/show a credits card in the video (credits are always in the description)
+WIKI_GENERIC = os.environ.get("WIKI_GENERIC", "0") == "1"
+CREDITS_CARD = os.environ.get("CREDITS_CARD", "0") == "1"
 STOCK_REQUIRE_REGION = os.environ.get("STOCK_REQUIRE_REGION", "1") != "0"
 
 BG1, BG2 = (11, 15, 23), (22, 40, 66)
@@ -246,8 +279,6 @@ def build_chunks(sentences: list[str], budget: int, target: int | None = None) -
 
 
 def strip_flat_page_chrome(text: str, title: str, author: str) -> str:
-    """If a whole web page was flattened to plain text, drop the title + byline at the start and the
-    copyright footer at the end, so narration begins with the story itself."""
     t = " ".join((text or "").split())
     if title and t.lower().startswith(title.lower()):
         t = t[len(title):].lstrip(" :-\u2013\u2014")
@@ -275,9 +306,14 @@ def build_segments(job: Job) -> list[Seg]:
     segs = [{"kind": "title", "title": title, "sub": sub, "speech": speech}]
 
     raw_body = job.get("body") or ""
-    if not re.search(r"<[a-zA-Z/!][^>]*>", raw_body):  # plain text from the portal
+    if not re.search(r"<[a-zA-Z/!][^>]*>", raw_body):
         raw_body = strip_flat_page_chrome(raw_body, title, author)
     main_html = extract_main(raw_body)
+    if not excerpt:
+        for s0 in split_sentences(clean_text(main_html))[:6]:
+            if 6 <= len(s0.split()) <= 40:
+                excerpt = s0
+                break
     parts = re.split(r"(?is)(<h[1-3]\b[^>]*>.*?</h[1-3]>)", main_html)
     budget, heading, first = MAX_WORDS, "", True
     for part in parts:
@@ -305,15 +341,15 @@ def build_segments(job: Job) -> list[Seg]:
         if len(segs) > 400:
             break
 
-    custom_intro = clean_text(job.get("intro"))  # per-article opening written in the portal
+    custom_intro = clean_text(job.get("intro"))
     greeting = custom_intro or narration_greeting(title, excerpt)
     if greeting and (custom_intro or not any(str(s.get("speech", "")).lower().startswith(NARRATION_GREETING.lower()) for s in segs)):
         if INTRO_TITLE:
-            # the title card is spoken: greeting replaces the bare title, excerpt still follows
+
             segs[0]["speech"] = greeting
             segs[0]["kind"] = "intro"
         else:
-            # the title card is dropped, so the greeting becomes the first thing said (and shown as a caption)
+
             segs.insert(1, {"kind": "intro", "title": title, "text": greeting, "speech": greeting, "heading": ""})
     if not INTRO_TITLE and len(segs) > 1:
         segs = segs[1:]
@@ -370,13 +406,11 @@ def fit_text(draw, text, max_w, max_h, sizes, bold=False):
     return font, lines, lh
 
 
-BAND_H = int(BGW * IMGH / W) // 2 * 2      # the part of the 2560x1440 canvas that is actually shown (2560x1080)
-MAX_CROP = 0.18                            # a photo may lose at most this much to fill the picture area
+BAND_H = int(BGW * IMGH / W) // 2 * 2
+MAX_CROP = 0.18
 
 
 def fit_band(img):
-    """Put the WHOLE photo in the picture area. If its shape is close, it is cropped by at most MAX_CROP;
-    otherwise it is shown complete with a soft blurred copy of itself on the sides (never a hard crop)."""
     from PIL import ImageFilter
     w, h = img.size
     s_cover = max(BGW / w, BAND_H / h)
@@ -394,14 +428,13 @@ def fit_band(img):
     return canvas
 
 
-PROFILE = [None]   # the round profile picture shown while the introduction is narrated
+PROFILE = [None]
 
 
-USER_CLIPS = []   # short video clips supplied with the job (portal "Extra video clips"), downloaded for this run
+USER_CLIPS = []
 
 
 def load_user_clips(job, tmp):
-    """Download the author's own short clips (direct .mp4 links) so they can play under the narration."""
     USER_CLIPS.clear()
     urls = [str(u).strip() for u in (job.get("clips") or []) if u and str(u).strip().startswith("http")][:12]
     for n, u in enumerate(urls):
@@ -427,7 +460,6 @@ def load_user_clips(job, tmp):
 
 
 def load_profile(job):
-    """Profile picture for the intro slide: job "profileUrl", env PROFILE_IMAGE_URL, or a file in the repo."""
     for u in (job.get("profileUrl"), os.environ.get("PROFILE_IMAGE_URL", "").strip()):
         if u and str(u).startswith("http"):
             img = load_cover(u)
@@ -443,13 +475,12 @@ def load_profile(job):
 
 
 def draw_intro_card(ov, d, seg, has_cover=False):
-    """Round profile picture, channel name and essay title in the picture area."""
     if os.environ.get("INTRO_TEXT", "0") != "1":
-        return   # introduction = the cover picture only: no words on top, only the caption bar below
+        return
     prof = None if has_cover else PROFILE[0]
     y = 36
     if has_cover:
-        d.rectangle([0, 0, W, IMGH], fill=(6, 10, 18, 150))   # darken the article's cover so the words read
+        d.rectangle([0, 0, W, IMGH], fill=(6, 10, 18, 150))
         y = 150
     if prof is not None:
         D = 250
@@ -492,7 +523,7 @@ def render_layers(seg, idx, total, cover):
     if seg.get("kind") == "intro":
         draw_intro_card(ov, d, seg, cover is not None)
     if seg.get("kind") == "end" and os.environ.get("END_CARD_TEXT", "1") == "1":
-        # End card: darken the picture and show the link on screen.
+
         d.rectangle([0, 0, W, IMGH], fill=(6, 10, 18, 175))
         rows = [(seg.get("title", ""), load_font(54, True), TEXT),
                 (seg.get("sub", ""), load_font(34), ACCENT),
@@ -555,7 +586,7 @@ def caption_timings(speech: str, dur: float) -> list[tuple[str, float, float]]:
     return out
 
 
-ACTIVE_VOICE = [None]      # set per article from the job file (portal "Narration voice"); None = the default VOICE
+ACTIVE_VOICE = [None]
 _VOICE_RE = re.compile(r"^[a-z]{2,3}-[A-Z]{2}-[A-Za-z]+Neural$")
 
 
@@ -564,9 +595,18 @@ def set_job_voice(job: Job) -> None:
     ACTIVE_VOICE[0] = v if _VOICE_RE.match(v or "") else None
 
 
-async def _edge_synth(text, out, voice=None):
+def _lively_rate():
+    base = float(RATE.strip("%")) if RATE.endswith("%") else 0.0
+    return f"{int(base + INTRO_RATE_BOOST):+d}%"
+
+
+async def _edge_synth(text, out, voice=None, lively=False):
     import edge_tts
-    await edge_tts.Communicate(text, voice or ACTIVE_VOICE[0] or VOICE, rate=RATE).save(out)
+    if lively:
+        await edge_tts.Communicate(text, voice or ACTIVE_VOICE[0] or VOICE, rate=_lively_rate(),
+                                   pitch=INTRO_PITCH, volume="+8%").save(out)
+    else:
+        await edge_tts.Communicate(text, voice or ACTIVE_VOICE[0] or VOICE, rate=RATE).save(out)
 
 
 def pick_rate(segs: list[Seg]) -> str:
@@ -582,7 +622,7 @@ def pick_rate(segs: list[Seg]) -> str:
     return f"{int(pct)}%"
 
 
-def synth(text, out_mp3):
+def synth(text, out_mp3, lively=False):
     if TTS_FAKE:
         dur = max(1.5, len(text.split()) / 2.6)
         run(["ffmpeg", "-y", "-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono",
@@ -593,9 +633,9 @@ def synth(text, out_mp3):
     first = ACTIVE_VOICE[0] or VOICE
     voices = [first] + [v for v in [VOICE] + VOICE_FALLBACKS if v != first]
     for attempt in range(4):
-        v = voices[min(attempt // 2, len(voices) - 1)]    # two tries per voice, then the next voice
+        v = voices[min(attempt // 2, len(voices) - 1)]
         try:
-            asyncio.run(_edge_synth(text, out_mp3, v))
+            asyncio.run(_edge_synth(text, out_mp3, v, lively and attempt < 2))
             if os.path.exists(out_mp3) and os.path.getsize(out_mp3) > 1000:
                 return "edge-tts"
         except Exception as e:
@@ -616,43 +656,192 @@ def probe_duration(path: str | Path) -> float:
 
 
 MOTIONS = [
-    (0.0, 1.0, 0.0, 1.0),
-    (1.0, 0.0, 1.0, 0.0),
-    (1.0, 0.0, 0.0, 1.0),
-    (0.0, 1.0, 1.0, 0.0),
-    (0.0, 1.0, 0.5, 0.5),
-    (1.0, 0.0, 0.5, 0.5),
-    (0.25, 0.75, 0.0, 1.0),
-    (0.75, 0.25, 1.0, 0.0),
+    (0.00, 0.22, 0.08, 0.92, 0.42, 0.58),
+    (0.18, 0.00, 0.92, 0.12, 0.58, 0.42),
+    (0.00, 0.16, 0.48, 0.52, 0.68, 0.32),
+    (0.10, 0.08, 0.04, 0.96, 0.50, 0.50),
+    (0.20, 0.02, 0.50, 0.50, 0.38, 0.62),
+    (0.02, 0.20, 0.90, 0.18, 0.50, 0.50),
+    (0.12, 0.10, 0.96, 0.04, 0.50, 0.50),
+    (0.00, 0.26, 0.28, 0.72, 0.33, 0.62),
+    (0.16, 0.00, 0.82, 0.22, 0.62, 0.38),
+    (0.08, 0.06, 0.08, 0.92, 0.44, 0.56),
+    (0.00, 0.18, 0.68, 0.38, 0.38, 0.58),
+    (0.14, 0.00, 0.18, 0.68, 0.56, 0.44),
 ]
+
+TRANSITIONS = ["dissolve", "fade", "smoothleft", "dissolve", "smoothright", "fade", "dissolve"]
+SHOT_CROPS = [(1.0, 0.5, 0.5), (0.80, 0.2, 0.45), (0.74, 0.8, 0.5), (0.86, 0.5, 0.2),
+              (0.72, 0.35, 0.65), (0.78, 0.7, 0.35), (0.90, 0.5, 0.8)]
+VIDEO_SHOT_MAX = float(os.environ.get("VIDEO_SHOT_MAX", "0")) or max(SHOT_SECONDS * 1.8, 12.0)
+MAX_SLOWDOWN = 1.25
+ROTATE_MAX_DEG = 0.35
+
+
+def shot_frame(img, n):
+    if img is None or n <= 0:
+        return img
+    frac, fx, fy = SHOT_CROPS[n % len(SHOT_CROPS)]
+    if n % len(SHOT_CROPS) == 0:
+        frac, fx, fy = 0.84, 0.5, 0.5
+    w, h = img.size
+    cw, ch = int(w * frac), int(h * frac)
+    x0, y0 = int((w - cw) * fx), int((h - ch) * fy)
+    return img.crop((x0, y0, x0 + cw, y0 + ch))
+
+
+def _jitter(index, salt):
+    v = math.sin(index * 12.9898 + salt * 78.233) * 43758.5453
+    return v - math.floor(v)
+
+
+def camera_move(index):
+    z0, z1, px0, px1, py0, py1 = MOTIONS[index % len(MOTIONS)]
+    amp = max(ZOOM, 0.12) / 0.18 * (0.88 + 0.28 * _jitter(index, 1))
+    shift = (_jitter(index, 2) - 0.5) * 0.16
+    clamp = lambda v: max(0.0, min(1.0, v))
+    return (z0 * amp, z1 * amp, clamp(px0 + shift), clamp(px1 - shift), py0, py1)
+
+
+def camera_roll(index):
+    return (_jitter(index, 4) * 2.0 - 1.0) * ROTATE_MAX_DEG
+
+
+def _ease(nfr):
+    q = f"min(on/{nfr},1)"
+    return f"(0.35*{q}+0.65*{q}*{q}*(3-2*{q}))"
+
+
+def _zoompan(move, nfr, phase=0.0):
+    z0, z1, px0, px1, py0, py1 = move
+    e = _ease(nfr)
+    z = f"1+{z0:.4f}+({z1 - z0:.4f})*{e}"
+    px = f"({px0:.4f}+({px1 - px0:.4f})*{e}+0.014*sin(on/{FPS}*0.55+{phase:.3f}))"
+    py = f"({py0:.4f}+({py1 - py0:.4f})*{e}+0.011*sin(on/{FPS}*0.42+{phase + 1.7:.3f}))"
+    return (f"zoompan=z='{z}':x='max(0,min(iw-iw/zoom,(iw-iw/zoom)*{px}))':"
+            f"y='max(0,min(ih-ih/zoom,(ih-ih/zoom)*{py}))':d=1:s={W}x{IMGH}:fps={FPS}")
+
+
+def _still_chain(inp, wide_h, ye2, index, nfr):
+    roll = camera_roll(index)
+    chain = (f"[{inp}:v]format=yuv420p,crop={BGW}:{wide_h}:x=0:y='{ye2}',"
+             + _zoompan(camera_move(index), nfr, phase=index * 1.3))
+    if abs(roll) > 0.005:
+        chain += (f",rotate=a={roll:.4f}*PI/180:ow=iw:oh=ih:c=black:bilinear=1,"
+                  f"crop=iw-16:ih-8,scale={W}:{IMGH}:flags=bilinear")
+    return chain
+
+
+def _finish_chain(chain):
+    if VIGNETTE:
+        chain += ",vignette=PI/5"
+    if GRAIN > 0:
+        chain += f",noise=alls={GRAIN}:allf=t"
+    return chain
+
+
+def plan_shot_durations(kinds, vid_lens, total, min_still=1.8):
+    n = len(kinds)
+    fixed = [min(v, VIDEO_SHOT_MAX) if k == "video" else 0.0 for k, v in zip(kinds, vid_lens)]
+    still_idx = [i for i, k in enumerate(kinds) if k != "video"]
+    if not still_idx:
+        return [total / n] * n
+    room = total - min_still * len(still_idx)
+    used = sum(fixed)
+    if used > room:
+        scale = max(room, 0.5) / used
+        fixed = [x * scale for x in fixed]
+        used = sum(fixed)
+    remaining = total - used
+    weights = {i: 1.0 + 0.22 * math.sin(i * 2.1 + 1.0) for i in still_idx}
+    wsum = sum(weights.values())
+    return [fixed[i] if kinds[i] == "video" else remaining * weights[i] / wsum for i in range(n)]
+
+
+def make_clip_multi(shots, ov_png, mp3, out, caps, move0=0, pad=0.7, vkbps=900):
+    dur = probe_duration(mp3) + pad
+    n = len(shots)
+    f = min(SHOT_FADE, dur / (n * 3.0))
+    total = dur + (n - 1) * f
+    kinds = [kind for kind, _ in shots]
+    raw_lens = [max(probe_duration(path), 1.0) if kind == "video" else 0.0 for kind, path in shots]
+    vid_lens = [r * MAX_SLOWDOWN - 0.1 if r else 0.0 for r in raw_lens]
+    durs = plan_shot_durations(kinds, vid_lens, total)
+    starts = [0.0]
+    for k in range(1, n):
+        starts.append(starts[-1] + durs[k - 1] - f)
+    ow, oh = (960, 540) if vkbps < 450 else (W, H)
+    wide_h = int(BGW * IMGH / W) // 2 * 2
+    ye2 = f"{0.5 * (BGH - wide_h):.1f}"
+    inputs, chains = [], []
+    for k, (kind, path) in enumerate(shots):
+        if kind == "video":
+            inputs += ["-i", str(path)]
+            vw, vh = probe_size(path)
+            sc = max(min(W / vw, IMGH / vh), max(W / vw, IMGH / vh) * (1 - MAX_CROP))
+            fw, fh = max(2, int(vw * sc) // 2 * 2), max(2, int(vh * sc) // 2 * 2)
+            slow = min(MAX_SLOWDOWN, max(1.0, (durs[k] + 0.1) / raw_lens[k]))
+            c = (f"[{k}:v]setpts={slow:.4f}*PTS,fps={FPS},split[va{k}][vb{k}];"
+                 f"[va{k}]scale={W}:{IMGH}:force_original_aspect_ratio=increase,crop={W}:{IMGH},boxblur=24:3,eq=brightness=-0.12[vg{k}];"
+                 f"[vb{k}]scale={fw}:{fh}[vf{k}];[vg{k}][vf{k}]overlay=(W-w)/2:(H-h)/2:shortest=1,crop={W}:{IMGH},"
+                 f"tpad=stop_mode=clone:stop_duration=3,setpts=PTS-STARTPTS")
+            chains.append(_finish_chain(c) + f",format=yuv420p,setsar=1[s{k}]")
+        else:
+            inputs += ["-loop", "1", "-framerate", str(FPS), "-i", str(path)]
+            nfr = max(int(durs[k] * FPS), 2)
+            c = _still_chain(k, wide_h, ye2, move0 + k, nfr)
+            chains.append(_finish_chain(c) + f",format=yuv420p,setsar=1[s{k}]")
+    fc = ";".join(chains) + ";"
+    cur = "s0"
+    for k in range(1, n):
+        tr = TRANSITIONS[(move0 + k) % len(TRANSITIONS)]
+        fc += f"[{cur}][s{k}]xfade=transition={tr}:duration={f:.3f}:offset={starts[k]:.3f}[x{k}];"
+        cur = f"x{k}"
+    ov_idx, mp3_idx, cap_base = n, n + 1, n + 2
+    fc += f"[{cur}]pad={W}:{H}:0:0:color=black,setsar=1[v0];[v0][{ov_idx}:v]overlay=format=auto[v1];"
+    last = "v1"
+    for k, (_, t0, t1) in enumerate(caps):
+        t1 = dur + 1 if k == len(caps) - 1 else t1
+        nxt = f"v{k + 2}"
+        fc += (f"[{last}][{cap_base + k}:v]overlay=format=auto:enable='between(t,{t0:.2f},{t1:.2f})'[{nxt}];")
+        last = nxt
+    fc += f"[{last}]scale={ow}:{oh}:flags=bicubic,format=yuv420p[v]"
+    cmd = ["ffmpeg", "-y"] + inputs
+    cmd += ["-loop", "1", "-framerate", str(FPS), "-i", str(ov_png), "-i", str(mp3)]
+    for png, _, _ in caps:
+        cmd += ["-loop", "1", "-framerate", str(FPS), "-i", str(png)]
+    cmd += ["-filter_complex", fc, "-map", "[v]", "-map", f"{mp3_idx}:a", "-t", f"{dur:.2f}",
+            "-af", f"apad=pad_dur={pad}",
+            "-c:v", "libx264", "-preset", "veryfast", "-b:v", f"{vkbps}k",
+            "-maxrate", f"{int(vkbps * 1.25)}k", "-bufsize", f"{vkbps * 2}k", "-r", str(FPS),
+            "-c:a", "aac", "-b:a", "40k", "-ar", "24000", "-ac", "1", str(out)]
+    run(cmd)
+    return dur
+
+
+def plan_shots(cover, n_shots, shot_idx, tmp, i, vid_path, vid_pos):
+    vid_pos = min(vid_pos, n_shots - 1)
+    specs = []
+    for k in range(n_shots):
+        if vid_path is not None and k == vid_pos:
+            specs.append(("video", vid_path))
+            continue
+        spath = Path(tmp) / f"b{i}_{k}.png"
+        fit_band(shot_frame(cover, shot_idx).convert("RGB")).save(spath)
+        shot_idx += 1
+        specs.append(("still", spath))
+    return specs, shot_idx
 
 
 def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_png=None):
-    """Animate a still (or pair of stills) so the picture feels alive while narration plays.
-    When bg2_png is set, crossfade between two related frames to imply character movement."""
     dur = probe_duration(mp3) + pad
-    x0, x1, y0, y1 = MOTIONS[motion % len(MOTIONS)]
     ow, oh = (960, 540) if vkbps < 450 else (W, H)
-    nfr = max(int(dur * FPS), 1)
-    zin = motion % 2 == 0
-    z_amt = max(ZOOM, 0.12)
-    zexpr = f"1+{z_amt}*on/{nfr}" if zin else f"1+{z_amt}*(1-on/{nfr})"
-    px = f"on/{nfr}" if x1 > x0 else f"(1-on/{nfr})"
+    nfr = max(int(dur * FPS), 2)
     wide_h = int(BGW * IMGH / W) // 2 * 2
-    vr = BGH - wide_h
-    ye2 = f"{0.5 * vr:.1f}"      # always the middle band: the whole photo is placed there, so no vertical panning
+    ye2 = f"{0.5 * (BGH - wide_h):.1f}"
 
-    def pic_chain(inp, label):
-        chain = (
-            f"[{inp}:v]crop={BGW}:{wide_h}:x=0:y='{ye2}',"
-            f"zoompan=z='{zexpr}':x='(iw-iw/zoom)*{px}':y='(ih-ih/zoom)*0.5':d=1:s={W}x{IMGH}:fps={FPS}"
-        )
-        if VIGNETTE:
-            chain += ",vignette=PI/5"
-        if GRAIN > 0:
-            chain += f",noise=alls={GRAIN}:allf=t"
-        chain += f"[{label}]"
-        return chain
+    def pic_chain(inp, label, move_index):
+        return _finish_chain(_still_chain(inp, wide_h, ye2, move_index, nfr)) + f"[{label}]"
 
     inputs = ["-loop", "1", "-framerate", str(FPS), "-i", str(bg_png)]
     if bg2_png:
@@ -660,14 +849,12 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_
         ov_idx = 2
         mp3_idx = 3
         cap_base = 4
-        # Crossfade in the middle third so characters appear to shift/move.
-        # Clamp so offset + fade length always fits inside the clip (short clips).
         fade_dur = min(1.2, max(0.6, dur * 0.28), dur * 0.5)
         fade_off = max(0.0, min(dur * 0.32, dur - fade_dur - 0.1))
         fc = (
-            pic_chain(0, "p0") + ";" +
-            pic_chain(1, "p1") + ";" +
-            f"[p0][p1]xfade=transition=fade:duration={fade_dur:.2f}:"
+            pic_chain(0, "p0", motion) + ";" +
+            pic_chain(1, "p1", motion + 3) + ";" +
+            f"[p0][p1]xfade=transition=dissolve:duration={fade_dur:.2f}:"
             f"offset={fade_off:.2f},"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
@@ -676,7 +863,7 @@ def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_
         mp3_idx = 2
         cap_base = 3
         fc = (
-            pic_chain(0, "p0") + ";" +
+            pic_chain(0, "p0", motion) + ";" +
             f"[p0]"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
@@ -722,7 +909,7 @@ def load_cover(url):
         return None
 
 
-USER_PHOTOS = []   # extra pictures supplied with the job (portal 'Extra images')
+USER_PHOTOS = []
 
 
 def load_photos(job):
@@ -738,7 +925,7 @@ def load_photos(job):
         if img is not None and img.width >= 400 and img.height >= 250:
             photos.append(img)
             if str(u) in mine:
-                USER_PHOTOS.append(img)   # pictures the author supplied in the portal: shown across the content slides
+                USER_PHOTOS.append(img)
     log(f"  {len(photos)} photograph(s) available for the background ({len(USER_PHOTOS)} supplied by you)")
     return photos
 
@@ -767,11 +954,11 @@ def wiki_queries(job):
     qs = []
     ph = bool(re.search(r"philippin|iloilo|zamboanga|visayas|mindanao|ilonggo|cebu|manila|panay|negros|sibugay",
                         (title + " " + body[:6000] + " " + clean_text((job.get("location") or {}).get("name"))).lower()))
-    anchor = " Philippines" if ph else ""      # a bare word like "Talon" or "Estancia" matches places all over the world
+    anchor = " Philippines" if ph else ""
     loc_name = clean_text(((job.get("location") or {}).get("name") or "").split(",")[0])
     if loc_name:
         qs.append(loc_name)
-    # Prefer searches that return people in action, not maps/flags
+
     if key:
         qs.append(" ".join(key[:4]) + " people")
         qs.append(" ".join(key[:3]))
@@ -882,11 +1069,10 @@ MOTION_HINTS = (
 
 
 def visual_focus(text: str | None) -> str:
-    """Pull the concrete people, places and actions the narrator is describing."""
     t = (text or "").strip()
     if not t:
         return "people in a real historical scene, mid-action"
-    # Prefer clauses with people/action verbs
+
     sentences = re.split(r"(?<=[.!?])\s+", t)
     best = sentences[0] if sentences else t
     for s in sentences:
@@ -897,14 +1083,14 @@ def visual_focus(text: str | None) -> str:
         ):
             best = s
             break
-    # Keep it short and visual
+
     words = best.split()
     if len(words) > 36:
         best = " ".join(words[:36])
     return best.rstrip(" ,.;:")
 
 
-PROMPT_WORDS = int(os.environ.get("PROMPT_WORDS", "115"))  # scene words; with style + setting the whole prompt stays near 170 words
+PROMPT_WORDS = int(os.environ.get("PROMPT_WORDS", "115"))
 
 
 def _words(text: str, n: int) -> str:
@@ -912,8 +1098,6 @@ def _words(text: str, n: int) -> str:
 
 
 def story_context(job: Job, speech: str) -> tuple[str, str, str]:
-    """From the job file: the characters in this stretch of narration, the place/era/palette, and the look.
-    A character is included when its name or one of its 'appearsIn' words is in the narration."""
     loc = job.get("location") or {}
     place = ", ".join(x for x in (_words(loc.get("name"), 10), _words(loc.get("era"), 6)) if x)
     details = _words(loc.get("description") or loc.get("details"), 28)
@@ -928,22 +1112,58 @@ def story_context(job: Job, speech: str) -> tuple[str, str, str]:
     return "; ".join(cast[:2]), setting, look
 
 
+_SCENE_CACHE: dict = {}
+
+
+def llm_scene(speech: str, heading: str, job: Job, cast: str) -> str:
+    if speech in _SCENE_CACHE:
+        return _SCENE_CACHE[speech]
+    loc = job.get("location") or {}
+    ctx = f"Article: {clean_text(job.get('title'))}. Place: {clean_text(loc.get('name'))}. Era: {clean_text(loc.get('era'))}."
+    if clean_text(loc.get("description")):
+        ctx += f" Typical scenery: {clean_text(loc.get('description'))[:200]}."
+    if cast:
+        ctx += f" Recurring people: {cast}."
+    out = llm_text(
+        "You direct a documentary. Read the narration and describe ONE concrete scene a camera could film that shows "
+        "what is being said. Rules: real people doing a specific action in a specific kind of place; turn abstract ideas "
+        "(policy, inequality, migration, supply chains) into one visible moment. Follow the era given: if it says present day, "
+        "show modern settings (factories, labs, offices, ports, classrooms, data centers) and NEVER a 1950s or rural scene; "
+        "if it is historical, use no modern objects (example for a historical sugar essay: 'a barefoot cane cutter resting beside a hand cart'). "
+        "Show only what the narration or typical scenery supports: do not add farmers, looms, markets, rice fields or foreign "
+        "nationalities unless the narration mentions them. No text, signs, maps, charts, flags or logos; never mention the "
+        "narration or the camera. Reply with the description only, 25 to 45 words.",
+        f"{ctx}\nSection: {heading}\nNarration: {speech[:900]}", max_tokens=130)
+    scene = ""
+    if out:
+        scene = clean_text(out).strip().strip('"')
+        scene = re.sub(r"^(scene|description|image)\s*:\s*", "", scene, flags=re.I)
+        scene = " ".join(scene.split()[:55]).rstrip(" ,;:")
+        if len(scene.split()) < 6:
+            scene = ""
+    _SCENE_CACHE[speech] = scene
+    return scene
+
+
 def scene_prompt(seg: Seg, job: Job) -> str:
-    """Describe EVERY sentence the picture sits under, shortened to its concrete part.
-    The image model ignores the end of a long prompt, so the style words go first and the
-    scene follows; if there are too many sentences they are thinned evenly, never cut off.
-    Characters, place, era and look come from the job file when it has them."""
     title = clean_text(job.get("title")) or ""
     category = clean_text(job.get("category")) or ""
     heading = clean_text(seg.get("heading") or "")
     speech = clean_text(seg.get("speech") or seg.get("text") or "")
     cast, setting, look = story_context(job, speech)
+    director = llm_scene(speech, heading, job, cast)
+    if director:
+        has_people = bool(_PEOPLE_RE.search(director)) or bool(cast)
+        style = (look + ", " if look else "") + STYLE_BASE + (", " + STYLE_PEOPLE if has_people else "")
+        parts = [f"Photograph of: {director}.", f"Place: {setting}." if setting else "",
+                 f"Characters: {cast}." if cast else "", style + "."]
+        return " ".join(p for p in parts if p).strip()[:1900]
 
     def short(x, n=16):
         w = re.sub(r"\s+([,.;:])", r"\1", visual_focus(x)).split()
         if len(w) > n:
             w = w[:n]
-            for k in range(len(w) - 1, 7, -1):  # cut at a comma instead of mid-phrase
+            for k in range(len(w) - 1, 7, -1):
                 if w[k].endswith(","):
                     w = w[:k + 1]
                     break
@@ -951,7 +1171,7 @@ def scene_prompt(seg: Seg, job: Job) -> str:
 
     sents = [x.strip() for x in re.split(r"(?<=[.!?])\s+", speech) if len(x.split()) >= 4] or [speech]
     per = [x for x in (short(x) for x in sents) if x]
-    # characters/setting use part of the word budget, so the scene sentences are thinned to fit
+
     extra = len((cast + " " + setting).split())
     budget = max(45, PROMPT_WORDS - extra)
     while per and sum(len(x.split()) for x in per) > budget and len(per) > 1:
@@ -985,7 +1205,7 @@ def gen_image_cloudflare(prompt):
     )
     if not r.ok:
         low = (r.text or "").lower()
-        # Only a message about the daily allowance means "out of quota". A bare 429 is a short rate limit: retry it.
+
         if any(k in low for k in ("neurons", "quota", "daily", "used up", "4006")):
             QUOTA_HIT[0] = True
         err = RuntimeError(f"Cloudflare HTTP {r.status_code}: {(r.text or '')[:250]}")
@@ -999,10 +1219,201 @@ def gen_image_cloudflare(prompt):
 
 
 LAST_IMG_ERROR = [""]
+FALLBACK_STATE = {"fails": 0, "dead": False, "used": 0, "last": 0.0}
+
+
+def gen_image_hf(prompt):
+    if not HF_TOKEN:
+        return None
+    r = requests.post(f"https://router.huggingface.co/hf-inference/models/{HF_MODEL}",
+                      headers={"Authorization": f"Bearer {HF_TOKEN}"},
+                      json={"inputs": prompt[:900]}, timeout=120)
+    if not r.ok:
+        raise RuntimeError(f"Hugging Face HTTP {r.status_code}: {(r.text or '')[:150]}")
+    return _from_bytes(r.content)
+
+
+def gen_image_pollinations(prompt):
+    from urllib.parse import quote
+    url = POLLINATIONS_URL.format(prompt=quote(prompt[:700], safe=""), seed=int(time.time()) % 100000)
+    r = requests.get(url, headers={"User-Agent": UA}, timeout=120)
+    if not r.ok or "image" not in (r.headers.get("content-type") or ""):
+        raise RuntimeError(f"Pollinations HTTP {r.status_code}: {(r.text or '')[:150]}")
+    return _from_bytes(r.content)
+
+
+def gen_image_fallback(prompt):
+    if not FALLBACK_IMAGES or FALLBACK_STATE["dead"]:
+        return None
+    wait = FALLBACK_PAUSE - (time.time() - FALLBACK_STATE["last"])
+    if wait > 0:
+        time.sleep(wait)
+    img = None
+    for fn in (gen_image_hf, gen_image_pollinations):
+        try:
+            img = fn(prompt)
+        except Exception as e:
+            LAST_IMG_ERROR[0] = str(e)[:300]
+            img = None
+        if img is not None:
+            break
+    FALLBACK_STATE["last"] = time.time()
+    if img is None:
+        FALLBACK_STATE["fails"] += 1
+        if FALLBACK_STATE["fails"] >= 3:
+            FALLBACK_STATE["dead"] = True
+            log(f"  backup picture generators failed 3 times in a row; stopping them ({LAST_IMG_ERROR[0]})")
+        return None
+    FALLBACK_STATE["fails"] = 0
+    FALLBACK_STATE["used"] += 1
+    return img
+
+
+def local_available():
+    return LOCAL_IMAGES not in ("0", "off", "no") and not LOCAL["dead"]
+
+
+def _local_short_prompt(prompt):
+    show = re.search(r"Show:\s*(.*?)\.(?:\s|$)", prompt or "", re.S)
+    place = re.search(r"Place:\s*(.*?)\.(?:\s|$)", prompt or "", re.S)
+    where = re.search(r"Where:\s*(.*?)\.(?:\s|$)", prompt or "", re.S)
+    parts = [x.group(1).strip() for x in (show, place or where) if x]
+    core = ", ".join(parts) if parts else (prompt or "")[:300]
+    return (core[:260] + ", photorealistic documentary photograph, natural light, sharp focus, no text").strip()
+
+
+def _local_load():
+    if LOCAL["pipe"] is not None:
+        return LOCAL["pipe"]
+    try:
+        try:
+            import torch, diffusers
+        except ImportError:
+            log("  local generator: installing torch (CPU) + diffusers, one time (a few minutes)")
+            subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "torch", "--index-url",
+                            "https://download.pytorch.org/whl/cpu"], check=True, timeout=1500)
+            subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "diffusers", "transformers",
+                            "accelerate", "safetensors"], check=True, timeout=900)
+        import torch
+        from diffusers import AutoPipelineForText2Image
+        log(f"  local generator: loading {LOCAL_MODEL} (first time downloads about 2-3 GB)")
+        t0 = time.time()
+        pipe = AutoPipelineForText2Image.from_pretrained(LOCAL_MODEL, torch_dtype=torch.float32, safety_checker=None)
+        pipe.set_progress_bar_config(disable=True)
+        torch.set_num_threads(max(1, os.cpu_count() or 2))
+        LOCAL["pipe"] = pipe
+        log(f"  local generator ready in {time.time() - t0:.0f}s")
+        return pipe
+    except Exception as e:
+        LOCAL["dead"] = True
+        log(f"  local generator unavailable: {str(e)[:300]}")
+        return None
+
+
+def gen_image_local(prompt):
+    if not local_available():
+        return None
+    pipe = _local_load()
+    if pipe is None:
+        return None
+    if not LOCAL["announced"]:
+        LOCAL["announced"] = True
+        log("  using the local picture generator (CPU); each picture takes a minute or two")
+    try:
+        t0 = time.time()
+        out = pipe(_local_short_prompt(prompt), num_inference_steps=LOCAL_STEPS, guidance_scale=0.0,
+                   width=LOCAL_W, height=LOCAL_H).images[0].convert("RGB")
+        out = out.resize((out.width * 2, out.height * 2), Image.LANCZOS)
+        LOCAL["used"] += 1
+        log(f"    local picture made in {time.time() - t0:.0f}s")
+        return out
+    except Exception as e:
+        LAST_IMG_ERROR[0] = f"local generator: {str(e)[:200]}"
+        LOCAL["fails"] = LOCAL.get("fails", 0) + 1
+        if LOCAL["fails"] >= 2:
+            LOCAL["dead"] = True
+            log(f"  local generator stopped: {LAST_IMG_ERROR[0]}")
+        return None
+
+
+def gemini_alive():
+    return bool(GEMINI_KEY) and not GEMINI["img_dead"]
+
+
+def _gemini_retry_seconds(text):
+    m = re.search(r'retryDelay"?\s*:\s*"?(\d+(?:\.\d+)?)s', text or "") or re.search(r"retry in (\d+(?:\.\d+)?)s", text or "", re.I)
+    return float(m.group(1)) if m else None
+
+
+def gen_image_gemini(prompt):
+    if not gemini_alive():
+        return None
+    import base64
+    wait = GEMINI_PAUSE - (time.time() - GEMINI["last"])
+    if wait > 0:
+        time.sleep(wait)
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_IMAGE_MODEL}:generateContent"
+    for attempt in range(3):
+        gen_cfg = {"responseModalities": ["IMAGE"]}
+        if GEMINI["aspect"]:
+            gen_cfg["imageConfig"] = {"aspectRatio": "16:9"}
+        try:
+            r = requests.post(url, headers={"x-goog-api-key": GEMINI_KEY},
+                              json={"contents": [{"parts": [{"text": prompt[:1900]}]}], "generationConfig": gen_cfg}, timeout=120)
+        except Exception as e:
+            LAST_IMG_ERROR[0] = "Gemini " + str(e)[:150]
+            time.sleep(3)
+            continue
+        GEMINI["last"] = time.time()
+        if r.status_code == 400 and GEMINI["aspect"] and ("aspect" in r.text.lower() or "imageconfig" in r.text.lower()):
+            GEMINI["aspect"] = False
+            continue
+        if r.status_code == 429:
+            delay = _gemini_retry_seconds(r.text)
+            if delay is not None and delay <= 70 and attempt < 2 and "limit: 0" not in r.text:
+                time.sleep(delay + 1)
+                continue
+            GEMINI["img_dead"] = True
+            log(f"  Gemini pictures off for this run: free limit reached or not available for this key (HTTP 429). {(r.text or '')[:160]}")
+            return None
+        if r.status_code in (400, 401, 403, 404):
+            GEMINI["img_dead"] = True
+            log(f"  Gemini pictures off for this run (HTTP {r.status_code}): {(r.text or '')[:200]}")
+            return None
+        if not r.ok:
+            LAST_IMG_ERROR[0] = f"Gemini HTTP {r.status_code}"
+            time.sleep(3)
+            continue
+        try:
+            parts = (r.json().get("candidates") or [{}])[0].get("content", {}).get("parts", [])
+            for part in parts:
+                blob = part.get("inlineData") or part.get("inline_data")
+                if blob and blob.get("data"):
+                    img = _from_bytes(base64.b64decode(blob["data"]))
+                    if img is not None:
+                        GEMINI["used"] += 1
+                        return img
+        except Exception as e:
+            LAST_IMG_ERROR[0] = "Gemini " + str(e)[:150]
+        return None
+    return None
 
 
 def gen_image(prompt):
-    waits = [2, 4]                       # ordinary errors: two quick retries
+    if LOCAL_IMAGES == "only":
+        return gen_image_local(prompt)
+    img = gen_image_gemini(prompt) if gemini_alive() else None
+    if img is None:
+        img = gen_image_cloudflare_retry(prompt) if (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) else None
+    if img is None:
+        img = gen_image_fallback(prompt)
+    if img is None and LOCAL_IMAGES != "only":
+        img = gen_image_local(prompt)
+    return img
+
+
+def gen_image_cloudflare_retry(prompt):
+    waits = [2, 4]
     attempt = 0
     while True:
         if QUOTA_HIT[0]:
@@ -1016,7 +1427,7 @@ def gen_image(prompt):
             LAST_IMG_ERROR[0] = str(e)[:300]
             rate_limited = bool(getattr(e, "rate_limited", False))
         if rate_limited:
-            waits = [8, 20, 40]          # a rate limit passes after a short wait
+            waits = [8, 20, 40]
         if attempt >= len(waits):
             return None
         time.sleep(waits[attempt])
@@ -1038,7 +1449,6 @@ def framing(img, k):
 
 
 def motion_pair(img):
-    """Two slightly different crops of the same scene so a crossfade feels like movement."""
     if img is None:
         return None, None
     a = framing(img, 0)
@@ -1047,21 +1457,20 @@ def motion_pair(img):
 
 
 def make_ai_images(segs, job):
-    """One image per body slide, prompt locked to that slide's spoken words."""
     if not AI_IMAGES:
         return []
-    if not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN):
+    if not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) and not FALLBACK_IMAGES and not GEMINI_KEY and not local_available():
         log("  no Cloudflare keys (CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN): skipping generated pictures, using your photos")
         return []
     body_idx = [i for i, g in enumerate(segs) if g["kind"] == "body"]
     if not body_idx:
         return []
-    # Prefer 1:1 with body slides; cap by AI_IMAGE_MAX
+
     k = min(len(body_idx), AI_IMAGE_MAX)
     out, fails, t_start = [], 0, time.time()
     for j in range(k):
-        # Same mapping build_video uses: picture j sits under every body slide n with n*k//total == j.
-        # Build its prompt from ALL of that narration, not just one slide.
+
+
         total_body = len(body_idx)
         members = [segs[body_idx[n]] for n in range(total_body) if n * k // total_body == j] or [segs[body_idx[j * total_body // k]]]
         narr = [m for m in members if not m.get("is_heading")] or members
@@ -1070,15 +1479,19 @@ def make_ai_images(segs, job):
             "speech": " ".join(m["speech"] for m in narr),
         }
         prompt = scene_prompt(seg, job)
-        if QUOTA_HIT[0]:
-            log(f"  Cloudflare free quota reached at {j}/{k}; using photos for the rest (no further calls)")
+        log(f"  picture {j + 1}/{k}: {prompt[:170]}")
+        if QUOTA_HIT[0] and not gemini_alive() and FALLBACK_IMAGES and not FALLBACK_STATE["dead"] and not FALLBACK_STATE.get("announced"):
+            FALLBACK_STATE["announced"] = True
+            log(f"  Cloudflare free quota reached at {j}/{k}; continuing with the free backup generators")
+        if QUOTA_HIT[0] and not gemini_alive() and (not FALLBACK_IMAGES or FALLBACK_STATE["dead"]) and not local_available():
+            log(f"  Cloudflare free quota reached at {j}/{k}; the remaining slides keep the last picture (no further calls)")
             if LAST_IMG_ERROR[0]:
                 log(f"  Cloudflare said: {LAST_IMG_ERROR[0]}")
             out.extend([None] * (k - j))
             break
-        if time.time() - t_start > IMG_BUDGET or fails >= IMG_FAIL_LIMIT:
+        if time.time() - t_start > IMG_BUDGET + (LOCAL_BUDGET if local_available() else 0) or fails >= IMG_FAIL_LIMIT:
             log(f"  picture generation stopped at {j}/{k} "
-                f"({'time budget' if fails < IMG_FAIL_LIMIT else 'too many failures'}); using the rest as photos")
+                f"({'time budget' if fails < IMG_FAIL_LIMIT else 'too many failures'}); keeping the last picture for the rest")
             if LAST_IMG_ERROR[0]:
                 log(f"  last picture error: {LAST_IMG_ERROR[0]}")
             out.extend([None] * (k - j))
@@ -1089,7 +1502,7 @@ def make_ai_images(segs, job):
         if (j + 1) % 6 == 0 or j + 1 == k:
             log(f"  generated pictures {j + 1}/{k}")
     got = sum(1 for x in out if x is not None)
-    log(f"  {got} of {k} generated pictures usable (matched to narration)")
+    log(f"  {got} of {k} generated pictures usable (matched to narration); {GEMINI['used']} from Gemini, {FALLBACK_STATE['used']} from the free backup generators, {LOCAL['used']} from the local generator")
     return out
 
 
@@ -1099,13 +1512,12 @@ def pick_bitrate(total_dur: float) -> int:
 
 
 def motion_prompt(seg, job):
-    """Short physical action line for Kling image-to-video, derived from narration."""
     speech = clean_text(seg.get("speech") or seg.get("text") or "")
     focus = visual_focus(speech)
     title = clean_text(job.get("title") or "")
     heading = clean_text(seg.get("heading") or "")
     place = heading or title
-    # Prefer action verbs; keep under ~80 words for Kling
+
     line = focus
     if place and place.lower() not in line.lower():
         line = f"{place}: {line}"
@@ -1121,7 +1533,6 @@ def motion_prompt(seg, job):
 
 
 def _image_to_data_uri(img, max_side=1280):
-    """Encode a PIL image as a JPEG data URI for APIs that accept base64."""
     import base64
     from io import BytesIO as _B
     im = img.convert("RGB")
@@ -1139,9 +1550,8 @@ LAST_KLING_ERROR = [""]
 
 
 def _kling_fal(image_uri, prompt, duration, out_mp4):
-    """fal.ai Kling image-to-video (v2.1 / v3 standard)."""
     model = KLING_MODEL or "fal-ai/kling-video/v2.1/standard/image-to-video"
-    # Prefer official fal client when installed; otherwise HTTP queue API
+
     try:
         import fal_client
         args = {
@@ -1160,7 +1570,7 @@ def _kling_fal(image_uri, prompt, duration, out_mp4):
         return out_mp4
     except ImportError:
         pass
-    # HTTP fallback using fal queue
+
     headers = {"Authorization": f"Key {KLING_API_KEY}", "Content-Type": "application/json"}
     payload = {
         "prompt": prompt[:2500],
@@ -1204,7 +1614,6 @@ def _kling_fal(image_uri, prompt, duration, out_mp4):
 
 
 def _kling_piapi(image_uri, prompt, duration, out_mp4):
-    """PiAPI Kling image-to-video task + poll."""
     headers = {"x-api-key": KLING_API_KEY, "Content-Type": "application/json"}
     version = KLING_MODEL or "2.6"
     payload = {
@@ -1255,7 +1664,6 @@ def _kling_piapi(image_uri, prompt, duration, out_mp4):
 
 
 def _kling_aimlapi(image_uri, prompt, duration, out_mp4):
-    """AIMLAPI Kling image-to-video."""
     headers = {"Authorization": f"Bearer {KLING_API_KEY}", "Content-Type": "application/json"}
     model = KLING_MODEL or "kling-video/v4/image-to-video"
     payload = {
@@ -1268,7 +1676,7 @@ def _kling_aimlapi(image_uri, prompt, duration, out_mp4):
     if not sub.ok:
         raise RuntimeError(f"aimlapi submit HTTP {sub.status_code}: {(sub.text or '')[:300]}")
     data = sub.json()
-    # Some responses are sync with URL; others return an id to poll
+
     url = None
     if isinstance(data.get("video"), dict):
         url = data["video"].get("url")
@@ -1296,12 +1704,11 @@ def _kling_aimlapi(image_uri, prompt, duration, out_mp4):
 
 
 def gen_kling_clip(img, prompt, duration, out_mp4):
-    """Animate a still with Kling image-to-video. Returns out_mp4 path or None on failure."""
     if not KLING_ENABLED or not KLING_API_KEY:
         return None
     if img is None:
         return None
-    # fal and piapi both need at least 5s, so clamp here to match what you'll be billed for
+
     duration = int(min(10, max(5, duration or KLING_DURATION)))
     image_uri = _image_to_data_uri(img)
     providers = {
@@ -1333,22 +1740,21 @@ def probe_size(path) -> tuple[int, int]:
 
 
 def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
-    """Composite a Kling (or other) video under the caption band + TTS narration."""
     spoken = probe_duration(mp3)
     dur = spoken + pad
     vid_dur = probe_duration(video_mp4)
     ow, oh = (960, 540) if vkbps < 450 else (W, H)
-    # Scale the clip into the picture area (W x IMGH). A Kling clip is ~5 s but a slide lasts much longer, so a
-    # short clip is played forward then backward, over and over ("ping-pong"): the people keep moving the whole
-    # slide instead of freezing after 5 seconds.
+    slow = min(MAX_SLOWDOWN, dur / vid_dur) if vid_dur + 0.05 < dur else 1.0
+    eff_dur = vid_dur * slow
     vw, vh = probe_size(video_mp4)
-    sc = max(min(W / vw, IMGH / vh), max(W / vw, IMGH / vh) * (1 - MAX_CROP))   # show the whole frame; crop at most MAX_CROP
+    sc = max(min(W / vw, IMGH / vh), max(W / vw, IMGH / vh) * (1 - MAX_CROP))
     fw, fh = max(2, int(vw * sc) // 2 * 2), max(2, int(vh * sc) // 2 * 2)
-    base = (f"[0:v]fps={FPS},split[va][vb];"
+    base = (f"[0:v]setpts={slow:.4f}*PTS,fps={FPS},split[va][vb];"
             f"[va]scale={W}:{IMGH}:force_original_aspect_ratio=increase,crop={W}:{IMGH},boxblur=24:3,eq=brightness=-0.12[vbg];"
             f"[vb]scale={fw}:{fh}[vfg];[vbg][vfg]overlay=(W-w)/2:(H-h)/2:shortest=1,crop={W}:{IMGH}")
-    if vid_dur + 0.05 < dur:
-        frames = max(2, int(vid_dur * FPS) * 2)
+    base = _finish_chain(base)
+    if eff_dur + 0.05 < dur:
+        frames = max(2, int(eff_dur * FPS) * 2)
         vchain = (
             f"{base},split[fw][bw];[bw]reverse[rv];[fw][rv]concat=n=2:v=1[pp];"
             f"[pp]loop=loop=-1:size={frames}:start=0,trim=duration={dur:.2f},setpts=PTS-STARTPTS,"
@@ -1356,7 +1762,7 @@ def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
         )
     else:
         vchain = (
-            f"{base},trim=duration={dur:.2f},"
+            f"{base},tpad=stop_mode=clone:stop_duration=2,trim=duration={dur:.2f},setpts=PTS-STARTPTS,"
             f"pad={W}:{H}:0:0:color=black,setsar=1[v0];"
         )
     fc = vchain + "[v0][1:v]overlay=format=auto[v1];"
@@ -1395,7 +1801,7 @@ def make_clip_from_video(video_mp4, ov_png, mp3, out, caps, pad=0.7, vkbps=900):
 _STOCK_STOP = {"that", "this", "with", "from", "were", "have", "been", "their", "there", "which", "would", "about",
                "into", "than", "then", "them", "they", "these", "those", "also", "while", "when", "where", "what",
                "more", "most", "some", "many", "such", "only", "over", "under", "after", "before", "because"}
-# concrete things a stock-video site can find; people and actions come first in the query
+
 _STOCK_PEOPLE = ["fisherman", "fishermen", "fishers", "fisherfolk", "farmer", "farmers", "workers", "children", "family", "crowd", "villagers",
                  "vendor", "vendors", "women", "men", "soldiers", "priest", "students", "traders", "sailors", "cook", "chef"]
 _STOCK_THINGS = ["market", "boat", "boats", "fishing", "harvest", "rice", "sugarcane", "cooking", "street", "village",
@@ -1405,7 +1811,6 @@ _STOCK_THINGS = ["market", "boat", "boats", "fishing", "harvest", "rice", "sugar
 
 
 def stock_queries(seg: Seg, job: Job) -> list[str]:
-    """Search phrases for a stock-video site, most specific first, built from this slide's narration."""
     speech = clean_text(seg.get("speech") or seg.get("text") or "").lower()
     words = re.findall(r"[a-z]+", speech)
     people = [w for w in dict.fromkeys(words) if w in _STOCK_PEOPLE]
@@ -1414,11 +1819,11 @@ def stock_queries(seg: Seg, job: Job) -> list[str]:
     ph = any(k in place_text or k in speech for k in ("philippin", "iloilo", "zamboanga", "visayas", "mindanao", "ilonggo", "panay", "manila", "cebu"))
     core = (people[:1] + things[:2]) or things[:2] or people[:2]
     if not core:
-        # nothing concrete in this sentence: use what the whole article is about
+
         wide = re.findall(r"[a-z]+", (place_text + " " + clean_text((job.get("location") or {}).get("description")).lower()))
         core = ([w for w in dict.fromkeys(wide) if w in _STOCK_PEOPLE][:1] + [w for w in dict.fromkeys(wide) if w in _STOCK_THINGS][:2])
     if not core:
-        return []          # nothing concrete to search for: keep the still picture rather than a random clip
+        return []
     out = []
     if ph:
         out.append("philippines " + " ".join(core[:2]))
@@ -1437,7 +1842,6 @@ def _pexels_search(query: str) -> list[Job]:
 
 
 def _pick_file(video: Job) -> Job | None:
-    """The mp4 closest to 1280 px wide (sharp enough, not huge)."""
     files = [f for f in video.get("video_files") or []
              if f.get("file_type") == "video/mp4" and f.get("link") and 800 <= int(f.get("width") or 0) <= 1920
              and int(f.get("width") or 0) >= int(f.get("height") or 0)]
@@ -1449,9 +1853,6 @@ _STOCK_BLOCK = {"jet", "jets", "airplane", "aircraft", "fighter", "helicopter", 
 
 
 def stock_relevant(text: str, query: str) -> bool:
-    """A free stock site matches loosely, so check the clip's own tags/title: it must mention a concrete word from
-    the search and nothing that clearly does not belong in a story about people and places.
-    A candidate with NO description is rejected under STRICT_MATCH: nothing proves it matches."""
     t = clean_text(text).lower()
     if not t:
         return not STRICT_MATCH
@@ -1468,7 +1869,7 @@ def _pixabay_search(query: str) -> list[Job]:
     out = []
     for h in r.json().get("hits") or []:
         vids = h.get("videos") or {}
-        # small = ~1280x720 (plenty); medium/large are 1080p/4K files that are far too big
+
         f = next((vids[k] for k in ("small", "tiny", "medium") if (vids.get(k) or {}).get("url")
                   and int(vids[k].get("width") or 0) >= int(vids[k].get("height") or 0)), None)
         if f:
@@ -1499,7 +1900,6 @@ def stock_sources() -> list:
 
 
 def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None:
-    """Download one free stock clip that matches this slide, or None (the slide then keeps its still picture)."""
     if not STOCK_VIDEO:
         return None
     sources = stock_sources()
@@ -1514,9 +1914,9 @@ def fetch_stock_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None
                     if conflict_mismatch(v.get("text", ""), seg.get("speech") or "", job) or plan_rejects(v.get("text", ""), seg, job):
                         continue
                     if STOCK_REQUIRE_REGION and _is_ph_job(job) and not _mentions_ph(v.get("text", "")):
-                        continue              # generic non-Filipino footage would contradict the narration
+                        continue
                     if v.get("size") and v["size"] > STOCK_MAX_MB * 1048576:
-                        continue              # too big: skip before downloading anything
+                        continue
                     with requests.get(v["link"], stream=True, timeout=120, headers={"User-Agent": UA}) as r:
                         r.raise_for_status()
                         size = 0
@@ -1546,8 +1946,7 @@ _CONFLICT_WORDS = {"coast", "guard", "navy", "naval", "military", "army", "shoal
                    "poster", "logo", "text", "cartoon", "meme", "infographic", "slide", "diagram", "map", "flag", "religion",
                    "bible", "symbol", "doctrine", "church", "ceremony"}
 
-# Words that signal footage of some other migration/place (Ellis Island, Atlantic crossings, ...). A candidate that
-# mentions one of these, or any place in _WORLD_PLACES, is rejected unless the article itself mentions it.
+
 _FOREIGN_HINTS = ["ellis island", "ellis", "european", "europeans", "emigrants", "immigrants", "immigrant", "steerage",
                   "atlantic", "transatlantic", "pilgrims", "pioneers", "wagon", "covered wagon", "gold rush", "prairie",
                   "irish", "italian", "german", "polish", "jewish", "victorian", "medieval", "viking"]
@@ -1558,7 +1957,6 @@ def _norm_words(text: str) -> str:
 
 
 def foreign_mismatch(text: str, job: Job) -> bool:
-    """True when the candidate's own description names a foreign place/migration the article never mentions."""
     t = _norm_words(text)
     article = _norm_words((job.get("title") or "") + " " + clean_text(extract_main(job.get("body")))[:30000])
     for p in _WORLD_PLACES + _FOREIGN_HINTS:
@@ -1569,9 +1967,6 @@ def foreign_mismatch(text: str, job: Job) -> bool:
 
 
 def conflict_mismatch(text: str, speech: str, job: Job | None = None) -> bool:
-    """True when a clip/photo's own description is about a confrontation, military or disaster event that the narration
-    and article are not about (e.g. a modern coast-guard clash shown under a sentence about crew size), or is dated after
-    the era of a historical story, or names a foreign place/migration the article never mentions."""
     t = set(re.findall(r"[a-z]+", clean_text(text).lower()))
     ctx = set(re.findall(r"[a-z]+", clean_text(speech).lower()))
     if job is not None:
@@ -1587,13 +1982,43 @@ def conflict_mismatch(text: str, speech: str, job: Job | None = None) -> bool:
     return False
 
 
-# ---------- AI planner / judge (free Cloudflare text model) ----------
 _LLM_CALLS = [0]
 _LLM_DEAD = [False]
 _PLAN_CACHE: dict = {}
 
 
+def llm_gemini(system: str, user: str, max_tokens: int, retried: bool = False) -> str | None:
+    if not GEMINI_KEY or GEMINI["txt_dead"]:
+        return None
+    try:
+        r = requests.post(
+            f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_TEXT_MODEL}:generateContent",
+            headers={"x-goog-api-key": GEMINI_KEY},
+            json={"systemInstruction": {"parts": [{"text": system}]}, "contents": [{"parts": [{"text": user}]}],
+                  "generationConfig": {"maxOutputTokens": max(max_tokens * 4, 600), "temperature": 0.2}}, timeout=60)
+        if r.status_code == 429:
+            delay = _gemini_retry_seconds(r.text)
+            if delay is not None and delay <= 30 and not retried:
+                time.sleep(delay + 1)
+                return llm_gemini(system, user, max_tokens, retried=True)
+        if not r.ok:
+            GEMINI["txt_dead"] = True
+            log(f"  Gemini text off for this run (HTTP {r.status_code}); using the Cloudflare planner")
+            return None
+        parts = (r.json().get("candidates") or [{}])[0].get("content", {}).get("parts", [])
+        txt = "".join(p.get("text", "") for p in parts if isinstance(p, dict))
+        return txt.strip() or None
+    except Exception as e:
+        log(f"  Gemini text call failed ({str(e)[:80]})")
+        return None
+
+
 def llm_text(system: str, user: str, max_tokens: int = 160) -> str | None:
+    if LLM_PLAN and _LLM_CALLS[0] < LLM_MAX_CALLS:
+        got = llm_gemini(system, user, max_tokens)
+        if got:
+            _LLM_CALLS[0] += 1
+            return got
     if not LLM_PLAN or _LLM_DEAD[0] or not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) or _LLM_CALLS[0] >= LLM_MAX_CALLS:
         return None
     _LLM_CALLS[0] += 1
@@ -1616,7 +2041,6 @@ def llm_text(system: str, user: str, max_tokens: int = 160) -> str | None:
 
 
 def slide_plan(seg: Seg, job: Job) -> Job:
-    """{'queries': [...], 'avoid': [...]} for this slide's narration, or {} when the AI planner is unavailable."""
     speech = clean_text(seg.get("speech") or seg.get("text") or "")
     if speech in _PLAN_CACHE:
         return _PLAN_CACHE[speech]
@@ -1649,7 +2073,6 @@ def plan_queries(seg: Seg, job: Job, rules: list[str]) -> list[str]:
 
 
 def plan_rejects(text: str, seg: Seg, job: Job) -> bool:
-    """True when the candidate's own words hit this slide's 'avoid' list, or the AI judge does not clearly say YES."""
     plan = slide_plan(seg, job)
     words = set(re.findall(r"[a-z]+", clean_text(text).lower()))
     if words & set(plan.get("avoid", [])):
@@ -1663,12 +2086,11 @@ def plan_rejects(text: str, seg: Seg, job: Job) -> bool:
                    "Answer NO if it shows a different country, culture, era or event, or if you are unsure.",
                    max_tokens=4)
     if ans is None:
-        return False            # judge unavailable: the stricter word and place checks above have already decided
-    return not ans.strip().upper().startswith("YES")   # only a clear YES passes
+        return False
+    return not ans.strip().upper().startswith("YES")
 
 
 def is_historical(seg: Seg, job: Job) -> bool:
-    """True when the story is set before 2000 (a year or decade in the title, place details or this sentence)."""
     loc = job.get("location") or {}
     text = " ".join(clean_text(x) for x in (job.get("title"), loc.get("name"), loc.get("era"), loc.get("description"),
                                              seg.get("speech") or seg.get("text") or ""))
@@ -1676,7 +2098,6 @@ def is_historical(seg: Seg, job: Job) -> bool:
 
 
 def _mentions_ph(text: str) -> bool:
-    """Strict: only unambiguous Philippine words count (see _PH_MATCH_PLACES; no 'Antique', 'Naga', 'Roxas', ...)."""
     places = "|".join(re.escape(p) for p in _PH_MATCH_PLACES)
     return bool(re.search(r"philippin|filipino|pilipin|\b(" + places + r")\b", clean_text(text), re.I))
 
@@ -1687,7 +2108,6 @@ def _is_ph_job(job: Job) -> bool:
 
 
 def archive_queries(seg: Seg, job: Job) -> list[str]:
-    """Plain search words for an archive: this slide's concrete things, with the country added for Philippine stories."""
     ph = _is_ph_job(job)
     out = []
     for q in plan_queries(seg, job, stock_queries(seg, job)):
@@ -1702,12 +2122,11 @@ def archive_queries(seg: Seg, job: Job) -> list[str]:
 
 
 def _words_match(text: str, query: str) -> bool:
-    """The clip's own title/description must mention at least one concrete word from the query."""
     t = clean_text(text).lower()
     keys = [w for w in re.findall(r"[a-z]+", query.lower()) if w != "philippines" and len(w) > 3]
     if not keys:
         return True
-    hits = sum(1 for k in keys if k[:4] in t)   # 4-letter stems: fisher/fishing, boat/boats
+    hits = sum(1 for k in keys if k[:4] in t)
     return hits >= (2 if (STRICT_MATCH and len(keys) >= 2) else 1)
 
 
@@ -1747,7 +2166,7 @@ def _ia_video_search(query: str) -> list[Job]:
                  if str(f.get("name", "")).lower().endswith((".mp4", ".ogv", ".webm")) and int(f.get("size") or 0) > 0]
         if not files:
             continue
-        f = min(files, key=lambda f: int(f["size"]))          # the smallest copy is plenty for a few seconds
+        f = min(files, key=lambda f: int(f["size"]))
         lic = d.get("licenseurl") or "no known copyright restrictions (Prelinger Archives)"
         if isinstance(lic, list):
             lic = lic[0]
@@ -1760,7 +2179,6 @@ def _ia_video_search(query: str) -> list[Job]:
 
 
 def _cut_clip(src: Path, out_mp4: Path) -> bool:
-    """A short, small, silent mp4 from the middle-ish of a long old film (skips title cards at the start)."""
     total = probe_duration(src)
     if total < 3:
         return False
@@ -1773,7 +2191,6 @@ def _cut_clip(src: Path, out_mp4: Path) -> bool:
 
 
 def fetch_archive_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | None:
-    """A few seconds of real archival film that matches this slide, or None."""
     if not (ARCHIVE_VIDEO and (ARCHIVE_ANY_ERA or is_historical(seg, job))):
         return None
     ph_job = _is_ph_job(job)
@@ -1786,7 +2203,7 @@ def fetch_archive_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | No
                     if conflict_mismatch(v["text"], seg.get("speech") or "", job) or plan_rejects(v["text"], seg, job):
                         continue
                     if ph_job and not _mentions_ph(v["text"]):
-                        continue          # a Philippine story needs footage that says it is from the Philippines
+                        continue
                     if v["size"] and v["size"] > ARCHIVE_MAX_MB * 1048576:
                         continue
                     raw = out_mp4.with_suffix(".raw")
@@ -1811,7 +2228,6 @@ def fetch_archive_clip(seg: Seg, job: Job, used: set, out_mp4: Path) -> str | No
     return None
 
 
-# ---------- per-slide real photographs ----------
 _PH_TERMS = {"fisherman": "filipino fisherman", "fishermen": "filipino fishermen", "fishers": "filipino fishermen",
              "fisherfolk": "filipino fishermen", "boat": "bangka outrigger boat", "boats": "bangka outrigger boats",
              "fishing": "filipino fishing boat", "village": "coastal fishing village", "farmer": "filipino farmer",
@@ -1890,8 +2306,6 @@ def _commons_photos(query: str) -> list[Job]:
 
 
 def fetch_slide_photo(seg: Seg, job: Job, used: set):
-    """A real photograph whose own title/tags mention what THIS slide's narration describes, or None.
-    On Philippine stories EVERY source (Unsplash, Pixabay, Commons) must name the Philippines or a Philippine place."""
     if not SLIDE_PHOTOS:
         return None
     ph = _is_ph_job(job)
@@ -1916,7 +2330,7 @@ def fetch_slide_photo(seg: Seg, job: Job, used: set):
                 if img is None or img.width < 800 or img.height < 450:
                     continue
                 if c.get("track"):
-                    try:       # Unsplash guideline: register the download
+                    try:
                         requests.get(c["track"], headers={"Authorization": f"Client-ID {UNSPLASH_ACCESS_KEY}", "User-Agent": UA}, timeout=20)
                     except Exception:
                         pass
@@ -1927,8 +2341,6 @@ def fetch_slide_photo(seg: Seg, job: Job, used: set):
 
 
 def pick_kling_slides(segs: list[Seg], n: int) -> set[int]:
-    """Choose up to n body slides to animate, spread across the whole video.
-    Slides whose narration mentions people come first, because that is where movement shows."""
     body = [i for i, g in enumerate(segs) if g["kind"] == "body" and not g.get("is_heading")]
     if n <= 0 or not body:
         return set()
@@ -1941,7 +2353,7 @@ def pick_kling_slides(segs: list[Seg], n: int) -> set[int]:
 
 def build_video(job):
     global RATE, ARCHIVE_VIDEO, STOCK_VIDEO
-    # Real footage is opt-in per article ("footage": true in the job file) unless FOOTAGE_ALL=1.
+
     footage_ok = bool(job.get("footage")) or FOOTAGE_ALL
     ARCHIVE_VIDEO = _ARCHIVE_ENV and footage_ok
     STOCK_VIDEO = _STOCK_ENV and footage_ok
@@ -1954,6 +2366,8 @@ def build_video(job):
     CREDITS.clear()
     CREDIT_ROWS.clear()
     QUOTA_HIT[0] = False
+    FALLBACK_STATE.update(fails=0, dead=False, used=0, announced=False)
+    LOCAL.update(used=0, fails=0)
     photos = load_photos(job)
     PROFILE[0] = load_profile(job)
     load_user_clips(job, tmp)
@@ -1961,7 +2375,7 @@ def build_video(job):
     if WIKI_GENERIC:
         photos += load_wiki_photos(job, len(photos))
     if CREDIT_ROWS and CREDITS_CARD:
-        # Visible attribution for CC-BY / CC-BY-SA images: a short spoken and captioned card before the end card.
+
         seen, bits = set(), []
         for artist, lic in CREDIT_ROWS:
             who = re.sub(r"\s+", " ", artist or "").strip()[:40] or "unknown author"
@@ -1984,7 +2398,7 @@ def build_video(job):
     engines, mp3s, est = set(), [], 0.0
     for i, seg in enumerate(segs):
         mp3 = tmp / f"a{i}.mp3"
-        engines.add(synth(seg["speech"], str(mp3)))
+        engines.add(synth(seg["speech"], str(mp3), lively=(seg.get("kind") == "intro" and INTRO_LIVELY)))
         mp3s.append(mp3)
         est += probe_duration(mp3) + 0.7
     vkbps = pick_bitrate(est)
@@ -1997,6 +2411,9 @@ def build_video(job):
         log("  slide photos on (" + " + ".join(n for n, k in (("Unsplash", UNSPLASH_ACCESS_KEY), ("Pixabay", PIXABAY_API_KEY), ("Wikimedia", True)) if k)
             + f"), up to {PHOTO_MAX_SEARCHES} searches")
     clips, total_dur, body_seen, ai_used = [], 0.0, 0, {}
+    user_pic_used = {}
+    last_pic = None
+    pic_key, last_pic_key, shot_idx, move_ctr, multi_count = None, None, 0, 0, 0
     kling_used, kling_t0 = 0, time.time()
     kling_slides = pick_kling_slides(segs, KLING_MAX_CLIPS) if (KLING_ENABLED and KLING_API_KEY) else set()
     stock_slides, stock_used, stock_count = set(), set(), 0
@@ -2021,33 +2438,46 @@ def build_video(job):
         bgp2 = tmp / f"b{i}b.png"
         kling_mp4 = tmp / f"k{i}.mp4"
         cover = framing(photos[i % len(photos)], i // len(photos)) if photos else None
+        pic_key = f"p{i}"
         if seg["kind"] == "body":
             if STRICT_MATCH:
-                cover = None          # no loosely related photo: only an AI image of this slide or a photo that matched it
+                cover = None
             if ai:
                 gi = body_seen * len(ai) // max(body_total, 1)
                 pic = ai[gi] if gi < len(ai) else None
+                if pic is None:
+                    pic = last_pic
                 if pic is not None:
+                    last_pic = pic
                     cover = pic
+                    pic_key = f"ai{gi}"
                     ai_used[gi] = ai_used.get(gi, 0) + 1
             if USER_PHOTOS:
-                # the author's own pictures win over generated ones: cycle through them, each reuse in a new framing
-                cover = framing(USER_PHOTOS[body_seen % len(USER_PHOTOS)], body_seen // len(USER_PHOTOS))
+
+
+                pi = min(body_seen * len(USER_PHOTOS) // max(body_total, 1), len(USER_PHOTOS) - 1)
+                user_pic_used[pi] = user_pic_used.get(pi, 0) + 1
+                cover = USER_PHOTOS[pi]
+                pic_key = f"u{pi}"
             body_seen += 1
             src_note = "AI image" if (ai and cover is not None) else ("generic photo" if cover is not None else "no picture matched: text card")
             sp = fetch_slide_photo(seg, job, photo_used)
             if sp:
                 cover, src_note = sp
+                pic_key = f"s{i}"
             STORYBOARD.append((i, src_note, clean_text(seg.get("speech") or "")[:90]))
             _pl = slide_plan(seg, job)
             log(f"  storyboard slide {i}: [{src_note}] {clean_text(seg.get('speech') or '')[:90]}"
                 + (f" | AI search: {', '.join(_pl.get('queries', [])[:2])} | avoid: {', '.join(_pl.get('avoid', [])[:5])}" if _pl else ""))
         elif seg.get("kind") == "intro":
-            cover = photos[0] if photos else (PROFILE[0].convert("RGB") if PROFILE[0] is not None else None)   # the article's cover image (profile picture if none); no words on it
+            cover = photos[0] if photos else (PROFILE[0].convert("RGB") if PROFILE[0] is not None else None)
+            if cover is None:
+                cover = next((x for x in (ai or []) if x is not None), None)
         elif photos:
             cover = photos[0]
 
-        frame_a, frame_b = motion_pair(cover) if cover is not None else (None, None)
+        _mc = framing(cover, user_pic_used.get(int(pic_key[1:]), 1) - 1) if (cover is not None and pic_key.startswith("u")) else cover
+        frame_a, frame_b = motion_pair(_mc) if cover is not None else (None, None)
         if frame_a is None and cover is not None:
             frame_a = cover
         bg_img, ov_img = render_layers(seg, i, len(segs), frame_a)
@@ -2056,12 +2486,18 @@ def build_video(job):
 
         spoken = probe_duration(mp3s[i])
         caps = []
-        for k, (txt, t0, t1) in enumerate(caption_timings(seg.get("caption") or seg["speech"], spoken)):
+        no_caps = seg.get("kind") == "intro" and os.environ.get("INTRO_CAPTIONS", "1") != "1"
+        for k, (txt, t0, t1) in enumerate([] if no_caps else caption_timings(seg.get("caption") or seg["speech"], spoken)):
             cp = tmp / f"cap{i}_{k}.png"
             render_caption(txt).save(cp)
             caps.append((cp, t0, t1))
 
+        n_shots = 1
+        if SHOT_SECONDS > 0 and seg.get("kind") == "body" and cover is not None:
+            n_shots = max(1, int((spoken + 0.7) / SHOT_SECONDS + 0.5))
+
         used_kling = False
+        vid_path, vid_pos, vid_cleanup, is_kling = None, 1, False, False
         if (
             KLING_ENABLED and KLING_API_KEY
             and i in kling_slides
@@ -2069,31 +2505,57 @@ def build_video(job):
             and (time.time() - kling_t0) < KLING_BUDGET
         ):
             mprompt = motion_prompt(seg, job)
-            # Match clip length to narration (clamped)
             kdur = int(min(10, max(5, round(spoken) or KLING_DURATION)))
             got = gen_kling_clip(cover, mprompt, kdur, kling_mp4)
             if got and Path(got).exists() and Path(got).stat().st_size > 5000:
-                total_dur += make_clip_from_video(got, ovp, mp3s[i], clip, caps, vkbps=vkbps)
-                used_kling = True
-                kling_used += 1
-                Path(got).unlink(missing_ok=True)
+                vid_path, vid_pos, vid_cleanup, is_kling = got, 0, True, True
 
-        if not used_kling and USER_CLIPS and seg.get("kind") == "body" and (not USER_PHOTOS or (body_seen - 1) % 2 == 0):
-            # the author's own short clips: cycle through them under the narration (short clips ping-pong)
-            ucl = USER_CLIPS[((body_seen - 1) // (2 if USER_PHOTOS else 1)) % len(USER_CLIPS)]
-            try:
-                total_dur += make_clip_from_video(ucl, ovp, mp3s[i], clip, caps, vkbps=vkbps)
-                used_kling = True
-            except Exception as e:
-                log(f"  supplied clip failed on slide {i} ({str(e)[:80]}); using a still picture")
+        if vid_path is None and USER_CLIPS and seg.get("kind") == "body" and (not USER_PHOTOS or (body_seen - 1) % 2 == 0):
+            vid_path = USER_CLIPS[((body_seen - 1) // (2 if USER_PHOTOS else 1)) % len(USER_CLIPS)]
+            vid_pos, vid_cleanup = 0, False
 
-        if not used_kling and i in stock_slides:
+        if vid_path is None and i in stock_slides:
             got = fetch_archive_clip(seg, job, stock_used, tmp / f"s{i}.mp4") or fetch_stock_clip(seg, job, stock_used, tmp / f"s{i}.mp4")
             if got and Path(got).exists() and Path(got).stat().st_size > 5000:
-                total_dur += make_clip_from_video(got, ovp, mp3s[i], clip, caps, vkbps=vkbps)
-                used_kling = True
                 stock_count += 1
-                Path(got).unlink(missing_ok=True)
+                vid_path, vid_pos, vid_cleanup = got, (1 if n_shots < 4 else 2), True
+
+        if vid_path is not None:
+            try:
+                if n_shots >= 2:
+                    if pic_key != last_pic_key:
+                        shot_idx = 0
+                    last_pic_key = pic_key
+                    specs, shot_idx = plan_shots(cover, n_shots, shot_idx, tmp, i, vid_path, vid_pos)
+                    total_dur += make_clip_multi(specs, ovp, mp3s[i], clip, caps, move_ctr, vkbps=vkbps)
+                    move_ctr += n_shots
+                    multi_count += 1
+                    for kind, pth in specs:
+                        if kind == "still":
+                            Path(pth).unlink(missing_ok=True)
+                else:
+                    total_dur += make_clip_from_video(vid_path, ovp, mp3s[i], clip, caps, vkbps=vkbps)
+                used_kling = True
+                if is_kling:
+                    kling_used += 1
+            except Exception as e:
+                log(f"  moving clip failed on slide {i} ({str(e)[:80]}); using still pictures")
+            finally:
+                if vid_cleanup:
+                    Path(vid_path).unlink(missing_ok=True)
+
+        if not used_kling and n_shots >= 2:
+            if pic_key != last_pic_key:
+                shot_idx = 0
+            last_pic_key = pic_key
+            specs, shot_idx = plan_shots(cover, n_shots, shot_idx, tmp, i, None, 0)
+            total_dur += make_clip_multi(specs, ovp, mp3s[i], clip, caps, move_ctr, vkbps=vkbps)
+            move_ctr += n_shots
+            multi_count += 1
+            for kind, pth in specs:
+                if kind == "still":
+                    Path(pth).unlink(missing_ok=True)
+            used_kling = True
 
         if not used_kling:
             bg2_path = None
@@ -2111,6 +2573,8 @@ def build_video(job):
             log(f"  slide {i + 1}/{len(segs)} ready"
                 + (f" (Kling clips so far: {kling_used})" if kling_used else ""))
 
+    if multi_count:
+        log(f"  faster cuts: {multi_count} slide(s) split into shots of about {SHOT_SECONDS:.0f}s ({move_ctr} shots in all)")
     if kling_used:
         log(f"  Kling animated {kling_used} slide(s)")
     if stock_count:
@@ -2128,7 +2592,7 @@ def build_video(job):
 
 def _upload_endpoints():
     out = [UPLOAD_API]
-    # Extra fallbacks: UPLOAD_FALLBACKS="https://a/api/upload,https://b/api/upload" replaces the built-in list.
+
     env = [u.strip() for u in os.environ.get("UPLOAD_FALLBACKS", "").split(",") if u.strip()]
     extras = env or [
         "https://poetic-codes.pages.dev/api/upload",
@@ -2227,6 +2691,84 @@ def publish_to_repo(path, filename):
     raise RuntimeError("Could not push the video to the repo: " + str(last))
 
 
+YT_CLIENT_ID = os.environ.get("YT_CLIENT_ID", "").strip()
+YT_CLIENT_SECRET = os.environ.get("YT_CLIENT_SECRET", "").strip()
+YT_REFRESH_TOKEN = os.environ.get("YT_REFRESH_TOKEN", "").strip()
+YT_PRIVACY = os.environ.get("YT_PRIVACY", "private").strip().lower()
+YT_CATEGORY = os.environ.get("YT_CATEGORY", "27")
+YT_ENABLED = bool(YT_CLIENT_ID and YT_CLIENT_SECRET and YT_REFRESH_TOKEN) and os.environ.get("YT_UPLOAD", "1") != "0"
+
+
+def youtube_seo(job, title, desc, row_tags=None):
+    body = clean_text(extract_main(job.get("body")))[:3000]
+    category = clean_text(job.get("category"))
+    base_tags = [clean_text(t) for t in (row_tags or []) if clean_text(t)]
+    ai = {}
+    raw = llm_text(
+        "You write YouTube metadata for a documentary-style essay video. Use ONLY facts in the text. Reply with JSON only: "
+        '{"title": "clear search-friendly title, max 90 characters, main keyword first, no clickbait, no all caps", '
+        '"summary": "2-3 sentence description of what the video covers", '
+        '"tags": ["10-15 search phrases people would type, 1-3 words each"], '
+        '"hashtags": ["3-5 relevant single-word or CamelCase hashtags without the # sign"]}',
+        f"Title: {title}\nCategory: {category}\nText: {body}", max_tokens=420)
+    if raw:
+        m = re.search(r"\{.*\}", raw, re.S)
+        try:
+            ai = json.loads(m.group(0)) if m else {}
+        except Exception:
+            ai = {}
+    yt_title = clean_text(ai.get("title")) if isinstance(ai.get("title"), str) else ""
+    if not (10 <= len(yt_title) <= 100):
+        yt_title = title
+    summary = clean_text(ai.get("summary")) if isinstance(ai.get("summary"), str) else ""
+    tags = [clean_text(t) for t in (ai.get("tags") or []) if isinstance(t, str)] + base_tags + [category, "Poetic Codes", "essay", "documentary"]
+    seen, out, total = set(), [], 0
+    for t in tags:
+        t = re.sub(r"[<>,]", "", t).strip()
+        if t and t.lower() not in seen and total + len(t) + 1 <= 450:
+            seen.add(t.lower()); out.append(t); total += len(t) + 1
+    hs = []
+    for h in (ai.get("hashtags") or []) + [category, "PoeticCodes"]:
+        if isinstance(h, str):
+            h = re.sub(r"[^A-Za-z0-9]", "", "".join(w[:1].upper() + w[1:] for w in clean_text(h).split()))
+            if h and h.lower() not in [x.lower() for x in hs]:
+                hs.append(h)
+    hs = hs[:5]
+    tagline = " ".join("#" + h for h in hs)
+    new_desc = (summary + "\n\n" if summary else "") + desc + ("\n\n" + tagline if tagline else "")
+    return yt_title, new_desc, out
+
+
+def upload_to_youtube(path, title, description, tags=None):
+    tok = requests.post("https://oauth2.googleapis.com/token", data={
+        "client_id": YT_CLIENT_ID, "client_secret": YT_CLIENT_SECRET,
+        "refresh_token": YT_REFRESH_TOKEN, "grant_type": "refresh_token"}, timeout=60)
+    if not tok.ok:
+        raise RuntimeError(f"YouTube sign-in failed ({tok.status_code}): {tok.text[:200]}")
+    access = tok.json()["access_token"]
+    privacy = YT_PRIVACY if YT_PRIVACY in ("private", "unlisted", "public") else "private"
+    clean = lambda s, n: re.sub(r"[<>]", "", s or "").strip()[:n]
+    meta = {
+        "snippet": {"title": clean(title, 100) or "Poetic Codes", "description": clean(description, 4900),
+                    "tags": [clean(t, 30) for t in (tags or []) if clean(t, 30)][:15], "categoryId": YT_CATEGORY},
+        "status": {"privacyStatus": privacy, "selfDeclaredMadeForKids": False},
+    }
+    size = os.path.getsize(path)
+    start = requests.post(
+        "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
+        headers={"Authorization": "Bearer " + access, "Content-Type": "application/json; charset=UTF-8",
+                 "X-Upload-Content-Type": "video/mp4", "X-Upload-Content-Length": str(size)},
+        json=meta, timeout=60)
+    if not start.ok:
+        raise RuntimeError(f"YouTube refused the upload ({start.status_code}): {start.text[:300]}")
+    with open(path, "rb") as fh:
+        up = requests.put(start.headers["Location"], data=fh,
+                          headers={"Content-Type": "video/mp4", "Content-Length": str(size)}, timeout=900)
+    if not up.ok:
+        raise RuntimeError(f"YouTube upload failed ({up.status_code}): {up.text[:300]}")
+    return up.json()["id"]
+
+
 def upload_video(path, filename):
     try:
         try:
@@ -2251,7 +2793,6 @@ _ARTICLES_CACHE = []
 
 
 def fetch_articles():
-    """The article list, fetched once per run (not once per job)."""
     if not _ARTICLES_CACHE:
         _ARTICLES_CACHE.append(_fetch_articles_uncached())
     return _ARTICLES_CACHE[0]
@@ -2286,18 +2827,16 @@ def find_article(job: Job, rows: list[Job]) -> Job | None:
 
 
 def article_slug(title: str | None) -> str:
-    # Same as slugify() in the portal
+
     return re.sub(r"[^a-z0-9]+", "-", (title or "").lower()).strip("-")
 
 
 def article_page_url(job: Job, row: Job | None = None) -> str:
-    """The public static page the portal publishes: https://poetic-codes.pages.dev/articles/<slug>.html"""
     slug = (job.get("slug") or "").strip() or article_slug((row or {}).get("title") or job.get("title"))
     return f"{SITE_URL.rstrip('/')}/articles/{slug}.html" if slug else ""
 
 
 def add_to_index_list(article_url):
-    """Keep a plain list of article URLs to paste into Search Console > URL Inspection > Request indexing."""
     if not article_url:
         return
     JOBS_DIR.mkdir(parents=True, exist_ok=True)
@@ -2313,20 +2852,20 @@ _PH_PLACES = ["Iloilo", "Zamboanga", "Sibugay", "Talon-Talon", "Naga", "Estancia
               "Basilan", "Dumaguete", "Bohol", "Leyte", "Samar", "Palawan", "Batangas", "Pampanga", "Bicol", "Cagayan",
               "Dipolog", "Pagadian", "Ipil", "Diplahan", "Roxas", "Jaro", "Molo", "Arevalo", "Lapuz", "Kalibo", "Tacloban",
               "Ormoc", "Iligan", "Marawi", "Sipalay", "Guimbal", "Miagao", "Oton"]
-# Used only to PROVE a clip/photo is Philippine. Names that also exist elsewhere (Antique, Naga, Roxas, Molo, Jaro,
-# Oton, Arevalo, Lapuz, Estancia, Sulu, Samar, Ipil, Roxas, Talon-Talon) are left out on purpose.
+
+
 _PH_MATCH_PLACES = ["Iloilo", "Zamboanga", "Sibugay", "Panay", "Negros", "Guimaras", "Cebu", "Mindanao", "Visayas", "Luzon",
                     "Davao", "Bacolod", "Capiz", "Aklan", "Cotabato", "Basilan", "Dumaguete", "Bohol", "Leyte", "Palawan",
                     "Batangas", "Pampanga", "Bicol", "Cagayan", "Dipolog", "Pagadian", "Diplahan", "Kalibo", "Tacloban",
                     "Ormoc", "Iligan", "Marawi", "Sipalay", "Guimbal", "Miagao", "General Santos", "Sarangani", "Kidapawan",
                     "Tacurong", "Sultan Kudarat", "Manila"]
 _WORLD_PLACES = [
-    # Europe
+
     "Europe", "France", "Paris", "Brittany", "Normandy", "Provence", "Italy", "Rome", "Venice", "Florence", "Naples", "Sicily",
     "Tuscany", "Spain", "Madrid", "Barcelona", "Seville", "Portugal", "Lisbon", "Germany", "Berlin", "Bavaria", "Austria", "Vienna",
     "Switzerland", "Netherlands", "Amsterdam", "Belgium", "Britain", "England", "London", "Scotland", "Wales", "Ireland", "Dublin",
     "Greece", "Athens", "Poland", "Prague", "Hungary", "Budapest", "Sweden", "Norway", "Denmark", "Finland", "Iceland", "Russia", "Moscow",
-    # Asia, Middle East, Africa, Americas, Oceania
+
     "Japan", "Tokyo", "Kyoto", "China", "Beijing", "Shanghai", "Hong Kong", "Korea", "Seoul", "India", "Delhi", "Mumbai", "Vietnam", "Hanoi",
     "Thailand", "Bangkok", "Indonesia", "Java", "Bali", "Malaysia", "Singapore", "Turkey", "Istanbul", "Egypt", "Cairo", "Israel", "Jerusalem",
     "Africa", "Nigeria", "Kenya", "Morocco", "South Africa", "Mexico", "Brazil", "Peru", "Argentina", "Cuba", "Canada", "America",
@@ -2353,9 +2892,19 @@ _VISUALS = [
 ]
 
 
+_TECH_VISUALS = [
+    (r"semiconductor|\bchips?\b|wafer|fabricat", "technicians in white cleanroom suits at a semiconductor plant"),
+    (r"\bai\b|artificial intelligence|data.?cent", "rows of server racks in a modern data center"),
+    (r"supply chain|logistic|shipping|container|\bports?\b", "container ships and cranes at a modern port"),
+    (r"electric|energy|power grid|renewable|solar", "power transmission lines and solar panels"),
+    (r"invest|econom|industrial|manufactur|factory|factories", "a clean modern factory floor with engineers"),
+    (r"engineer|technician|training|universit|school|students", "engineering students and trainers in a modern lab"),
+    (r"minister|government|policy|coalition|agreement|diplomat", "officials at a conference table in a modern meeting room"),
+    (r"new clark|industrial zone|economic security zone", "a planned modern industrial park with new buildings"),
+]
+
+
 def infer_location(job: Job) -> Job:
-    """Work out place, era and visual details from the article itself, so no form needs filling in.
-    Anything the job already has (e.g. typed in the portal or the Actions form) is kept as it is."""
     title = clean_text(job.get("title"))
     body = clean_text(extract_main(job.get("body"))) if job.get("body") else ""
     text = f"{title}. {title}. {title}. {body}"
@@ -2372,16 +2921,26 @@ def infer_location(job: Job) -> Job:
         era = f"{decs[0]}s" if len(decs) == 1 else f"{decs[0]}s to {decs[-1]}s"
 
     low = text.lower()
-    scored = sorted(((len(re.findall(rx, low)), phrase) for rx, phrase in _VISUALS), reverse=True)
-    phrases = [ph for c, ph in scored if c > 0][:6]
-    if in_ph and phrases:
-        phrases.append("tropical Philippine setting")
+
+    tech_hits = sum(len(re.findall(rx, low)) for rx, _ in _TECH_VISUALS)
+    modern = (not era) and (tech_hits >= 12 or (years and sum(y >= 2015 for y in years) >= 0.6 * len(years)))
+    if modern:
+        era = "present day"
+        scored = sorted(((len(re.findall(rx, low)), phrase) for rx, phrase in _TECH_VISUALS), reverse=True)
+        phrases = [ph for c, ph in scored if c > 0][:6] or ["modern offices and industrial buildings"]
+        if in_ph:
+            phrases.append("modern Philippine setting")
+    else:
+        scored = sorted(((len(re.findall(rx, low)), phrase) for rx, phrase in _VISUALS), reverse=True)
+        phrases = [ph for c, ph in scored if c > 0][:6]
+        if in_ph and phrases:
+            phrases.append("tropical Philippine setting")
     out = {"name": name, "era": era, "description": ", ".join(phrases)}
     ai = llm_text(
         "You prepare a documentary video from an article. Reply with JSON only: "
-        '{"name": "main place, region, country", "era": "time period such as 1950s or present day", '
-        '"description": "6-10 concrete visual details of the scenes the article describes, comma-separated, '
-        'e.g. wooden outrigger fishing boats, nipa huts, wet market stalls", '
+        '{"name": "main place, region, country", "era": "time period such as 1950s, or present day when the article is about current events", '
+        '"description": "6-10 concrete visual details of the scenes the article describes, in the right era, comma-separated, '
+        'e.g. for a history essay: wooden outrigger fishing boats, nipa huts; for a technology essay: semiconductor cleanroom, container port, server racks", '
         '"palette": "3-5 colour words", "characters": [{"name": "...", "description": "age, clothing, look", '
         '"appearsIn": ["words in the text where they appear"]}]} . Use only what the article says. Max 3 characters.',
         f"Title: {title}\nText: {body[:3500]}", max_tokens=420)
@@ -2398,14 +2957,16 @@ def infer_location(job: Job) -> Job:
             if chars and not job.get("characters"):
                 job["characters"] = chars
         except Exception:
-            pass
+            log("  AI location planner gave no usable answer; using built-in rules")
+    else:
+        log("  AI location planner unavailable; using built-in rules")
     have = {k: v for k, v in (job.get("location") or {}).items() if clean_text(str(v))}
     return {**{k: v for k, v in out.items() if v}, **have}
 
 
 def fill_job_from_article(job: Job, row: Job) -> None:
-    """A job file may hold only a title (+ location/characters). Take the text from the article on the site."""
-    for key, names in (("body", ("content", "body")), ("excerpt", ("excerpt", "summary")), ("category", ("category",))):
+    for key, names in (("body", ("content", "body")), ("excerpt", ("excerpt", "summary")), ("category", ("category",)),
+                       ("coverUrl", ("photo_url", "photoUrl"))):
         if not str(job.get(key) or "").strip():
             for n in names:
                 if str(row.get(n) or "").strip():
@@ -2465,6 +3026,14 @@ def write_marker(name, data):
     (DONE_DIR / name).write_text(json.dumps(data, indent=2), encoding="utf-8")
 
 
+def looks_like_tutorial(job: Job) -> bool:
+    body = str(job.get("body") or "")
+    title = clean_text(job.get("title"))
+    return (len(re.findall(r"<pre\b", body)) >= 3
+            or len(re.findall(r"\bCopy\s+Run\b", clean_text(body))) >= 3
+            or bool(re.search(r"\|\s*Poetic Bytes\s*$", title)))
+
+
 def needs_work(job: Job, marker: Job | None) -> bool:
     if FORCE_REDO:
         return True
@@ -2482,7 +3051,7 @@ def process_job(path):
     if not DRY_RUN and not needs_work(job, marker):
         return None
 
-    if not job.get("jobId"):  # forms that leave it empty would otherwise be "done" forever after the first run
+    if not job.get("jobId"):
         job["jobId"] = str(int(path.stat().st_mtime))
     title = job.get("title", name)
     log(f"\n=== {title} ({name})")
@@ -2506,6 +3075,13 @@ def process_job(path):
         if not clean_text(job.get("body")):
             raise RuntimeError("this job has no article text and the article was not found on the site "
                                "(the title must match exactly), so there is nothing to narrate")
+        if looks_like_tutorial(job) and not job.get("essay"):
+            log("  this is a Poetic Bytes tutorial page (code lessons), so it is skipped here: "
+                "make it with the 'Tutorial video' workflow, which shows the code typed on a laptop")
+            if not DRY_RUN:
+                write_marker(name, {"jobId": job.get("jobId"), "status": "skipped",
+                                    "reason": "tutorial page: use the Tutorial video workflow", "title": title})
+            return "skipped"
         set_job_voice(job)
         loc0 = dict(job.get("location") or {})
         job["location"] = infer_location(job)
@@ -2543,7 +3119,18 @@ def process_job(path):
             log(f"  attached to article #{row['id']}")
             add_to_index_list(article_url)
             log(f"  article page (request indexing in Search Console): {article_url}")
-        write_marker(name, {"jobId": job.get("jobId"), "status": "done", "title": title,
+        yt_id = ""
+        if YT_ENABLED and not (marker and marker.get("jobId") == job.get("jobId") and marker.get("youtubeId")):
+            try:
+                tags = row.get("tags") if row else None
+                if isinstance(tags, str):
+                    tags = [t.strip() for t in tags.split(",") if t.strip()]
+                yt_title, yt_desc, yt_tags = youtube_seo(job, title, desc, tags if isinstance(tags, list) else [])
+                yt_id = upload_to_youtube(final, yt_title, yt_desc, yt_tags)
+                log(f"  uploaded to YouTube ({YT_PRIVACY}): https://youtu.be/{yt_id}")
+            except Exception as e:
+                log(f"  YouTube upload skipped ({str(e)[:300]})")
+        write_marker(name, {"jobId": job.get("jobId"), "status": "done", "title": title, "youtubeId": yt_id,
                             "videoUrl": url, "articleUrl": article_url, "attached": attached, "engine": engine, "credits": CREDITS[:30],
                             "seconds": round(dur)})
         return "done"
@@ -2556,7 +3143,7 @@ def process_job(path):
         return "failed"
 
     finally:
-        # free the scratch folder (pictures, audio, clips) so many jobs don't fill the runner's disk
+
         if final is not None and Path(final).parent.name.startswith("vid_"):
             shutil.rmtree(Path(final).parent, ignore_errors=True)
 
