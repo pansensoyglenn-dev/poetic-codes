@@ -20,13 +20,17 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 Job = dict[str, Any]
 Seg = dict[str, Any]
 
-SCRIPT_VERSION = "2026-11-15-lively"
+SCRIPT_VERSION = "2026-11-16-intro2"
 W, H, FPS = 1280, 720, 25
 BGW, BGH = 2560, 1440
 IMGH = 540
 BANDH = H - IMGH
 CROPW, CROPH = 2000, 844
 ZOOM = float(os.environ.get("ZOOM", "0.18"))
+# Faster cuts: a long slide is split into shots of about SHOT_SECONDS each (a new framing or a real footage clip, joined by a
+# short transition) so the picture changes every 8-12 seconds instead of staying still for a minute. 0 = off (old behaviour).
+SHOT_SECONDS = float(os.environ.get("SHOT_SECONDS", "10"))
+SHOT_FADE = float(os.environ.get("SHOT_FADE", "0.5"))
 GRAIN = int(os.environ.get("GRAIN", "2"))
 VIGNETTE = os.environ.get("VIGNETTE", "1") != "0"
 CAP_WORDS = int(os.environ.get("CAP_WORDS", "20"))
@@ -59,13 +63,16 @@ INTRO_TITLE = os.environ.get("INTRO_TITLE", "0") != "0"  # off: video starts str
 INTRO_LIVELY = os.environ.get("INTRO_LIVELY", "1") != "0"
 INTRO_RATE_BOOST = int(os.environ.get("INTRO_RATE_BOOST", "8"))
 INTRO_PITCH = os.environ.get("INTRO_PITCH", "+6Hz")
-NARRATION_GREETING = os.environ.get("NARRATION_GREETING", "Hello everyone! Welcome back to Poetic Codes! This is an educational video that tackles topics on AI, economy, and history. This video is about").strip()
+NARRATION_GREETING = os.environ.get("NARRATION_GREETING", ("Hello, everyone! Welcome back to Poetic Codes, where curiosity comes first! "
+    "Here we explore the big ideas and everyday questions that shape our lives: AI, philosophy, economy, history, "
+    "computer programming, local and international politics, the weather, agriculture, and so much more. "
+    "So get ready to discover something new, because today's video is about")).strip()
 
 
 NARRATION_CLOSER = os.environ.get(
     "NARRATION_CLOSER",
-    "Along the way, we will look at the background, the key ideas, and what they mean for us today. "
-    "So please settle in, and let's begin.").strip()
+    "Why does it matter, and what does it mean for you and me? Stay with me, because the answers may surprise you. "
+    "Let's dive in!").strip()
 
 
 def narration_greeting(title: str, excerpt: str = "") -> str:
@@ -90,6 +97,16 @@ IMG_BUDGET = float(os.environ.get("IMG_BUDGET_SECONDS", "1500"))
 # photos that do not match: Hugging Face (optional free HF_TOKEN) and Pollinations (no key). FALLBACK_IMAGES=0 turns this off.
 FALLBACK_IMAGES = os.environ.get("FALLBACK_IMAGES", "1") != "0"
 HF_TOKEN = os.environ.get("HF_TOKEN", "").strip()
+# Local picture generator (no key, no quota): a small Stable Diffusion model (SD-Turbo) that runs on the GitHub runner's CPU.
+# LOCAL_IMAGES: "auto" = last backup when Gemini / Cloudflare / the free backups give nothing (default); "only" = use it
+# instead of the online sources; "0" = off.  About 0.5-3 minutes per picture on a CPU runner.
+LOCAL_IMAGES = os.environ.get("LOCAL_IMAGES", "auto").strip().lower()
+LOCAL_MODEL = os.environ.get("LOCAL_MODEL", "stabilityai/sd-turbo").strip()
+LOCAL_W = int(os.environ.get("LOCAL_W", "512"))
+LOCAL_H = int(os.environ.get("LOCAL_H", "512"))
+LOCAL_STEPS = int(os.environ.get("LOCAL_STEPS", "2"))
+LOCAL_BUDGET = float(os.environ.get("LOCAL_BUDGET_SECONDS", "3600"))
+LOCAL = {"pipe": None, "dead": False, "used": 0, "announced": False}
 HF_MODEL = os.environ.get("HF_MODEL", "black-forest-labs/FLUX.1-schnell")
 POLLINATIONS_URL = os.environ.get(
     "POLLINATIONS_URL",
@@ -660,6 +677,98 @@ MOTIONS = [
 ]
 
 
+TRANSITIONS = ["fade", "slideleft", "dissolve", "smoothright", "wipeleft", "slideright", "smoothleft", "wiperight"]
+# (zoom in?, zoom amount, pan start, pan end): different camera moves so no two neighbouring shots feel alike
+SHOT_MOVES = [
+    (True, 0.20, 0.0, 1.0), (False, 0.12, 1.0, 0.0), (True, 0.10, 0.5, 0.5), (None, 0.10, 0.0, 1.0),
+    (False, 0.20, 0.5, 0.5), (True, 0.14, 1.0, 0.0), (None, 0.12, 1.0, 0.0), (True, 0.24, 0.3, 0.7),
+    (False, 0.16, 0.8, 0.2), (None, 0.08, 0.0, 1.0),
+]
+SHOT_CROPS = [(1.0, 0.5, 0.5), (0.80, 0.2, 0.45), (0.74, 0.8, 0.5), (0.86, 0.5, 0.2), (0.72, 0.35, 0.65),
+              (0.78, 0.7, 0.35), (0.90, 0.5, 0.8)]
+
+
+def shot_frame(img, n):
+    """A different part of the same picture for each shot (n = 0 is the whole picture), so a cut shows something new."""
+    if img is None or n <= 0:
+        return img
+    frac, fx, fy = SHOT_CROPS[n % len(SHOT_CROPS)]
+    if n % len(SHOT_CROPS) == 0:
+        frac, fx, fy = 0.84, 0.5, 0.5
+    w, h = img.size
+    cw, ch = int(w * frac), int(h * frac)
+    x0, y0 = int((w - cw) * fx), int((h - ch) * fy)
+    return img.crop((x0, y0, x0 + cw, y0 + ch))
+
+
+def make_clip_multi(shots, ov_png, mp3, out, caps, move0=0, pad=0.7, vkbps=900):
+    """One slide made of several shots joined by short transitions. shots = [("still", png) | ("video", mp4), ...].
+    Stills get their own camera move; a footage shot plays real movement. Narration, caption bar and captions run across all of them."""
+    dur = probe_duration(mp3) + pad
+    n = len(shots)
+    f = min(SHOT_FADE, dur / (n * 3.0))
+    d = (dur + (n - 1) * f) / n
+    ow, oh = (960, 540) if vkbps < 450 else (W, H)
+    nfr = max(int(d * FPS), 2)
+    wide_h = int(BGW * IMGH / W) // 2 * 2
+    ye2 = f"{0.5 * (BGH - wide_h):.1f}"
+    inputs, chains = [], []
+    for k, (kind, path) in enumerate(shots):
+        if kind == "video":
+            inputs += ["-stream_loop", "-1", "-i", str(path)]
+            vw, vh = probe_size(path)
+            sc = max(min(W / vw, IMGH / vh), max(W / vw, IMGH / vh) * (1 - MAX_CROP))
+            fw, fh = max(2, int(vw * sc) // 2 * 2), max(2, int(vh * sc) // 2 * 2)
+            chains.append(
+                f"[{k}:v]fps={FPS},split[va{k}][vb{k}];"
+                f"[va{k}]scale={W}:{IMGH}:force_original_aspect_ratio=increase,crop={W}:{IMGH},boxblur=24:3,eq=brightness=-0.12[vg{k}];"
+                f"[vb{k}]scale={fw}:{fh}[vf{k}];[vg{k}][vf{k}]overlay=(W-w)/2:(H-h)/2:shortest=1,crop={W}:{IMGH},"
+                f"setpts=PTS-STARTPTS,format=yuv420p,setsar=1[s{k}]")
+        else:
+            inputs += ["-loop", "1", "-framerate", str(FPS), "-i", str(path)]
+            zin, amt, p0, p1 = SHOT_MOVES[(move0 + k) % len(SHOT_MOVES)]
+            if zin is None:
+                zexpr = f"1+{amt}"
+            elif zin:
+                zexpr = f"1+{amt}*on/{nfr}"
+            else:
+                zexpr = f"1+{amt}*(1-on/{nfr})"
+            pexpr = f"({p0}+({p1}-{p0})*on/{nfr})"
+            c = (f"[{k}:v]crop={BGW}:{wide_h}:x=0:y='{ye2}',"
+                 f"zoompan=z='{zexpr}':x='(iw-iw/zoom)*{pexpr}':y='(ih-ih/zoom)*0.5':d=1:s={W}x{IMGH}:fps={FPS}")
+            if VIGNETTE:
+                c += ",vignette=PI/5"
+            if GRAIN > 0:
+                c += f",noise=alls={GRAIN}:allf=t"
+            chains.append(c + f",format=yuv420p,setsar=1[s{k}]")
+    fc = ";".join(chains) + ";"
+    cur = "s0"
+    for k in range(1, n):
+        tr = TRANSITIONS[(move0 + k) % len(TRANSITIONS)]
+        fc += f"[{cur}][s{k}]xfade=transition={tr}:duration={f:.3f}:offset={k * (d - f):.3f}[x{k}];"
+        cur = f"x{k}"
+    ov_idx, mp3_idx, cap_base = n, n + 1, n + 2
+    fc += f"[{cur}]pad={W}:{H}:0:0:color=black,setsar=1[v0];[v0][{ov_idx}:v]overlay=format=auto[v1];"
+    last = "v1"
+    for k, (_, t0, t1) in enumerate(caps):
+        t1 = dur + 1 if k == len(caps) - 1 else t1
+        nxt = f"v{k + 2}"
+        fc += (f"[{last}][{cap_base + k}:v]overlay=format=auto:enable='between(t,{t0:.2f},{t1:.2f})'[{nxt}];")
+        last = nxt
+    fc += f"[{last}]scale={ow}:{oh}:flags=bicubic,format=yuv420p[v]"
+    cmd = ["ffmpeg", "-y"] + inputs
+    cmd += ["-loop", "1", "-framerate", str(FPS), "-i", str(ov_png), "-i", str(mp3)]
+    for png, _, _ in caps:
+        cmd += ["-loop", "1", "-framerate", str(FPS), "-i", str(png)]
+    cmd += ["-filter_complex", fc, "-map", "[v]", "-map", f"{mp3_idx}:a", "-t", f"{dur:.2f}",
+            "-af", f"apad=pad_dur={pad}",
+            "-c:v", "libx264", "-preset", "veryfast", "-b:v", f"{vkbps}k",
+            "-maxrate", f"{int(vkbps * 1.25)}k", "-bufsize", f"{vkbps * 2}k", "-r", str(FPS),
+            "-c:a", "aac", "-b:a", "40k", "-ar", "24000", "-ac", "1", str(out)]
+    run(cmd)
+    return dur
+
+
 def make_clip(bg_png, ov_png, mp3, out, caps, motion=0, pad=0.7, vkbps=900, bg2_png=None):
     """Animate a still (or pair of stills) so the picture feels alive while narration plays.
     When bg2_png is set, crossfade between two related frames to imply character movement."""
@@ -1125,6 +1234,74 @@ def gen_image_fallback(prompt):
     return img
 
 
+def local_available():
+    return LOCAL_IMAGES not in ("0", "off", "no") and not LOCAL["dead"]
+
+
+def _local_short_prompt(prompt):
+    """SD-Turbo reads only ~77 tokens, so keep the scene and the place and drop the long style preamble."""
+    show = re.search(r"Show:\s*(.*?)\.(?:\s|$)", prompt or "", re.S)
+    place = re.search(r"Place:\s*(.*?)\.(?:\s|$)", prompt or "", re.S)
+    where = re.search(r"Where:\s*(.*?)\.(?:\s|$)", prompt or "", re.S)
+    parts = [x.group(1).strip() for x in (show, place or where) if x]
+    core = ", ".join(parts) if parts else (prompt or "")[:300]
+    return (core[:260] + ", photorealistic documentary photograph, natural light, sharp focus, no text").strip()
+
+
+def _local_load():
+    if LOCAL["pipe"] is not None:
+        return LOCAL["pipe"]
+    try:
+        try:
+            import torch, diffusers  # noqa: F401
+        except ImportError:
+            log("  local generator: installing torch (CPU) + diffusers, one time (a few minutes)")
+            subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "torch", "--index-url",
+                            "https://download.pytorch.org/whl/cpu"], check=True, timeout=1500)
+            subprocess.run([sys.executable, "-m", "pip", "install", "--quiet", "diffusers", "transformers",
+                            "accelerate", "safetensors"], check=True, timeout=900)
+        import torch
+        from diffusers import AutoPipelineForText2Image
+        log(f"  local generator: loading {LOCAL_MODEL} (first time downloads about 2-3 GB)")
+        t0 = time.time()
+        pipe = AutoPipelineForText2Image.from_pretrained(LOCAL_MODEL, torch_dtype=torch.float32, safety_checker=None)
+        pipe.set_progress_bar_config(disable=True)
+        torch.set_num_threads(max(1, os.cpu_count() or 2))
+        LOCAL["pipe"] = pipe
+        log(f"  local generator ready in {time.time() - t0:.0f}s")
+        return pipe
+    except Exception as e:
+        LOCAL["dead"] = True
+        log(f"  local generator unavailable: {str(e)[:300]}")
+        return None
+
+
+def gen_image_local(prompt):
+    if not local_available():
+        return None
+    pipe = _local_load()
+    if pipe is None:
+        return None
+    if not LOCAL["announced"]:
+        LOCAL["announced"] = True
+        log("  using the local picture generator (CPU); each picture takes a minute or two")
+    try:
+        t0 = time.time()
+        out = pipe(_local_short_prompt(prompt), num_inference_steps=LOCAL_STEPS, guidance_scale=0.0,
+                   width=LOCAL_W, height=LOCAL_H).images[0].convert("RGB")
+        out = out.resize((out.width * 2, out.height * 2), Image.LANCZOS)
+        LOCAL["used"] += 1
+        log(f"    local picture made in {time.time() - t0:.0f}s")
+        return out
+    except Exception as e:
+        LAST_IMG_ERROR[0] = f"local generator: {str(e)[:200]}"
+        LOCAL["fails"] = LOCAL.get("fails", 0) + 1
+        if LOCAL["fails"] >= 2:
+            LOCAL["dead"] = True
+            log(f"  local generator stopped: {LAST_IMG_ERROR[0]}")
+        return None
+
+
 def gemini_alive():
     return bool(GEMINI_KEY) and not GEMINI["img_dead"]
 
@@ -1191,11 +1368,15 @@ def gen_image_gemini(prompt):
 
 
 def gen_image(prompt):
+    if LOCAL_IMAGES == "only":
+        return gen_image_local(prompt)
     img = gen_image_gemini(prompt) if gemini_alive() else None
     if img is None:
         img = gen_image_cloudflare_retry(prompt) if (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) else None
     if img is None:
         img = gen_image_fallback(prompt)
+    if img is None and LOCAL_IMAGES != "only":
+        img = gen_image_local(prompt)
     return img
 
 
@@ -1248,7 +1429,7 @@ def make_ai_images(segs, job):
     """One image per body slide, prompt locked to that slide's spoken words."""
     if not AI_IMAGES:
         return []
-    if not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) and not FALLBACK_IMAGES and not GEMINI_KEY:
+    if not (CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN) and not FALLBACK_IMAGES and not GEMINI_KEY and not local_available():
         log("  no Cloudflare keys (CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN): skipping generated pictures, using your photos")
         return []
     body_idx = [i for i, g in enumerate(segs) if g["kind"] == "body"]
@@ -1272,13 +1453,13 @@ def make_ai_images(segs, job):
         if QUOTA_HIT[0] and not gemini_alive() and FALLBACK_IMAGES and not FALLBACK_STATE["dead"] and not FALLBACK_STATE.get("announced"):
             FALLBACK_STATE["announced"] = True
             log(f"  Cloudflare free quota reached at {j}/{k}; continuing with the free backup generators")
-        if QUOTA_HIT[0] and not gemini_alive() and (not FALLBACK_IMAGES or FALLBACK_STATE["dead"]):
+        if QUOTA_HIT[0] and not gemini_alive() and (not FALLBACK_IMAGES or FALLBACK_STATE["dead"]) and not local_available():
             log(f"  Cloudflare free quota reached at {j}/{k}; the remaining slides keep the last picture (no further calls)")
             if LAST_IMG_ERROR[0]:
                 log(f"  Cloudflare said: {LAST_IMG_ERROR[0]}")
             out.extend([None] * (k - j))
             break
-        if time.time() - t_start > IMG_BUDGET or fails >= IMG_FAIL_LIMIT:
+        if time.time() - t_start > IMG_BUDGET + (LOCAL_BUDGET if local_available() else 0) or fails >= IMG_FAIL_LIMIT:
             log(f"  picture generation stopped at {j}/{k} "
                 f"({'time budget' if fails < IMG_FAIL_LIMIT else 'too many failures'}); keeping the last picture for the rest")
             if LAST_IMG_ERROR[0]:
@@ -1291,7 +1472,7 @@ def make_ai_images(segs, job):
         if (j + 1) % 6 == 0 or j + 1 == k:
             log(f"  generated pictures {j + 1}/{k}")
     got = sum(1 for x in out if x is not None)
-    log(f"  {got} of {k} generated pictures usable (matched to narration); {GEMINI['used']} from Gemini, {FALLBACK_STATE['used']} from the free backup generators")
+    log(f"  {got} of {k} generated pictures usable (matched to narration); {GEMINI['used']} from Gemini, {FALLBACK_STATE['used']} from the free backup generators, {LOCAL['used']} from the local generator")
     return out
 
 
@@ -2189,6 +2370,7 @@ def build_video(job):
     CREDIT_ROWS.clear()
     QUOTA_HIT[0] = False
     FALLBACK_STATE.update(fails=0, dead=False, used=0, announced=False)
+    LOCAL.update(used=0, fails=0)
     photos = load_photos(job)
     PROFILE[0] = load_profile(job)
     load_user_clips(job, tmp)
@@ -2234,6 +2416,7 @@ def build_video(job):
     clips, total_dur, body_seen, ai_used = [], 0.0, 0, {}
     user_pic_used = {}
     last_pic = None
+    pic_key, last_pic_key, shot_idx, move_ctr, multi_count = None, None, 0, 0, 0
     kling_used, kling_t0 = 0, time.time()
     kling_slides = pick_kling_slides(segs, KLING_MAX_CLIPS) if (KLING_ENABLED and KLING_API_KEY) else set()
     stock_slides, stock_used, stock_count = set(), set(), 0
@@ -2258,6 +2441,7 @@ def build_video(job):
         bgp2 = tmp / f"b{i}b.png"
         kling_mp4 = tmp / f"k{i}.mp4"
         cover = framing(photos[i % len(photos)], i // len(photos)) if photos else None
+        pic_key = f"p{i}"
         if seg["kind"] == "body":
             if STRICT_MATCH:
                 cover = None          # no loosely related photo: only an AI image of this slide or a photo that matched it
@@ -2269,18 +2453,21 @@ def build_video(job):
                 if pic is not None:
                     last_pic = pic
                     cover = pic
+                    pic_key = f"ai{gi}"
                     ai_used[gi] = ai_used.get(gi, 0) + 1
             if USER_PHOTOS:
                 # the author's own pictures win over generated ones: cycle through them, each reuse in a new framing
                 # in the order you uploaded them, spread across the narration: photo 1 for the first stretch, photo 20 for the last
                 pi = min(body_seen * len(USER_PHOTOS) // max(body_total, 1), len(USER_PHOTOS) - 1)
                 user_pic_used[pi] = user_pic_used.get(pi, 0) + 1
-                cover = framing(USER_PHOTOS[pi], user_pic_used[pi] - 1)
+                cover = USER_PHOTOS[pi]
+                pic_key = f"u{pi}"
             body_seen += 1
             src_note = "AI image" if (ai and cover is not None) else ("generic photo" if cover is not None else "no picture matched: text card")
             sp = fetch_slide_photo(seg, job, photo_used)
             if sp:
                 cover, src_note = sp
+                pic_key = f"s{i}"
             STORYBOARD.append((i, src_note, clean_text(seg.get("speech") or "")[:90]))
             _pl = slide_plan(seg, job)
             log(f"  storyboard slide {i}: [{src_note}] {clean_text(seg.get('speech') or '')[:90]}"
@@ -2292,7 +2479,8 @@ def build_video(job):
         elif photos:
             cover = photos[0]
 
-        frame_a, frame_b = motion_pair(cover) if cover is not None else (None, None)
+        _mc = framing(cover, user_pic_used.get(int(pic_key[1:]), 1) - 1) if (cover is not None and pic_key.startswith("u")) else cover
+        frame_a, frame_b = motion_pair(_mc) if cover is not None else (None, None)
         if frame_a is None and cover is not None:
             frame_a = cover
         bg_img, ov_img = render_layers(seg, i, len(segs), frame_a)
@@ -2301,7 +2489,7 @@ def build_video(job):
 
         spoken = probe_duration(mp3s[i])
         caps = []
-        no_caps = seg.get("kind") == "intro" and os.environ.get("INTRO_CAPTIONS", "0") != "1"   # opening: cover picture + narration only, no text
+        no_caps = seg.get("kind") == "intro" and os.environ.get("INTRO_CAPTIONS", "1") != "1"   # opening: cover picture + narration + captions (INTRO_CAPTIONS=0 hides the captions)
         for k, (txt, t0, t1) in enumerate([] if no_caps else caption_timings(seg.get("caption") or seg["speech"], spoken)):
             cp = tmp / f"cap{i}_{k}.png"
             render_caption(txt).save(cp)
@@ -2333,13 +2521,45 @@ def build_video(job):
             except Exception as e:
                 log(f"  supplied clip failed on slide {i} ({str(e)[:80]}); using a still picture")
 
+        # Faster cuts: a long narrated slide is cut into shots of about SHOT_SECONDS (new framing / real footage)
+        n_shots = 1
+        if SHOT_SECONDS > 0 and seg.get("kind") == "body" and cover is not None and not used_kling:
+            n_shots = max(1, int((spoken + 0.7) / SHOT_SECONDS + 0.5))
+        stock_path = None
         if not used_kling and i in stock_slides:
             got = fetch_archive_clip(seg, job, stock_used, tmp / f"s{i}.mp4") or fetch_stock_clip(seg, job, stock_used, tmp / f"s{i}.mp4")
             if got and Path(got).exists() and Path(got).stat().st_size > 5000:
-                total_dur += make_clip_from_video(got, ovp, mp3s[i], clip, caps, vkbps=vkbps)
-                used_kling = True
                 stock_count += 1
-                Path(got).unlink(missing_ok=True)
+                if n_shots >= 2:
+                    stock_path = got           # one footage shot inside the slide, stills around it
+                else:
+                    total_dur += make_clip_from_video(got, ovp, mp3s[i], clip, caps, vkbps=vkbps)
+                    used_kling = True
+                    Path(got).unlink(missing_ok=True)
+
+        if not used_kling and n_shots >= 2:
+            if pic_key != last_pic_key:
+                shot_idx = 0
+            last_pic_key = pic_key
+            vid_pos = 1 if n_shots < 4 else 2
+            specs = []
+            for k in range(n_shots):
+                if stock_path and k == vid_pos:
+                    specs.append(("video", stock_path))
+                    continue
+                spath = tmp / f"b{i}_{k}.png"
+                fit_band(shot_frame(cover, shot_idx).convert("RGB")).save(spath)
+                shot_idx += 1
+                specs.append(("still", spath))
+            total_dur += make_clip_multi(specs, ovp, mp3s[i], clip, caps, move_ctr, vkbps=vkbps)
+            move_ctr += n_shots
+            multi_count += 1
+            for kind, pth in specs:
+                if kind == "still":
+                    Path(pth).unlink(missing_ok=True)
+            if stock_path:
+                Path(stock_path).unlink(missing_ok=True)
+            used_kling = True
 
         if not used_kling:
             bg2_path = None
@@ -2357,6 +2577,8 @@ def build_video(job):
             log(f"  slide {i + 1}/{len(segs)} ready"
                 + (f" (Kling clips so far: {kling_used})" if kling_used else ""))
 
+    if multi_count:
+        log(f"  faster cuts: {multi_count} slide(s) split into shots of about {SHOT_SECONDS:.0f}s ({move_ctr} shots in all)")
     if kling_used:
         log(f"  Kling animated {kling_used} slide(s)")
     if stock_count:
