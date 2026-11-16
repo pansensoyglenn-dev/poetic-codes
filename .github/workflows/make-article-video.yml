@@ -61,7 +61,8 @@ jobs:
           ARCHIVE_VIDEO: "1"
           ARCHIVE_ANY_ERA: "1"
           STOCK_VIDEO: "1"
-          STOCK_MAX_CLIPS: "20"
+          STOCK_MAX_CLIPS: "30"
+          FOOTAGE_ALL: "1"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
@@ -69,12 +70,13 @@ jobs:
           KLING_PROVIDER: "fal"
           KLING_MAX_CLIPS: "6"
           FAL_KEY: ${{ secrets.FAL_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
           YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
           YT_REFRESH_TOKEN: ${{ secrets.YT_REFRESH_TOKEN }}
           YT_PRIVACY: "private"
           MAX_WORDS: "5000"
-          TTS_RATE: "+15%"
+          TTS_RATE: "+0%"
           MAX_JOBS_PER_RUN: "30"
         run: python scripts/make_article_video.py
       - name: Keep a downloadable copy of the video
