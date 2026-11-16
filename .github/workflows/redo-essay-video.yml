@@ -56,10 +56,13 @@ jobs:
           AI_IMAGE_MAX: "20"
           LLM_MAX_CALLS: "60"
           ARCHIVE_VIDEO: "0"
-          STOCK_VIDEO: "0"
+          STOCK_VIDEO: "1"
+          STOCK_MAX_CLIPS: "30"
+          FOOTAGE_ALL: "1"
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           KLING_ENABLED: "0"
           MAX_WORDS: "3000"
-          TTS_RATE: "+15%"
+          TTS_RATE: "+0%"
           MAX_JOBS_PER_RUN: "1"
           FORCE_REDO: "1"
         run: python scripts/make_article_video.py
