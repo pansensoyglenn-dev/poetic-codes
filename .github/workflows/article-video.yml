@@ -45,22 +45,29 @@ jobs:
           ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          # "0" = no generated pictures (only your cover + Wikimedia photos).
+          # Set to "1" to make a picture for each stretch of narration (Gemini first, then Cloudflare's free daily quota).
           AI_IMAGES: "1"
           AI_IMAGE_MAX: "20"
+          # FREE moving people: real stock footage from Pexels (free key at pexels.com/api, saved as a secret)
+          # Real old film (public domain) for stories set before 2000, from Wikimedia Commons + Internet Archive (no key needed)
           ARCHIVE_VIDEO: "1"
           ARCHIVE_ANY_ERA: "1"
           STOCK_VIDEO: "1"
-          STOCK_MAX_CLIPS: "20"
+          STOCK_MAX_CLIPS: "30"
+          FOOTAGE_ALL: "1"
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+          # People that really move (paid; each clip is billed by the provider). "0" = off, nothing is spent.
           KLING_ENABLED: "0"
           KLING_PROVIDER: "fal"
           KLING_MAX_CLIPS: "6"
           FAL_KEY: ${{ secrets.FAL_KEY }}
+          # Gemini writes the picture prompts and makes the pictures (free Google AI Studio key saved as a secret)
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           MAX_WORDS: "3000"
-          TTS_RATE: "+15%"
+          TTS_RATE: "+0%"
           ONLY_JOB: ${{ github.event.inputs.only }}
           FORCE_REDO: ${{ github.event.inputs.redo }}
         run: python scripts/make_article_video.py
@@ -70,6 +77,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: article-videos
+          # the video plus its .description.txt (link + photo credits)
           path: out/*
           if-no-files-found: ignore
           retention-days: 3
