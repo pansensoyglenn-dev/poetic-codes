@@ -109,7 +109,7 @@
     origLoad(article);
     var ids = article._ids || {};
     if (article.id != null && ids[article._source] == null) ids[article._source] = article.id;
-    var main = ids.worker != null ? ids.worker : ids.vercel;
+    var main = ids.worker;
     if (main != null) {
       csEditing = {
         id: main, ids: ids, date: article.date, category: article.category,
@@ -129,7 +129,6 @@
     if (csEditing) {
       var where = [];
       if (csEditing.ids && csEditing.ids.worker != null) where.push('Worker');
-      if (csEditing.ids && csEditing.ids.vercel != null) where.push('Vercel');
       var wrapOn = document.getElementById('update-rebuild-wrap');
       if (wrapOn) wrapOn.style.display = 'inline-flex';
       banner.style.display = 'block';
@@ -167,43 +166,18 @@
   }
 
   async function saveWorker(id, body) {
-    var r = await fetch(COMMONPLACE_API + 'articles/' + encodeURIComponent(id), {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
-    });
-    if (!r.ok) {
-      var j = await r.json().catch(function () { return {}; });
-      if (r.status === 404 || r.status === 405) {
-        throw new Error('the Worker needs a PUT /api/articles/:id route (HTTP ' + r.status + ')');
-      }
-      throw new Error(j.error || 'HTTP ' + r.status);
-    }
-  }
-
-  async function saveVercel(id, base) {
-    var cur = null;
-    try {
-      var lr = await fetch(CS_SOURCE_API, { cache: 'no-store', headers: { Accept: 'application/json' } });
-      if (lr.ok) {
-        var rows = await lr.json();
-        if (Array.isArray(rows)) {
-          cur = rows.find(function (x) { return String(x.id) === String(id); }) || null;
-        }
-      }
-    } catch (e) { }
-    if (!cur) throw new Error('could not read the current record first, so nothing was changed');
-
-    function pick(a, b) { return cur[a] != null ? cur[a] : (cur[b] != null ? cur[b] : null); }
-    var body = Object.assign({}, base, {
-      photoUrl:   pick('photo_url', 'photoUrl') || base.photoUrl,
-      githubUrl:  pick('github_url', 'githubUrl'),
-      pageUrl:    pick('page_url', 'pageUrl'),
-      bloggerUrl: pick('blogger_url', 'bloggerUrl')
-    });
     var r = await fetch(CS_SOURCE_API + '?id=' + encodeURIComponent(id), {
-      method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+      method: 'PUT', headers: adminHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(body)
     });
+    clearAdminKeyOn401(r);
     if (!r.ok) {
       var j = await r.json().catch(function () { return {}; });
+      if (r.status === 401) {
+        throw new Error('Admin key rejected. Paste it in the Admin Security Key box, press Save Key, then try again.');
+      }
+      if (r.status === 404 || r.status === 405) {
+        throw new Error('the Worker needs a PUT /api/articles?id=<id> route (HTTP ' + r.status + ')');
+      }
       throw new Error(j.error || 'HTTP ' + r.status);
     }
   }
@@ -247,10 +221,6 @@
     if (ids.worker != null) {
       try { await saveWorker(ids.worker, base); done.push('Worker'); }
       catch (e) { failed.push('Worker: ' + e.message); }
-    }
-    if (ids.vercel != null) {
-      try { await saveVercel(ids.vercel, base); done.push('Vercel'); }
-      catch (e) { failed.push('Vercel: ' + e.message); }
     }
 
     var rebuildBox = document.getElementById('update-rebuild-gh');
@@ -354,7 +324,7 @@
     list.innerHTML = items.map(function (a) {
       var section = csSectionFor(a.category) || a.category || 'Uncategorised';
       var snippet = a.summary || plainText(a.body).slice(0, 180);
-      var where = Object.keys(a._ids || {}).map(function (k) { return k === 'worker' ? 'Worker' : 'Vercel'; }).join(' + ');
+      var where = Object.keys(a._ids || {}).map(function (k) { return 'Worker'; }).join(' + ');
       return '<li class="cs-picker-row" data-key="' + esc(a._key) + '">' +
         '<div class="pr-row-main">' +
           '<div class="cs-picker-title">' + esc(a.title || '(untitled)') + '</div>' +
@@ -407,7 +377,7 @@
   async function loadList(quiet) {
     var status = document.getElementById('pr-status');
     if (!quiet) {
-      status.textContent = 'Loading articles from the Worker and Vercel…';
+      status.textContent = 'Loading articles from the Cloudflare Worker…';
       document.getElementById('pr-list').innerHTML =
         '<li style="padding:1rem;text-align:center;color:var(--dim);font-family:\'JetBrains Mono\',monospace;font-size:.65rem;">Loading…</li>';
     }
@@ -431,7 +401,7 @@
     hashHandled = true;
     var id = m[1];
     var a = csArticlesCache.find(function (x) {
-      return x._ids && (String(x._ids.vercel) === id || String(x._ids.worker) === id);
+      return x._ids && String(x._ids.worker) === id;
     });
     try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
     if (a) startEdit(a);
