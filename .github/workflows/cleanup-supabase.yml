@@ -1,0 +1,34 @@
+# Save as .github/workflows/cleanup-supabase.yml
+# Add these in GitHub: Settings > Secrets and variables > Actions > Secrets
+#   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_BUCKET
+name: Cleanup Supabase storage
+
+on:
+  schedule:
+    - cron: "0 3 * * 0"          # every Sunday 03:00 UTC
+  workflow_dispatch:
+    inputs:
+      max_age_days:
+        description: "Delete files older than (days)"
+        default: "30"
+      dry_run:
+        description: "true = only list, false = really delete"
+        default: "true"
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Delete old files
+        run: python cleanup_supabase.py
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_BUCKET: ${{ secrets.SUPABASE_BUCKET }}
+          MAX_AGE_DAYS: ${{ github.event.inputs.max_age_days || '30' }}
+          # scheduled runs default to a SAFE dry run until you change 'true' to 'false' below
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'true' }}
