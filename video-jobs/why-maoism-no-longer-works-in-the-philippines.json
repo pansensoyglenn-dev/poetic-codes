@@ -1,6 +1,6 @@
 {
-  "jobId": "1794964543799",
-  "createdAt": "2026-11-18T01:15:43.799Z",
+  "jobId": "1794964563395",
+  "createdAt": "2026-11-18T01:16:03.395Z",
   "title": "Why Maoism No Longer Works in the Philippines",
   "author": "Glenn Junsay Pansensoy",
   "category": "Local Politics",
@@ -20,5 +20,5 @@
   "slug": "why-maoism-no-longer-works-in-the-philippines",
   "articleId": 68,
   "coverUrl": null,
-  "force": false
+  "force": true
 }
