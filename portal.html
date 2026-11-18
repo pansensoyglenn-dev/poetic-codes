@@ -751,7 +751,7 @@
 const BLOGGER_CLIENT_ID = '790965276439-flja0u6tel45rqbg47p6l8fp6aua1tch.apps.googleusercontent.com';
 
 const SITE_URL = 'https://poetic-codes.pages.dev';
-const API_BASE = 'https://poetic-codes.vercel.app';
+const API_BASE = 'https://poetic-codes.pages.dev'; // Cloudflare Worker (D1 + R2). Supabase/Vercel no longer used.
 
 // ---- AdSense (loader lives ONCE in each page <head>; these helpers emit <ins> units only) ----
 const ADSENSE_PUBLISHER   = 'ca-pub-6428799122405621';
@@ -820,9 +820,9 @@ const GH_BRANCH   = 'main';
 // SEO FIX: static article pages live under this folder in the repo (matches /articles/<slug>.html)
 const GH_ARTICLES_DIR = 'articles';
 
-const COMMONPLACE_API  = 'https://poetic-codes.pages.dev/api/';
-const CP_PUBLISH_API   = API_BASE + '/api/';
-const CS_SOURCE_API    = API_BASE + '/api/articles';
+const COMMONPLACE_API  = 'https://poetic-codes.pansensoyglenn150.workers.dev/api/'; // the Worker (pages.dev/api returns 405: it is static)
+const CP_PUBLISH_API   = COMMONPLACE_API;
+const CS_SOURCE_API    = COMMONPLACE_API + 'articles';
 
 const CP_CATEGORY = {
   'History':                 'history',
@@ -1452,7 +1452,7 @@ async function compressCoverImage(file) {
   return blob;
 }
 
-async function uploadCoverToSupabase(file) {
+async function uploadCoverImage(file) {
   if (!file) return null;
   showToast('Preparing cover image…', '', 3000);
 
@@ -1468,16 +1468,17 @@ async function uploadCoverToSupabase(file) {
 
   let res;
   try {
-    res = await fetch(API_BASE + '/api/upload', {
+    const qs = new URLSearchParams({
+      filename: 'cover-' + randomId(8) + '.jpg',
+      contentType: 'image/jpeg'
+    });
+    res = await fetch(COMMONPLACE_API + 'upload?' + qs.toString(), {
       method: 'POST',
-      headers: {
-        'X-Admin-Key': getAdminKey(),
-        'Content-Type': 'image/jpeg'
-      },
+      headers: adminHeaders({ 'Content-Type': 'image/jpeg' }),
       body
     });
   } catch (e) {
-    throw new Error('Could not reach ' + API_BASE + '/api/upload (network or CORS error).');
+    throw new Error('Could not reach ' + COMMONPLACE_API + 'upload (network or CORS error).');
   }
   clearAdminKeyOn401(res);
 
@@ -1592,7 +1593,7 @@ document.getElementById('f-video-image-files').addEventListener('change', async 
   st.textContent = 'Uploading picture ' + (have + 1) + ' of 20…';
   input.disabled = true;
   try {
-    const u = await uploadCoverToSupabase(file);
+    const u = await uploadCoverImage(file);
     if (u) {
       box.value = (box.value.trim() ? box.value.trim() + '\n' : '') + u;
       st.textContent = 'Picture ' + (have + 1) + ' added (' + (have + 1) + ' of 20). Choose another, or publish.';
@@ -2651,7 +2652,7 @@ async function submitArticle() {
     const coverFileInput = document.getElementById('f-cover-image');
     if (coverFileInput && coverFileInput.files.length > 0) {
       try {
-        uploadedCoverUrl = await uploadCoverToSupabase(coverFileInput.files[0]);
+        uploadedCoverUrl = await uploadCoverImage(coverFileInput.files[0]);
         distLines.push('✓ Cover image uploaded');
       } catch (err) {
         distLines.push('⚠ Cover image upload failed: ' + err.message + ' (will use the auto-generated cover)');
@@ -2690,7 +2691,7 @@ async function submitArticle() {
             if (sid != null) cpArticleId = sid;
             videoCoverUrl = savedCp.photo_url || savedCp.photoUrl || (savedCp.article && (savedCp.article.photo_url || savedCp.article.photoUrl)) || null;
           }
-          distLines.push('✓ Commonplace: saved to the database (Vercel)');
+          distLines.push('✓ Commonplace: saved to the database (Cloudflare D1)');
         }
       } catch (e) {
         distLines.push('⚠ Commonplace: ' + e.message);
@@ -2804,7 +2805,7 @@ async function submitArticle() {
 }
 
 const CS_SOURCES = [
-  { key: 'vercel', label: 'Vercel', url: CS_SOURCE_API }
+  { key: 'worker', label: 'Worker', url: CS_SOURCE_API }
 ];
 
 function csPick(a, names) {
@@ -2919,7 +2920,7 @@ function renderAllArticles(filter) {
       <li class="cs-picker-row">
         <div style="flex:1;min-width:0;">
           <div class="cs-picker-title">${esc(a.title || '(untitled)')}</div>
-          <div class="cs-picker-meta">${esc(section)} · ${esc(a.date.slice(0, 10))}<span class="cs-src-badge">${a._source === 'worker' ? 'Worker' : 'Vercel'}</span></div>
+          <div class="cs-picker-meta">${esc(section)} · ${esc(a.date.slice(0, 10))}<span class="cs-src-badge">${'Worker'}</span></div>
         </div>
         <div style="display:flex;gap:0.4rem;flex-wrap:wrap;">${btns}</div>
       </li>`;
@@ -2967,9 +2968,7 @@ function deleteArticleGated(article) {
   requireSignIn(async () => {
     if (article.id == null) { showToast('This article has no id.', 'error'); return; }
     if (!confirm('Delete "' + (article.title || 'this article') + '" permanently from the main site? This cannot be undone.')) return;
-    const url = article._source === 'vercel'
-      ? CS_SOURCE_API + '?id=' + encodeURIComponent(article.id)
-      : COMMONPLACE_API + 'articles/' + encodeURIComponent(article.id);
+    const url = CS_SOURCE_API + '?id=' + encodeURIComponent(article.id);
     try {
       const r = await fetch(url, { method: 'DELETE', headers: adminHeaders() });
       clearAdminKeyOn401(r);
@@ -3027,7 +3026,7 @@ function renderCsPickerList(filter) {
         <input type="checkbox" data-cs-key="${esc(a._key)}" aria-label="Select ${esc(a.title || 'article')}">
         <div style="flex:1;min-width:0;">
           <div class="cs-picker-title">${esc(a.title || '(untitled)')}${note}</div>
-          <div class="cs-picker-meta">${esc(section)} · ${esc(a.date.slice(0, 10))}<span class="cs-src-badge">${a._source === 'worker' ? 'Worker' : 'Vercel'}</span></div>
+          <div class="cs-picker-meta">${esc(section)} · ${esc(a.date.slice(0, 10))}<span class="cs-src-badge">${'Worker'}</span></div>
         </div>
         <button type="button" class="cs-edit-btn" data-cs-edit="${esc(a._key)}"><i class="fas fa-pen" aria-hidden="true"></i> Edit</button>
       </li>`;
@@ -3057,7 +3056,7 @@ async function openCsPicker() {
   modal.style.display = 'block';
   document.body.style.overflow = 'hidden';
   list.innerHTML = '<li style="padding:1rem;text-align:center;color:var(--dim);font-family:\'JetBrains Mono\',monospace;font-size:0.65rem;">Loading…</li>';
-  status.textContent = 'Fetching articles from Vercel…';
+  status.textContent = 'Fetching articles from Cloudflare…';
   try {
     const result = await fetchCommonplaceArticles();
     csArticlesCache = result.articles;
@@ -3168,13 +3167,13 @@ async function updateCommonplaceEntry() {
     const coverFileInput = document.getElementById('f-cover-image');
     if (coverFileInput && coverFileInput.files.length > 0) {
       try {
-        uploadedCoverUrl = await uploadCoverToSupabase(coverFileInput.files[0]);
+        uploadedCoverUrl = await uploadCoverImage(coverFileInput.files[0]);
       } catch (err) {
         throw new Error('Cover image upload failed, so nothing was saved.\n' + err.message);
       }
     }
 
-    const isVercel = csEditing.source === 'vercel';
+    const isVercel = true; // the Worker uses PUT /api/articles?id=<id>
     const putUrl = isVercel
       ? CS_SOURCE_API + '?id=' + encodeURIComponent(csEditing.id)
       : COMMONPLACE_API + 'articles/' + encodeURIComponent(csEditing.id);
@@ -3198,7 +3197,7 @@ async function updateCommonplaceEntry() {
     if (!r.ok) {
       const j = await r.json().catch(() => ({}));
       if (r.status === 404 || r.status === 405) {
-        throw new Error('The Vercel API rejected the update (HTTP ' + r.status + '). It needs a PUT /api/articles?id=<id> route before edits can be saved.');
+        throw new Error('The Cloudflare Worker rejected the update (HTTP ' + r.status + '). It needs a PUT /api/articles?id=<id> route before edits can be saved.');
       }
       if (r.status === 401) {
         throw new Error('Admin key rejected. Paste it in the Admin Security Key box, press Save Key, then try again.');
