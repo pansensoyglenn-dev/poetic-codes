@@ -24,7 +24,7 @@ function corsHeaders(req) {
   if (!ALLOWED_ORIGINS.includes(o)) return {};
   return {
     'Access-Control-Allow-Origin': o,
-    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type, X-Admin-Key',
     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     Vary: 'Origin',
   };
@@ -36,7 +36,7 @@ const json = (req, data, status = 200) =>
   });
 
 function authed(req, env) {
-  const got = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
+  const got = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '') || (req.headers.get('X-Admin-Key') || '');
   const want = env.ADMIN_KEY || '';
   if (!want || got.length !== want.length) return false;
   let d = 0;
@@ -204,16 +204,25 @@ export default {
 
     if (pathname.startsWith('/media/') && req.method === 'GET') {
       const key = decodeURIComponent(pathname.slice(7));
-      if (!key.startsWith('photos/')) return new Response('Not found', { status: 404 });
-      const obj = await env.MEDIA.get(key);
+      if (!key.startsWith('photos/') && !key.startsWith('videos/')) return new Response('Not found', { status: 404 });
+      const wantsRange = req.headers.has('Range');
+      const obj = await env.MEDIA.get(key, wantsRange ? { range: req.headers } : undefined);
       if (!obj) return new Response('Not found', { status: 404 });
-      return new Response(obj.body, {
-        headers: {
-          'Content-Type': obj.httpMetadata?.contentType || 'application/octet-stream',
-          'Cache-Control': 'public, max-age=31536000, immutable',
-          'Access-Control-Allow-Origin': '*',
-        },
-      });
+      const h = {
+        'Content-Type': obj.httpMetadata?.contentType || 'application/octet-stream',
+        'Cache-Control': 'public, max-age=31536000, immutable',
+        'Accept-Ranges': 'bytes',
+        'Access-Control-Allow-Origin': '*',
+      };
+      let status = 200;
+      if (wantsRange && obj.range) {
+        const off = obj.range.offset ?? 0;
+        const len = obj.range.length ?? obj.size - off;
+        h['Content-Range'] = `bytes ${off}-${off + len - 1}/${obj.size}`;
+        h['Content-Length'] = String(len);
+        status = 206;
+      }
+      return new Response(obj.body, { status, headers: h });
     }
 
     if (pathname === '/api/articles' && req.method === 'GET') {
@@ -229,12 +238,20 @@ export default {
 
     if (pathname === '/api/upload' && req.method === 'POST') {
       const ct = url.searchParams.get('contentType') || 'image/jpeg';
-      if (!/^image\//.test(ct)) return json(req, { error: 'Images only' }, 400);
-      const buf = await req.arrayBuffer();
-      if (buf.byteLength > 10 * 1024 * 1024) return json(req, { error: 'Photo over 10 MB' }, 413);
-      const name = (url.searchParams.get('filename') || 'photo.jpg').replace(/[^a-zA-Z0-9._-]/g, '_');
-      const key = `photos/${Date.now()}-${name}`;
-      await env.MEDIA.put(key, buf, { httpMetadata: { contentType: ct } });
+      const isVideo = /^video\//.test(ct);
+      if (!isVideo && !/^image\//.test(ct)) return json(req, { error: 'Images and videos only' }, 400);
+      const name = (url.searchParams.get('filename') || (isVideo ? 'video.mp4' : 'photo.jpg')).replace(/[^a-zA-Z0-9._-]/g, '_');
+      const key = `${isVideo ? 'videos' : 'photos'}/${Date.now()}-${name}`;
+      if (isVideo) {
+        const len = Number(req.headers.get('Content-Length') || 0);
+        if (!len || !req.body) return json(req, { error: 'Video upload needs a Content-Length' }, 411);
+        if (len > 95 * 1024 * 1024) return json(req, { error: 'Video over 95 MB' }, 413);
+        await env.MEDIA.put(key, req.body, { httpMetadata: { contentType: ct } });
+      } else {
+        const buf = await req.arrayBuffer();
+        if (buf.byteLength > 10 * 1024 * 1024) return json(req, { error: 'Photo over 10 MB' }, 413);
+        await env.MEDIA.put(key, buf, { httpMetadata: { contentType: ct } });
+      }
       return json(req, { url: `${url.origin}/media/${key}` });
     }
 
