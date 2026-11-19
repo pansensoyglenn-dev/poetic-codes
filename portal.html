@@ -817,6 +817,8 @@ const BLOGSPOT_COOKIES_URL = 'https://poetic-bytes.blogspot.com/2026/04/cookie-p
 const GH_USERNAME = 'pansensoyglenn-dev';
 const GH_REPO     = 'poetic-codes';
 const GH_BRANCH   = 'main';
+// Every article is also copied to these repos. Vercel redeploys current-situation.vercel.app from the first one.
+const MIRROR_REPOS = [{ repo: 'current-situation', site: 'https://current-situation.vercel.app' }];
 // SEO FIX: static article pages live under this folder in the repo (matches /articles/<slug>.html)
 const GH_ARTICLES_DIR = 'articles';
 
@@ -2024,11 +2026,11 @@ async function publishToBlogger(title, bodyHTML, labels, publishType) {
 }
 
 // SEO FIX: canonical URL returned here is now the real live URL on poetic-codes.pages.dev
-async function publishToGitHub(slug, htmlContent, coverImageUrl) {
+async function publishToGitHub(slug, htmlContent, coverImageUrl, repoOverride) {
   const cfg = getGitHubConfig();
   if (!cfg.token) throw new Error('No GitHub token saved.');
   const path    = GH_ARTICLES_DIR + '/' + slug + '.html';
-  const apiURL  = `https://api.github.com/repos/${cfg.username}/${cfg.repo}/contents/${path}`;
+  const apiURL  = `https://api.github.com/repos/${cfg.username}/${repoOverride || cfg.repo}/contents/${path}`;
   const headers = {
     'Authorization':'Bearer '+cfg.token,
     'Accept':'application/vnd.github+json',
@@ -2662,10 +2664,25 @@ async function submitArticle() {
     if (doGitHub) {
       try {
         // SEO FIX: a pasted full web page is cut down to its <main> so the static page has one title/canonical
-        const ghBody = buildPageBody(content);
-        const ghPage = buildGitHubPage(title, author, category, excerpt, ghBody, slug, uploadedCoverUrl, '', ((document.getElementById('f-youtube-url') || {}).value || '').trim());
+        // A complete interactive lesson page (has its own <html> and the Pyodide runner) is published exactly as it is,
+        // so the Run buttons, colours and canonical tag keep working. Everything else is rebuilt as before.
+        const isFullLesson = /<html[\s>]/i.test(content) && /pyodide/i.test(content);
+        const ghBody = isFullLesson ? '' : buildPageBody(content);
+        const ghPage = isFullLesson ? content : buildGitHubPage(title, author, category, excerpt, ghBody, slug, uploadedCoverUrl, '', ((document.getElementById('f-youtube-url') || {}).value || '').trim());
         githubURL    = await publishToGitHub(slug, ghPage, uploadedCoverUrl);
-        distLines.push('✓ GitHub: '+githubURL);
+        distLines.push('✓ GitHub: '+githubURL + (isFullLesson ? ' (full lesson page, published unchanged)' : ''));
+        if (isFullLesson) distLines.push('– current-situation: skipped for full lesson pages (keeps one copy of each lesson)');
+        // Copy the same page to current-situation (Vercel). Its canonical/og:url point to the Vercel address.
+        for (const m of (isFullLesson ? [] : MIRROR_REPOS)) {
+          try {
+            const fromOrigin = originFor(getDeployTarget());
+            const mirrorPage = ghPage.split(fromOrigin + '/' + GH_ARTICLES_DIR + '/').join(m.site + '/' + GH_ARTICLES_DIR + '/');
+            await publishToGitHub(slug, mirrorPage, uploadedCoverUrl, m.repo);
+            distLines.push('✓ ' + m.repo + ': ' + m.site + '/' + GH_ARTICLES_DIR + '/' + slug + '.html');
+          } catch (mErr) {
+            distLines.push('⚠ ' + m.repo + ' skipped: ' + mErr.message);
+          }
+        }
       } catch(ghErr) {
         distLines.push('⚠ GitHub skipped: '+ghErr.message);
       }
