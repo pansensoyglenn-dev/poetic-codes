@@ -7,6 +7,14 @@
   <language>en-ph</language>
   <atom:link href="https://poetic-codes.pages.dev/feed.xml" rel="self" type="application/rss+xml"/>
   <item>
+    <title>Python Numbers: Integers, Floats, Complex, Decimal</title>
+    <link>https://poetic-codes.pages.dev/articles/python-numbers-integers-floats-complex-decimal.html</link>
+    <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/python-numbers-integers-floats-complex-decimal.html</guid>
+    <pubDate>Fri, 20 Nov 2026 12:00:00 GMT</pubDate>
+    <category>Programming</category>
+    <description>Learn Python numbers free with 16 runnable programs: integers, floats, complex, math, random, Decimal and Fraction, line by line.</description>
+  </item>
+  <item>
     <title>Why Maoism No Longer Works in the Philippines</title>
     <link>https://poetic-codes.pages.dev/articles/why-maoism-no-longer-works-in-the-philippines.html</link>
     <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/why-maoism-no-longer-works-in-the-philippines.html</guid>
