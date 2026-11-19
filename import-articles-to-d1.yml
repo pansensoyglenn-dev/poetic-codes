@@ -20,7 +20,10 @@ jobs:
         with:
           node-version: "20"
       - name: Run the import (safe to run twice, it skips articles that already exist)
-        run: npx --yes wrangler@4 d1 execute "${{ github.event.inputs.database_name }}" --remote --yes --file=import_articles.sql
+        run: |
+          DB="$(echo "$DB_NAME" | xargs)"      # trims stray spaces added by phone keyboards
+          npx --yes wrangler@4 d1 execute "$DB" --remote --yes --file=import_articles.sql
         env:
+          DB_NAME: ${{ github.event.inputs.database_name }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
