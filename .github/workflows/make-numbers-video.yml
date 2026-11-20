@@ -1,3 +1,12 @@
+# Save in the Poetic Bytes repo as:  .github/workflows/make-numbers-video.yml
+# Repo layout needed:
+#   the lesson page (python-numbers.html in the root, or articles/python-numbers.html:
+#   type its path in the "page" box when you run the workflow)
+#   video/build_video.py
+#   video/narration.py
+# Run it from the Actions tab. When it finishes, open the run and download the
+# "numbers-tutorial" artifact: it contains tutorial.mp4, tutorial-portal.mp4 (under 90 MB, for the portal), subtitles.srt,
+# chapters.txt and youtube_description.txt.
 name: Make Numbers tutorial video
 
 on:
@@ -32,19 +41,16 @@ jobs:
           PAGE: ${{ github.event.inputs.page }}
           VOICE: ${{ github.event.inputs.voice }}
           RATE: ${{ github.event.inputs.rate }}
-        run: |
-          echo "Requested PAGE=$PAGE"
-          ls -la ..
-          python build_video.py "../$PAGE" --out ../out
+        run: python build_video.py "../$PAGE" --out ../out
       - name: Make a portal-sized copy (under 90 MB for the Worker upload limit)
         run: |
           DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 out/tutorial.mp4)
-          # total bitrate budget: ~85 MB, minus 96 kbps audio
-          VB=$(python3 -c "d=float('$DUR'); print(max(250, int((85 * 8 * 1024 * 1024 / max(d, 1.0) / 1000) - 96)))")
+          # total bitrate budget: 85 MB, minus 96 kbps audio
+          VB=$(python3 -c "d=float('$DUR'); print(max(150,int((85*8*1024/d)-96)))")
           echo "duration=$DUR video_kbps=$VB"
           ffmpeg -y -i out/tutorial.mp4 -c:v libx264 -preset medium -b:v ${VB}k -maxrate ${VB}k -bufsize $((VB*2))k \
             -pix_fmt yuv420p -c:a aac -b:a 96k -movflags +faststart out/tutorial-portal.mp4
-          ls -lh out/*.mp4
+          ls -l out/*.mp4
       - uses: actions/upload-artifact@v4
         with:
           name: numbers-tutorial
