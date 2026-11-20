@@ -1,0 +1,24 @@
+{
+  "jobId": "1795143033900",
+  "createdAt": "2026-11-20T02:50:33.900Z",
+  "title": "Python Numbers Tutorial for Beginners (Full Video)",
+  "author": "Glenn Junsay Pansensoy",
+  "category": "Programming",
+  "excerpt": "Watch a 20-minute Python numbers tutorial: code typed step by step, explained line by line, with the real output for each program.",
+  "body": "Numbers are the foundation of almost everything you will build in Python, from calculators and games to financial software and data analysis. In this video tutorial you will learn every numeric type in Python and the tools that go with them. Each program is typed on screen step by step, explained line by line, and run so you can see its real output. 1.1 Creating Integers 1.2 Arbitrary Precision 2.1 Creating Floats 2.2 Special Float Values 3.1 Creating Complex Numbers 3.2 Complex Number Functions 4.1 Basic Operators 4.2 Augmented Assignment 5.1 Common math Functions 5.2 Constants and Special Functions 6.1 Basic Random Functions 6.2 Seeding for Reproducibility 7.1 Decimal: Exact Decimal Arithmetic 7.2 Fraction: Rational Numbers 8.1 Formatting Floats 8.2 Formatting Integers Pause the video, run every example yourself, and change the values to see what happens. The full interactive lesson, with a code runner for every program and a line-by-line explanation, is here: Python Numbers on Poetic Bytes. If this tutorial helped you, please like and subscribe, and share it with someone who is learning Python.",
+  "tags": [
+    "python tutorial",
+    "python numbers",
+    "python for beginners",
+    "video tutorial",
+    "learn python",
+    "python programming",
+    "integers",
+    "floats",
+    "math module"
+  ],
+  "slug": "python-numbers-tutorial-for-beginners-full-video",
+  "articleId": 71,
+  "coverUrl": null,
+  "force": true
+}
