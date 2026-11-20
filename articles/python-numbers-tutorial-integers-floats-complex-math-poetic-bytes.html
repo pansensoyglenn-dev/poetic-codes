@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Numbers Tutorial: Integers, Floats, Complex &amp; Math | Poetic Bytes – Poetic Codes</title>
+<meta name="description" content="Master Python numbers: integers, floats, complex, arithmetic, math module, random, Decimal, Fraction &amp; formatting. 24 interactive lessons.">
+<meta name="keywords" content="Programming, essay, poetic bytes, glenn pansensoy">
+<meta name="author" content="Glenn Junsay Pansensoy">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://poetic-codes.pages.dev/articles/python-numbers-tutorial-integers-floats-complex-math-poetic-bytes.html">
+<meta name="google-adsense-account" content="ca-pub-6428799122405621">
+<meta property="og:site_name" content="The Commonplace">
+<meta property="og:title" content="Python Numbers Tutorial: Integers, Floats, Complex &amp; Math | Poetic Bytes">
+<meta property="og:description" content="Master Python numbers: integers, floats, complex, arithmetic, math module, random, Decimal, Fraction &amp; formatting. 24 interactive lessons.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://poetic-codes.pages.dev/articles/python-numbers-tutorial-integers-floats-complex-math-poetic-bytes.html">
+<meta property="og:image" content="https://poetic-codes.pages.dev/og-default.png">
+<meta property="article:section" content="Programming">
+<meta property="article:published_time" content="2026-11-20T21:13:57.133Z">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@PoeticGlenn">
+<meta name="twitter:creator" content="@PoeticGlenn">
+<meta name="twitter:title" content="Python Numbers Tutorial: Integers, Floats, Complex &amp; Math | Poetic Bytes">
+<meta name="twitter:description" content="Master Python numbers: integers, floats, complex, arithmetic, math module, random, Decimal, Fraction &amp; formatting. 24 interactive lessons.">
+<meta name="twitter:image" content="https://poetic-codes.pages.dev/og-default.png">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Crimson+Pro:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"Python Numbers Tutorial: Integers, Floats, Complex & Math | Poetic Bytes","author":{"@type":"Person","name":"Glenn Junsay Pansensoy","url":"https://x.com/PoeticGlenn","sameAs":["https://x.com/PoeticGlenn","https://www.youtube.com/@PoeticBytes"]},"publisher":{"@type":"Organization","name":"Poetic Codes","url":"https://poetic-codes.pages.dev/","sameAs":["https://x.com/PoeticGlenn","https://www.youtube.com/@PoeticBytes"]},"datePublished":"2026-11-20T21:13:57.133Z","description":"Master Python numbers: integers, floats, complex, arithmetic, math module, random, Decimal, Fraction & formatting. 24 interactive lessons.","articleSection":"Programming","mainEntityOfPage":"https://poetic-codes.pages.dev/articles/python-numbers-tutorial-integers-floats-complex-math-poetic-bytes.html","image":"https://poetic-codes.pages.dev/og-default.png"}
+</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6428799122405621" crossorigin="anonymous"></script>
+<style>
+body{background:#0b0f17;color:#e6edf7;font-family:"Crimson Pro",Georgia,serif;font-size:1.2rem;max-width:720px;margin:0 auto;padding:1.5rem 1.25rem 3rem;line-height:1.8;overflow-wrap:break-word;}
+h1{font-family:"Cinzel Decorative",serif;font-size:clamp(1.3rem,5vw,2rem);line-height:1.3;margin:.5rem 0 .8rem;color:#fff;}
+h2,h3{font-family:"Cinzel Decorative",serif;color:#fff;line-height:1.35;margin:2rem 0 .8rem;font-size:1.25rem;}
+.meta{font-size:0.78rem;color:#8fa6c7;margin-bottom:1.5rem;font-family:monospace;}
+article p{text-align:left;hyphens:none;-webkit-hyphens:none;margin:0 0 1.3rem;}
+article li{margin-bottom:.5rem;}
+blockquote{margin:1.5rem 0;padding:.2rem 0 .2rem 1rem;border-left:3px solid #74b9e8;color:#c9d6ea;font-style:italic;}
+a{color:#74b9e8;}
+img{max-width:100%;height:auto;border-radius:10px;}
+video{max-width:100%;border-radius:12px;}
+audio{width:100%;}
+iframe{max-width:100%;border-radius:12px;}
+.back{display:inline-block;margin-bottom:.5rem;font-size:0.8rem;font-family:monospace;color:#74b9e8;text-decoration:none;}
+footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid #253649;font-size:0.72rem;color:#8fa6c7;text-align:center;font-family:monospace;line-height:2;}
+</style>
+</head>
+<body>
+<a class="back" href="https://poetic-codes.pages.dev/">← The Commonplace</a>
+<article>
+<h1>Python Numbers Tutorial: Integers, Floats, Complex &amp; Math | Poetic Bytes</h1>
+<div class="meta">Glenn Junsay Pansensoy · Programming · November 21, 2026</div>
+<section class="hero" aria-label="Python Numbers Tutorial">
+            <div class="page-col">
+                <div class="back-home-row">
+                    <a href="index.html" class="btn btn-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
+                    <span class="lesson-counter"><i class="fas fa-book-open"></i> 24 lessons</span>
+                    <span class="pyodide-status"><span class="dot"></span> Pyodide ready</span>
+                </div>
+                
+                <p class="lead">Master every numeric type in Python: integers, floating-point numbers, complex numbers, arithmetic operations, the <code>math</code> module, random number generation, <code>Decimal</code>, <code>Fraction</code>, and formatting. 24 interactive lessons with runnable code — crafted by <strong>@PoeticGlenn</strong>.</p>
+                <div class="hero-btns">
+                    <a href="#toc" class="btn btn-outline"><i class="fas fa-list"></i> Browse All Lessons</a>
+                    <a href="#intro" class="btn btn-primary"><i class="fas fa-play"></i> Start Learning</a>
+                </div>
+                <div class="info-box">
+                    <h4><i class="fas fa-info-circle"></i> What you will learn</h4>
+                    <p>Everything about numbers in Python — from the humble integer to complex numbers, from basic arithmetic to advanced math functions, random generation, and precise decimal arithmetic. Each concept is broken down step-by-step with interactive code examples from <strong>@PoeticGlenn</strong>.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="video-tutorial" aria-labelledby="video-heading">
+            <div class="page-col">
+                <div class="section-label"><span>🎬 Video Tutorial</span></div>
+                <div>
+                    <h2 id="video-heading">
+                        Watch the Full Python Numbers Tutorial
+                    </h2>
+                    <p>
+                        A 20-minute guided video. Every program is typed on screen step by step, explained line by line,
+                        and run so you can see its real output. Pause, try the code below, and come back.
+                    </p>
+                    <div>
+                        <video controls="" playsinline="" preload="metadata" width="1920" height="1080" style="position:absolute;inset:0;width:100%;height:100%;display:block" aria-label="Python Numbers video tutorial by Glenn">
+                            <source src="https://poetic-codes.pages.dev/videos/python-numbers-tutorial.mp4" type="video/mp4">
+                            Your browser cannot play this video.
+                            <a href="https://poetic-codes.pages.dev/videos/python-numbers-tutorial.mp4">Download the video</a>.
+                        </video>
+                    </div>
+                    <p>
+                        Prefer to read? Every lesson from the video is below with a runnable code editor.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="intro" aria-labelledby="intro-heading">
+            <div class="page-col">
+                <div class="section-label"><span>📖 Introduction</span></div>
+                <div>
+                    <h2 id="intro-heading">
+                        Why Numbers Are the Foundation of Programming
+                    </h2>
+                    <p>
+                        Numbers are everywhere in programming. From counting loops and calculating statistics to
+                        building financial systems and scientific simulations, understanding how Python handles
+                        numbers is essential. This curriculum, designed by <strong>@PoeticGlenn</strong>,
+                        covers integers, floats, complex numbers, arithmetic, the <code>math</code> module, random
+                        numbers, and the precision tools <code>Decimal</code> and <code>Fraction</code> — everything
+                        you need to work with numeric data confidently.
+                    </p>
+                    <div class="intro-grid">
+                        <div class="intro-item">
+                            <i class="fas fa-sort-numeric-up-alt"></i>
+                            <h4>All Number Types</h4>
+                            <p>Integers, floats, complex numbers — learn when to use each and how they work under the hood.</p>
+                        </div>
+                        <div class="intro-item">
+                            <i class="fas fa-infinity"></i>
+                            <h4>Advanced Math</h4>
+                            <p>From trigonometry to logarithms, the <code>math</code> module gives you the full power of mathematical computing.</p>
+                        </div>
+                        <div class="intro-item">
+                            <i class="fas fa-random"></i>
+                            <h4>Randomness &amp; Precision</h4>
+                            <p>Generate random numbers for games and simulations, and use <code>Decimal</code> for exact financial calculations.</p>
+                        </div>
+                    </div>
+                    <p>
+                        <i class="fas fa-quote-left" style="margin-right:0.3rem"></i>
+                        "The best way to predict the future is to implement it." — Numbers make that possible.
+                        <span>🐍</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="why-learn" aria-labelledby="why-heading">
+            <div class="page-col">
+                <div class="section-label"><span>🚀 Why Learn This Curriculum</span></div>
+                <div>
+                    <h2 id="why-heading">
+                        Numeric Mastery Unlocks Every Domain
+                    </h2>
+                    <p>
+                        Whether you're building a game, analyzing financial data, simulating physics, or training
+                        a machine learning model, you need to be fluent in Python's numeric capabilities. This
+                        curriculum, curated by <strong>@PoeticGlenn</strong>, gives you
+                        the confidence to tackle any numeric challenge.
+                    </p>
+                    <div class="why-grid">
+                        <div class="why-item">
+                            <h4>📊 Data Science &amp; AI</h4>
+                            <p>NumPy, pandas, and scikit-learn all rely on Python's numeric types and the <code>math</code> module.</p>
+                        </div>
+                        <div class="why-item">
+                            <h4>💰 Finance &amp; Accounting</h4>
+                            <p>Use <code>Decimal</code> for exact currency calculations, avoiding floating-point rounding errors.</p>
+                        </div>
+                        <div class="why-item">
+                            <h4>🎮 Game Development</h4>
+                            <p>Random numbers drive game mechanics, physics, and procedural generation.</p>
+                        </div>
+                        <div class="why-item">
+                            <h4>🔬 Science &amp; Engineering</h4>
+                            <p>Complex numbers, trigonometry, and logarithms are essential for scientific computing.</p>
+                        </div>
+                    </div>
+                    <div class="insight">
+                        <i class="fas fa-gem" style="margin-right:0.4rem"></i>
+                        <strong>@PoeticGlenn</strong> says: <em>"Numbers are the language of computers. Master them, and you master computation itself."</em>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="significance" aria-labelledby="sig-heading">
+            <div class="page-col">
+                <div class="section-label"><span>🌍 Significance in the Programming World</span></div>
+                <div>
+                    <h2 id="sig-heading">
+                        Why Numeric Computing Drives Innovation
+                    </h2>
+                    <p>
+                        From the earliest computers to the latest AI models, numbers have been at the heart of
+                        computing. Python's numeric types and libraries are used by scientists, engineers, and
+                        developers around the world to solve real problems. This curriculum, designed by
+                        <strong>@PoeticGlenn</strong>, gives you the tools to join them.
+                    </p>
+                    <div class="sig-grid">
+                        <div class="sig-item">
+                            <span class="sig-icon"><i class="fas fa-chart-pie"></i></span>
+                            <h4>Data Analysis</h4>
+                            <p>Python is the #1 language for data analysis, and numbers are the raw material.</p>
+                        </div>
+                        <div class="sig-item">
+                            <span class="sig-icon"><i class="fas fa-microchip"></i></span>
+                            <h4>Scientific Computing</h4>
+                            <p>From physics simulations to genetic algorithms, Python is used in cutting-edge research.</p>
+                        </div>
+                        <div class="sig-item">
+                            <span class="sig-icon"><i class="fas fa-coins"></i></span>
+                            <h4>FinTech</h4>
+                            <p>Algorithmic trading, risk analysis, and banking systems rely on precise numeric computation.</p>
+                        </div>
+                    </div>
+                    <p>
+                        <i class="fas fa-quote-right" style="margin-left:0.3rem"></i>
+                        The numbers you work with today may change the world tomorrow.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="toc" aria-labelledby="toc-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="toc-heading">📑 Table of Contents</h2>
+                    <p>Jump to any section — all entries are equal size</p>
+                </div>
+                <div class="toc-grid">
+                    <a href="#intro">📖 Introduction</a>
+                    <a href="#why-learn">🚀 Why Learn This</a>
+                    <a href="#significance">🌍 Significance</a>
+                    <a href="#integers">🔢 Integers</a>
+                    <a href="#floats">💧 Floats</a>
+                    <a href="#complex">⚡ Complex Numbers</a>
+                    <a href="#arithmetic">➕ Arithmetic</a>
+                    <a href="#math-module">📐 Math Module</a>
+                    <a href="#random">🎲 Random Numbers</a>
+                    <a href="#decimal-fraction">💰 Decimal &amp; Fraction</a>
+                    <a href="#formatting">🎯 Formatting</a>
+                    <a href="#faq-numbers">❓ FAQ</a>
+                    <a href="#outro">💛 Outro</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="integers" aria-labelledby="int-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="int-heading">🔢 Integers — Whole Numbers</h2>
+                    <p>Integers are whole numbers without a decimal point. Python supports arbitrarily large integers.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 1.1 Creating Integers</h3>
+                    <p>Assign integers directly, or use <code>int()</code> to convert from strings or other types.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Assign integer literals: <code>x = 42</code>, <code>y = -17</code>.</li>
+                        <li><strong>Step 2:</strong> Use <code>int()</code> to convert a string: <code>int("100")</code>.</li>
+                        <li><strong>Step 3:</strong> Use <code>int()</code> with a base: <code>int("1010", 2)</code> for binary.</li>
+                        <li><strong>Step 4:</strong> Check the type with <code>type()</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="x = 42
+y = -17
+z = int(&quot;100&quot;)
+binary = int(&quot;1010&quot;, 2)
+
+print(f&quot;x = {x}, type: {type(x)}&quot;)
+print(f&quot;y = {y}, type: {type(y)}&quot;)
+print(f&quot;z = {z}, type: {type(z)}&quot;)
+print(f&quot;binary = {binary}, type: {type(binary)}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">x</span> = 42
+<span class="kw">y</span> = -17
+<span class="kw">z</span> = <span class="fn">int</span>(<span class="st">"100"</span>)
+<span class="kw">binary</span> = <span class="fn">int</span>(<span class="st">"1010"</span>, 2)
+
+<span class="fn">print</span>(<span class="st">f"x = {x}, type: {type(x)}"</span>)
+<span class="fn">print</span>(<span class="st">f"y = {y}, type: {type(y)}"</span>)
+<span class="fn">print</span>(<span class="st">f"z = {z}, type: {type(z)}"</span>)
+<span class="fn">print</span>(<span class="st">f"binary = {binary}, type: {type(binary)}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 1.2 Arbitrary Precision</h3>
+                    <p>Python integers can grow to any size — limited only by your system's memory.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Create a very large integer: <code>big = 10 ** 100</code>.</li>
+                        <li><strong>Step 2:</strong> Print the number of digits: <code>len(str(big))</code>.</li>
+                        <li><strong>Step 3:</strong> Perform arithmetic on huge integers without overflow.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="big = 10 ** 100
+print(f&quot;10^100 = {big}&quot;)
+print(f&quot;Digits: {len(str(big))}&quot;)
+
+huge = big * big
+print(f&quot;10^100 * 10^100 = 10^200&quot;)
+print(f&quot;Digits in huge: {len(str(huge))}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">big</span> = 10 ** 100
+<span class="fn">print</span>(<span class="st">f"10^100 = {big}"</span>)
+<span class="fn">print</span>(<span class="st">f"Digits: {len(str(big))}"</span>)
+
+<span class="kw">huge</span> = big * big
+<span class="fn">print</span>(<span class="st">f"10^100 * 10^100 = 10^200"</span>)
+<span class="fn">print</span>(<span class="st">f"Digits in huge: {len(str(huge))}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="insight">💡 Unlike many languages, Python integers have no fixed size limit. You can work with numbers that have millions of digits.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="floats" aria-labelledby="float-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="float-heading">💧 Floating-Point Numbers</h2>
+                    <p>Floats represent real numbers. They are implemented using double-precision (64-bit) IEEE 754.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 2.1 Creating Floats</h3>
+                    <p>Use decimal points, scientific notation, or <code>float()</code> to create floats.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Assign float literals: <code>pi = 3.14159</code>, <code>neg = -2.5</code>.</li>
+                        <li><strong>Step 2:</strong> Use scientific notation: <code>e = 1.6e-19</code> (electron charge).</li>
+                        <li><strong>Step 3:</strong> Convert using <code>float()</code>: <code>float("3.14")</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="pi = 3.14159
+neg = -2.5
+e_charge = 1.6e-19
+from_str = float(&quot;3.14&quot;)
+
+print(f&quot;pi = {pi}, type: {type(pi)}&quot;)
+print(f&quot;neg = {neg}, type: {type(neg)}&quot;)
+print(f&quot;e_charge = {e_charge}, type: {type(e_charge)}&quot;)
+print(f&quot;from_str = {from_str}, type: {type(from_str)}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">pi</span> = 3.14159
+<span class="kw">neg</span> = -2.5
+<span class="kw">e_charge</span> = 1.6e-19
+<span class="kw">from_str</span> = <span class="fn">float</span>(<span class="st">"3.14"</span>)
+
+<span class="fn">print</span>(<span class="st">f"pi = {pi}, type: {type(pi)}"</span>)
+<span class="fn">print</span>(<span class="st">f"neg = {neg}, type: {type(neg)}"</span>)
+<span class="fn">print</span>(<span class="st">f"e_charge = {e_charge}, type: {type(e_charge)}"</span>)
+<span class="fn">print</span>(<span class="st">f"from_str = {from_str}, type: {type(from_str)}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 2.2 Special Float Values</h3>
+                    <p>Python floats include special values: <code>inf</code>, <code>-inf</code>, and <code>nan</code>.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Create infinity: <code>inf = float("inf")</code>.</li>
+                        <li><strong>Step 2:</strong> Create not-a-number: <code>nan = float("nan")</code>.</li>
+                        <li><strong>Step 3:</strong> Check for infinity using <code>math.isinf()</code> and NaN using <code>math.isnan()</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import math
+
+inf = float(&quot;inf&quot;)
+neg_inf = float(&quot;-inf&quot;)
+nan = float(&quot;nan&quot;)
+
+print(f&quot;inf = {inf}, isinf: {math.isinf(inf)}&quot;)
+print(f&quot;neg_inf = {neg_inf}, isinf: {math.isinf(neg_inf)}&quot;)
+print(f&quot;nan = {nan}, isnan: {math.isnan(nan)}&quot;)
+
+print(f&quot;inf + 5 = {inf + 5}&quot;)
+print(f&quot;inf / inf = {inf / inf}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> math
+
+<span class="kw">inf</span> = <span class="fn">float</span>(<span class="st">"inf"</span>)
+<span class="kw">neg_inf</span> = <span class="fn">float</span>(<span class="st">"-inf"</span>)
+<span class="kw">nan</span> = <span class="fn">float</span>(<span class="st">"nan"</span>)
+
+<span class="fn">print</span>(<span class="st">f"inf = {inf}, isinf: {math.isinf(inf)}"</span>)
+<span class="fn">print</span>(<span class="st">f"neg_inf = {neg_inf}, isinf: {math.isinf(neg_inf)}"</span>)
+<span class="fn">print</span>(<span class="st">f"nan = {nan}, isnan: {math.isnan(nan)}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"inf + 5 = {inf + 5}"</span>)
+<span class="fn">print</span>(<span class="st">f"inf / inf = {inf / inf}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="note-warn">⚠️ NaN is not equal to itself: <code>nan == nan</code> is <code>False</code>. Always use <code>math.isnan()</code> to test for NaN.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="complex" aria-labelledby="complex-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="complex-heading">⚡ Complex Numbers</h2>
+                    <p>Python has built-in support for complex numbers, using <code>j</code> as the imaginary unit.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 3.1 Creating Complex Numbers</h3>
+                    <p>Use <code>j</code> or <code>J</code> for the imaginary part, or <code>complex()</code>.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Create a complex number: <code>z = 3 + 4j</code>.</li>
+                        <li><strong>Step 2:</strong> Use <code>complex(real, imag)</code>: <code>z2 = complex(2, -1)</code>.</li>
+                        <li><strong>Step 3:</strong> Access real and imaginary parts: <code>z.real</code>, <code>z.imag</code>.</li>
+                        <li><strong>Step 4:</strong> Get the conjugate: <code>z.conjugate()</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="z = 3 + 4j
+z2 = complex(2, -1)
+
+print(f&quot;z = {z}, type: {type(z)}&quot;)
+print(f&quot;z2 = {z2}&quot;)
+print(f&quot;z.real = {z.real}, z.imag = {z.imag}&quot;)
+print(f&quot;z.conjugate() = {z.conjugate()}&quot;)
+
+print(f&quot;z + z2 = {z + z2}&quot;)
+print(f&quot;z * z2 = {z * z2}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">z</span> = 3 + 4j
+<span class="kw">z2</span> = <span class="fn">complex</span>(2, -1)
+
+<span class="fn">print</span>(<span class="st">f"z = {z}, type: {type(z)}"</span>)
+<span class="fn">print</span>(<span class="st">f"z2 = {z2}"</span>)
+<span class="fn">print</span>(<span class="st">f"z.real = {z.real}, z.imag = {z.imag}"</span>)
+<span class="fn">print</span>(<span class="st">f"z.conjugate() = {z.conjugate()}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"z + z2 = {z + z2}"</span>)
+<span class="fn">print</span>(<span class="st">f"z * z2 = {z * z2}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 3.2 Complex Number Functions</h3>
+                    <p>The <code>cmath</code> module provides mathematical functions for complex numbers.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>cmath</code> for complex math.</li>
+                        <li><strong>Step 2:</strong> Compute magnitude: <code>abs(z)</code>.</li>
+                        <li><strong>Step 3:</strong> Compute phase angle: <code>cmath.phase(z)</code>.</li>
+                        <li><strong>Step 4:</strong> Compute polar coordinates: <code>cmath.polar(z)</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import cmath
+
+z = 3 + 4j
+
+print(f&quot;z = {z}&quot;)
+print(f&quot;|z| = {abs(z)}&quot;)
+print(f&quot;phase(z) = {cmath.phase(z)} radians&quot;)
+print(f&quot;polar(z) = {cmath.polar(z)}&quot;)
+
+r, theta = cmath.polar(z)
+print(f&quot;rect(r, theta) = {cmath.rect(r, theta)}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> cmath
+
+<span class="kw">z</span> = 3 + 4j
+
+<span class="fn">print</span>(<span class="st">f"z = {z}"</span>)
+<span class="fn">print</span>(<span class="st">f"|z| = {abs(z)}"</span>)
+<span class="fn">print</span>(<span class="st">f"phase(z) = {cmath.phase(z)} radians"</span>)
+<span class="fn">print</span>(<span class="st">f"polar(z) = {cmath.polar(z)}"</span>)
+
+<span class="kw">r, theta</span> = cmath.polar(z)
+<span class="fn">print</span>(<span class="st">f"rect(r, theta) = {cmath.rect(r, theta)}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="arithmetic" aria-labelledby="arith-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="arith-heading">➕ Arithmetic Operations</h2>
+                    <p>Python supports all standard arithmetic operators, plus some special ones.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 4.1 Basic Operators</h3>
+                    <p><code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>, <code>//</code>, <code>%</code>, <code>**</code></p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Addition: <code>10 + 3</code>.</li>
+                        <li><strong>Step 2:</strong> Subtraction: <code>10 - 3</code>.</li>
+                        <li><strong>Step 3:</strong> Multiplication: <code>10 * 3</code>.</li>
+                        <li><strong>Step 4:</strong> Division: <code>10 / 3</code> returns float.</li>
+                        <li><strong>Step 5:</strong> Floor division: <code>10 // 3</code> returns integer.</li>
+                        <li><strong>Step 6:</strong> Modulo (remainder): <code>10 % 3</code>.</li>
+                        <li><strong>Step 7:</strong> Exponentiation: <code>10 ** 3</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="a, b = 10, 3
+
+print(f&quot;a + b = {a + b}&quot;)
+print(f&quot;a - b = {a - b}&quot;)
+print(f&quot;a * b = {a * b}&quot;)
+print(f&quot;a / b = {a / b}&quot;)
+print(f&quot;a // b = {a // b}&quot;)
+print(f&quot;a % b = {a % b}&quot;)
+print(f&quot;a ** b = {a ** b}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">a, b</span> = 10, 3
+
+<span class="fn">print</span>(<span class="st">f"a + b = {a + b}"</span>)
+<span class="fn">print</span>(<span class="st">f"a - b = {a - b}"</span>)
+<span class="fn">print</span>(<span class="st">f"a * b = {a * b}"</span>)
+<span class="fn">print</span>(<span class="st">f"a / b = {a / b}"</span>)
+<span class="fn">print</span>(<span class="st">f"a // b = {a // b}"</span>)
+<span class="fn">print</span>(<span class="st">f"a % b = {a % b}"</span>)
+<span class="fn">print</span>(<span class="st">f"a ** b = {a ** b}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="insight">💡 Division <code>/</code> always returns a float. Use <code>//</code> for integer division.</div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 4.2 Augmented Assignment</h3>
+                    <p>Combine assignment with an operator: <code>+=</code>, <code>-=</code>, <code>*=</code>, etc.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Start with <code>x = 10</code>.</li>
+                        <li><strong>Step 2:</strong> <code>x += 3</code> is equivalent to <code>x = x + 3</code>.</li>
+                        <li><strong>Step 3:</strong> <code>x *= 2</code> is equivalent to <code>x = x * 2</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="x = 10
+print(f&quot;x = {x}&quot;)
+
+x += 3
+print(f&quot;x += 3 → x = {x}&quot;)
+
+x -= 5
+print(f&quot;x -= 5 → x = {x}&quot;)
+
+x *= 2
+print(f&quot;x *= 2 → x = {x}&quot;)
+
+x //= 4
+print(f&quot;x //= 4 → x = {x}&quot;)
+
+x **= 2
+print(f&quot;x **= 2 → x = {x}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">x</span> = 10
+<span class="fn">print</span>(<span class="st">f"x = {x}"</span>)
+
+x += 3
+<span class="fn">print</span>(<span class="st">f"x += 3 → x = {x}"</span>)
+
+x -= 5
+<span class="fn">print</span>(<span class="st">f"x -= 5 → x = {x}"</span>)
+
+x *= 2
+<span class="fn">print</span>(<span class="st">f"x *= 2 → x = {x}"</span>)
+
+x //= 4
+<span class="fn">print</span>(<span class="st">f"x //= 4 → x = {x}"</span>)
+
+x **= 2
+<span class="fn">print</span>(<span class="st">f"x **= 2 → x = {x}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+
+        <section id="math-module" aria-labelledby="math-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="math-heading">📐 The <code>math</code> Module — Advanced Mathematical Functions</h2>
+                    <p>Python's <code>math</code> module provides a wide range of mathematical functions.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 5.1 Common <code>math</code> Functions</h3>
+                    <p>Trigonometry, logarithms, square roots, and more.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>math</code>.</li>
+                        <li><strong>Step 2:</strong> Square root: <code>math.sqrt(25)</code>.</li>
+                        <li><strong>Step 3:</strong> Trigonometry: <code>math.sin(math.pi / 2)</code>.</li>
+                        <li><strong>Step 4:</strong> Logarithms: <code>math.log(100, 10)</code>.</li>
+                        <li><strong>Step 5:</strong> Factorial: <code>math.factorial(5)</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import math
+
+print(f&quot;math.sqrt(25) = {math.sqrt(25)}&quot;)
+print(f&quot;math.pi = {math.pi}&quot;)
+print(f&quot;math.sin(math.pi/2) = {math.sin(math.pi/2)}&quot;)
+print(f&quot;math.log(100, 10) = {math.log(100, 10)}&quot;)
+print(f&quot;math.log2(8) = {math.log2(8)}&quot;)
+print(f&quot;math.factorial(5) = {math.factorial(5)}&quot;)
+print(f&quot;math.comb(5, 2) = {math.comb(5, 2)}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> math
+
+<span class="fn">print</span>(<span class="st">f"math.sqrt(25) = {math.sqrt(25)}"</span>)
+<span class="fn">print</span>(<span class="st">f"math.pi = {math.pi}"</span>)
+<span class="fn">print</span>(<span class="st">f"math.sin(math.pi/2) = {math.sin(math.pi/2)}"</span>)
+<span class="fn">print</span>(<span class="st">f"math.log(100, 10) = {math.log(100, 10)}"</span>)
+<span class="fn">print</span>(<span class="st">f"math.log2(8) = {math.log2(8)}"</span>)
+<span class="fn">print</span>(<span class="st">f"math.factorial(5) = {math.factorial(5)}"</span>)
+<span class="fn">print</span>(<span class="st">f"math.comb(5, 2) = {math.comb(5, 2)}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 5.2 Constants and Special Functions</h3>
+                    <p><code>math</code> includes constants like <code>pi</code>, <code>e</code>, and <code>tau</code>, plus functions like <code>ceil</code>, <code>floor</code>, <code>gcd</code>.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Constants: <code>math.e</code>, <code>math.tau</code>.</li>
+                        <li><strong>Step 2:</strong> Ceiling and floor: <code>math.ceil(3.14)</code>, <code>math.floor(3.14)</code>.</li>
+                        <li><strong>Step 3:</strong> Greatest common divisor: <code>math.gcd(48, 18)</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import math
+
+print(f&quot;math.e = {math.e}&quot;)
+print(f&quot;math.tau = {math.tau} (2*pi)&quot;)
+print(f&quot;math.ceil(3.14) = {math.ceil(3.14)}&quot;)
+print(f&quot;math.floor(3.14) = {math.floor(3.14)}&quot;)
+print(f&quot;math.gcd(48, 18) = {math.gcd(48, 18)}&quot;)
+print(f&quot;math.isclose(0.1 + 0.2, 0.3) = {math.isclose(0.1 + 0.2, 0.3)}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> math
+
+<span class="fn">print</span>(<span class="st">f"math.e = {math.e}"</span>)
+<span class="fn">print</span>(<span class="st">f"math.tau = {math.tau} (2*pi)"</span>)
+<span class="fn">print</span>(<span class="st">f"math.ceil(3.14) = {math.ceil(3.14)}"</span>)
+<span class="fn">print</span>(<span class="st">f"math.floor(3.14) = {math.floor(3.14)}"</span>)
+<span class="fn">print</span>(<span class="st">f"math.gcd(48, 18) = {math.gcd(48, 18)}"</span>)
+<span class="fn">print</span>(<span class="st">f"math.isclose(0.1 + 0.2, 0.3) = {math.isclose(0.1 + 0.2, 0.3)}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="random" aria-labelledby="random-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="random-heading">🎲 Random Numbers — The <code>random</code> Module</h2>
+                    <p>Generate random numbers for games, simulations, testing, and more.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 6.1 Basic Random Functions</h3>
+                    <p><code>random.random()</code>, <code>random.randint()</code>, <code>random.choice()</code>, <code>random.shuffle()</code>.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>random</code>.</li>
+                        <li><strong>Step 2:</strong> Generate a random float between 0 and 1: <code>random.random()</code>.</li>
+                        <li><strong>Step 3:</strong> Generate a random integer: <code>random.randint(1, 10)</code>.</li>
+                        <li><strong>Step 4:</strong> Choose a random element: <code>random.choice(["a", "b", "c"])</code>.</li>
+                        <li><strong>Step 5:</strong> Shuffle a list in place: <code>random.shuffle(items)</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import random
+
+print(f&quot;random.random() = {random.random()}&quot;)
+print(f&quot;random.randint(1, 10) = {random.randint(1, 10)}&quot;)
+
+colors = [&quot;red&quot;, &quot;green&quot;, &quot;blue&quot;]
+print(f&quot;random.choice(colors) = {random.choice(colors)}&quot;)
+
+items = [1, 2, 3, 4, 5]
+random.shuffle(items)
+print(f&quot;shuffled items = {items}&quot;)
+
+sample = random.sample(range(100), 5)
+print(f&quot;random.sample(100, 5) = {sample}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> random
+
+<span class="fn">print</span>(<span class="st">f"random.random() = {random.random()}"</span>)
+<span class="fn">print</span>(<span class="st">f"random.randint(1, 10) = {random.randint(1, 10)}"</span>)
+
+colors = [<span class="st">"red"</span>, <span class="st">"green"</span>, <span class="st">"blue"</span>]
+<span class="fn">print</span>(<span class="st">f"random.choice(colors) = {random.choice(colors)}"</span>)
+
+items = [1, 2, 3, 4, 5]
+random.shuffle(items)
+<span class="fn">print</span>(<span class="st">f"shuffled items = {items}"</span>)
+
+sample = random.sample(range(100), 5)
+<span class="fn">print</span>(<span class="st">f"random.sample(100, 5) = {sample}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 6.2 Seeding for Reproducibility</h3>
+                    <p>Use <code>random.seed()</code> to get reproducible random sequences.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Seed the random generator: <code>random.seed(42)</code>.</li>
+                        <li><strong>Step 2:</strong> Generate random numbers — they will be the same every time.</li>
+                        <li><strong>Step 3:</strong> This is essential for reproducible research and debugging.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="import random
+
+random.seed(42)
+print(&quot;First sequence (seed=42):&quot;)
+for i in range(3):
+    print(f&quot;  {random.randint(1, 100)}&quot;)
+
+random.seed(42)
+print(&quot;Second sequence (seed=42):&quot;)
+for i in range(3):
+    print(f&quot;  {random.randint(1, 100)}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">import</span> random
+
+random.seed(42)
+<span class="fn">print</span>(<span class="st">"First sequence (seed=42):"</span>)
+<span class="kw">for</span> i <span class="kw">in</span> range(3):
+    <span class="fn">print</span>(<span class="st">f"  {random.randint(1, 100)}"</span>)
+
+random.seed(42)
+<span class="fn">print</span>(<span class="st">"Second sequence (seed=42):"</span>)
+<span class="kw">for</span> i <span class="kw">in</span> range(3):
+    <span class="fn">print</span>(<span class="st">f"  {random.randint(1, 100)}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="insight">💡 Seeding is critical for scientific reproducibility. Use a fixed seed for deterministic results.</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="decimal-fraction" aria-labelledby="decfrac-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="decfrac-heading">💰 <code>Decimal</code> &amp; <code>Fraction</code> — Exact Numbers</h2>
+                    <p>For precise decimal arithmetic and rational numbers, use <code>Decimal</code> and <code>Fraction</code>.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 7.1 <code>Decimal</code> — Exact Decimal Arithmetic</h3>
+                    <p>Avoid floating-point rounding errors with <code>Decimal</code>. Essential for financial applications.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>Decimal</code> from <code>decimal</code>.</li>
+                        <li><strong>Step 2:</strong> Create Decimals from strings: <code>Decimal("0.1")</code>.</li>
+                        <li><strong>Step 3:</strong> Compare float vs Decimal precision.</li>
+                        <li><strong>Step 4:</strong> Set precision with <code>getcontext().prec</code>.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="from decimal import Decimal, getcontext
+
+print(&quot;Float: 0.1 + 0.2 =&quot;, 0.1 + 0.2)
+print(&quot;Decimal: 0.1 + 0.2 =&quot;, Decimal(&quot;0.1&quot;) + Decimal(&quot;0.2&quot;))
+
+getcontext().prec = 4
+print(&quot;Precision 4:&quot;, Decimal(&quot;1&quot;) / Decimal(&quot;3&quot;))
+
+price = Decimal(&quot;19.99&quot;)
+tax_rate = Decimal(&quot;0.08&quot;)
+total = price + (price * tax_rate)
+print(f&quot;Price: ${price}, Total with tax: ${total}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">from</span> decimal <span class="kw">import</span> Decimal, getcontext
+
+<span class="fn">print</span>(<span class="st">"Float: 0.1 + 0.2 ="</span>, 0.1 + 0.2)
+<span class="fn">print</span>(<span class="st">"Decimal: 0.1 + 0.2 ="</span>, Decimal(<span class="st">"0.1"</span>) + Decimal(<span class="st">"0.2"</span>))
+
+getcontext().prec = 4
+<span class="fn">print</span>(<span class="st">"Precision 4:"</span>, Decimal(<span class="st">"1"</span>) / Decimal(<span class="st">"3"</span>))
+
+price = Decimal(<span class="st">"19.99"</span>)
+tax_rate = Decimal(<span class="st">"0.08"</span>)
+total = price + (price * tax_rate)
+<span class="fn">print</span>(<span class="st">f"Price: ${price}, Total with tax: ${total}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                    <div class="note-warn">⚠️ Always create <code>Decimal</code> from strings or integers, not floats, to avoid floating-point inaccuracies.</div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 7.2 <code>Fraction</code> — Rational Numbers</h3>
+                    <p>Represent exact rational numbers with <code>Fraction</code> from the <code>fractions</code> module.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Import <code>Fraction</code> from <code>fractions</code>.</li>
+                        <li><strong>Step 2:</strong> Create fractions: <code>Fraction(3, 4)</code>.</li>
+                        <li><strong>Step 3:</strong> Perform arithmetic and see simplification.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="from fractions import Fraction
+
+f1 = Fraction(3, 4)
+f2 = Fraction(1, 6)
+
+print(f&quot;f1 = {f1}&quot;)
+print(f&quot;f2 = {f2}&quot;)
+print(f&quot;f1 + f2 = {f1 + f2}&quot;)
+print(f&quot;f1 * f2 = {f1 * f2}&quot;)
+print(f&quot;f1 / f2 = {f1 / f2}&quot;)
+
+f3 = Fraction(&quot;0.125&quot;)
+print(f&quot;Fraction(\&quot;0.125\&quot;) = {f3}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">from</span> fractions <span class="kw">import</span> Fraction
+
+f1 = Fraction(3, 4)
+f2 = Fraction(1, 6)
+
+<span class="fn">print</span>(<span class="st">f"f1 = {f1}"</span>)
+<span class="fn">print</span>(<span class="st">f"f2 = {f2}"</span>)
+<span class="fn">print</span>(<span class="st">f"f1 + f2 = {f1 + f2}"</span>)
+<span class="fn">print</span>(<span class="st">f"f1 * f2 = {f1 * f2}"</span>)
+<span class="fn">print</span>(<span class="st">f"f1 / f2 = {f1 / f2}"</span>)
+
+f3 = Fraction(<span class="st">"0.125"</span>)
+<span class="fn">print</span>(<span class="st">f"Fraction('0.125') = {f3}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="formatting" aria-labelledby="format-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="format-heading">🎯 Number Formatting</h2>
+                    <p>Control how numbers are displayed with f-strings and the <code>format()</code> function.</p>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 8.1 Formatting Floats</h3>
+                    <p>Control decimal places, alignment, and thousands separators.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Use <code>:.2f</code> for 2 decimal places.</li>
+                        <li><strong>Step 2:</strong> Use <code>:,</code> for thousands separators.</li>
+                        <li><strong>Step 3:</strong> Use <code>:.2%</code> for percentages.</li>
+                        <li><strong>Step 4:</strong> Use <code>:.2e</code> for scientific notation.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="pi = 3.14159265359
+big = 1234567.89
+
+print(f&quot;pi to 2 decimals: {pi:.2f}&quot;)
+print(f&quot;pi to 4 decimals: {pi:.4f}&quot;)
+print(f&quot;pi in scientific: {pi:.2e}&quot;)
+
+print(f&quot;big with commas: {big:,.2f}&quot;)
+
+pct = 0.875
+print(f&quot;percentage: {pct:.2%}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">pi</span> = 3.14159265359
+<span class="kw">big</span> = 1234567.89
+
+<span class="fn">print</span>(<span class="st">f"pi to 2 decimals: {pi:.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"pi to 4 decimals: {pi:.4f}"</span>)
+<span class="fn">print</span>(<span class="st">f"pi in scientific: {pi:.2e}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"big with commas: {big:,.2f}"</span>)
+
+pct = 0.875
+<span class="fn">print</span>(<span class="st">f"percentage: {pct:.2%}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+
+                <div class="oop-block">
+                    <h3>📝 8.2 Formatting Integers</h3>
+                    <p>Format integers with width, padding, and different bases.</p>
+
+                    <h4>Step-by-step explanation:</h4>
+                    <ul class="step-list">
+                        <li><strong>Step 1:</strong> Use <code>:d</code> for integer (default).</li>
+                        <li><strong>Step 2:</strong> Use <code>:b</code> for binary, <code>:o</code> for octal, <code>:x</code> for hex.</li>
+                        <li><strong>Step 3:</strong> Use <code>:05d</code> to pad with zeros.</li>
+                    </ul>
+
+                    <div class="code-container" data-code="n = 42
+
+print(f&quot;decimal: {n:d}&quot;)
+print(f&quot;binary:  {n:b}&quot;)
+print(f&quot;octal:   {n:o}&quot;)
+print(f&quot;hex:     {n:x}&quot;)
+print(f&quot;hex (uppercase): {n:X}&quot;)
+
+print(f&quot;padded:  {n:05d}&quot;)
+print(f&quot;padded with spaces: {n:5d}&quot;)">
+                        <div class="code-header">
+                            <span>python</span>
+                            <div class="code-actions">
+                                <button class="code-btn copy-btn"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="code-btn run-btn"><i class="fas fa-play"></i> Run</button>
+                            </div>
+                        </div>
+                        <div class="code-snippet"><pre><span class="kw">n</span> = 42
+
+<span class="fn">print</span>(<span class="st">f"decimal: {n:d}"</span>)
+<span class="fn">print</span>(<span class="st">f"binary:  {n:b}"</span>)
+<span class="fn">print</span>(<span class="st">f"octal:   {n:o}"</span>)
+<span class="fn">print</span>(<span class="st">f"hex:     {n:x}"</span>)
+<span class="fn">print</span>(<span class="st">f"hex (uppercase): {n:X}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"padded:  {n:05d}"</span>)
+<span class="fn">print</span>(<span class="st">f"padded with spaces: {n:5d}"</span>)</pre></div>
+                        <div class="output-panel"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq-numbers" aria-labelledby="faq-numbers-heading">
+            <div class="page-col">
+                <div class="section-intro">
+                    <h2 id="faq-numbers-heading">❓ Frequently Asked Questions — Python Numbers</h2>
+                    <p>Common questions about numbers in Python, answered.</p>
+                </div>
+                <div class="faq-list">
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>Why does <code>0.1 + 0.2</code> give <code>0.30000000000000004</code>?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p>This is due to floating-point representation. Binary floating-point cannot represent 0.1 exactly. Use <code>Decimal</code> for exact decimal arithmetic, or round the result.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>What is the difference between <code>float</code> and <code>Decimal</code>?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p><code>float</code> is fast and uses hardware-accelerated binary arithmetic but has rounding errors. <code>Decimal</code> is slower but provides exact decimal arithmetic, making it suitable for financial applications.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>When should I use <code>Fraction</code>?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p>Use <code>Fraction</code> when you need exact rational arithmetic — for example, in mathematical proofs, educational software, or when working with ratios.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>How do I generate a random number in a specific range?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p>Use <code>random.randint(a, b)</code> for integers between <code>a</code> and <code>b</code> inclusive, or <code>random.uniform(a, b)</code> for floats between <code>a</code> and <code>b</code>.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>What are <code>math.inf</code> and <code>math.nan</code>?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p><code>math.inf</code> represents infinity, and <code>math.nan</code> represents "Not a Number". They are used to handle special cases in mathematical computations.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>How do I format a number with thousands separators?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p>Use <code>f"{number:,}"</code> for integers, or <code>f"{number:,.2f}"</code> for floats with 2 decimal places.</p></div></div>
+                    <div class="faq-item"><div class="faq-q" onclick="toggleFaq(this)"><h3>What is the maximum size of an integer in Python?</h3><span class="faq-toggle">+</span></div><div class="faq-a"><p>Python integers are arbitrary precision — they can grow to any size limited only by your system's available memory. There is no fixed maximum.</p></div></div>
+                </div>
+            </div>
+        </section>
+
+        
+        <section id="outro" aria-labelledby="outro-heading">
+            <div class="page-col">
+                <div class="outro-box">
+                    <h2 id="outro-heading">💛 You've Mastered Python Numbers</h2>
+                    <p>
+                        From integers and floats to complex numbers, from basic arithmetic to advanced math,
+                        random generation, and precise decimal arithmetic — you now have a complete toolkit
+                        for working with numbers in Python. You've learned to handle every numeric situation
+                        with confidence.
+                    </p><div class="ad-slot" style="margin:1.6rem 0;text-align:center;"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6428799122405621" data-ad-slot="9585168014" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>
+<p>
+                        This curriculum, crafted by <strong>@PoeticGlenn</strong>,
+                        is your go-to reference for numeric computing in Python. Whether you're building
+                        financial systems, scientific simulations, or games, you have the skills to succeed.
+                    </p>
+                    <div>
+                        <span>
+                            <i class="fas fa-check-circle"></i> 24 lessons
+                        </span>
+                        <span>
+                            <i class="fas fa-code"></i> 25+ code examples
+                        </span>
+                        <span>
+                            <i class="fas fa-users"></i> 950+ learners
+                        </span>
+                    </div>
+                    <div class="outro-cta">
+                        <a href="index.html" class="btn btn-home"><i class="fas fa-home"></i> Explore More</a>
+                        <a href="https://twitter.com/PoeticGlenn" target="_blank" rel="noopener" class="btn btn-outline"><i class="fab fa-twitter"></i> Follow @PoeticGlenn</a>
+                        <a href="https://github.com/pansensoyglenn-dev/poetic-bytes" target="_blank" rel="noopener" class="btn btn-outline"><i class="fab fa-github"></i> Star on GitHub</a>
+                    </div>
+                    <p>
+                        <i class="fas fa-quote-left" style="margin-right:0.3rem"></i>
+                        "Numbers are the invisible language that powers the universe. Now you speak it fluently."
+                        <span>— Glenn Junsay Pansensoy <span>(@PoeticGlenn)</span></span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section aria-label="Share this resource">
+            <div class="page-col">
+                <div class="share-box" id="shareSection">
+                    <h3>📤 Share this guide</h3>
+                    <p>Help other developers master numbers in Python — share this resource!</p>
+                    <div class="share-row" id="shareRowBottom">
+                        <button class="share-btn copy-btn" id="copyLinkBottom"><i class="fas fa-link"></i> Copy link</button>
+                        <a href="#" class="share-btn" id="shareFbBottom" target="_blank" rel="noopener"><i class="fab fa-facebook-f"></i> Facebook</a>
+                        <a href="#" class="share-btn" id="shareTwBottom" target="_blank" rel="noopener"><i class="fab fa-twitter"></i> X</a>
+                        <a href="#" class="share-btn" id="shareLiBottom" target="_blank" rel="noopener"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
+                        <a href="#" class="share-btn" id="shareWaBottom" target="_blank" rel="noopener"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                        <a href="#" class="share-btn" id="shareTgBottom" target="_blank" rel="noopener"><i class="fab fa-telegram-plane"></i> Telegram</a>
+                    </div>
+                </div>
+            </div>
+        </section><div class="ad-slot" style="margin:1.6rem 0;text-align:center;"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-6428799122405621" data-ad-slot="1982565389" data-ad-format="auto" data-full-width-responsive="true"></ins><script>(adsbygoogle=window.adsbygoogle||[]).push({});</script></div>
+</article>
+<div style="margin:2rem 0 0;"><a style="display:inline-block;margin:0 .5rem .5rem 0;padding:.55rem 1.1rem;border-radius:999px;font:.8rem monospace;text-decoration:none;border:1px solid #c4302b;color:#ff8a85;" href="https://www.youtube.com/@PoeticBytes?sub_confirmation=1" target="_blank" rel="noopener">Subscribe @PoeticBytes</a></div>
+<div style="margin:2.5rem 0 1rem;"><div style="font:.7rem monospace;color:#667fa3;margin-bottom:.6rem;">SHARE THIS ESSAY</div><a style="display:inline-block;margin:0 .4rem .5rem 0;padding:.45rem .9rem;border:1px solid #253649;border-radius:999px;font:.75rem monospace;color:#74b9e8;text-decoration:none;background:none;cursor:pointer;" href="https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fpoetic-codes.pages.dev%2Farticles%2Fpython-numbers-tutorial-integers-floats-complex-math-poetic-bytes.html" target="_blank" rel="noopener">Facebook</a><a style="display:inline-block;margin:0 .4rem .5rem 0;padding:.45rem .9rem;border:1px solid #253649;border-radius:999px;font:.75rem monospace;color:#74b9e8;text-decoration:none;background:none;cursor:pointer;" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fpoetic-codes.pages.dev%2Farticles%2Fpython-numbers-tutorial-integers-floats-complex-math-poetic-bytes.html&text=Python%20Numbers%20Tutorial%3A%20Integers%2C%20Floats%2C%20Complex%20%26%20Math%20%7C%20Poetic%20Bytes" target="_blank" rel="noopener">X</a><a style="display:inline-block;margin:0 .4rem .5rem 0;padding:.45rem .9rem;border:1px solid #253649;border-radius:999px;font:.75rem monospace;color:#74b9e8;text-decoration:none;background:none;cursor:pointer;" href="https://wa.me/?text=Python%20Numbers%20Tutorial%3A%20Integers%2C%20Floats%2C%20Complex%20%26%20Math%20%7C%20Poetic%20Bytes%20https%3A%2F%2Fpoetic-codes.pages.dev%2Farticles%2Fpython-numbers-tutorial-integers-floats-complex-math-poetic-bytes.html" target="_blank" rel="noopener">WhatsApp</a><a style="display:inline-block;margin:0 .4rem .5rem 0;padding:.45rem .9rem;border:1px solid #253649;border-radius:999px;font:.75rem monospace;color:#74b9e8;text-decoration:none;background:none;cursor:pointer;" href="https://t.me/share/url?url=https%3A%2F%2Fpoetic-codes.pages.dev%2Farticles%2Fpython-numbers-tutorial-integers-floats-complex-math-poetic-bytes.html&text=Python%20Numbers%20Tutorial%3A%20Integers%2C%20Floats%2C%20Complex%20%26%20Math%20%7C%20Poetic%20Bytes" target="_blank" rel="noopener">Telegram</a><button style="display:inline-block;margin:0 .4rem .5rem 0;padding:.45rem .9rem;border:1px solid #253649;border-radius:999px;font:.75rem monospace;color:#74b9e8;text-decoration:none;background:none;cursor:pointer;" onclick="(navigator.share?navigator.share({title:document.title,url:location.href}):navigator.clipboard.writeText(location.href).then(function(){alert('Link copied')}))">Share / copy link</button></div>
+<nav style="margin:2rem 0;padding-top:1.2rem;border-top:1px solid #253649;"><div style="font:.7rem monospace;color:#667fa3;margin-bottom:.6rem;">KEEP READING</div><ul style="padding-left:1.1rem;"><li style="margin-bottom:.5rem;"><a href="https://poetic-codes.pages.dev/articles/why-maoism-no-longer-works-in-the-philippines.html">Why Maoism No Longer Works in the Philippines</a></li><li style="margin-bottom:.5rem;"><a href="https://poetic-codes.pages.dev/articles/democratic-social-reformism-a-relevant-philippine-ideology.html">Democratic Social Reformism: A Relevant Philippine Ideology</a></li><li style="margin-bottom:.5rem;"><a href="https://poetic-codes.pages.dev/articles/the-filipino-psyche-cultural-habits-blocking-progress.html">The Filipino Psyche: Cultural Habits Blocking Progress</a></li><li style="margin-bottom:.5rem;"><a href="https://poetic-codes.pages.dev/articles/vietnam-s-cooperative-model-and-the-philippine-challenge.html">Vietnam's Cooperative Model and the Philippine Challenge</a></li><li style="margin-bottom:.5rem;"><a href="https://poetic-codes.pages.dev/articles/pax-silica-secure-tech-supply-chains-philippine-growth.html">Pax Silica: Secure Tech Supply Chains &amp; Philippine Growth</a></li></ul></nav>
+<footer>
+<a href="https://poetic-bytes.blogspot.com/2026/04/about_01131455884.html" target="_blank" rel="noopener">About</a> |
+<a href="https://poetic-bytes.blogspot.com/2026/04/privacy-policy_01328570854.html" target="_blank" rel="noopener">Privacy</a> |
+<a href="https://poetic-bytes.blogspot.com/2026/04/terms-of-service_01797605838.html" target="_blank" rel="noopener">Terms</a> |
+<a href="https://poetic-bytes.blogspot.com/2026/04/cookie-policy.html" target="_blank" rel="noopener">Cookies</a><br>
+<a href="https://x.com/PoeticGlenn" target="_blank" rel="noopener me">X @PoeticGlenn</a> |
+<a href="https://www.youtube.com/@PoeticBytes?sub_confirmation=1" target="_blank" rel="noopener me">YouTube @PoeticBytes</a> |
+<a href="https://poetic-codes.pages.dev/">poetic-codes.pages.dev</a><br>
+&copy; 2026 Glenn Junsay Pansensoy
+</footer>
+</body>
+</html>
