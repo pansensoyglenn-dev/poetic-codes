@@ -1,6 +1,6 @@
 {
-  "jobId": "1795200000001",
-  "createdAt": "2026-11-20T07:38:22.148Z",
+  "jobId": "1795162123191",
+  "createdAt": "2026-11-20T08:08:43.191Z",
   "title": "Python Numbers Tutorial for Beginners (Full Video)",
   "author": "Glenn Junsay Pansensoy",
   "category": "Programming",
@@ -20,6 +20,5 @@
   "slug": "python-numbers-tutorial-for-beginners-full-video",
   "articleId": 71,
   "coverUrl": null,
-  "force": true,
-  "premadeVideo": "https://poetic-codes.pages.dev/videos/python-numbers-tutorial.mp4"
+  "force": true
 }
