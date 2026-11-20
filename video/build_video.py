@@ -293,14 +293,56 @@ def slide_outro(bullets, idx, total):
     return im
 
 # ---------- audio ----------
-def tts(text, path, voice, rate):
-    try:
-        import edge_tts
-    except ImportError:
-        return False
+FALLBACK_VOICES = ["en-US-AndrewNeural", "en-US-GuyNeural", "en-GB-RyanNeural", "en-US-AriaNeural"]
+
+def _tts_once(text, path, voice, rate):
+    import edge_tts
     async def go():
         await edge_tts.Communicate(text, voice, rate=rate).save(str(path))
     asyncio.run(go())
+    if not Path(path).exists() or Path(path).stat().st_size < 500:
+        raise RuntimeError("empty audio file")
+
+def tts(text, path, voice, rate):
+    """Speak `text` into an mp3. Long text is cut into sentence groups; each is retried, and other voices are tried if needed."""
+    try:
+        import edge_tts  # noqa: F401
+    except ImportError:
+        return False
+    import time
+    voice = (voice or "").strip() or FALLBACK_VOICES[0]
+    rate = (rate or "").strip()
+    if not re.fullmatch(r"[+-]\d+%", rate): rate = "+0%"
+    sents = re.split(r"(?<=[.!?])\s+", text.strip())
+    groups, cur = [], ""
+    for s_ in sents:
+        if cur and len(cur) + len(s_) > 350: groups.append(cur); cur = s_
+        else: cur = (cur + " " + s_).strip()
+    if cur: groups.append(cur)
+    voices = [voice] + [v for v in FALLBACK_VOICES if v != voice]
+    parts = []
+    for gi, g in enumerate(groups):
+        part = Path(f"{path}.p{gi}.mp3"); ok = False; last = None
+        for v in voices:
+            for attempt in range(3):
+                try:
+                    _tts_once(g, part, v, rate); ok = True; break
+                except Exception as e:
+                    last = e; time.sleep(1.5 * (attempt + 1))
+            if ok:
+                if v != voice: print(f"NOTE: voice {voice} failed, used {v}")
+                break
+        if not ok:
+            raise SystemExit(f"ERROR: the narrator voice failed on: {g[:80]!r}\nLast error: {last!r}\n"
+                             "Try again in a few minutes, or run the workflow with another voice (en-US-GuyNeural).")
+        parts.append(part)
+    if len(parts) == 1:
+        shutil.move(str(parts[0]), str(path))
+    else:
+        lst = Path(f"{path}.txt"); lst.write_text("".join(f"file '{Path(p).resolve()}'\n" for p in parts))
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", str(lst),
+                        "-c:a", "libmp3lame", "-b:a", "96k", str(path)], check=True)
+        for p in parts: Path(p).unlink(missing_ok=True)
     return True
 
 def silence(path, seconds):
@@ -332,6 +374,11 @@ def main():
     a = ap.parse_args()
     out = Path(a.out); work = out / "work"; shutil.rmtree(work, ignore_errors=True); work.mkdir(parents=True, exist_ok=True)
     page = read_lessons(a.html)
+    raw = open(a.html, encoding="utf-8", errors="replace").read()
+    print(f"Lesson page: {a.html}  size={len(raw)} bytes  oop-block={raw.count('oop-block')}  code-container={raw.count('code-container')}  lessons found={sorted(page)}")
+    if not page:
+        sys.exit("ERROR: no lessons were found in this page. It must be the full python-numbers.html (about 127 KB, with 16 programs).\n"
+                 f"This file is {len(raw)} bytes and starts with: {raw[:150]!r}")
     lessons = [l for l in N.LESSONS if l["id"] in page]
     if a.only: lessons = lessons[:a.only]
     missing = [l["id"] for l in N.LESSONS if l["id"] not in page]
