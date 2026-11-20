@@ -41,7 +41,15 @@ jobs:
           PAGE: ${{ github.event.inputs.page }}
           VOICE: ${{ github.event.inputs.voice }}
           RATE: ${{ github.event.inputs.rate }}
-        run: python build_video.py "../$PAGE" --out ../out
+        run: |
+          if [ ! -f "../$PAGE" ]; then
+            echo "ERROR: the lesson page '$PAGE' is not in this repo."
+            echo "Pages that look like it:"
+            (cd .. && find . -iname 'python-numbers*.html' -not -path './.git/*' | head -20)
+            echo "Run the workflow again and type the correct path in the 'page' box."
+            exit 1
+          fi
+          python build_video.py "../$PAGE" --out ../out
       - name: Make a portal-sized copy (under 90 MB for the Worker upload limit)
         run: |
           DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 out/tutorial.mp4)
