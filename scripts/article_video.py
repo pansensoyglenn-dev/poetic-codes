@@ -3070,6 +3070,18 @@ def process_job(path):
                                     "reason": "article already has a video", "title": title})
                 return "skipped"
 
+        premade = str(job.get("premadeVideo") or "").strip()
+        if premade and not DRY_RUN:
+            # a finished video (for example the laptop tutorial) is already on the website: just attach it
+            if row is None:
+                raise RuntimeError("premade video: the article was not found on the site (the title must match exactly)")
+            attach_video(row, premade)
+            article_url = article_page_url(job, row)
+            log(f"  premade video attached to article #{row['id']}: {premade}")
+            write_marker(name, {"jobId": job.get("jobId"), "status": "done", "title": title, "videoUrl": premade,
+                                "articleUrl": article_url, "attached": True, "engine": "premade"})
+            return "done"
+
         if row is not None:
             fill_job_from_article(job, row)
         if not clean_text(job.get("body")):
