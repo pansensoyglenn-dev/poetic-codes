@@ -4,7 +4,7 @@
 #   type its path in the "page" box when you run the workflow)
 #   video/build_video.py
 #   video/narration.py
-# Run it from the Actions tab. When it finishes, the video is ALREADY on the website:
+# Run it from the Actions tab. When it finishes, the video is attached to the article straight away (uploaded to your Worker, no waiting for Cloudflare Pages), and a copy is committed to videos/:
 #   https://poetic-codes.pages.dev/videos/python-numbers-tutorial.mp4
 # (the workflow commits it to the repo's videos/ folder, and Cloudflare Pages publishes it).
 # The "numbers-tutorial" artifact also holds tutorial.mp4 (full quality, for YouTube), subtitles.srt,
@@ -26,6 +26,9 @@ on:
       rate:
         description: "Speaking speed (e.g. -4% is slightly slower than normal)"
         default: "-4%"
+      article_title:
+        description: "Exact title of the article that should get this video"
+        default: "Python Numbers Tutorial for Beginners (Full Video)"
 
 permissions:
   contents: write
@@ -85,16 +88,39 @@ jobs:
             for i in 1 2 3; do git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break || sleep 5; done
           fi
           echo "VIDEO_URL=https://poetic-codes.pages.dev/videos/$VNAME" >> "$GITHUB_ENV"
-      - name: Wait until the video is live on poetic-codes.pages.dev
+      - name: Attach the video to the article right now (no waiting for Cloudflare Pages)
+        # Uploads the web copy to your Worker's video storage (live in seconds) and sets it as the article's video.
+        # The copy in videos/ is still committed above, so the article page itself keeps working too.
+        continue-on-error: true
+        env:
+          ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+          WORKER: https://poetic-codes.pansensoyglenn150.workers.dev
+          ARTICLE_TITLE: ${{ github.event.inputs.article_title }}
         run: |
-          echo "Checking $VIDEO_URL"
-          for i in $(seq 1 30); do
-            CODE=$(curl -s -o /dev/null -w "%{http_code}" -I "$VIDEO_URL" || true)
-            echo "attempt $i: HTTP $CODE"
-            if [ "$CODE" = "200" ]; then echo "LIVE: $VIDEO_URL"; exit 0; fi
-            sleep 20
-          done
-          echo "NOTE: not live yet. Cloudflare Pages may still be deploying: check Workers & Pages > poetic-codes > Deployments, then open $VIDEO_URL"
+          if [ -z "$ADMIN_KEY" ]; then echo "ADMIN_KEY secret is not set: skipping the article attach."; exit 0; fi
+          python3 - <<'PY'
+          import os, re, sys, json, time, urllib.request, urllib.parse
+          W = os.environ["WORKER"]; K = os.environ["ADMIN_KEY"]; want = re.sub(r"[^a-z0-9]+", " ", os.environ["ARTICLE_TITLE"].lower()).strip()
+          def call(method, path, data=None, headers=None):
+              h = {"X-Admin-Key": K, "User-Agent": "tutorial-video-bot/1.0"}; h.update(headers or {})
+              req = urllib.request.Request(W + path, data=data, method=method, headers=h)
+              with urllib.request.urlopen(req, timeout=600) as r:
+                  return json.loads(r.read().decode())
+          raw = open("out/tutorial-portal.mp4", "rb").read()
+          q = urllib.parse.urlencode({"contentType": "video/mp4", "filename": "python-numbers-tutorial.mp4"})
+          url = call("POST", "/api/upload?" + q, raw, {"Content-Type": "video/mp4", "Content-Length": str(len(raw))})["url"]
+          print("video is live at", url)
+          rows = call("GET", "/api/articles")
+          rows = rows.get("articles", rows) if isinstance(rows, dict) else rows
+          row = next((r for r in rows if re.sub(r"[^a-z0-9]+", " ", (r.get("title") or "").lower()).strip() == want), None)
+          if not row:
+              print("No article titled", repr(os.environ["ARTICLE_TITLE"]), "on the Worker. Video is uploaded, but not attached."); sys.exit(0)
+          payload = {"title": row["title"], "category": row["category"], "date": str(row.get("date") or "")[:10],
+                     "contentType": row.get("content_type") or "html", "body": row["body"], "summary": row.get("summary") or "",
+                     "tags": row.get("tags") or [], "photoUrl": row.get("photo_url"), "videoUrl": url}
+          call("PUT", "/api/articles?id=" + str(row["id"]), json.dumps(payload).encode(), {"Content-Type": "application/json"})
+          print("attached to article #%s" % row["id"])
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: numbers-tutorial
