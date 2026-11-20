@@ -99,13 +99,22 @@ jobs:
         run: |
           if [ -z "$ADMIN_KEY" ]; then echo "ADMIN_KEY secret is not set: skipping the article attach."; exit 0; fi
           python3 - <<'PY'
-          import os, re, sys, json, time, urllib.request, urllib.parse
+          import os, re, sys, json, time, urllib.request, urllib.parse, urllib.error
           W = os.environ["WORKER"]; K = os.environ["ADMIN_KEY"]; want = re.sub(r"[^a-z0-9]+", " ", os.environ["ARTICLE_TITLE"].lower()).strip()
           def call(method, path, data=None, headers=None):
               h = {"X-Admin-Key": K, "User-Agent": "tutorial-video-bot/1.0"}; h.update(headers or {})
               req = urllib.request.Request(W + path, data=data, method=method, headers=h)
-              with urllib.request.urlopen(req, timeout=600) as r:
-                  return json.loads(r.read().decode())
+              try:
+                  with urllib.request.urlopen(req, timeout=600) as r:
+                      return json.loads(r.read().decode())
+              except urllib.error.HTTPError as e:
+                  body = e.read().decode("utf-8", "replace")[:300]
+                  print("Worker said HTTP %s for %s %s: %s" % (e.code, method, path.split("?")[0], body))
+                  if e.code == 404:
+                      print("404 means the Worker running on Cloudflare does not have this route yet: open Workers & Pages > poetic-codes > Edit code, paste the newest worker.js from your repo, and Deploy.")
+                  elif e.code == 401:
+                      print("401 means the ADMIN_KEY secret in GitHub is not the same as the Worker's ADMIN_KEY.")
+                  sys.exit(0)
           raw = open("out/tutorial-portal.mp4", "rb").read()
           q = urllib.parse.urlencode({"contentType": "video/mp4", "filename": "python-numbers-tutorial.mp4"})
           url = call("POST", "/api/upload?" + q, raw, {"Content-Type": "video/mp4", "Content-Length": str(len(raw))})["url"]
