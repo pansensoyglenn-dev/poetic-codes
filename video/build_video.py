@@ -9,7 +9,7 @@ Needs: ffmpeg, Pillow, pygments, beautifulsoup4 (+ lxml), and edge-tts for the n
 Without edge-tts it still builds the video, but silent (timing placeholder) so you can check the layout.
 Outputs in --out: tutorial.mp4, subtitles.srt, chapters.txt, youtube_description.txt, narration_script.txt
 """
-import argparse, asyncio, functools, os, re, subprocess, sys, shutil
+import argparse, asyncio, os, re, subprocess, sys, textwrap, shutil
 from pathlib import Path
 from bs4 import BeautifulSoup
 from PIL import Image, ImageDraw, ImageFont
@@ -32,46 +32,12 @@ def find_font(names):
             if p.exists(): return str(p)
     out = subprocess.run(["fc-match", "-f", "%{file}", names[0].split(".")[0]], capture_output=True, text=True).stdout
     return out or None
-
-F_SANS = find_font(["DejaVuSans.ttf"])
-F_BOLD = find_font(["DejaVuSans-Bold.ttf"])
-F_MONO = find_font(["DejaVuSansMono.ttf"])
-
-@functools.lru_cache(maxsize=64)
-def font(path, size):
-    size = max(10, int(size))
-    return ImageFont.truetype(path, size) if path else ImageFont.load_default()
-
-def resolve_html_path(raw_path):
-    p = Path(raw_path)
-    if p.is_file():
-        return str(p)
-    script_dir = Path(__file__).resolve().parent
-    repo_root = script_dir.parent
-    candidates = [
-        script_dir / raw_path,
-        repo_root / raw_path,
-        repo_root / p.name,
-    ]
-    for c in candidates:
-        if c.is_file():
-            return str(c)
-    matches = [
-        m for m in repo_root.rglob(p.name)
-        if len(m.relative_to(repo_root).parts) <= 4
-    ]
-    if matches:
-        matches.sort(key=lambda m: len(m.parts))
-        return str(matches[0])
-    raise FileNotFoundError(
-        f"Could not find '{raw_path}' (searched {raw_path}, {[str(c) for c in candidates]}, and {repo_root} for '{p.name}')."
-    )
+F_SANS = find_font(["DejaVuSans.ttf"]); F_BOLD = find_font(["DejaVuSans-Bold.ttf"]); F_MONO = find_font(["DejaVuSansMono.ttf"])
+def font(path, size): return ImageFont.truetype(path, size)
 
 # ---------- read the lessons from the HTML page ----------
 def read_lessons(html_path):
-    resolved = resolve_html_path(html_path)
-    print(f"Reading HTML lesson page: {resolved}")
-    soup = BeautifulSoup(Path(resolved).read_text(encoding="utf-8"), "lxml")
+    soup = BeautifulSoup(open(html_path, encoding="utf-8").read(), "lxml")
     out = {}
     for b in soup.find_all(class_="oop-block"):
         h3, cc = b.find("h3"), b.find(class_="code-container")
@@ -82,7 +48,7 @@ def read_lessons(html_path):
         out[m.group(1)] = {
             "intro": p.get_text(" ", strip=True) if p else "",
             "steps": [re.sub(r"^Step \d+:\s*", "", li.get_text(" ", strip=True)) for li in b.select(".step-list li")],
-            "code": cc.get("data-code") or "",
+            "code": cc.get("data-code"),
         }
     return out
 
@@ -106,9 +72,7 @@ def wrap(d, text, f, width):
     for w in words:
         t = (cur + " " + w).strip()
         if d.textlength(t, font=f) <= width: cur = t
-        else:
-            if cur: lines.append(cur)
-            cur = w
+        else: lines.append(cur); cur = w
     if cur: lines.append(cur)
     return lines
 
@@ -147,8 +111,10 @@ def slide_code(num, title, code, output, varies, idx, total):
     ph = max(lh * len(lines) + 90, 420)
     d.rounded_rectangle((px, 150, px + pw, 150 + ph), 18, fill=PANEL, outline=BORDER, width=2)
     d.text((px + 28, 172), "python", font=font(F_SANS, 24), fill=MUTED)
-    y = 225; x = px + 28; col = x
+    # syntax-highlight line by line
+    y0 = 225; x = px + 28; y = y0; col = x
     for ttype, val in lex(code, PythonLexer()):
+        color = TXT
         t = ttype
         while t is not Token and t not in TOK: t = t.parent
         color = TOK.get(t, TXT)
@@ -159,12 +125,12 @@ def slide_code(num, title, code, output, varies, idx, total):
     ox, ow = px + pw + 40, W - 80 - (px + pw + 40)
     d.rounded_rectangle((ox, 150, ox + ow, 150 + ph), 18, fill="#0A0F18", outline=GREEN, width=2)
     d.text((ox + 28, 172), "Output", font=font(F_SANS, 24), fill=GREEN)
-    fo_size = min(size, 30)
-    fo = font(F_MONO, fo_size); loh = int(fo_size * 1.5); y = 225
+    fo = font(F_MONO, min(size, 30)); loh = int(min(size, 30) * 1.5); y = 225
     for ln in output.split("\n")[:15]:
-        while d.textlength(ln, font=fo) > ow - 56 and len(ln) > 4:
-            ln = ln[:-2]
-        d.text((ox + 28, y), ln, font=fo, fill="#C9F7D1"); y += loh
+        while d.textlength(ln, font=fo) > ow - 56 and len(ln) > 4: ln = ln[:-2]; trunc = True
+        else: pass
+        shown = ln
+        d.text((ox + 28, y), shown, font=fo, fill="#C9F7D1"); y += loh
     if varies:
         d.text((ox + 28, 150 + ph - 46), "Random values: your output will differ.", font=font(F_SANS, 24), fill=GOLD)
     return im
@@ -189,34 +155,33 @@ class Laptop:
     SX, SY, SW, SH = 130, 150, 1660, 785          # screen (outer)
     IX, IY, IW, IH = 160, 175, 1600, 735          # inner display
     def __init__(self, num, title, code, output, idx, total, nsteps):
-        self.code_lines = code.split("\n") if code else [""]
-        self.tokens = line_tokens(code) if code else [[]]
+        self.code_lines = code.split("\n"); self.tokens = line_tokens(code)
         self.out_lines = output.split("\n") if output else []
-        n, ml = max(len(self.code_lines), 1), max([len(l) for l in self.code_lines] + [1])
+        n, ml = len(self.code_lines), max(len(l) for l in self.code_lines)
         best = None
         for ew in (880, 960, 1040, 1120):
             size = min(30, 650 / (n * 1.55), (ew - 120) / (CW * ml))
-            if self.IW - ew >= 520 and (best is None or size > best[0] + 0.5):
-                best = (size, ew)
-        if best is None:
-            best = (18, 960)
-        self.size, self.ew = int(max(14, best[0])), best[1]
+            if self.IW - ew >= 520 and (best is None or size > best[0] + 0.5): best = (size, ew)
+        self.size, self.ew = int(best[0]), best[1]
         self.lh = int(self.size * 1.55)
         self.f = font(F_MONO, self.size)
         mo = max([len(l) for l in self.out_lines] + [10])
         tw = self.IW - self.ew
-        self.fo_size = int(max(18, min(26, (tw - 60) / (CW * mo))))
-        self.fo = font(F_MONO, self.fo_size)
-        self.loh = int(self.fo_size * 1.55)
+        self.fo = font(F_MONO, int(max(20, min(26, (tw - 60) / (CW * mo)))))
+        self.loh = int(self.fo.size * 1.55)
         self.bg = self._background(num, title, idx, total, nsteps)
 
     def _background(self, num, title, idx, total, nsteps):
         im, d = base(f"Lesson {num}  ·  {title}", idx, total)
+        # soft glow + desk shadow
         d.ellipse((120, 960, W - 120, 1010), fill="#070C14")
+        # screen shell
         d.rounded_rectangle((self.SX, self.SY, self.SX + self.SW, self.SY + self.SH), 30, fill="#05080D", outline="#2F3B4E", width=4)
         d.ellipse((self.SX + self.SW // 2 - 5, self.SY + 8, self.SX + self.SW // 2 + 5, self.SY + 18), fill="#16202E")
+        # base / keyboard deck
         d.polygon([(80, 935), (W - 80, 935), (W - 30, 985), (30, 985)], fill="#2A3342", outline="#3A475B")
         d.rounded_rectangle((W // 2 - 130, 935, W // 2 + 130, 952), 8, fill="#1E2632")
+        # editor
         ix, iy, ew, ih = self.IX, self.IY, self.ew, self.IH
         d.rectangle((ix, iy, ix + self.IW, iy + ih), fill="#0A0F18")
         d.rectangle((ix, iy, ix + ew, iy + ih), fill="#0D1520")
@@ -224,6 +189,7 @@ class Laptop:
         for k, c in enumerate(("#FF5F56", "#FFBD2E", "#27C93F")): d.ellipse((ix + 18 + 26 * k, iy + 14, ix + 32 + 26 * k, iy + 28), fill=c)
         d.text((ix + ew // 2, iy + 22), f"lesson_{num.replace('.', '_')}.py  —  Python 3.12", font=font(F_SANS, 22), fill=MUTED, anchor="mm")
         d.rectangle((ix, iy + 44, ix + 62, iy + ih), fill="#0B121C")
+        # terminal
         tx = ix + ew
         d.rectangle((tx, iy, ix + self.IW, iy + 44), fill="#10202A")
         d.text((tx + 24, iy + 22), "Terminal", font=font(F_SANS, 22), fill=GREEN, anchor="lm")
@@ -243,19 +209,20 @@ class Laptop:
         for i, toks in enumerate(self.tokens):
             y = top + i * self.lh
             d.text((ix + 50, y), str(i + 1), font=font(F_MONO, max(14, self.size - 6)), fill=("#58A6FF" if hl and hl[0] <= i + 1 <= hl[1] else "#445168"), anchor="ra")
-            n = typed[i] if i < len(typed) else 0
+            n = typed[i]
             x = ix + 84
             for text, color in toks:
                 if n <= 0: break
                 seg = text[:n]; d.text((x, y), seg, font=self.f, fill=color)
                 x += d.textlength(seg, font=self.f); n -= len(text)
             if caret == i and blink: d.rectangle((x + 2, y + 2, x + 2 + int(self.size * 0.5), y + self.lh - 8), fill=TXT)
+        # terminal output
         ty = iy + 112
         for ln in self.out_lines[:outn]:
             tw = self.IW - self.ew - 48
-            while d.textlength(ln, font=self.fo) > tw and len(ln) > 4:
-                ln = ln[:-2] + "…"
+            while d.textlength(ln, font=self.fo) > tw and len(ln) > 4: ln = ln[:-2] + "…" if not ln.endswith("…") else ln[:-2] + "…"
             d.text((ix + self.ew + 24, ty), ln, font=self.fo, fill="#C9F7D1"); ty += self.loh
+        # step pill
         if step:
             d.rounded_rectangle((W - 80 - 250, 124, W - 80, 148), 12, fill=PANEL, outline=BLUE, width=2)
             d.text((W - 80 - 125, 136), f"Step {step} of {self.nsteps}", font=font(F_BOLD, 18), fill=BLUE, anchor="mm")
@@ -263,9 +230,7 @@ class Laptop:
 
 def build_code_scene(lesson, meta, code, output, idx, total, work, tag, voice, rate, have_tts):
     """Returns (clip_path, duration, [(start, end, sentence)], have_tts)."""
-    sents = [s for s in re.split(r"(?<=[.!?])\s+", lesson["walk"].strip()) if s]
-    if not sents:
-        sents = [f"Running lesson {lesson['id']}."]
+    sents = re.split(r"(?<=[.!?])\s+", lesson["walk"].strip())
     cues = N.CUES.get(lesson["id"], [])
     lap = Laptop(lesson["id"], lesson["title"], code, output, idx, total, max(len(cues), 1))
     nlines = len(lap.code_lines)
@@ -274,8 +239,7 @@ def build_code_scene(lesson, meta, code, output, idx, total, work, tag, voice, r
     frames, wavs, timeline, t = [], [], [], 0.0
     for k, s in enumerate(sents):
         mp3 = work / f"{tag}_{k:02d}.mp3"
-        if have_tts and tts(s, mp3, voice, rate):
-            pass
+        if have_tts and tts(s, mp3, voice, rate): pass
         else:
             if have_tts: print("NOTE: edge-tts not installed -> building a SILENT preview."); have_tts = False
             silence(mp3, max(1.5, len(s.split()) / 2.6))
@@ -286,7 +250,7 @@ def build_code_scene(lesson, meta, code, output, idx, total, work, tag, voice, r
         wavs.append(wav); timeline.append((t, t + dur - 0.25, s)); t += dur
         if k < len(cues):
             a, b, outn = cues[k]; step = k + 1; hl = (a, b)
-            todo = [i for i in range(typed_upto, min(b, nlines)) if typed[i] < len(lap.code_lines[i])]
+            todo = [i for i in range(typed_upto, b) if typed[i] < len(lap.code_lines[i])]
             chars = sum(len(lap.code_lines[i]) - typed[i] for i in todo)
             tt = min(dur * 0.7, max(0.5, chars / 26.0)) if chars else 0.0
             nfr = max(1, int(round(tt * 5))) if chars else 0
@@ -296,16 +260,16 @@ def build_code_scene(lesson, meta, code, output, idx, total, work, tag, voice, r
                 cur = typed[:]
                 for i, c in order[:upto]: cur[i] = max(cur[i], c)
                 car = order[upto - 1][0] if upto else None
-                frames.append((lap.frame(cur, hl, 0, step, caret=car, blink=(f % 2 == 0)), tt / nfr))
+                frames.append((lap.frame(cur, hl, 0 if outn else 0, step, caret=car, blink=(f % 2 == 0)), tt / nfr))
             for i in todo: typed[i] = len(lap.code_lines[i])
             typed_upto = max(typed_upto, b)
-            frames.append((lap.frame(typed, hl, outn, step), max(0.05, dur - (tt if chars else 0))))
+            frames.append((lap.frame(typed, hl, outn, step), dur - (tt if chars else 0)))
         else:
             for i in range(nlines): typed[i] = len(lap.code_lines[i])
             frames.append((lap.frame(typed, None, len(lap.out_lines), None), dur))
     lst = work / f"{tag}_frames.txt"; parts = []
     for n, (img, dd) in enumerate(frames):
-        p = work / f"{tag}_f{n:04d}.png"; img.save(p); parts.append(f"file '{p.resolve()}'\nduration {max(0.04, dd):.3f}\n")
+        p = work / f"{tag}_f{n:04d}.png"; img.save(p); parts.append(f"file '{p.resolve()}'\nduration {dd:.3f}\n")
     parts.append(f"file '{(work / f'{tag}_f{len(frames)-1:04d}.png').resolve()}'\n")
     lst.write_text("".join(parts))
     alst = work / f"{tag}_a.txt"; alst.write_text("".join(f"file '{w.resolve()}'\n" for w in wavs))
@@ -373,16 +337,18 @@ def main():
     missing = [l["id"] for l in N.LESSONS if l["id"] not in page]
     if missing: print("WARNING: lessons in narration but not in the page:", missing)
 
+    scenes = [("intro", "Introduction", slide_title(N.TITLE, "A professional, step-by-step guide",
+                ["Integers  ·  Floats  ·  Complex numbers", "Arithmetic  ·  math module  ·  random",
+                 "Decimal & Fraction  ·  Number formatting"], 0, 1), " ".join(N.INTRO))]
     total = 2 + 2 * len(lessons)
-    scenes = [
-        ("intro", "Introduction", slide_title(N.TITLE, "A professional, step-by-step guide",
-            ["Integers  ·  Floats  ·  Complex numbers", "Arithmetic  ·  math module  ·  random",
-             "Decimal & Fraction  ·  Number formatting"], 1, total), " ".join(N.INTRO))
-    ]
+    scenes[0] = ("intro", "Introduction", slide_title(N.TITLE, "A professional, step-by-step guide",
+                ["Integers  ·  Floats  ·  Complex numbers", "Arithmetic  ·  math module  ·  random",
+                 "Decimal & Fraction  ·  Number formatting"], 1, total), " ".join(N.INTRO))
     i = 2
     for l in lessons:
         p = page[l["id"]]
         outp = run_code(p["code"])
+        varies = "import random" in p["code"] and "seed" not in p["code"]
         scenes.append((l["id"], f'{l["id"]} {l["title"]}', slide_concept(l["id"], l["title"], p["intro"], p["steps"], i, total), l["concept"])); i += 1
         scenes.append((None, None, ("code", l, p["code"], outp, i), l["walk"])); i += 1
     scenes.append(("outro", "Recap and next steps", slide_outro(
@@ -410,13 +376,10 @@ def main():
             silence(mp3, max(3.0, len(text.split()) / 2.5))
         d = make_clip(png, mp3, clip)
         if chap: chapters.append((t, label))
-        sents = [s for s in re.split(r"(?<=[.!?])\s+", text) if s]
-        tot = sum(len(s) for s in sents)
-        tt = t
-        if tot > 0:
-            for s in sents:
-                dd = (d - 0.6) * len(s) / tot
-                srt.append((tt, tt + dd, s)); tt += dd
+        sents = re.split(r"(?<=[.!?])\s+", text); tot = sum(len(s) for s in sents); tt = t
+        for s in sents:
+            dd = (d - 0.6) * len(s) / tot
+            srt.append((tt, tt + dd, s)); tt += dd
         narr_txt.append((label or "") + "\n" + text + "\n")
         clips.append(clip); t += d
         print(f"  scene {n+1}/{len(scenes)}  {d:5.1f}s")
