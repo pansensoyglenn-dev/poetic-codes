@@ -1,6 +1,6 @@
 {
-  "jobId": "1795133265148",
-  "createdAt": "2026-11-20T00:07:45.148Z",
+  "jobId": "1795141758900",
+  "createdAt": "2026-11-20T02:29:18.900Z",
   "title": "Python Numbers Tutorial for Beginners (Full Video)",
   "author": "Glenn Junsay Pansensoy",
   "category": "Programming",
@@ -20,5 +20,5 @@
   "slug": "python-numbers-tutorial-for-beginners-full-video",
   "articleId": 71,
   "coverUrl": null,
-  "force": false
+  "force": true
 }
