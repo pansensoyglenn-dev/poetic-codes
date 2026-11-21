@@ -16,7 +16,8 @@ from PIL import Image, ImageDraw, ImageFont
 from pygments import lex
 from pygments.lexers import PythonLexer
 from pygments.token import Token
-import narration as N
+import importlib
+N = importlib.import_module(os.environ.get("NARRATION", "narration"))   # narration.py (Numbers) or e.g. narration_operators.py
 
 W, H = 1920, 1080
 BG, PANEL, BORDER = "#0B121C", "#111B2A", "#22324A"
@@ -36,6 +37,25 @@ F_SANS = find_font(["DejaVuSans.ttf"]); F_BOLD = find_font(["DejaVuSans-Bold.ttf
 def font(path, size): return ImageFont.truetype(path, size)
 
 # ---------- read the lessons from the HTML page ----------
+def lesson_code(cc):
+    """The program text. Uses data-code, but falls back to the visible code box when data-code is broken
+    (for example, an unescaped quote inside the attribute cuts the program short)."""
+    code = cc.get("data-code") or ""
+    try:
+        compile(code, "<lesson>", "exec")
+        return code
+    except SyntaxError:
+        snip = cc.select_one(".code-snippet pre") or cc.select_one("pre")
+        if snip:
+            alt = snip.get_text()
+            try:
+                compile(alt, "<lesson>", "exec")
+                print("NOTE: data-code was cut short; using the code shown on the page instead.")
+                return alt
+            except SyntaxError:
+                pass
+        return code
+
 def read_lessons(html_path):
     soup = BeautifulSoup(open(html_path, encoding="utf-8").read(), "lxml")
     out = {}
@@ -48,7 +68,7 @@ def read_lessons(html_path):
         out[m.group(1)] = {
             "intro": p.get_text(" ", strip=True) if p else "",
             "steps": [re.sub(r"^Step \d+:\s*", "", li.get_text(" ", strip=True)) for li in b.select(".step-list li")],
-            "code": cc.get("data-code"),
+            "code": lesson_code(cc),
         }
     return out
 
@@ -384,13 +404,13 @@ def main():
     missing = [l["id"] for l in N.LESSONS if l["id"] not in page]
     if missing: print("WARNING: lessons in narration but not in the page:", missing)
 
-    scenes = [("intro", "Introduction", slide_title(N.TITLE, "A professional, step-by-step guide",
-                ["Integers  ·  Floats  ·  Complex numbers", "Arithmetic  ·  math module  ·  random",
-                 "Decimal & Fraction  ·  Number formatting"], 0, 1), " ".join(N.INTRO))]
     total = 2 + 2 * len(lessons)
-    scenes[0] = ("intro", "Introduction", slide_title(N.TITLE, "A professional, step-by-step guide",
-                ["Integers  ·  Floats  ·  Complex numbers", "Arithmetic  ·  math module  ·  random",
-                 "Decimal & Fraction  ·  Number formatting"], 1, total), " ".join(N.INTRO))
+    IB = getattr(N, "INTRO_BULLETS", ["Integers  ·  Floats  ·  Complex numbers", "Arithmetic  ·  math module  ·  random",
+                                      "Decimal & Fraction  ·  Number formatting"])
+    OB = getattr(N, "OUTRO_BULLETS", ["Integers have unlimited size", "Floats are fast but approximate", "Complex numbers use j",
+                                      "math and random extend Python", "Decimal and Fraction are exact", "Format specifiers control display"])
+    scenes = [("intro", "Introduction", slide_title(N.TITLE, getattr(N, "SUBTITLE", "A professional, step-by-step guide"),
+                IB, 1, total), " ".join(N.INTRO))]
     i = 2
     for l in lessons:
         p = page[l["id"]]
@@ -399,8 +419,7 @@ def main():
         scenes.append((l["id"], f'{l["id"]} {l["title"]}', slide_concept(l["id"], l["title"], p["intro"], p["steps"], i, total), l["concept"])); i += 1
         scenes.append((None, None, ("code", l, p["code"], outp, i), l["walk"])); i += 1
     scenes.append(("outro", "Recap and next steps", slide_outro(
-        ["Integers have unlimited size", "Floats are fast but approximate", "Complex numbers use j",
-         "math and random extend Python", "Decimal and Fraction are exact", "Format specifiers control display"], total, total), " ".join(N.OUTRO)))
+        OB, total, total), " ".join(N.OUTRO)))
 
     clips, t, chapters, srt, narr_txt = [], 0.0, [], [], []
     have_tts = True
@@ -439,9 +458,9 @@ def main():
     (out / "chapters.txt").write_text(ch + "\n")
     (out / "narration_script.txt").write_text("\n".join(narr_txt))
     (out / "youtube_description.txt").write_text(
-        "Learn every numeric type in Python: integers, floats, complex numbers, arithmetic, the math module, random numbers, "
-        "Decimal, Fraction, and number formatting. Every program is shown with its real output and explained step by step.\n\n"
-        "Chapters:\n" + ch + "\n\nFree interactive lesson with runnable code: https://poetic-bytes.vercel.app/python-numbers.html\n"
+        getattr(N, "DESCRIPTION", "Learn every numeric type in Python: integers, floats, complex numbers, arithmetic, the math module, random numbers, "
+        "Decimal, Fraction, and number formatting. Every program is shown with its real output and explained step by step.") + "\n\n"
+        "Chapters:\n" + ch + "\n\nFree interactive lesson with runnable code: " + getattr(N, "PAGE_URL", "https://poetic-bytes.vercel.app/python-numbers.html") + "\n"
         "#python #pythontutorial #learnpython #programming\n")
     print(f"DONE: {out/'tutorial.mp4'}  ({t/60:.1f} min)  voice={'edge-tts ' + a.voice if have_tts else 'SILENT preview'}")
 
