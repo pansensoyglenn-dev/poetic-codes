@@ -205,6 +205,7 @@ export default {
     if (pathname.startsWith('/media/') && req.method === 'GET') {
       const key = decodeURIComponent(pathname.slice(7));
       if (!key.startsWith('photos/') && !key.startsWith('videos/')) return new Response('Not found', { status: 404 });
+      if (!env.MEDIA) return new Response('Media storage is not enabled', { status: 404 });
       const wantsRange = req.headers.has('Range');
       const obj = await env.MEDIA.get(key, wantsRange ? { range: req.headers } : undefined);
       if (!obj) return new Response('Not found', { status: 404 });
@@ -237,6 +238,7 @@ export default {
     if (pathname === '/api/login') return json(req, { ok: true });
 
     if (pathname === '/api/upload' && req.method === 'POST') {
+      if (!env.MEDIA) return json(req, { error: 'Media storage (R2) is not enabled - publish without a cover image' }, 501);
       const ct = url.searchParams.get('contentType') || 'image/jpeg';
       const isVideo = /^video\//.test(ct);
       if (!isVideo && !/^image\//.test(ct)) return json(req, { error: 'Images and videos only' }, 400);
