@@ -6,7 +6,3 @@ compatibility_date = "2025-01-01"
 binding = "DB"
 database_name = "commonplace"
 database_id = "6911ed21-f619-4c84-8016-732c9673544f"
-
-[[r2_buckets]]
-binding = "MEDIA"
-bucket_name = "commonplace-media"
