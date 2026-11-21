@@ -2600,6 +2600,11 @@ async function submitArticle() {
   const publishType = document.getElementById('f-publish-type').value;
   const excerpt     = document.getElementById('f-excerpt').value.trim();
   const content     = getContentHTML();
+  // The pasted page BEFORE it is cut down to article text. A complete interactive lesson (own <html> + Pyodide runner)
+  // must be detected here, because getContentHTML() strips <html>, scripts and styles.
+  const rawInput    = (currentMode === 'html' ? document.getElementById('html-textarea').value
+                       : currentMode === 'video' ? '' : document.getElementById('plain-textarea').value).trim();
+  const isFullLessonInput = /<html[\s>]/i.test(rawInput) && /pyodide/i.test(rawInput);
   const errorBox    = document.getElementById('publish-error-box');
 
   errorBox.style.display = 'none';
@@ -2666,9 +2671,9 @@ async function submitArticle() {
         // SEO FIX: a pasted full web page is cut down to its <main> so the static page has one title/canonical
         // A complete interactive lesson page (has its own <html> and the Pyodide runner) is published exactly as it is,
         // so the Run buttons, colours and canonical tag keep working. Everything else is rebuilt as before.
-        const isFullLesson = /<html[\s>]/i.test(content) && /pyodide/i.test(content);
+        const isFullLesson = isFullLessonInput;
         const ghBody = isFullLesson ? '' : buildPageBody(content);
-        const ghPage = isFullLesson ? content : buildGitHubPage(title, author, category, excerpt, ghBody, slug, uploadedCoverUrl, '', ((document.getElementById('f-youtube-url') || {}).value || '').trim());
+        const ghPage = isFullLesson ? rawInput : buildGitHubPage(title, author, category, excerpt, ghBody, slug, uploadedCoverUrl, '', ((document.getElementById('f-youtube-url') || {}).value || '').trim());
         githubURL    = await publishToGitHub(slug, ghPage, uploadedCoverUrl);
         distLines.push('✓ GitHub: '+githubURL + (isFullLesson ? ' (full lesson page, published unchanged)' : ''));
         if (isFullLesson) distLines.push('– current-situation: skipped for full lesson pages (keeps one copy of each lesson)');
@@ -2717,7 +2722,7 @@ async function submitArticle() {
       distLines.push('– Commonplace: skipped (unchecked)');
     }
     // NEW: queue the automatic video (built by the GitHub Action, attached to the article)
-    const doVideo = document.getElementById('dist-autovideo') && document.getElementById('dist-autovideo').checked;
+    const doVideo = document.getElementById('dist-autovideo') && document.getElementById('dist-autovideo').checked && !isFullLessonInput;
     if (doVideo) {
       try {
         await queueVideoJob({
@@ -2739,7 +2744,7 @@ async function submitArticle() {
         distLines.push('⚠ Video not queued: ' + vErr.message + ' (use the Video button in All Articles to retry)');
       }
     } else {
-      distLines.push('– Video: skipped (unchecked)');
+      distLines.push(isFullLessonInput ? '– Video: skipped (a full lesson page already carries its own video)' : '– Video: skipped (unchecked)');
     }
     setProgress(85);
 
