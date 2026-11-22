@@ -160,7 +160,9 @@ This section is a record of songs and images that stuck. Not a definitive list, 
 
 const SITE_URL = 'https://poetic-codes.pages.dev/';
 const CANONICAL_URL = 'https://poetic-codes.pages.dev/';
-const API_URL = 'https://poetic-codes.vercel.app/';
+// FIX: the article API is the Cloudflare Worker (D1 + R2), same one portal.html uses.
+// It used to point at the old Vercel backend, which is why new articles never showed up here.
+const API_URL = 'https://poetic-codes.pansensoyglenn150.workers.dev/';
 
 // Public origin for each publishing platform. Used for canonical URLs, og:url,
 // sitemap and RSS so every copy of an article points at the host it lives on.
