@@ -1,6 +1,6 @@
 {
-  "jobId": "1795312210204",
-  "createdAt": "2026-11-22T01:50:10.204Z",
+  "jobId": "1795334963206",
+  "createdAt": "2026-11-22T08:09:23.206Z",
   "title": "China's Infrastructure Miracle: A New Standard for Modern Development",
   "author": "Glenn Junsay Pansensoy",
   "category": "Economy",
@@ -12,15 +12,10 @@
     "high-speed rail",
     "economy",
     "belt and road",
-    "united states",
-    "development"
+    "united states"
   ],
   "slug": "china-s-infrastructure-miracle-a-new-standard-for-modern-development",
   "articleId": 46,
   "coverUrl": null,
-  "force": false,
-  "location": {
-    "name": "China, 1978 to today",
-    "description": ""
-  }
+  "force": true
 }
