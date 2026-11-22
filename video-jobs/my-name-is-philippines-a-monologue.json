@@ -1,6 +1,6 @@
 {
-  "jobId": "1795377260336",
-  "createdAt": "2026-11-22T19:54:20.336Z",
+  "jobId": "1795387881091",
+  "createdAt": "2026-11-22T22:51:21.091Z",
   "title": "My Name Is Philippines: A Monologue",
   "author": "Glenn Junsay Pansensoy",
   "category": "Culture",
@@ -12,10 +12,15 @@
     "colonialism",
     "debt",
     "sovereignty",
-    "west philippine sea"
+    "west philippine sea",
+    "national identity"
   ],
   "slug": "my-name-is-philippines-a-monologue",
-  "articleId": 47,
+  "articleId": 48,
   "coverUrl": null,
-  "force": true
+  "force": false,
+  "location": {
+    "name": "Philippine islands, 1500s to today",
+    "description": "old churches, harbor ships, reefs and fishing boats, crowded homes, a woman at a mirror"
+  }
 }
