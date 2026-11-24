@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Import from Blogger</title>
+<style>
+  body{background:#0b0f17;color:#eef4ff;font-family:Georgia,serif;margin:0;padding:1rem;line-height:1.5}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-size:1.3rem}
+  input,select,button{font:inherit;padding:.5rem .7rem;border-radius:8px;border:1px solid #253649;background:#060c18;color:#eef4ff}
+  button{background:#306998;border:0;cursor:pointer}
+  button:disabled{opacity:.5}
+  .row{display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0}
+  .post{display:flex;gap:.6rem;align-items:center;border-bottom:1px solid #253649;padding:.5rem 0}
+  .post .t{flex:1;min-width:0}
+  .post .m{font:.7rem monospace;color:#8fa6c7}
+  .dup{color:#c9a84c}
+  #log{white-space:pre-wrap;font:.75rem monospace;background:#060c18;padding:.7rem;border-radius:8px;max-height:260px;overflow:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Import posts from Blogger to The Commonplace</h1>
+<p>Serve this page from <b>poetic-codes.pages.dev</b> so it shares your saved admin key. It only reads public posts and writes to your Worker.</p>
+
+<div class="row">
+  <input id="blog" size="38" value="https://poetic-bytes.blogspot.com">
+  <input id="key" type="password" placeholder="Admin key (auto-filled if saved)">
+  <button id="load">1. Load posts</button>
+</div>
+<div class="row">
+  <button id="all">Select all new</button>
+  <button id="none">Clear</button>
+  <button id="go" disabled>2. Import selected</button>
+</div>
+<div id="status"></div>
+<div id="list"></div>
+<h2>Log</h2>
+<div id="log"></div>
+</div>
+
+<script>
+const WORKER = 'https://poetic-codes.pansensoyglenn150.workers.dev/api/';
+const SECTIONS = {
+  'history':'History','philosophy':'Philosophy','economy':'Economy','programming':'Programming','culture':'Culture',
+  'culinary':'Culinary','local-politics':'Local Politics','global-politics':'Global Politics','weather':'Weather',
+  'farming':'Farming','ai':'AI','music-video':'Music Video'
+};
+const $ = id => document.getElementById(id);
+let posts = [], existing = new Set();
+
+function log(m){ $('log').textContent += m + '\n'; $('log').scrollTop = 1e9; }
+try { $('key').value = localStorage.getItem('pc_admin_key') || ''; } catch(e){}
+
+function guessSection(labels, title){
+  const text = (labels.join(' ') + ' ' + title).toLowerCase();
+  const rules = [
+    ['programming', /python|code|coding|programming|javascript|software/],
+    ['ai', /\bai\b|artificial intelligence|machine learning/],
+    ['economy', /econom|market|trade|inflation|debt|gdp|finance/],
+    ['history', /history|historical|colonial|ancient|medieval|war of/],
+    ['philosophy', /philosoph|ethic|meaning|stoic|christian|faith/],
+    ['culinary', /food|recipe|cooking|cuisine|culinary/],
+    ['farming', /farm|agricultur|crop|rice|sugarcane/],
+    ['weather', /weather|typhoon|rain|climate|monsoon/],
+    ['global-politics', /global|international|geopolit|china|united states|europe|war/],
+    ['local-politics', /philippin|local|barangay|mayor|duterte|marcos|congress|senate/],
+    ['music-video', /music video|song|lyrics/],
+  ];
+  for (const [slug, rx] of rules) if (rx.test(text)) return slug;
+  return 'culture';
+}
+
+function extractBody(html){
+  const doc = new DOMParser().parseFromString('<div id="r">' + html + '</div>', 'text/html');
+  const root = doc.getElementById('r');
+  const inner = root.querySelector('.pc-article') || root;
+  inner.querySelectorAll('script,style,ins,iframe,noscript,.ad-slot,#disqus_thread').forEach(n => n.remove());
+  inner.querySelectorAll('[style]').forEach(n => n.removeAttribute('style'));
+  inner.querySelectorAll('[class]').forEach(n => n.removeAttribute('class'));
+  return inner.innerHTML.trim();
+}
+function plain(html){
+  const d = new DOMParser().parseFromString(html, 'text/html');
+  return (d.body.textContent || '').replace(/\s+/g, ' ').trim();
+}
+function slug(t){ return String(t||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''); }
+
+async function loadAll(){
+  const base = $('blog').value.replace(/\/+$/, '');
+  $('load').disabled = true; $('status').textContent = 'Loading Blogger feed...';
+  posts = []; let start = 1, total = Infinity;
+  try {
+    while (posts.length < total) {
+      const r = await fetch(`${base}/feeds/posts/default?alt=json&max-results=100&start-index=${start}`);
+      if (!r.ok) throw new Error('Blogger feed HTTP ' + r.status);
+      const f = (await r.json()).feed;
+      total = parseInt(f.openSearch$totalResults.$t, 10) || 0;
+      const entries = f.entry || [];
+      if (!entries.length) break;
+      for (const e of entries) {
+        const labels = (e.category || []).map(c => c.term);
+        const link = ((e.link || []).find(l => l.rel === 'alternate') || {}).href || '';
+        const raw = (e.content && e.content.$t) || '';
+        const body = extractBody(raw);
+        const firstImg = (new DOMParser().parseFromString(raw, 'text/html').querySelector('img') || {}).src || null;
+        posts.push({
+          title: e.title.$t, date: e.published.$t.slice(0, 10), labels, link, body, firstImg,
+          section: guessSection(labels, e.title.$t),
+          summary: plain(body).slice(0, 155)
+        });
+      }
+      start += entries.length;
+    }
+    const r2 = await fetch(WORKER + 'articles', { cache: 'no-store' });
+    existing = new Set((await r2.json()).map(a => slug(a.title)));
+    render();
+    $('status').textContent = `${posts.length} Blogger post(s) found, ${existing.size} article(s) already on the site.`;
+  } catch (e) {
+    $('status').textContent = 'Failed: ' + e.message;
+    log('Load failed: ' + e.message);
+  }
+  $('load').disabled = false;
+}
+
+function render(){
+  $('list').innerHTML = '';
+  posts.forEach((p, i) => {
+    const dup = existing.has(slug(p.title));
+    const row = document.createElement('div');
+    row.className = 'post';
+    const opts = Object.entries(SECTIONS).map(([k, v]) => `<option value="${k}"${k === p.section ? ' selected' : ''}>${v}</option>`).join('');
+    row.innerHTML = `<input type="checkbox" data-i="${i}" ${dup ? '' : 'checked'}>
+      <div class="t"><div>${p.title.replace(/</g, '&lt;')}</div>
+      <div class="m">${p.date} · ${p.labels.join(', ') || 'no labels'} ${dup ? '<span class="dup">· already on the site</span>' : ''}</div></div>
+      <select data-s="${i}">${opts}</select>`;
+    $('list').appendChild(row);
+  });
+  $('go').disabled = !posts.length;
+}
+
+async function importSelected(){
+  const key = $('key').value.trim();
+  if (!key) { alert('Enter the admin key first.'); return; }
+  try { localStorage.setItem('pc_admin_key', key); } catch(e){}
+  const picks = [...document.querySelectorAll('#list input[type=checkbox]:checked')].map(c => +c.dataset.i);
+  if (!picks.length) { alert('Nothing selected.'); return; }
+  $('go').disabled = true; let ok = 0, bad = 0;
+  for (const i of picks) {
+    const p = posts[i];
+    p.section = document.querySelector(`[data-s="${i}"]`).value;
+    try {
+      const r = await fetch(WORKER + 'articles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Key': key },
+        body: JSON.stringify({
+          title: p.title, category: p.section, date: p.date, contentType: 'html',
+          body: p.body, summary: p.summary,
+          tags: p.labels.slice(0, 8), photoUrl: p.firstImg, videoUrl: null
+        })
+      });
+      if (r.status === 401) { log('Admin key rejected (401). Stopping.'); break; }
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      ok++; existing.add(slug(p.title));
+      log('OK   ' + p.title);
+    } catch (e) { bad++; log('FAIL ' + p.title + ' - ' + e.message); }
+    await new Promise(r => setTimeout(r, 400));
+  }
+  $('status').textContent = `Done: ${ok} imported, ${bad} failed.`;
+  $('go').disabled = false;
+}
+
+$('load').onclick = loadAll;
+$('go').onclick = importSelected;
+$('all').onclick = () => document.querySelectorAll('#list input[type=checkbox]').forEach(c => { const i = +c.dataset.i; c.checked = !existing.has(slug(posts[i].title)); });
+$('none').onclick = () => document.querySelectorAll('#list input[type=checkbox]').forEach(c => c.checked = false);
+</script>
+</body>
+</html>
