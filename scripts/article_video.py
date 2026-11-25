@@ -1,4 +1,4 @@
-SCRIPT_VERSION = "2026-11-24-worker-v3"
+SCRIPT_VERSION = "2026-11-26-worker-v4"
 import asyncio
 import glob
 import html
@@ -1190,8 +1190,8 @@ def _scene_prompt_raw(seg: Seg, job: Job) -> str:
     director = llm_scene(speech, heading, job, cast)
     if director:
         has_people = bool(_PEOPLE_RE.search(director)) or bool(cast)
-        style = (look + ", " if look else "") + STYLE_BASE + (", " + STYLE_PEOPLE if has_people else "")
-        parts = [f"Photograph of: {director}.", f"Place: {setting}." if setting else "",
+        style = (look + ", " if look else "") + (job.get("style") or {}).get("base", STYLE_BASE) + (", " + STYLE_PEOPLE if has_people else "")
+        parts = [f"{(job.get('style') or {}).get('prefix', 'Photograph of')}: {director}.", f"Place: {setting}." if setting else "",
                  f"Characters: {cast}." if cast else "", style + "."]
         return " ".join(p for p in parts if p).strip()[:1900]
 
@@ -1214,7 +1214,7 @@ def _scene_prompt_raw(seg: Seg, job: Job) -> str:
         per.pop(len(per) // 2)
     focus = "; ".join(per)
     has_people = bool(_PEOPLE_RE.search(focus)) or bool(cast)
-    style = (look + ", " if look else "") + STYLE_BASE + (", " + STYLE_PEOPLE if has_people else "")
+    style = (look + ", " if look else "") + (job.get("style") or {}).get("base", STYLE_BASE) + (", " + STYLE_PEOPLE if has_people else "")
     scene = ("people actively moving through the scene, caught mid-movement." if has_people
              else "the places, objects and landscape described, people only if they fit naturally.")
     where = heading or title
