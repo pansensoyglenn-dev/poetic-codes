@@ -1,4 +1,4 @@
-SCRIPT_VERSION = "2026-11-26-worker-v4"
+SCRIPT_VERSION = "2026-11-26-worker-v5"
 import asyncio
 import glob
 import html
@@ -1322,6 +1322,9 @@ def local_available():
     return LOCAL_IMAGES not in ("0", "off", "no") and not LOCAL["dead"]
 
 
+LOCAL_STYLE = [""]  # set per job from job["style"]["local"]; "" keeps the old photographic look
+
+
 def _local_short_prompt(prompt):
     show = re.search(r"Show:\s*(.*?)\.(?:\s|$)", prompt or "", re.S)
     place = re.search(r"Place:\s*(.*?)\.(?:\s|$)", prompt or "", re.S)
@@ -1335,6 +1338,9 @@ def _local_short_prompt(prompt):
     else:
         who = ""
     lead = (ANCHOR[0] + ", ") if ANCHOR[0] else ""
+    if LOCAL_STYLE[0]:
+        # custom look goes first so the 77-token CLIP limit cuts the scene detail, not the style
+        return (LOCAL_STYLE[0] + ", " + lead + core[:170] + who).strip()
     return (lead + core[:240] + who + ", photorealistic documentary photograph, natural light, sharp focus, no text").strip()
 
 
@@ -3123,6 +3129,7 @@ def needs_work(job: Job, marker: Job | None) -> bool:
 def process_job(path):
     name = path.name
     job = json.loads(path.read_text(encoding="utf-8"))
+    LOCAL_STYLE[0] = str((job.get("style") or {}).get("local") or "").strip()
     marker = read_marker(name)
     if not DRY_RUN and not needs_work(job, marker):
         return None
