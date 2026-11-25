@@ -70,7 +70,7 @@ jobs:
           TTS_RATE: "+0%"
           ONLY_JOB: ${{ github.event.inputs.only }}
           FORCE_REDO: ${{ github.event.inputs.redo }}
-        run: python scripts/make_article_video.py
+        run: python scripts/article_video.py
 
       - name: Keep a downloadable copy of the video
         if: always()
