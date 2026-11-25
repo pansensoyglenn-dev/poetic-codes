@@ -1,6 +1,6 @@
 {
-  "jobId": "1794602180753",
-  "createdAt": "2026-11-13T20:36:20.753Z",
+  "jobId": "1795576923298",
+  "createdAt": "2026-11-25T03:22:03.298Z",
   "title": "Medieval Europe and the Making of the Modern World",
   "author": "Glenn Junsay Pansensoy",
   "category": "History",
@@ -20,7 +20,7 @@
     "modern world"
   ],
   "slug": "medieval-europe-and-the-making-of-the-modern-world",
-  "articleId": 62,
+  "articleId": 38,
   "coverUrl": "https://tbveujdfminxzxlsadpc.supabase.co/storage/v1/object/public/covers/cover-1794524080525.jpg",
   "force": true
 }
