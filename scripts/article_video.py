@@ -1,4 +1,4 @@
-SCRIPT_VERSION = "2026-11-16-cinema-v2"
+SCRIPT_VERSION = "2026-11-24-worker-v3"
 import asyncio
 import glob
 import html
@@ -35,19 +35,46 @@ SHOT_FADE = float(os.environ.get("SHOT_FADE", "0.5"))
 GRAIN = int(os.environ.get("GRAIN", "2"))
 VIGNETTE = os.environ.get("VIGNETTE", "1") != "0"
 CAP_WORDS = int(os.environ.get("CAP_WORDS", "20"))
-MAX_MB = float(os.environ.get("MAX_MB", "45"))
+# Cloudflare Pages refuses any single file over 25 MiB, so keep videos under that.
+MAX_MB = float(os.environ.get("MAX_MB", "24"))
 MIN_SECONDS = int(os.environ.get("MIN_SECONDS", "0"))
 WPM = 155.0
 
 JOBS_DIR = Path(os.environ.get("JOBS_DIR", "video-jobs"))
 DONE_DIR = JOBS_DIR / "done"
 SITE_URL = os.environ.get("SITE_URL", "https://poetic-codes.pages.dev")
-ARTICLES_API = os.environ.get("ARTICLES_API", "https://poetic-codes.vercel.app/api/articles")
-VIDEO_URL_API = os.environ.get("VIDEO_URL_API", "https://poetic-codes.vercel.app/api/video-upload-url")
-UPLOAD_API = os.environ.get("UPLOAD_API", "https://poetic-codes.pages.dev/api/upload")
+
+WORKER = os.environ.get("WORKER_URL", "https://poetic-codes.pansensoyglenn150.workers.dev").rstrip("/")
+
+
+def _api_env(name, default):
+    """Use the environment value, unless it is empty or still points at the old Vercel backend."""
+    v = os.environ.get(name, "").strip()
+    if not v or "vercel.app" in v:
+        return default
+    return v
+
+
+ARTICLES_API = _api_env("ARTICLES_API", WORKER + "/api/articles")
+VIDEO_URL_API = os.environ.get("VIDEO_URL_API", "").strip() if "vercel.app" not in os.environ.get("VIDEO_URL_API", "") else ""
+UPLOAD_API = _api_env("UPLOAD_API", WORKER + "/api/upload")
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 AI_IMAGES = os.environ.get("AI_IMAGES", "1") != "0"
 AI_IMAGE_MAX = int(os.environ.get("AI_IMAGE_MAX", "60"))
+
+# Pictures: show people of the nationality the article is about (set PEOPLE_IN_IMAGES=0 for no people at all)
+PEOPLE_IN_IMAGES = os.environ.get("PEOPLE_IN_IMAGES", "1") != "0"
+ANCHOR = [""]
+PEOPLE = [""]
+DEMONYMS = {
+    "Philippines": "Filipino", "China": "Chinese", "United States": "American", "America": "American",
+    "Japan": "Japanese", "Korea": "Korean", "India": "Indian", "Vietnam": "Vietnamese", "Thailand": "Thai",
+    "Indonesia": "Indonesian", "Malaysia": "Malaysian", "Singapore": "Singaporean", "Hong Kong": "Hong Kong Chinese",
+    "Europe": "European", "France": "French", "Germany": "German", "Italy": "Italian", "Spain": "Spanish",
+    "Britain": "British", "England": "British", "Russia": "Russian", "Turkey": "Turkish", "Egypt": "Egyptian",
+    "Africa": "African", "Nigeria": "Nigerian", "Kenya": "Kenyan", "Mexico": "Mexican", "Brazil": "Brazilian",
+    "Canada": "Canadian", "Australia": "Australian", "Israel": "Israeli", "Palestine": "Palestinian",
+}
 
 
 CLOUDFLARE_ACCOUNT_ID = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
@@ -218,6 +245,15 @@ def clean_text(raw: str | None) -> str:
     s = html.unescape(s)
     s = re.sub(r"https?://\S+", "", s)
     return re.sub(r"\s+", " ", s).strip()
+
+
+def people_anchor(job):
+    name = clean_text((job.get("location") or {}).get("name"))
+    found = []
+    for place, dem in DEMONYMS.items():
+        if re.search(r"(?<![A-Za-z])" + re.escape(place) + r"(?![A-Za-z])", name) and dem not in found:
+            found.append(dem)
+    return " and ".join(found[:2])
 
 
 def extract_main(raw: str | None) -> str:
@@ -1145,7 +1181,7 @@ def llm_scene(speech: str, heading: str, job: Job, cast: str) -> str:
     return scene
 
 
-def scene_prompt(seg: Seg, job: Job) -> str:
+def _scene_prompt_raw(seg: Seg, job: Job) -> str:
     title = clean_text(job.get("title")) or ""
     category = clean_text(job.get("category")) or ""
     heading = clean_text(seg.get("heading") or "")
@@ -1186,6 +1222,19 @@ def scene_prompt(seg: Seg, job: Job) -> str:
     parts = [style + ".", f"{where}." if where else "", "Show: " + focus + ".",
              f"Characters: {cast}." if cast else "", f"Place: {setting}." if setting else "", scene, ctx]
     return " ".join(p for p in parts if p).strip()[:1900]
+
+
+def scene_prompt(seg: Seg, job: Job) -> str:
+    """Every picture prompt starts with the place and era, and names the nationality of any people shown."""
+    p = _scene_prompt_raw(seg, job)
+    lead = ANCHOR[0] + ". " if ANCHOR[0] else ""
+    if not PEOPLE_IN_IMAGES:
+        tail = " No people, no faces: show places and objects only."
+    elif PEOPLE[0]:
+        tail = f" Any people shown are {PEOPLE[0]} people, in everyday clothing typical of that place and era."
+    else:
+        tail = ""
+    return (lead + p + tail)[:1900]
 
 
 def _from_bytes(data):
@@ -1279,7 +1328,14 @@ def _local_short_prompt(prompt):
     where = re.search(r"Where:\s*(.*?)\.(?:\s|$)", prompt or "", re.S)
     parts = [x.group(1).strip() for x in (show, place or where) if x]
     core = ", ".join(parts) if parts else (prompt or "")[:300]
-    return (core[:260] + ", photorealistic documentary photograph, natural light, sharp focus, no text").strip()
+    if not PEOPLE_IN_IMAGES:
+        who = ", no people, no faces"
+    elif PEOPLE[0]:
+        who = f", {PEOPLE[0]} people"
+    else:
+        who = ""
+    lead = (ANCHOR[0] + ", ") if ANCHOR[0] else ""
+    return (lead + core[:240] + who + ", photorealistic documentary photograph, natural light, sharp focus, no text").strip()
 
 
 def _local_load():
@@ -2354,6 +2410,12 @@ def pick_kling_slides(segs: list[Seg], n: int) -> set[int]:
 def build_video(job):
     global RATE, ARCHIVE_VIDEO, STOCK_VIDEO
 
+    loc_ctx = job.get("location") or {}
+    ANCHOR[0] = ", ".join(x for x in (clean_text(loc_ctx.get("name"))[:60], clean_text(loc_ctx.get("era"))[:20]) if x)
+    PEOPLE[0] = people_anchor(job)
+    if ANCHOR[0]:
+        log(f"  picture setting: {ANCHOR[0]}" + (f" | people shown: {PEOPLE[0]}" if PEOPLE[0] and PEOPLE_IN_IMAGES else ""))
+
     footage_ok = bool(job.get("footage")) or FOOTAGE_ALL
     ARCHIVE_VIDEO = _ARCHIVE_ENV and footage_ok
     STOCK_VIDEO = _STOCK_ENV and footage_ok
@@ -2586,20 +2648,19 @@ def build_video(job):
     final = tmp / "final.mp4"
     run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listing),
          "-c", "copy", "-movflags", "+faststart", str(final)])
-    log(f"  final file {final.stat().st_size / 1048576:.1f} MB")
+    size_mb = final.stat().st_size / 1048576
+    log(f"  final file {size_mb:.1f} MB")
+    if size_mb > 25:
+        log("  WARNING: this video is over 25 MB, so Cloudflare Pages will refuse it if it is saved in the repo. "
+            "Lower MAX_MB or shorten the article.")
     return final, total_dur, ",".join(sorted(engines))
 
 
 def _upload_endpoints():
     out = [UPLOAD_API]
 
-    env = [u.strip() for u in os.environ.get("UPLOAD_FALLBACKS", "").split(",") if u.strip()]
-    extras = env or [
-        "https://poetic-codes.pages.dev/api/upload",
-        "https://rhythmic.pansensoyglenn150.workers.dev/api/upload",
-        "https://poetic-codes.vercel.app/api/upload",
-    ]
-    for extra in extras:
+    env = [u.strip() for u in os.environ.get("UPLOAD_FALLBACKS", "").split(",") if u.strip() and "vercel.app" not in u]
+    for extra in env:
         if extra not in out:
             out.append(extra)
     return out
@@ -2671,8 +2732,9 @@ def _git(*args, check=True):
 
 def publish_to_repo(path, filename):
     size_mb = os.path.getsize(path) / 1048576
-    if size_mb > 95:
-        raise RuntimeError(f"Video is {size_mb:.0f} MB, too big to store in the repo.")
+    # Cloudflare Pages refuses any single file over 25 MiB, which makes EVERY later build fail.
+    if size_mb > 24:
+        raise RuntimeError(f"Video is {size_mb:.0f} MB, too big to store in the repo (limit 24 MB for Cloudflare Pages).")
     Path("videos").mkdir(exist_ok=True)
     dest = Path("videos") / filename
     dest.write_bytes(Path(path).read_bytes())
@@ -2734,7 +2796,7 @@ def youtube_seo(job, title, desc, row_tags=None):
             if h and h.lower() not in [x.lower() for x in hs]:
                 hs.append(h)
     hs = hs[:5]
-    tagline = " ".join("#" + h for h in hs)
+    tagline = " ".join("#" + h.lower() for h in hs)
     new_desc = (summary + "\n\n" if summary else "") + desc + ("\n\n" + tagline if tagline else "")
     return yt_title, new_desc, out
 
@@ -2770,7 +2832,9 @@ def upload_to_youtube(path, title, description, tags=None):
 
 
 def upload_video(path, filename):
-    try:
+    """Store the finished video. Tries the Supabase route only if VIDEO_URL_API is set, then the Worker (R2),
+    and finally the repo (only if the file is under 24 MB, because Cloudflare Pages refuses bigger files)."""
+    if VIDEO_URL_API:
         try:
             url = upload_via_supabase(path, filename)
             print("  uploaded to Supabase storage")
@@ -2778,14 +2842,15 @@ def upload_video(path, filename):
         except RuntimeError as e:
             if "401" in str(e)[:60]:
                 raise
-            print(f"  Supabase route unavailable ({str(e)[:450]}); trying the other upload addresses")
+            print(f"  Supabase route unavailable ({str(e)[:300]}); trying the Worker")
         except Exception as e:
-            print(f"  Supabase route failed ({str(e)[:450]}); trying the other upload addresses")
+            print(f"  Supabase route failed ({str(e)[:300]}); trying the Worker")
+    try:
         return upload_to_endpoints(path, filename)
     except RuntimeError as e:
         if "401" in str(e)[:60]:
             raise
-        print(f"  upload endpoints failed, saving the video in the repo instead ({str(e)[:120]})")
+        print(f"  upload endpoints failed, saving the video in the repo instead ({str(e)[:200]})")
         return publish_to_repo(path, filename)
 
 
@@ -2804,6 +2869,7 @@ def _fetch_articles_uncached():
     data = r.json()
     if isinstance(data, dict):
         data = data.get("articles") or data.get("results") or data.get("data") or []
+    log(f"  article list loaded from {ARTICLES_API}: {len(data)} article(s)")
     return data
 
 
@@ -2814,14 +2880,24 @@ def _num(v):
         return 0
 
 
+def _norm_title(s: str | None) -> str:
+    """Lower-case, with curly quotes and extra spaces folded, so a curly apostrophe still matches a straight one."""
+    t = html.unescape(s or "")
+    t = (t.replace("\u2019", "'").replace("\u2018", "'").replace("\u201c", '"').replace("\u201d", '"')
+          .replace("\u2013", "-").replace("\u2014", "-"))
+    return re.sub(r"\s+", " ", t).strip().lower()
+
+
 def find_article(job: Job, rows: list[Job]) -> Job | None:
     aid = job.get("articleId")
     if aid not in (None, ""):
         for r in rows:
             if str(r.get("id")) == str(aid):
                 return r
-    t = (job.get("title") or "").strip().lower()
-    cands = [r for r in rows if (r.get("title") or "").strip().lower() == t]
+    t = _norm_title(job.get("title"))
+    cands = [r for r in rows if _norm_title(r.get("title")) == t]
+    if not cands and job.get("slug"):
+        cands = [r for r in rows if article_slug(r.get("title")) == str(job.get("slug")).strip()]
     cands.sort(key=lambda r: _num(r.get("id")), reverse=True)
     return cands[0] if cands else None
 
@@ -3162,7 +3238,9 @@ def process_job(path):
 
 def main():
     log(f"article_video.py {SCRIPT_VERSION} | INTRO_TITLE={int(INTRO_TITLE)} SPEAK_HEADINGS={int(SPEAK_HEADINGS)} "
-        f"SLIDE_WORDS={SLIDE_WORDS} AI_IMAGE_MAX={AI_IMAGE_MAX} FORCE_REDO={int(FORCE_REDO)}")
+        f"SLIDE_WORDS={SLIDE_WORDS} AI_IMAGE_MAX={AI_IMAGE_MAX} FORCE_REDO={int(FORCE_REDO)} "
+        f"PEOPLE_IN_IMAGES={int(PEOPLE_IN_IMAGES)} MAX_MB={MAX_MB:g}")
+    log(f"  articles API: {ARTICLES_API} | upload API: {UPLOAD_API}")
     if not DRY_RUN and not ADMIN_KEY:
         log("ADMIN_KEY is not set. Add it under Settings > Secrets and variables > Actions.")
         return 1
