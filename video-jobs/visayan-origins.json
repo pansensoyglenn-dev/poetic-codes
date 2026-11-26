@@ -1,6 +1,6 @@
 {
-  "jobId": "1795733866435",
-  "createdAt": "2026-11-26T22:57:46.435Z",
+  "jobId": "1795734059372",
+  "createdAt": "2026-11-26T23:00:59.372Z",
   "title": "Visayan-Origins",
   "author": "Glenn Junsay Pansensoy",
   "category": "History",
@@ -12,24 +12,10 @@
     "bisaya",
     "cebuano",
     "hiligaynon",
-    "waray",
-    "kinaray-a",
-    "aklanon",
-    "austronesian migration",
-    "malayo-polynesian languages",
-    "philippine history",
-    "central philippines",
-    "visayas",
-    "panay",
-    "cebu",
-    "negros",
-    "leyte",
-    "bohol",
-    "samar",
-    "srivijaya  Sources"
+    "waray"
   ],
   "slug": "visayan-origins",
   "articleId": 55,
   "coverUrl": null,
-  "force": false
+  "force": true
 }
