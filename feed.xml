@@ -7,6 +7,14 @@
   <language>en-ph</language>
   <atom:link href="https://poetic-codes.pages.dev/feed.xml" rel="self" type="application/rss+xml"/>
   <item>
+    <title>Visayan-Origins</title>
+    <link>https://poetic-codes.pages.dev/articles/visayan-origins.html</link>
+    <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/visayan-origins.html</guid>
+    <pubDate>Fri, 27 Nov 2026 12:00:00 GMT</pubDate>
+    <category>History</category>
+    <description>The deep origins of the Visayan peoples: Austronesian migrations, genetics, language, and the maritime history of the central Philippines.</description>
+  </item>
+  <item>
     <title>England’s Conquest &amp; the Rise of the British Empire: Full History</title>
     <link>https://poetic-codes.pages.dev/articles/england-s-conquest-the-rise-of-the-british-empire-full-history.html</link>
     <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/england-s-conquest-the-rise-of-the-british-empire-full-history.html</guid>
@@ -397,14 +405,6 @@
     <pubDate>Wed, 28 Oct 2026 12:00:00 GMT</pubDate>
     <category>Culinary</category>
     <description>Explore Iloilo's caldereta: a Spanish stew transformed into Filipino heritage and identity.</description>
-  </item>
-  <item>
-    <title>Babaylan: Spiritual Leaders, Healers &amp; Advisers of the Pre-Colonial Philippines</title>
-    <link>https://poetic-codes.pages.dev/articles/babaylan-spiritual-leaders-healers-advisers-of-the-pre-colonial-philippines.html</link>
-    <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/babaylan-spiritual-leaders-healers-advisers-of-the-pre-colonial-philippines.html</guid>
-    <pubDate>Wed, 28 Oct 2026 12:00:00 GMT</pubDate>
-    <category>History</category>
-    <description>Discover the Babaylan: healers, priestesses, and spiritual leaders of the pre-colonial Philippines.</description>
   </item>
 </channel>
 </rss>
