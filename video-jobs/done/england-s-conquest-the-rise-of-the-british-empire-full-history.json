@@ -1,21 +1,7 @@
 {
-  "jobId": "1795658021853",
-  "status": "done",
-  "title": "England\u2019s Conquest & the Rise of the British Empire: Full History",
-  "youtubeId": "",
-  "videoUrl": "https://poetic-codes.pages.dev/videos/england-s-conquest-the-rise-of-the-british-empire-full-histo-video-021853.mp4",
-  "articleUrl": "https://poetic-codes.pages.dev/articles/england-s-conquest-the-rise-of-the-british-empire-full-history.html",
-  "attached": true,
-  "engine": "edge-tts",
-  "credits": [
-    "Archival film - Tom Hannen (CC0) via Wikimedia Commons https://commons.wikimedia.org/wiki/File:Garip_large_island_looking_out_across_the_sea.webm",
-    "Archival film - Giacomo Alessandroni (CC BY-SA 4.0) via Wikimedia Commons https://commons.wikimedia.org/wiki/File:Adriatic_Sea_waves.ogg",
-    "Archival film - U.S. Army 21TSC by Spc. Mya Webster (Public domain) via Wikimedia Commons https://commons.wikimedia.org/wiki/File:AER-_Soldiers_Helping_Soldiers_(963422).webm",
-    "Archival film - Nederlands Instituut voor Beeld en Geluid (CC BY-SA 3.0 nl) via Wikimedia Commons https://commons.wikimedia.org/wiki/File:Melkoorlog_Weeknummer_68-22_-_Open_Beelden_-_15290.ogv",
-    "Archival film - Gnan garra (CC BY-SA 4.0) via Wikimedia Commons https://commons.wikimedia.org/wiki/File:Penguin_Island_Ferry_Gnangarra.webm",
-    "Archival film - unknown (Public domain) via Wikimedia Commons https://commons.wikimedia.org/wiki/File:20250502_port_explosion.webm",
-    "Archival film - ANU TV (CC BY 3.0) via Wikimedia Commons https://commons.wikimedia.org/wiki/File:Professor_Matthew_Cook_-_Profile.webm",
-    "Archival film - Fatty Arbuckle (Public domain) via Wikimedia Commons https://commons.wikimedia.org/wiki/File:The_Cook_(spoof_clip,_1918).webm"
-  ],
-  "seconds": 639
+  "jobId": "1795667434009",
+  "status": "failed",
+  "attempts": 1,
+  "error": "Video is 25 MB, too big to store in the repo (limit 24 MB for Cloudflare Pages).",
+  "title": "England\u2019s Conquest & the Rise of the British Empire: Full History"
 }
