@@ -1,6 +1,6 @@
 {
-  "jobId": "1795820726219",
-  "createdAt": "2026-11-27T23:05:26.219Z",
+  "jobId": "1795820798905",
+  "createdAt": "2026-11-27T23:06:38.905Z",
   "title": "Python Loops: From for to Mastery",
   "author": "Glenn Junsay Pansensoy",
   "category": "Programming",
@@ -16,5 +16,5 @@
   "slug": "python-loops-from-for-to-mastery",
   "articleId": 57,
   "coverUrl": null,
-  "force": false
+  "force": true
 }
