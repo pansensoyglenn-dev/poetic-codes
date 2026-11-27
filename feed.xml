@@ -7,6 +7,14 @@
   <language>en-ph</language>
   <atom:link href="https://poetic-codes.pages.dev/feed.xml" rel="self" type="application/rss+xml"/>
   <item>
+    <title>Python Loops: From for to Mastery</title>
+    <link>https://poetic-codes.pages.dev/articles/python-loops-from-for-to-mastery.html</link>
+    <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/python-loops-from-for-to-mastery.html</guid>
+    <pubDate>Sat, 28 Nov 2026 12:00:00 GMT</pubDate>
+    <category>Programming</category>
+    <description>Master Python loops: for, while, range, break, continue, nested loops, comprehensions and real-world patterns.</description>
+  </item>
+  <item>
     <title>From Scarcity to Transformation: What China’s Poverty Reduction Can Teach the Philippines</title>
     <link>https://poetic-codes.pages.dev/articles/from-scarcity-to-transformation-what-china-s-poverty-reduction-can-teach-the-philippines.html</link>
     <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/from-scarcity-to-transformation-what-china-s-poverty-reduction-can-teach-the-philippines.html</guid>
@@ -397,14 +405,6 @@
     <pubDate>Thu, 29 Oct 2026 12:00:00 GMT</pubDate>
     <category>Culinary</category>
     <description>Discover Filipino curry's journey from ancient trade routes to kulma, kare-kare, and home kitchens.</description>
-  </item>
-  <item>
-    <title>Growing Corn in the Philippines: Planting, Fertilizing, Weeding, and Pest Control</title>
-    <link>https://poetic-codes.pages.dev/articles/growing-corn-in-the-philippines-planting-fertilizing-weeding-and-pest-control.html</link>
-    <guid isPermaLink="true">https://poetic-codes.pages.dev/articles/growing-corn-in-the-philippines-planting-fertilizing-weeding-and-pest-control.html</guid>
-    <pubDate>Thu, 29 Oct 2026 12:00:00 GMT</pubDate>
-    <category>Farming</category>
-    <description>Complete guide to growing corn in the Philippines: planting, fertilizing, weeding, pest control.</description>
   </item>
 </channel>
 </rss>
