@@ -1,4 +1,4 @@
-SCRIPT_VERSION = "2026-11-28-tutorial-v3"
+SCRIPT_VERSION = "2026-11-28-tutorial-v4"
 import asyncio
 import html as htmllib
 import os
@@ -49,6 +49,11 @@ PANEL, CODE_BG = (15, 28, 47), (10, 26, 36)
 BLUE, BLUE_DEEP, BLUE_LT = (75, 139, 190), (48, 105, 152), (120, 185, 230)
 GOLD, TEXT, MUTED = (255, 217, 102), (226, 232, 240), (139, 163, 191)
 PADX = 90
+CINEMA = os.environ.get("CINEMA", "1") != "0"
+CINEMA_ZOOM = float(os.environ.get("CINEMA_ZOOM", "0.07"))
+CINEMA_UP = int(os.environ.get("CINEMA_UP", "2"))
+CINEMA_FADE = float(os.environ.get("CINEMA_FADE", "0.4"))
+CINEMA_VIGNETTE = os.environ.get("CINEMA_VIGNETTE", "1") != "0"
 WRITE_LEADS = ["Let's write the code for {}.", "Now let's type out {}.", "Time to code {}.", "Let's build {} step by step."]
 LOOK_LEADS = ["Let's look at the {}.", "Here is the {}.", "Now the {}."]
 NEXT_LEADS = ["Now the next part.", "Let's continue.", "And now, the rest of the code."]
@@ -161,6 +166,8 @@ class Builder:
 
     def paragraph(self, text):
         text = screen_clean(text)
+        if re.match(r"(?i)this is the written version", text):
+            return
         if len(text.split()) < 3 or text[:1] in "\u2014\u2013-":
             return
         if self.cur and self.cur["heading"] == self.heading:
@@ -250,6 +257,9 @@ class Builder:
             if name in ("h2", "h3", "h4"):
                 if name != "h4" and ch is not first_h2:
                     self.heading = el_text(ch)
+                continue
+            if name == "blockquote" and not ch.find(["p", "pre", "ul", "ol", "table"]):
+                self.paragraph(ch.get_text(""))
                 continue
             if name in ("div", "span") and not ch.find(["p", "pre", "ul", "ol", "table", "h2", "h3", "h4", "div"]):
                 nxt = ch.find_next_sibling()
@@ -504,6 +514,18 @@ def greeting(title, desc, prev):
     return first + (" " + speak_clean(d) if d else "")
 
 
+def flat_sections(soup, root):
+    out, cur = [], None
+    for ch in list(root.children):
+        if not isinstance(ch, Tag) or ch.name == "h1":
+            continue
+        if ch.name == "h2" or cur is None:
+            cur = soup.new_tag("section")
+            out.append(cur)
+        cur.append(ch.extract())
+    return out
+
+
 def build_scenes(page_html, page_url, limit=None):
     soup = BeautifulSoup(page_html, "html.parser")
     for t in soup(["script", "style", "noscript"]):
@@ -513,8 +535,10 @@ def build_scenes(page_html, page_url, limit=None):
     title = title.rstrip(" .!:;")
     md = soup.find("meta", attrs={"name": "description"})
     desc = screen_clean(md["content"]) if md and md.get("content") else ""
+    title = os.environ.get("TITLE", "").strip() or title
+    desc = screen_clean(os.environ.get("DESC", "")) or desc
     canon = soup.find("link", rel="canonical")
-    link = (canon["href"] if canon and canon.get("href") else page_url) or ""
+    link = os.environ.get("LINK", "").strip() or (canon["href"] if canon and canon.get("href") else page_url) or ""
     author = soup.find("meta", attrs={"name": "author"})
     author = screen_clean(author["content"]) if author and author.get("content") else ""
 
@@ -532,6 +556,8 @@ def build_scenes(page_html, page_url, limit=None):
     b.add(kind="title", title=title, desc=desc, author=author, speech=intro)
     root = soup.find("main") or soup.body or soup
     sections = [s for s in root.find_all("section") if not s.find_parent("section")]
+    if not sections:
+        sections = flat_sections(soup, root)
     for sec in sections:
         classes = " ".join(sec.get("class") or [])
         if "hero" in classes.split() or SKIP_SECTION.search(sec.get("id") or ""):
@@ -1003,9 +1029,68 @@ def stamp(secs):
     return f"{secs // 60}:{secs % 60:02d}"
 
 
+def cinema_plan(scenes, durs):
+    groups, cur = [], None
+    for i, sc in enumerate(scenes):
+        k = sc["kind"]
+        if k == "code" or cur is None or k != "laptop_text" or cur["kind"] != "laptop":
+            if k in ("code", "laptop_text"):
+                cur = {"kind": "laptop", "idx": []}
+            else:
+                cur = {"kind": k, "idx": []}
+            groups.append(cur)
+        cur["idx"].append(i)
+    plan = [None] * len(scenes)
+    for gi, g in enumerate(groups):
+        frames = [max(1, round(durs[i] * FPS)) for i in g["idx"]]
+        total = sum(frames)
+        if g["kind"] == "laptop":
+            z0, z1 = 1.0, 1.0 + CINEMA_ZOOM * 0.6
+            dx, dy = 0.006, 0.004
+        elif gi % 2 == 0:
+            z0, z1 = 1.0, 1.0 + CINEMA_ZOOM
+            dx, dy = (-0.01, 0.006) if gi % 4 == 0 else (0.01, -0.006)
+        else:
+            z0, z1 = 1.0 + CINEMA_ZOOM, 1.0
+            dx, dy = (0.01, 0.006) if gi % 4 == 1 else (-0.01, -0.006)
+        off = 0
+        for j, i in enumerate(g["idx"]):
+            plan[i] = {"z0": z0, "z1": z1, "dx": dx, "dy": dy, "off": off, "total": total, "frames": frames[j],
+                       "fade_in": j == 0, "fade_out": j == len(g["idx"]) - 1}
+            off += frames[j]
+    return plan
+
+
+def cinema_clip(src, dst, p, dur):
+    tot = max(1, p["total"] - 1)
+    prog = f"((on+{p['off']})/{tot})"
+    z = f"{p['z0']:.5f}+({p['z1'] - p['z0']:.5f})*{prog}"
+    x = f"iw/2-(iw/zoom/2)+({p['dx']})*iw*({prog}-0.5)"
+    y = f"ih/2-(ih/zoom/2)+({p['dy']})*ih*({prog}-0.5)"
+    vf = [f"scale={W * CINEMA_UP}:{H * CINEMA_UP}:flags=bicubic",
+          f"zoompan=z='{z}':x='{x}':y='{y}':d=1:s={W}x{H}:fps={FPS}"]
+    if CINEMA_VIGNETTE:
+        vf.append("vignette=PI/5")
+    f = min(CINEMA_FADE, dur / 3)
+    af = []
+    if p["fade_in"]:
+        vf.append(f"fade=t=in:st=0:d={f:.2f}")
+        af.append(f"afade=t=in:st=0:d={f:.2f}")
+    if p["fade_out"]:
+        vf.append(f"fade=t=out:st={max(0, dur - f):.2f}:d={f:.2f}")
+        af.append(f"afade=t=out:st={max(0, dur - f):.2f}:d={f:.2f}")
+    vf.append("format=yuv420p")
+    cmd = ["ffmpeg", "-y", "-i", str(src), "-vf", ",".join(vf)]
+    if af:
+        cmd += ["-af", ",".join(af)]
+    cmd += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "25", "-r", str(FPS),
+            "-c:a", "aac", "-b:a", "64k", "-ar", "24000", "-ac", "1", str(dst)]
+    run(cmd)
+
+
 def render_video(scenes, stem, title, desc, link):
     tmp = Path(tempfile.mkdtemp(prefix="tut_"))
-    clips, t, chapters, cues = [], 0.0, [], []
+    clips, durs, t, chapters, cues = [], [], 0.0, [], []
     try:
         for i, sc in enumerate(scenes):
             png, mp3, clip = tmp / f"s{i}.png", tmp / f"a{i}.mp3", tmp / f"c{i}.mp4"
@@ -1015,13 +1100,26 @@ def render_video(scenes, stem, title, desc, link):
             if sc.get("speech", "").strip():
                 cues.append((t, probe_duration(mp3), sc["speech"]))
             if sc["kind"] == "code":
-                t += typing_clip(sc, i, len(scenes), mp3, clip, tmp)
+                d_ = typing_clip(sc, i, len(scenes), mp3, clip, tmp)
             else:
                 RENDER[sc["kind"]](sc, i, len(scenes)).save(png)
-                t += make_clip(png, mp3, clip, sc.get("pad", 0.9))
+                d_ = make_clip(png, mp3, clip, sc.get("pad", 0.9))
+            t += d_
+            durs.append(d_)
             clips.append(clip)
             if (i + 1) % 10 == 0 or i + 1 == len(scenes):
                 log(f"  slide {i + 1}/{len(scenes)} ready ({t / 60:.1f} min so far)")
+        if CINEMA:
+            plan = cinema_plan(scenes, durs)
+            graded = []
+            for i, c in enumerate(clips):
+                g = tmp / f"g{i}.mp4"
+                cinema_clip(c, g, plan[i], durs[i])
+                c.unlink(missing_ok=True)
+                graded.append(g)
+                if (i + 1) % 20 == 0 or i + 1 == len(clips):
+                    log(f"  cinematic pass {i + 1}/{len(clips)}")
+            clips = graded
         listing = tmp / "list.txt"
         listing.write_text("".join(f"file '{c}'\n" for c in clips), encoding="utf-8")
         OUT_DIR.mkdir(parents=True, exist_ok=True)
