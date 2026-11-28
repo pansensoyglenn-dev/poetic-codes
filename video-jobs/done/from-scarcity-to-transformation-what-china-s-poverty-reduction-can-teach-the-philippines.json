@@ -1,7 +1,7 @@
 {
   "jobId": "1795747292730",
   "status": "failed",
-  "attempts": 1,
-  "error": "Video is 26 MB, too big to store in the repo (limit 24 MB for Cloudflare Pages).",
+  "attempts": 2,
+  "error": "Video is 27 MB, too big to store in the repo (limit 24 MB for Cloudflare Pages).",
   "title": "From Scarcity to Transformation: What China\u2019s Poverty Reduction Can Teach the Philippines"
 }
