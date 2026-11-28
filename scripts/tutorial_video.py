@@ -1,19 +1,4 @@
-#!/usr/bin/env python3
-"""Make a narrated video from a Poetic Bytes tutorial page.
-
-    python scripts/tutorial_video.py https://poetic-bytes.vercel.app/shopping-cart.html
-    python scripts/tutorial_video.py my-page.html
-
-What it does
-  * reads the page (headings, paragraphs, bullet lists, callouts, tables, code snippets)
-  * shows each code snippet being TYPED on a laptop screen (syntax-highlighted), then explains it with
-    the explanation text under the laptop while the finished code stays in view
-  * other parts become clean slides: text cards, tables; narration reads the explanation text, never the code
-  * writes out/<slug>.mp4 and out/<slug>.description.txt (link + YouTube chapters)
-
-Free: edge-tts voice + ffmpeg. Optional EXPLAIN_CODE=1 asks Cloudflare's free AI to add a
-two-sentence spoken explanation to each code snippet (needs CLOUDFLARE_ACCOUNT_ID / CLOUDFLARE_API_TOKEN).
-"""
+SCRIPT_VERSION = "2026-11-28-tutorial-v3"
 import asyncio
 import html as htmllib
 import os
@@ -33,20 +18,19 @@ from pygments import lex
 from pygments.lexers import TextLexer, get_lexer_by_name
 from pygments.token import Token
 
-SCRIPT_VERSION = "2026-11-08-o"
 W, H, FPS = 1280, 720, 25
 VOICE = os.environ.get("TTS_VOICE", "en-PH-JamesNeural")
 VOICE_FALLBACKS = ["en-PH-RosaNeural", "en-US-ChristopherNeural"]
 RATE = os.environ.get("TTS_RATE", "+0%")
-MAX_WORDS = int(os.environ.get("MAX_WORDS", "2500"))        # narration budget for the whole video
-PAGE_LINES = int(os.environ.get("PAGE_LINES", "16"))        # code lines per slide
-SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "55"))      # longest paragraph shown on one slide
-TYPE_CPS = float(os.environ.get("TYPE_CPS", "28"))             # typing speed on the laptop, characters per second
-TYPE_FPS = int(os.environ.get("TYPE_FPS", "10"))               # animation frames per second while typing
-FULL_LINES = int(os.environ.get("FULL_LINES", "60"))              # a code block longer than this is "the full source": not typed out
-SPLIT_MINUTES = float(os.environ.get("SPLIT_MINUTES", "12"))    # auto-split pages whose video would be longer than this
-SPLIT_MODE = os.environ.get("SPLIT", "auto")                  # auto = one video per topic when the page is too long for one video; 1 = always; 0 = never
-LAPTOP_WORDS = int(os.environ.get("LAPTOP_WORDS", "26"))       # longest explanation shown under the laptop at once
+MAX_WORDS = int(os.environ.get("MAX_WORDS", "2500"))
+PAGE_LINES = int(os.environ.get("PAGE_LINES", "16"))
+SLIDE_WORDS = int(os.environ.get("SLIDE_WORDS", "55"))
+TYPE_CPS = float(os.environ.get("TYPE_CPS", "28"))
+TYPE_FPS = int(os.environ.get("TYPE_FPS", "10"))
+FULL_LINES = int(os.environ.get("FULL_LINES", "60"))
+SPLIT_MINUTES = float(os.environ.get("SPLIT_MINUTES", "12"))
+SPLIT_MODE = os.environ.get("SPLIT", "auto")
+LAPTOP_WORDS = int(os.environ.get("LAPTOP_WORDS", "26"))
 EXPLAIN_CODE = os.environ.get("EXPLAIN_CODE", "0") == "1"
 CF_ACCOUNT = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "").strip()
 CF_TOKEN = os.environ.get("CLOUDFLARE_API_TOKEN", "").strip()
@@ -54,10 +38,10 @@ LLM_MODEL = os.environ.get("LLM_MODEL", "@cf/meta/llama-3.1-8b-instruct")
 BRAND = os.environ.get("BRAND", "Poetic Bytes")
 OUT_DIR = Path(os.environ.get("OUT_DIR", "out"))
 TTS_FAKE = os.environ.get("TTS_FAKE") == "1"
-SHOW_OUTPUT = os.environ.get("SHOW_OUTPUT", "1") != "0"       # run each Python snippet and show what it prints in a terminal under the code
-OUT_LINES = int(os.environ.get("OUT_LINES", "7"))             # most output lines shown
-RUN_TIMEOUT = float(os.environ.get("RUN_TIMEOUT", "8"))       # seconds a snippet may run
-MIN_CODE_BLOCKS = int(os.environ.get("MIN_CODE_BLOCKS", "0"))   # batch mode sets 1 so non-tutorial pages are skipped
+SHOW_OUTPUT = os.environ.get("SHOW_OUTPUT", "1") != "0"
+OUT_LINES = int(os.environ.get("OUT_LINES", "7"))
+RUN_TIMEOUT = float(os.environ.get("RUN_TIMEOUT", "8"))
+MIN_CODE_BLOCKS = int(os.environ.get("MIN_CODE_BLOCKS", "0"))
 UA = "tutorial-video-bot/1.0 (+https://poetic-bytes.vercel.app)"
 
 BG1, BG2 = (11, 18, 28), (17, 32, 52)
@@ -65,12 +49,15 @@ PANEL, CODE_BG = (15, 28, 47), (10, 26, 36)
 BLUE, BLUE_DEEP, BLUE_LT = (75, 139, 190), (48, 105, 152), (120, 185, 230)
 GOLD, TEXT, MUTED = (255, 217, 102), (226, 232, 240), (139, 163, 191)
 PADX = 90
+WRITE_LEADS = ["Let's write the code for {}.", "Now let's type out {}.", "Time to code {}.", "Let's build {} step by step."]
+LOOK_LEADS = ["Let's look at the {}.", "Here is the {}.", "Now the {}."]
+NEXT_LEADS = ["Now the next part.", "Let's continue.", "And now, the rest of the code."]
 
 SKIP_TAGS = {"script", "style", "button", "svg", "i", "nav", "form", "input", "textarea", "select", "iframe",
              "noscript", "canvas", "audio", "video", "footer", "header"}
 SKIP_CLASS = re.compile(r"(^|\s)(tags|desc-meta|code-header|code-actions|section-label|hero|nav-bar|toc|ad-slot|"
-                        r"quiz|runner|output|console|breadcrumb)(\s|$)")
-SKIP_SECTION = re.compile(r"quiz|knowledge|question|comment|share|newsletter|subscribe|related|footer|follow|social|connect|\\btoc\\b|table of contents", re.I)
+                        r"quiz|runner|output|output-panel|console|breadcrumb|ad-container|ad-label|faq-toggle)(\s|$)")
+SKIP_SECTION = re.compile(r"quiz|knowledge|question|comment|share|newsletter|subscribe|related|footer|follow|social|connect|\btoc\b|table of contents", re.I)
 EMOJI = re.compile("[\U00010000-\U0010ffff\u2300-\u23ff\u2600-\u27bf\u2b00-\u2bff\u2190-\u21ff\ufe0f\u200d]")
 
 
@@ -85,7 +72,6 @@ def run(cmd):
     return p
 
 
-# ---------------------------------------------------------------- text helpers
 def screen_clean(t):
     t = EMOJI.sub("", t or "")
     t = re.sub(r"\s+", " ", t).strip()
@@ -97,11 +83,11 @@ def speak_clean(t):
     t = screen_clean(t)
     t = t.replace("&", " and ").replace("\u2192", " to ").replace("\u2014", ", ").replace("\u2013", ", ")
     t = t.replace("\u00b7", ", ").replace("`", "").replace("()", "")
-    t = re.sub(r"__(\w+?)__", r"dunder \1", t)             # __str__ -> dunder str
-    t = re.sub(r"\.py\b", " dot py", t)                    # cart.py -> cart dot py
-    t = re.sub(r"(?<=\w)_(?=\w)", " ", t)                 # place_order -> place order
-    t = re.sub(r"@(\w+)", r"at \1", t)                    # @dataclass -> at dataclass
-    t = re.sub(r"(?<![\w/])/(\w+)", r"slash \1", t)       # /docs -> slash docs
+    t = re.sub(r"__(\w+?)__", r"dunder \1", t)
+    t = re.sub(r"\.py\b", " dot py", t)
+    t = re.sub(r"(?<=\w)_(?=\w)", " ", t)
+    t = re.sub(r"@(\w+)", r"at \1", t)
+    t = re.sub(r"(?<![\w/])/(\w+)", r"slash \1", t)
     t = re.sub(r"\s+", " ", t).strip()
     return re.sub(r"\s+([,.;:!?])", r"\1", t)
 
@@ -133,7 +119,6 @@ def slugify(s):
     return re.sub(r"[^a-z0-9]+", "-", (s or "").lower()).strip("-")[:60] or "tutorial"
 
 
-# ---------------------------------------------------------------- page -> scenes
 def get_page(src):
     if re.match(r"https?://", src):
         r = requests.get(src, headers={"User-Agent": UA}, timeout=60)
@@ -150,10 +135,10 @@ class Builder:
         self.limit = limit or MAX_WORDS
         self.scenes = []
         self.heading = ""
-        self.spoken = ""            # last heading that was read aloud
-        self.label = ""             # caption above the next code block, e.g. "Naive approach"
+        self.spoken = ""
+        self.label = ""
         self.words = 0
-        self.cur = None             # the laptop currently on screen: explanation under the same heading is shown with it
+        self.cur = None
 
     def room(self, speech):
         return self.words + len(speech.split()) <= self.limit
@@ -168,18 +153,17 @@ class Builder:
         return True
 
     def lead(self, body_speech):
-        """Read a new heading aloud once, before the first thing under it."""
         if self.heading and self.heading != self.spoken:
             self.spoken = self.heading
             return speak_clean(self.heading) + ". " + body_speech
         return body_speech
 
-    # -- block handlers
+
     def paragraph(self, text):
         text = screen_clean(text)
-        if len(text.split()) < 3 or text[:1] in "\u2014\u2013-":     # too short, or a quote attribution
+        if len(text.split()) < 3 or text[:1] in "\u2014\u2013-":
             return
-        if self.cur and self.cur["heading"] == self.heading:           # explaining the code that was just typed
+        if self.cur and self.cur["heading"] == self.heading:
             for chunk in chunk_text(text, LAPTOP_WORDS):
                 self.add(kind="laptop_text", heading=self.heading, body=chunk, code=self.cur,
                          speech=speak_clean(chunk))
@@ -189,7 +173,7 @@ class Builder:
 
     def bullets(self, items):
         items = [screen_clean(i) for i in items if len(screen_clean(i).split()) >= 2]
-        if self.cur and self.cur["heading"] == self.heading:           # list explaining the code just typed
+        if self.cur and self.cur["heading"] == self.heading:
             for it in items:
                 for chunk in chunk_text(it, LAPTOP_WORDS):
                     self.add(kind="laptop_text", heading=self.heading, body=chunk, code=self.cur,
@@ -225,11 +209,11 @@ class Builder:
         for k, (lines, start) in enumerate(pages):
             if k == 0:
                 if label:
-                    speech = f"Let's look at the {speak_clean(label)}."
+                    speech = LOOK_LEADS[len(self.scenes) % len(LOOK_LEADS)].format(speak_clean(label))
                 else:
-                    speech = f"Let's write the code for {speak_clean(name)}." if name else "Let's write this code."
+                    speech = WRITE_LEADS[len(self.scenes) % len(WRITE_LEADS)].format(speak_clean(name)) if name else "Let's write this code."
             else:
-                speech = "Now the next part."
+                speech = NEXT_LEADS[len(self.scenes) % len(NEXT_LEADS)]
             last_page = k == len(pages) - 1
             if out and last_page:
                 speech += " Run it, and the terminal shows the output."
@@ -254,7 +238,7 @@ class Builder:
             intro = "Here is a quick reference. " if k == 0 else ""
             self.add(kind="table", heading=self.heading, head=head, rows=part, speech=self.lead(intro + sp))
 
-    # -- walker
+
     def walk(self, node, first_h2):
         for ch in node.children:
             if not isinstance(ch, Tag):
@@ -274,7 +258,7 @@ class Builder:
                     self.label = txt
                     continue
             if name in ("div", "span") and not ch.find(["p", "pre", "ul", "ol", "table", "h2", "h3", "h4", "div", "section"]):
-                self.paragraph(ch.get_text(""))        # e.g. a "💡 insight" box that holds plain text
+                self.paragraph(ch.get_text(""))
                 continue
             if name == "p":
                 self.paragraph(ch.get_text(""))
@@ -300,7 +284,6 @@ LANG_LABEL = {"python": "Python", "javascript": "JavaScript", "js": "JavaScript"
 
 
 def detect_lang(pre):
-    """The code's language: a language-xxx class, else the label in the code box header ('python'), else Python."""
     for el in [pre] + list(pre.find_all("code")) + [pre.parent]:
         for c in (el.get("class") or []) if hasattr(el, "get") else []:
             m = re.match(r"(?:language|lang)-(\w+)", c)
@@ -317,7 +300,6 @@ def detect_lang(pre):
 
 
 def file_name(name, lang="python"):
-    """A believable file name for the editor tab, e.g. 'The Money Value Object' -> money_value_object.py"""
     base = re.sub(r"[^a-z0-9]+", "_", re.sub(r"\(.*?\)", "", (name or "").lower())).strip("_")
     base = re.sub(r"^(the|a|an)_", "", base)
     if len(base) > 22:
@@ -326,8 +308,6 @@ def file_name(name, lang="python"):
 
 
 def page_code(lines):
-    """Split a long snippet into slides of at most PAGE_LINES, preferring to cut at a blank line.
-    Returns [(lines, first_line_number), ...]."""
     pages, cur, start, n = [], [], 1, 0
     for ln in lines:
         cur.append(ln)
@@ -349,8 +329,7 @@ def page_code(lines):
 
 _RUN_CACHE = {}
 
-# Added in front of snippets that call input() / getpass(): the answers are typed for the reader and shown in the terminal
-# the way they look on a real screen (prompt, then what was typed).
+
 INPUT_PRELUDE = '''
 import builtins as _b, sys as _s, itertools as _it
 _nums = _it.cycle(["10", "5", "3", "7", "2"])
@@ -388,8 +367,6 @@ except Exception:
 
 
 def run_snippet(code):
-    """Run a Python snippet in a throw-away folder with no secrets and no input; return its printed output, or [] when it
-    fails, prints nothing, waits for input or takes too long (then no terminal is shown for it)."""
     if code in _RUN_CACHE:
         return _RUN_CACHE[code]
     out = []
@@ -421,7 +398,6 @@ def run_snippet(code):
 
 
 def explain_code(code, name):
-    """Optional: two spoken sentences about what this snippet does (free Cloudflare model)."""
     if not (CF_ACCOUNT and CF_TOKEN):
         return ""
     try:
@@ -443,7 +419,6 @@ def explain_code(code, name):
 
 
 def heading_title(h1):
-    """Text of an <h1> whose lines are split with <br>: 'Python Basics<br>Build a Solid Foundation' -> 'Python Basics: Build a Solid Foundation'."""
     parts = [screen_clean(BeautifulSoup(x, "html.parser").get_text(" ")) for x in re.split(r"<br\s*/?>", str(h1))]
     out = parts[0] if parts else ""
     for nxt in parts[1:]:
@@ -455,8 +430,6 @@ def heading_title(h1):
 
 
 def steps_after_code(scenes):
-    """On many pages the 'Step 1, Step 2...' list comes BEFORE its code. For a tutorial the code should be typed first, then the
-    steps explained under the laptop while the finished code stays in view: move such lists to just after the code."""
     out, i, n = [], 0, len(scenes)
     while i < n:
         j = i
@@ -484,7 +457,6 @@ def steps_after_code(scenes):
 
 
 def short_title(t):
-    """'Python Inputs: From input() to CLI mastery' -> 'Python Inputs'; 'Python Basics – Learn Python Free 2026 | Poetic Bytes' -> 'Python Basics'."""
     t = re.split(r"\s*[|:\u2013\u2014]\s*", screen_clean(t))[0]
     return t.strip(" .!")
 
@@ -496,7 +468,6 @@ def spoken_topic(t):
 
 
 def previous_lesson(page_url):
-    """Title of the lesson before this one, read from the order of lessons on the site's home page (best effort)."""
     if not re.match(r"https?://", page_url or ""):
         return ""
     try:
@@ -524,12 +495,11 @@ def previous_lesson(page_url):
 def greeting(title, desc, prev):
     topic = short_title(title)
     lang = topic.split()[0] if topic.split() and topic.split()[0] in LANG_LABEL.values() else ""
-    another = f"another {lang} lesson" if lang else "another lesson"
+    kind = f"{lang} lesson" if lang else "lesson"
+    first = (f"Hello everyone and I wish you all a very good day. Hi, my name is Glenn and I welcome you to another "
+             f"interesting {kind}: {topic}.")
     if prev and prev.lower() != topic.lower():
-        first = (f"Hello and good day everybody! We learned {spoken_topic(prev)} from the previous video, and today we are "
-                 f"going to {another}, which is {topic}.")
-    else:
-        first = f"Hello and good day everybody! Welcome to this {BRAND} lesson. Today we are going to learn {topic}."
+        first += f" Last time we learned {spoken_topic(prev)}, and today we build on it."
     d = " ".join(x for x in split_sentences(screen_clean(desc)) if "@" not in x and not re.match(r"^by\b", x, re.I))
     return first + (" " + speak_clean(d) if d else "")
 
@@ -599,11 +569,10 @@ def build_scenes(page_html, page_url, limit=None):
         scenes.insert(1, overview)
     b.scenes = scenes
     b.add(kind="end", title="Try the code live", url=link or BRAND,
-          speech=f"Try the live code on {BRAND}. The link is in the description.", chapter="Try it yourself")
+          speech=f"Thank you for watching, and I will see you in the next lesson. Try the live code on {BRAND}. The link is in the description.", chapter="Try it yourself")
     return b.scenes, {"title": title, "desc": desc, "link": link}
 
 
-# ---------------------------------------------------------------- drawing
 def load_font(size, bold=False, mono=False):
     base = "DejaVuSansMono" if mono else "DejaVuSans"
     name = base + ("-Bold" if bold else "") + ".ttf"
@@ -768,16 +737,15 @@ def cached_bg():
 
 
 def laptop_setup(lines, fname, start, lang="python", out=None):
-    """Draw the empty laptop once; return everything needed to draw typed-in frames quickly."""
     img = cached_bg()
     d = ImageDraw.Draw(img)
     lx0, lx1, ly0, ly1 = 140, 1140, 16, 536
-    d.ellipse([lx0 - 40, ly1 + 8, lx1 + 90, ly1 + 40], fill=(6, 10, 16))                       # shadow on the desk
+    d.ellipse([lx0 - 40, ly1 + 8, lx1 + 90, ly1 + 40], fill=(6, 10, 16))
     d.rounded_rectangle([lx0, ly0, lx1, ly1], radius=20, fill=(46, 53, 68), outline=(78, 88, 108), width=2)
-    d.ellipse([(lx0 + lx1) // 2 - 3, ly0 + 5, (lx0 + lx1) // 2 + 3, ly0 + 11], fill=(20, 24, 32))   # camera
+    d.ellipse([(lx0 + lx1) // 2 - 3, ly0 + 5, (lx0 + lx1) // 2 + 3, ly0 + 11], fill=(20, 24, 32))
     sx0, sy0, sx1, sy1 = lx0 + 14, ly0 + 16, lx1 - 14, ly1 - 14
     d.rounded_rectangle([sx0, sy0, sx1, sy1], radius=6, fill=CODE_BG)
-    d.rectangle([sx0, sy0, sx1, sy0 + 30], fill=PANEL)                                          # editor title bar
+    d.rectangle([sx0, sy0, sx1, sy0 + 30], fill=PANEL)
     for k, c in enumerate(((239, 68, 68), (245, 158, 11), (16, 185, 129))):
         d.ellipse([sx0 + 14 + k * 22, sy0 + 10, sx0 + 26 + k * 22, sy0 + 22], fill=c)
     tf = load_font(14)
@@ -785,11 +753,11 @@ def laptop_setup(lines, fname, start, lang="python", out=None):
     d.rectangle([sx0 + 90, sy0 + 4, sx0 + 90 + tw, sy0 + 30], fill=CODE_BG)
     d.ellipse([sx0 + 102, sy0 + 13, sx0 + 110, sy0 + 21], fill=GOLD)
     d.text((sx0 + 120, sy0 + 8), fname, font=tf, fill=TEXT)
-    d.rectangle([sx0, sy1 - 24, sx1, sy1], fill=(18, 52, 86))                                   # status bar
+    d.rectangle([sx0, sy1 - 24, sx1, sy1], fill=(18, 52, 86))
     sf = load_font(13)
     right = f"{LANG_LABEL.get(lang, lang.capitalize())}   UTF-8   Spaces: 4"
     d.text((sx1 - 14 - d.textlength(right, font=sf), sy1 - 20), right, font=sf, fill=(190, 215, 240))
-    d.rounded_rectangle([90, ly1, 1190, ly1 + 18], radius=8, fill=(70, 79, 98))                 # laptop base
+    d.rounded_rectangle([90, ly1, 1190, ly1 + 18], radius=8, fill=(70, 79, 98))
     d.rounded_rectangle([560, ly1, 720, ly1 + 7], radius=4, fill=(40, 46, 58))
     out = list(out or [])
     term_h = (34 + len(out) * 21 + 12) if out else 0
@@ -799,7 +767,7 @@ def laptop_setup(lines, fname, start, lang="python", out=None):
     n = max(len(lines), 10)
     size = min(22, int(geo["avail_h"] / (n * 1.42)))
     longest = max((len(l) for l in lines), default=1)
-    size = max(14, min(size, int((geo["code_w"] - 14) / ((longest + 3) * 0.603))))   # shrink so long lines fit
+    size = max(14, min(size, int((geo["code_w"] - 14) / ((longest + 3) * 0.603))))
     font = load_font(size, mono=True)
     return {"base": img, "geo": geo, "font": font, "lh": int(size * 1.42), "cw": font.getlength("M"),
             "toks": lex_lines(lines, lang), "lines": lines, "start": start, "out": out, "fname": fname}
@@ -811,7 +779,7 @@ def laptop_frame(lp, nchars, caption, idx, total, cursor=True, show_out=False):
     g, font, lh, cw, toks, start = lp["geo"], lp["font"], lp["lh"], lp["cw"], lp["toks"], lp["start"]
     x0 = g["sx0"] + 16
     gutter = int(cw * 3) + 14
-    # where is the cursor?
+
     rem, cur_n, cur_col = nchars, len(toks) - 1, None
     for n, lt in enumerate(toks):
         ln = sum(len(t) for t, _ in lt)
@@ -848,7 +816,7 @@ def laptop_frame(lp, nchars, caption, idx, total, cursor=True, show_out=False):
             d.text((g["sx0"] + 16, tt + 45 + k * 21), ln, font=mf, fill=TEXT)
     sf = load_font(13)
     d.text((g["sx0"] + 14, g["sy1"] - 20), f"Ln {start + cur_n}, Col {cur_col + 1}", font=sf, fill=(190, 215, 240))
-    # explanation panel under the laptop
+
     py0, py1 = 574, H - 16
     d.rounded_rectangle([60, py0, W - 60, py1], radius=14, fill=PANEL, outline=(31, 64, 96), width=2)
     d.rectangle([60, py0 + 14, 66, py1 - 14], fill=GOLD)
@@ -879,7 +847,6 @@ def draw_laptop_text(sc, idx, total):
 
 
 def typing_clip(sc, idx, total, mp3, out, tmp):
-    """The code appears character by character on the laptop while the lead-in is spoken."""
     lines = sc["lines"]
     lp = laptop_setup(lines, sc["fname"], sc["start"], sc.get("lang", "python"), sc.get("out"))
     nchars = max(1, sum(len(l) + 1 for l in lines) - 1)
@@ -898,7 +865,7 @@ def typing_clip(sc, idx, total, mp3, out, tmp):
         laptop_frame(lp, n, sc["speech"], idx, total, cursor=(k % 4 != 3 or k == nframes - 1),
                      show_out=(k == nframes - 1)).save(pth)
         paths.append(pth)
-    hold = 2.6 if sc.get("out") else 1.2        # the terminal output stays on screen a moment before the explanation
+    hold = 2.6 if sc.get("out") else 1.2
     listing = tmp / f"t{idx}.txt"
     with open(listing, "w", encoding="utf-8") as fh:
         for k, pth in enumerate(paths):
@@ -967,7 +934,6 @@ RENDER = {"title": draw_title, "section": draw_section, "text": draw_text, "lapt
           "table": draw_table, "end": draw_end}
 
 
-# ---------------------------------------------------------------- audio / video
 async def _edge(text, out, voice):
     import edge_tts
     await edge_tts.Communicate(text, voice, rate=RATE).save(out)
@@ -1013,21 +979,41 @@ def make_clip(png, mp3, out, pad):
     return dur
 
 
+def srt_time(sec):
+    ms = int(round(sec * 1000))
+    return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
+
+
+def write_subtitles(cues, path):
+    n, out = 0, []
+    for start, dur, text in cues:
+        pieces = chunk_text(text, 14) or [text]
+        total = sum(len(p.split()) for p in pieces) or 1
+        at = start
+        for p in pieces:
+            span = dur * len(p.split()) / total
+            n += 1
+            out.append(f"{n}\n{srt_time(at)} --> {srt_time(at + span)}\n{p}\n")
+            at += span
+    Path(path).write_text("\n".join(out), encoding="utf-8")
+
+
 def stamp(secs):
     secs = int(secs)
     return f"{secs // 60}:{secs % 60:02d}"
 
 
 def render_video(scenes, stem, title, desc, link):
-    """Render one list of scenes to out/<stem>.mp4 plus out/<stem>.description.txt."""
     tmp = Path(tempfile.mkdtemp(prefix="tut_"))
-    clips, t, chapters = [], 0.0, []
+    clips, t, chapters, cues = [], 0.0, [], []
     try:
         for i, sc in enumerate(scenes):
             png, mp3, clip = tmp / f"s{i}.png", tmp / f"a{i}.mp3", tmp / f"c{i}.mp4"
             synth(sc.get("speech", ""), mp3)
             if sc.get("chapter"):
                 chapters.append((t, sc["chapter"]))
+            if sc.get("speech", "").strip():
+                cues.append((t, probe_duration(mp3), sc["speech"]))
             if sc["kind"] == "code":
                 t += typing_clip(sc, i, len(scenes), mp3, clip, tmp)
             else:
@@ -1052,6 +1038,11 @@ def render_video(scenes, stem, title, desc, link):
                 lines += ["0:00 Intro"]
             lines += [f"{stamp(c_t)} {c}" for c_t, c in chapters]
         (OUT_DIR / f"{stem}.description.txt").write_text("\n".join(lines), encoding="utf-8")
+        write_subtitles(cues, OUT_DIR / f"{stem}.srt")
+        if chapters:
+            (OUT_DIR / f"{stem}.chapters.txt").write_text(
+                "\n".join(["0:00 Intro"] * (chapters[0][0] > 1) + [f"{stamp(c_t)} {c}" for c_t, c in chapters]), encoding="utf-8")
+        (OUT_DIR / f"{stem}.script.txt").write_text("\n\n".join(c[2] for c in cues), encoding="utf-8")
         log(f"  done: {final} ({final.stat().st_size / 1048576:.1f} MB, {t / 60:.1f} min)")
         return final
     finally:
@@ -1059,7 +1050,6 @@ def render_video(scenes, stem, title, desc, link):
 
 
 def estimate_minutes(scenes):
-    """Rough running time: narration at ~2.5 words a second plus the time spent typing code."""
     t = 0.0
     for sc in scenes:
         if sc["kind"] == "code":
@@ -1071,7 +1061,6 @@ def estimate_minutes(scenes):
 
 
 def split_videos(scenes, meta):
-    """One video per topic (each <h2> section that contains code), plus an overview for the opening sections."""
     title_sc, end_sc, body = scenes[0], scenes[-1], scenes[1:-1]
     groups = []
     for sc in body:
@@ -1085,7 +1074,7 @@ def split_videos(scenes, meta):
         elif not vids:
             overview += items
         else:
-            vids[-1]["scenes"] += items          # closing remarks go with the last topic
+            vids[-1]["scenes"] += items
     out = []
     if sum(len(x.get("speech", "").split()) for x in overview) >= 40:
         out.append(("overview", [title_sc] + overview + [end_sc]))
