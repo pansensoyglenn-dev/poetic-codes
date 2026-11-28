@@ -1,4 +1,4 @@
-SCRIPT_VERSION = "2026-11-28-tutorial-auto-v1"
+SCRIPT_VERSION = "2026-11-28-tutorial-auto-v2"
 import html as htmllib
 import json
 import os
@@ -18,7 +18,7 @@ PAGE = os.environ.get("PAGE", "").strip()
 MAX_ARTICLES = int(os.environ.get("MAX_ARTICLES", "1"))
 FORCE = os.environ.get("FORCE", "0") == "1"
 MIN_CODE = int(os.environ.get("MIN_CODE_BLOCKS", "1"))
-WEB_LIMIT = int(os.environ.get("WEB_LIMIT", "23500000"))
+WEB_LIMIT = int(os.environ.get("WEB_LIMIT", "45000000"))
 OUT = Path(os.environ.get("OUT", "out"))
 VIDEO_SCRIPT = os.environ.get("TUTORIAL_SCRIPT", str(Path(__file__).with_name("tutorial_video.py")))
 
