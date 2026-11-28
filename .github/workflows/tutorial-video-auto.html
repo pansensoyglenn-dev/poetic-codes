@@ -1,0 +1,71 @@
+name: Tutorial video (automatic)
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: "Leave empty to make videos automatically. Or type an article title to make its video now"
+        required: false
+        default: ""
+      page:
+        description: "Optional: a lesson page link instead of an article"
+        required: false
+        default: ""
+      redo:
+        description: "Make the video again even if the article already has one (yes or no)"
+        required: false
+        default: "no"
+  schedule:
+    - cron: "17 */4 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tutorial-video
+  cancel-in-progress: false
+
+jobs:
+  video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+      TITLE: ${{ github.event.inputs.title }}
+      PAGE: ${{ github.event.inputs.page }}
+      FORCE: ${{ github.event.inputs.redo == 'yes' && '1' || '0' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Look for articles that need a video
+        id: find
+        run: python scripts/tutorial_auto.py --check
+      - name: Install tools
+        if: steps.find.outputs.work == '1'
+        run: |
+          pip install edge-tts pillow pygments beautifulsoup4 lxml requests
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+      - name: Make the videos and attach them to the articles
+        if: steps.find.outputs.work == '1'
+        run: python scripts/tutorial_auto.py
+      - name: Make download links for YouTube
+        if: steps.find.outputs.work == '1'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ -f out/jobs.txt ] || exit 0
+          while read -r NAME; do
+            [ -n "$NAME" ] || continue
+            TAG="video-${NAME}-${GITHUB_RUN_NUMBER}"
+            FILES="out/${NAME}-for-youtube.mp4"
+            for X in srt chapters.txt youtube_description.txt script.txt; do
+              [ -f "out/${NAME}.${X}" ] && FILES="$FILES out/${NAME}.${X}"
+            done
+            gh release create "$TAG" $FILES --title "$NAME (download for YouTube)" \
+              --notes "Full-quality video. Tap the .mp4 to download it, then upload it in YouTube Studio. Title, chapters and captions are in the other files."
+            echo "### ${NAME}" >> "$GITHUB_STEP_SUMMARY"
+            echo "https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG}" >> "$GITHUB_STEP_SUMMARY"
+          done < out/jobs.txt
